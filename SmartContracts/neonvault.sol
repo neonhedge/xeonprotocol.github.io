@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity 0.8.4;
-//Options Functionality
+// NEON HEDGE - Shitcoin hedging platform. Hedge any ERC20 token.
+// We aim is to expand the scope of hedging beyond just BTC & ETH; to all tokens.
+
+//Call Options Functionality
 //1. to receive any ERC20 token as collateral/assets
 //2. Price these assets using getReserves
 //3. allow people to own the rights to withdrawing these tokens
@@ -10,22 +13,26 @@ pragma solidity 0.8.4;
 // - token withdrawals terms:
 //1. depositors withdraw after an option expires
 //2. withdrawal value = asset value + option cost
-//3. traders withdraw profits if strike is hit & value + cost => price
+//3. taker profits if strike is hit & value + cost => price
 
 //Equity Swaps Functionality
-//1. Equity swap contracts for both crypto tokens and stocks
-//2. Holder of assets must deposit tokens or in stables equivalent to the stocks
+//1. Equity swap contracts for any erc20 token
+//2. Holder of assets must deposit tokens as collateral
+//3. taker must also deposit collateral equal to the nortional value of the swap
+//4. buying or settlement is in base currency of underlying token
 
 //key functions
 // - value
 // - deposit
 // - withdraw
-// - create call option
-// - buy call option
-// - settle call option
-// - create equity swap
-// - buy swap
-// - conclude swap
+// - calculate fees
+// - get pair addresses of all erc20
+// - create hedge
+// - buy hedge
+// - settle hedge
+// - withdrawable versus locked
+// - get hedge details by id
+// - fetch hedges
 
 //key dependencies
 // 1. getReserves Uniswap
@@ -37,7 +44,9 @@ pragma solidity 0.8.4;
 // - lockedinuse is the current account (+-) on trades. it is also escrow
 // - only base currencies :weth, usdt and usdc contract balance tracked
 // - getUnderlyingValue is variable loss/gain equally for both parties
-// - whilst getOptionValue is a maximum loss/gain for the option buyer only (i.e. the real world call option, win all or lose all based on strike price)
+// - unified creating, buying and settling functions
+// - user taxes only calculated on settlement not deposits, withdrawals or buys
+// - contract taxes credited to fee wallet on buy (call option cost , & equity swao collateral is cost)
 
 import "./SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
@@ -55,27 +64,16 @@ contract POLContract {
       _;
     }
 
-    struct UserTokenBalance {
+    struct userBalance {
       uint256 deposited; // incremented on successful deposit
       uint256 withdrawn; // incremented on successful withdrawl
       uint256 lockedinuse; // adjust on hedge creation or buy or settle
     }
-    // map erc20 token to user address to release schedule
-    mapping(address => mapping(address => UserTokenBalance)) tokenUserMap;
-
-    struct Balances {
-      uint256 deposited; // incremented on successful deposit
-      uint256 withdrawn; // incremented on successful withdrawl
+    struct contractBalances {
+      uint256 deposited;
+      uint256 withdrawn;
     }
-    // track all erc20 token deposits and withdrawals
-    mapping(address => Balances) tokenAmountMap;
-    
-    // fast mapping to prevent array iteration in solidity
-    mapping(address => bool) public hedgedTokenLookup;
-
-    // ** call options and equity swaps both use this
     struct hedgingOption{
-      bool tool;//call option true, equity swap false
       address owner;
       address taker;
       address token;
@@ -92,23 +90,37 @@ contract POLContract {
       uint256 dt_settled;
       HedgeType hedgeType;
     }
-     enum HedgeType {CALL, SWAP}
-    //mapped array of all hedges 
+    enum HedgeType {CALL, SWAP}
+
+    // mapping of erc20 token balances for traders
+    mapping(address => mapping(address => userBalance)) userBalanceMap;
+
+    //mapping of user-hedge-Ids array for each erc20 token
+    mapping(address => mapping(address => uint[])) userHedgesForTokenMap;
+
+    // track all erc20 deposits and withdrawals to contract
+    mapping(address => contractBalances) contractBalanceMap;
+    
+    // mapped addresses erc20s hedged/traded
+    mapping(address => bool) public hedgedTokenLookup;
+
+    // mapping of all hedge storages by Id
     mapping(uint => hedgingOption) hedges;
 
-    //mapped array of all tokens transacted by user
-    mapping(address => address[]) public userhedgedTokens;
-
-    //mapped array of all hedges under specific address
+    // mapping of all hedges for each erc20
     mapping(address => uint[]) public hedgesArray;
 
-    //mapped array of all hedges for user
+    // mapping of all hedges for user by Id
     mapping(address => uint[]) myhedgesCreated;
     mapping(address => uint[]) myhedgesTaken;
     
-    //all hedges 
+    // mapping of all tokens transacted by user
+    mapping(address => address[]) public userhedgedTokens;
+    
+    // all hedges 
     uint[] private hedgesCreated;
     uint[] private hedgesTaken;
+
     // array of currently deposited tokens
     address[] public depositedTokens;
     
@@ -153,15 +165,18 @@ contract POLContract {
             depositedTokens.push(_token);
             hedgedTokenLookup[_token] = true;
         }
-        // global tracker for tokens on contract
-        tokenAmountMap[_token].deposited += _amount;
-        // personal tracker for user tokens on contract
-        UserTokenBalance storage uto = tokenUserMap[_token][msg.sender];
+        //global tracker for tokens on contract
+        contractBalanceMap[_token].deposited += _amount;
+        //personal tracker for user tokens on contract
+        userBalance storage uto = userBalanceMap[_token][msg.sender];
         uto.deposited = uto.deposited.add(_amount);
-        // on first deposit save address
+        //on first deposit save address
         if(uto.deposited == 0){
             userhedgedTokens[msg.sender].push(_token);
         }
+        //store in storage
+        userBalanceMap[_token][msg.sender] = uto;
+        //emit
         emit onDeposit(_token, _amount, msg.sender);
     }
 
@@ -175,10 +190,9 @@ contract POLContract {
         require(token != UNISWAP_ROUTER_ADDRESS, "Token address cannot be router address");
         require(token != UNISWAP_FACTORY_ADDRESS, "Token address cannot be factory address");
         require(token != address(this), "Token address cannot be contract address");
-        //save option
-        hedgingOption storage newOption = hedges[optionID];
+        //assign option values
+        hedgingOption memory newOption = hedges[optionID];
         newOption.owner = msg.sender;
-        newOption.tool = tool;
         newOption.token = token;
         newOption.status = 1;
         newOption.amount = amount;
@@ -187,69 +201,81 @@ contract POLContract {
         newOption.cost = cost;
         newOption.dt_expiry = deadline;
         newOption.dt_created = block.timestamp;
+        if(tool){
+          newOption.hedgeType = HedgeType.CALL
+        }else{
+          newOption.hedgeType = HedgeType.SWAP
+        }
+        //store;  only stores changed or added data to the struct
+        hedges[optionID] = newOption;
         //update user balances for token in hedge
-        UserTokenBalance storage hto = tokenUserMap[token][msg.sender];
+        userBalance memory hto = userBalanceMap[token][msg.sender];
+        //modify the property of hto in memory
         hto.lockedinuse += amount;
+        //store the updated hto value in storage
+        userBalanceMap[token][msg.sender] = hto;
         //save hedges
         myhedgesCreated[msg.sender].push(optionID);
         hedgesCreated.push(optionID);
         optionID ++;
         //push hedge into array under address
         hedgesArray[token].push(optionID);
-        userhedgedTokens[msg.sender].push(token);
         //emit
         emit hedgeCreated(token, optionID, amount, tool, cost);
     }
 
-    //buy with the paired currency to avoid base currency loss
-    //ie vela/weth in weth, vela/usdt pair in usdt
-    //when buying a call option or quity swap; cost deposited by taker should be reference equity i.e. underlying token
-
-    function buyHedge(uint256 _optionId, uint256 cost) public {
-        hedgingOption storage option = hedges[_optionId];
-        UserTokenBalance storage utt = tokenUserMap[option.paired][msg.sender];
-        require(getWithdrawableBalance(option.paired, msg.sender) >= cost, 'Insufficient balance');
+    //when buying a hedge; cost deposited by taker should be in underlying token
+    //for call options;
+    //cost is P2P agreed, based on expected value vs current, by owner & taker
+    //for equity swaps;
+    //current value of hedged tokens should equal buyer collateral
+    //cost = collateral + 1% of hedged assets (to cover price deviation)
+    function buyEquitySwap(uint256 _optionId) public {
+        hedgingOption memory hedge = hedges[_optionId];
+        userBalance memory stk = userBalanceMap[hedge.paired][msg.sender];
+        require(getWithdrawableBalance(hedge.paired, msg.sender) >= hedge.cost, 'Insufficient base balance');
         require(_optionId < optionID, "Invalid option ID");
-        require(cost > 0 && cost == option.cost, 'Your attempting to buy option with 0 base tokens');
-        //take fee from deal
-        uint256 fee = calculateFee(cost);
-        uint256 amountIn = cost.sub(fee);
-        require(IERC20(option.paired).transferFrom(address(this), address(feeReserveAddress), fee), 'Transfer failed');
+        //calc fee from deal
+        uint256 fee = calculateFee(hedge.cost);
+        uint256 amountIn = hedge.cost.sub(fee);
+        //transfer fee
+        require(IERC20(hedge.paired).transferFrom(address(this), address(feeReserveAddress), fee), 'Transfer failed');
         //taker lockedinuse increases until settlement
-        utt.lockedinuse = utt.lockedinuse.add(amountIn);
-        option.taker = msg.sender;
-        option.status = 2;
-        (option.startvalue, ) = getUnderlyingValue(option.token, option.amount);
-        require(option.startvalue > 0,'math error whilst getting price');
-        option.dt_started = block.timestamp;
-        //use array to save hedges and getter function to iterate index ranges to retrieve
-        //from index[x] to index[y]
+        stk.lockedinuse = stk.lockedinuse.add(amountIn);
+        hedge.taker = msg.sender;
+        hedge.status = 2;
+        (hedge.startvalue, ) = getUnderlyingValue(hedge.token, hedge.amount);
+        require(hedge.startvalue > 0,'math error whilst getting price');
+        hedge.dt_started = block.timestamp;
+        //store updated structs
+        userBalanceMap[hedge.paired][msg.sender] = stk;
+        hedges[_optionId] = hedge;
+        //update user hedges taken array
         myhedgesTaken[msg.sender].push(_optionId);
         hedgesTaken.push(_optionId);
         takesCount +1;
         //emit
-        emit hedgePurchased(option.token, _optionId, option.amount, option.tool, msg.sender);
+        emit hedgePurchased(hedge.token, _optionId, hedge.amount, hedge.tool, msg.sender);
     }
+    
     //settle hedge
-    //this is a variable loss approach not textbook maximum loss approach as calculated using 'getOptionValue' function
-    //as such these are techically equity swaps with strike price = nortional value
-    //strike value = start value, notional value = start value
-    //funds moved from locked in use to deposit balances
+    //this is a variable loss approach not textbook maximum loss approach, as calculated using 'getOptionValue' function
+    //techically equity swaps have max loss of collateral at max strike, option calls have max loss of cost only
+    //strike value = strike price, start price = start value
+    //funds moved from locked in use to deposit balances for both parties, settlement in base or equivalent underlying
     function settleHedge(uint256 _optionId) external {
         require(_optionId < optionID, "Invalid option ID");
-        hedgingOption storage option = hedges[_optionId];
+        hedgingOption memory option = hedges[_optionId];
         require(block.timestamp >= option.dt_expiry, "Option has not expired");
 
         uint256 startValue = option.startvalue;
         (uint256 underlying, ) = getUnderlyingValue(option.token, option.amount);
         uint256 payOff;
 
-        UserTokenBalance storage oti = tokenUserMap[option.paired][option.owner];
-        UserTokenBalance storage otiU = tokenUserMap[option.token][option.owner];
-        UserTokenBalance storage tti = tokenUserMap[option.paired][option.taker];
-        UserTokenBalance storage ttiU = tokenUserMap[option.token][option.taker];
-        UserTokenBalance storage ccBT = tokenUserMap[option.paired][address(this)];
-        UserTokenBalance storage ccUT = tokenUserMap[option.token][address(this)];
+        userBalance memory oti = userBalanceMap[option.paired][option.owner];
+        userBalance memory otiU = userBalanceMap[option.token][option.owner];
+        userBalance memory tti = userBalanceMap[option.paired][option.taker];
+        userBalance memory ttiU = userBalanceMap[option.token][option.taker];
 
         if (option.hedgeType == HedgeType.CALL) {
           //in the money, factor cost in calculation of call option profit
@@ -266,17 +292,12 @@ contract POLContract {
                 //move money - pay cost to owner from taker
                 tti.lockedinuse -= option.cost;
                 oti.deposited += option.cost.sub(calculateFee(option.cost));
-                //move money - credit taxes
-                ccUT.deposited += calculateFee(tokensDue);
-                ccBT.deposited += calculateFee(option.cost);
                 //restore initials - continue from balance of oti.lockedinuse
                 oti.lockedinuse -= option.amount - tokensDue;
             } else {
                 //move money - maximum loss of base cost to taker only, owner loses nothing
                 tti.lockedinuse -= option.cost;
                 oti.deposited += option.cost.sub(calculateFee(option.cost));
-                //move money - credit taxes in bases only
-                ccBT.deposited += calculateFee(option.cost);
                 //restore initials - continue from balance of oti.lockedinuse
                 oti.lockedinuse -= option.amount;
             }
@@ -297,13 +318,10 @@ contract POLContract {
                 //move money - price is up: equiv loss of cost from taker to owner
                 tti.lockedinuse -= option.cost;
                 oti.deposited += option.cost.sub(calculateFee(option.cost));
-                //move money - credit taxes
-                ccUT.deposited += calculateFee(tokensDue);
-                ccBT.deposited += calculateFee(option.cost);
                 //restore initials - continue from balance of oti.lockedinuse
                 oti.lockedinuse -= option.amount - tokensDue;                
             } else {
-              //owner loses nothing, max loss to taker collateral only
+                //owner loses nothing, max loss to taker collateral only
                 payOff = startValue.sub(underlying);
                 //max loss config
                 if(payOff > option.cost){
@@ -312,28 +330,33 @@ contract POLContract {
                 //price is down: taker loses equiv in base
                 tti.lockedinuse -= payOff;
                 oti.deposited += payOff.sub(calculateFee(option.cost));
-                //move money - credit taxes
-                ccBT.deposited += calculateFee(option.cost);
                 //restore initials - continue from balance of oti.lockedinuse
                 oti.lockedinuse -= option.amount;
             }
         }
+        //update hedge
         option.status = 3;
         option.endvalue = underlying;
         option.dt_settled = block.timestamp;
+        //store updated structs
+        userBalanceMap[option.paired][option.owner] = oti;
+        uuserBalanceMap[option.token][option.owner] = otiU;
+        userBalanceMap[option.paired][option.taker] = tti;
+        userBalanceMap[option.token][option.taker] = ttiU;
+        hedges[_optionId] = option;        
         //emit
         emit hedgeSettled(option.token, _optionId, option.amount, payOff, underlying);
     }
 
     function withdrawToken(address token, uint256 amount) public {
         uint256 withdrawable = getWithdrawableBalance(token, msg.sender);
-        UserTokenBalance storage uto = tokenUserMap[token][msg.sender];
+        userBalance memory uto = userBalanceMap[token][msg.sender];
         uto.withdrawn = uto.withdrawn.add(amount);
         require(withdrawable >= amount, "Insufficient balance.");
         require(amount <= withdrawable, 'Your attempting to withdraw more than you have available');
         require(IERC20(token).transfer(msg.sender, amount), 'Transfer failed');
-        // track each token amounts
-        tokenAmountMap[token].withdrawn -= amount;
+        //track each token amounts
+        contractBalanceMap[token].withdrawn -= amount;
         //emit
         emit onWithdraw(token, amount, msg.sender);
     }
@@ -388,13 +411,13 @@ contract POLContract {
     }
     
     function getWithdrawableBalance(address token, address user) public view returns (uint256) {
-      UserTokenBalance storage uto = tokenUserMap[token][address(user)];
+      userBalance memory uto = userBalanceMap[token][address(user)];
       uint256 withdrawable = 0;
       withdrawable = withdrawable.add(uto.deposited).sub(uto.withdrawn).sub(uto.lockedinuse);
       return withdrawable;
     }
 
-    // zero knowledge pair addr generator
+    //zero knowledge pair addr generator
     function getPairAddressZK(address tokenAddress) public view returns (address pairAddress, address pairedCurrency) {
       IUniswapV2Factory factory = IUniswapV2Factory(UNISWAP_FACTORY_ADDRESS);
       address wethPairAddress = factory.getPair(tokenAddress, wethAddress);
@@ -411,14 +434,14 @@ contract POLContract {
       }
     }
 
-    // users base balances
+    //users base balances
     function getUserBases(address user) public view returns (uint256,uint256,uint256) {
-      return (tokenUserMap[wethAddress][user].deposited, tokenUserMap[usdtAddress][user].deposited, tokenUserMap[usdcAddress][user].deposited);
+      return (userBalanceMap[wethAddress][user].deposited, userBalanceMap[usdtAddress][user].deposited, userBalanceMap[usdcAddress][user].deposited);
     }
 
     //users token balances
-    function getUserTokenBalances (address token, address user) public view returns (uint256, uint256, uint256, uint256, uint256, address) {
-      UserTokenBalance storage uto = tokenUserMap[address(token)][address(user)];
+    function getuserBalances (address token, address user) public view returns (uint256, uint256, uint256, uint256, uint256, address) {
+      userBalance memory uto = userBalanceMap[address(token)][address(user)];
       uint256 deposited = uto.deposited;
       uint256 withdrawn = uto.withdrawn;
       uint256 lockedinuse = uto.lockedinuse;
@@ -429,7 +452,7 @@ contract POLContract {
     
     //contract balances
     function getTokenBalances(address _token) public view returns (uint256, uint256) {
-        return (tokenAmountMap[_token].deposited, tokenAmountMap[_token].withdrawn);
+        return (contractBalanceMap[_token].deposited, contractBalanceMap[_token].withdrawn);
     }
 
     //user tokens transacted/interacted with
@@ -461,7 +484,7 @@ contract POLContract {
     }
 
     function getHedgeDetails(uint256 _optionId) public view returns (hedgingOption memory) {
-        hedgingOption storage hedge = hedges[_optionId];
+        hedgingOption memory hedge = hedges[_optionId];
         require(hedge.owner != address(0), "Option does not exist.");
         return hedge;
     }
@@ -503,11 +526,11 @@ contract POLContract {
       uint256 fee = calculateFee(msg.value);
       uint256 amountIn = amount.sub(fee);
       // track each token amounts
-      tokenAmountMap[_tokenAddress].deposited += amountIn;
+      contractBalanceMap[_tokenAddress].deposited += amountIn;
       //track users added tokens
       userTokenMap[msg.sender][_tokenAddress] = true;
       // token mapped to user
-      UserTokenBalance storage uto = tokenUserMap[_tokenAddress][msg.sender];
+      userBalance storage uto = userBalanceMap[_tokenAddress][msg.sender];
       uto.deposited = uto.deposited.add(amountIn);
       baseETH_in += amountIn;
       emit onDeposit(_tokenAddress, msg.value, fee);
