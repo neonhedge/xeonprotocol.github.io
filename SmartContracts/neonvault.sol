@@ -143,8 +143,8 @@ contract POLContract {
     event Received(address, uint);
     event onDeposit(address indexed token, uint256 indexed amount, address indexed wallet);
     event onWithdraw(address indexed token, uint256 indexed amount, address indexed wallet);
-    event hedgeCreated(address indexed token, uint256 indexed optionId, uint256 amount, bool indexed tool, uint256 cost);
-    event hedgePurchased(address indexed token, uint256 indexed optionId, uint256 amount, bool indexed tool, address buyer);
+    event hedgeCreated(address indexed token, uint256 indexed optionId, uint256 amount, HedgeType hedgeType, uint256 cost);
+    event hedgePurchased(address indexed token, uint256 indexed optionId, uint256 amount, HedgeType hedgeType, address buyer);
     event hedgeSettled(address indexed token, uint256 indexed optionId, uint256 amount, uint256 indexed payOff, uint256 endvalue);
     
     constructor() public {
@@ -202,9 +202,9 @@ contract POLContract {
         newOption.dt_expiry = deadline;
         newOption.dt_created = block.timestamp;
         if(tool){
-          newOption.hedgeType = HedgeType.CALL
+          newOption.hedgeType = HedgeType.CALL;
         }else{
-          newOption.hedgeType = HedgeType.SWAP
+          newOption.hedgeType = HedgeType.SWAP;
         }
         //store;  only stores changed or added data to the struct
         hedges[optionID] = newOption;
@@ -221,7 +221,7 @@ contract POLContract {
         //push hedge into array under address
         hedgesArray[token].push(optionID);
         //emit
-        emit hedgeCreated(token, optionID, amount, tool, cost);
+        emit hedgeCreated(token, optionID, amount, newOption.hedgeType, cost);
     }
 
     //when buying a hedge; cost deposited by taker should be in underlying token
@@ -255,7 +255,7 @@ contract POLContract {
         hedgesTaken.push(_optionId);
         takesCount +1;
         //emit
-        emit hedgePurchased(hedge.token, _optionId, hedge.amount, hedge.tool, msg.sender);
+        emit hedgePurchased(hedge.token, _optionId, hedge.amount, hedge.hedgeType, msg.sender);
     }
     
     //settle hedge
@@ -276,6 +276,8 @@ contract POLContract {
         userBalance memory otiU = userBalanceMap[option.token][option.owner];
         userBalance memory tti = userBalanceMap[option.paired][option.taker];
         userBalance memory ttiU = userBalanceMap[option.token][option.taker];
+        userBalance storage ccBT = userBalanceMap[option.paired][address(this)];
+        userBalance storage ccUT = userBalanceMap[option.token][address(this)];
 
         if (option.hedgeType == HedgeType.CALL) {
           //in the money, factor cost in calculation of call option profit
@@ -285,7 +287,6 @@ contract POLContract {
                 //convert to equiv tokens lockedinuse by owner, factor fee
                 (uint256 priceNow, ) = getUnderlyingValue(option.token, 1);
                 uint256 tokensDue = payOff.div(priceNow);
-                tokensDue = (tokensDue).sub(calculateFee(tokensDue));
                 //move money - take full gains from owner, give taxed amount to taker, pocket difference
                 otiU.lockedinuse -= tokensDue;
                 ttiU.deposited += tokensDue.sub(calculateFee(tokensDue));
@@ -294,18 +295,22 @@ contract POLContract {
                 oti.deposited += option.cost.sub(calculateFee(option.cost));
                 //restore initials - continue from balance of oti.lockedinuse
                 oti.lockedinuse -= option.amount - tokensDue;
+                //move money - take taxes from settlement
+                ccUT.deposited += calculateFee(tokensDue);
+                ccBT.deposited += calculateFee(option.cost);
             } else {
                 //move money - maximum loss of base cost to taker only, owner loses nothing
                 tti.lockedinuse -= option.cost;
                 oti.deposited += option.cost.sub(calculateFee(option.cost));
                 //restore initials - continue from balance of oti.lockedinuse
                 oti.lockedinuse -= option.amount;
+                //move money - take taxes from settlement
+                ccBT.deposited += calculateFee(option.cost);
             }
         } else {
             if (underlying > startValue) {
                 payOff = underlying.sub(startValue);
                 //max loss config
-                //cant sub fee here, it distorts owner tokens deducted & double taxes taker
                 if(payOff > option.cost){
                   payOff = option.cost;
                 }
@@ -315,11 +320,14 @@ contract POLContract {
                 //move money - take full gains from owner, give taxed to taker, pocket difference
                 otiU.lockedinuse -= tokensDue;
                 ttiU.deposited += tokensDue.sub(calculateFee(tokensDue));
-                //move money - price is up: equiv loss of cost from taker to owner
+                //move money - price is up: moving equiv cost lost from taker to owner
                 tti.lockedinuse -= option.cost;
                 oti.deposited += option.cost.sub(calculateFee(option.cost));
                 //restore initials - continue from balance of oti.lockedinuse
-                oti.lockedinuse -= option.amount - tokensDue;                
+                oti.lockedinuse -= option.amount - tokensDue;
+                //move money - take taxes from settlement
+                ccUT.deposited += calculateFee(tokensDue);
+                ccBT.deposited += calculateFee(option.cost);
             } else {
                 //owner loses nothing, max loss to taker collateral only
                 payOff = startValue.sub(underlying);
@@ -332,6 +340,8 @@ contract POLContract {
                 oti.deposited += payOff.sub(calculateFee(option.cost));
                 //restore initials - continue from balance of oti.lockedinuse
                 oti.lockedinuse -= option.amount;
+                //move money - take taxes from settlement
+                ccBT.deposited += calculateFee(option.cost);
             }
         }
         //update hedge
@@ -340,7 +350,7 @@ contract POLContract {
         option.dt_settled = block.timestamp;
         //store updated structs
         userBalanceMap[option.paired][option.owner] = oti;
-        uuserBalanceMap[option.token][option.owner] = otiU;
+        userBalanceMap[option.token][option.owner] = otiU;
         userBalanceMap[option.paired][option.taker] = tti;
         userBalanceMap[option.token][option.taker] = ttiU;
         hedges[_optionId] = option;        
@@ -458,6 +468,16 @@ contract POLContract {
     //user tokens transacted/interacted with
     function getUserTokensList(address user) public view returns(address[] memory){
       return userhedgedTokens[user];
+    }
+    
+    //all hedges created
+    function getAllHedgesCreated() public view returns(uint[] memory){
+      return hedgesCreated;
+    }
+
+    //all hedges taken
+    function getAllHedgesTaken() public view returns(uint[] memory){
+      return hedgesTaken;
     }
 
     //user hedges created
