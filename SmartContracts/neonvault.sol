@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity 0.8.4;
-// NEON HEDGE - Shitcoin hedging platform. Hedge any ERC20 token.
-// We aim is to expand the scope of hedging beyond just BTC & ETH; to all tokens.
+// NEON HEDGE - hedge any ERC20 token. borrow with any ERC20 token.
+// We aim is to push hedging and crypto lending beyond just BTC & ETH as underlying assets.
 
 //Call Options Functionality
 //1. to receive any ERC20 token as collateral/assets
@@ -55,15 +55,23 @@ import "@uniswap/v2-core/contracts/interfaces/IUniswapV2Factory.sol";
 import "@uniswap/v2-core/contracts/interfaces/IUniswapV2Pair.sol";
 import "@uniswap/v2-periphery/contracts/interfaces/IUniswapV2Router02.sol";
 
-contract POLContract {
+contract HEDGEFUND {
 
     using SafeMath for uint256;
 
+    bool private locked = false;
+    bool private isExecuting;
+
+    modifier nonReentrant() {
+        require(!isExecuting, "Function is currently being executed");
+        isExecuting = true;
+        _;
+        isExecuting = false;
+    }
     modifier onlyOwner {
       require(msg.sender == owner, "You are not the owner");
       _;
     }
-
     struct userBalance {
       uint256 deposited; // incremented on successful deposit
       uint256 withdrawn; // incremented on successful withdrawl
@@ -82,7 +90,6 @@ contract POLContract {
       uint256 amount;
       uint256 startvalue;
       uint256 endvalue;
-      uint256 strike;
       uint256 cost;
       uint256 dt_created;
       uint256 dt_started;
@@ -93,36 +100,37 @@ contract POLContract {
     enum HedgeType {CALL, SWAP}
 
     // mapping of erc20 token balances for traders
-    mapping(address => mapping(address => userBalance)) userBalanceMap;
+    mapping(address => mapping(address => userBalance)) private userBalanceMap;
 
     //mapping of user-hedge-Ids array for each erc20 token
-    mapping(address => mapping(address => uint[])) userHedgesForTokenMap;
+    mapping(address => mapping(address => uint[])) private userHedgesForTokenMap;
 
     // track all erc20 deposits and withdrawals to contract
-    mapping(address => contractBalances) contractBalanceMap;
+    mapping(address => contractBalances) public contractBalanceMap;
     
     // mapped addresses erc20s hedged/traded
     mapping(address => bool) public hedgedTokenLookup;
 
     // mapping of all hedge storages by Id
-    mapping(uint => hedgingOption) hedges;
+    mapping(uint => hedgingOption) private hedgeMap;
 
     // mapping of all hedges for each erc20
-    mapping(address => uint[]) public hedgesArray;
+    mapping(address => uint[]) private tokenHedges;
 
     // mapping of all hedges for user by Id
+    mapping(address => uint[]) myhedgesHistory;
     mapping(address => uint[]) myhedgesCreated;
     mapping(address => uint[]) myhedgesTaken;
     
     // mapping of all tokens transacted by user
-    mapping(address => address[]) public userhedgedTokens;
+    mapping(address => address[]) public userERC20s;
     
-    // all hedges 
+    // all hedges
     uint[] private hedgesCreated;
     uint[] private hedgesTaken;
 
     // array of currently deposited tokens
-    address[] public depositedTokens;
+    address[] private depositedTokens;
     
     uint public optionID;
     uint public takesCount;
@@ -134,8 +142,8 @@ contract POLContract {
     address public feeReserveAddress;
     address public owner;
 
-    address public constant UNISWAP_FACTORY_ADDRESS = 0xc35DADB65012eC5796536bD9864eD8773aBc74C4;
-    address public constant UNISWAP_ROUTER_ADDRESS = 0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506;
+    address private constant UNISWAP_FACTORY_ADDRESS = 0xc35DADB65012eC5796536bD9864eD8773aBc74C4;
+    address private constant UNISWAP_ROUTER_ADDRESS = 0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506;
     address public wethAddress;
     address public usdtAddress;
     address public usdcAddress;
@@ -152,6 +160,7 @@ contract POLContract {
       wethAddress = router.WETH();
       usdtAddress = 0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9; // USDT address on Arb
       usdcAddress = 0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d; // USDC address on Arb
+      //BUSD 0xeD24FC36d5Ee211Ea25A80239Fb8C4Cfd80f12Ee
 
       feeNumerator = 3;
       feeDenominator = 1000;
@@ -160,44 +169,50 @@ contract POLContract {
     }
 
     function depositToken(address _token, uint256 _amount) public payable {
-        require(_amount > 0, 'Your attempting to trasfer 0 tokens');
+        require(_amount > 0, "Your attempting to transfer 0 tokens");
         if (!hedgedTokenLookup[_token]) {
             depositedTokens.push(_token);
             hedgedTokenLookup[_token] = true;
         }
+        uint256 allowance = IERC20(_token).allowance(msg.sender, address(this));
+        require(allowance >= _amount, "You need to set a higher allowance");
+        //transfer tokens from sender to contract
+        require(IERC20(_token).transferFrom(msg.sender, address(this), _amount), "Transfer failed");
         //global tracker for tokens on contract
         contractBalanceMap[_token].deposited += _amount;
         //personal tracker for user tokens on contract
         userBalance storage uto = userBalanceMap[_token][msg.sender];
-        uto.deposited = uto.deposited.add(_amount);
-        //on first deposit save address
         if(uto.deposited == 0){
-            userhedgedTokens[msg.sender].push(_token);
+          userERC20s[msg.sender].push(_token);
         }
+        uto.deposited = uto.deposited.add(_amount);
         //store in storage
         userBalanceMap[_token][msg.sender] = uto;
         //emit
         emit onDeposit(_token, _amount, msg.sender);
     }
 
-    function createHedge(bool tool, address token, uint256 amount, uint256 strike, uint256 cost, uint256 deadline) public {
-        require(amount > 0, 'Your attempting to create with 0 tokens');
+    //covers both call options and equity swaps
+    //uses withdrawable balance as the current account
+    //cap the max cost of option to the market standard for X years
+    //this virtually means we have x max year options based on this cap
+    //and we can calculate proportion for a lessor duration
+    function createHedge(bool tool, address token, uint256 amount, uint256 cost, uint256 deadline) public nonReentrant  {
+        require(!locked, "Function is locked"); locked = true;
+        require(amount > 0 && cost > 0 && deadline > block.timestamp, "Invalid option parameters");
         uint256 withdrawable = getWithdrawableBalance(token, msg.sender);
-        require(withdrawable > 0, 'Insufficient balance');
-        require(strike > 0, "Strike price must be greater than zero");
-        require(cost > 0, "Cost must be greater than zero");
+        require(withdrawable > 0, "Insufficient free balance");
         require(token != address(0), "Token address cannot be zero");
         require(token != UNISWAP_ROUTER_ADDRESS, "Token address cannot be router address");
         require(token != UNISWAP_FACTORY_ADDRESS, "Token address cannot be factory address");
         require(token != address(this), "Token address cannot be contract address");
         //assign option values
-        hedgingOption memory newOption = hedges[optionID];
+        hedgingOption memory newOption = hedgeMap[optionID];
         newOption.owner = msg.sender;
         newOption.token = token;
         newOption.status = 1;
         newOption.amount = amount;
         (, newOption.paired) = getUnderlyingValue(token, amount);
-        newOption.strike = strike;
         newOption.cost = cost;
         newOption.dt_expiry = deadline;
         newOption.dt_created = block.timestamp;
@@ -206,8 +221,8 @@ contract POLContract {
         }else{
           newOption.hedgeType = HedgeType.SWAP;
         }
-        //store;  only stores changed or added data to the struct
-        hedges[optionID] = newOption;
+        //store; only stores changed or added data to the struct
+        hedgeMap[optionID] = newOption;
         //update user balances for token in hedge
         userBalance memory hto = userBalanceMap[token][msg.sender];
         //modify the property of hto in memory
@@ -215,57 +230,63 @@ contract POLContract {
         //store the updated hto value in storage
         userBalanceMap[token][msg.sender] = hto;
         //save hedges
+        myhedgesHistory[msg.sender].push(optionID);
         myhedgesCreated[msg.sender].push(optionID);
         hedgesCreated.push(optionID);
-        optionID ++;
-        //push hedge into array under address
-        hedgesArray[token].push(optionID);
+        tokenHedges[token].push(optionID);
         //emit
         emit hedgeCreated(token, optionID, amount, newOption.hedgeType, cost);
+        optionID ++;
+        locked = false;
     }
 
     //when buying a hedge; cost deposited by taker should be in underlying token
-    //for call options;
-    //cost is P2P agreed, based on expected value vs current, by owner & taker
-    //for equity swaps;
-    //current value of hedged tokens should equal buyer collateral
-    //cost = collateral + 1% of hedged assets (to cover price deviation)
-    function buyEquitySwap(uint256 _optionId) public {
-        hedgingOption memory hedge = hedges[_optionId];
+    //cost is OTC, factors in current value vs expected value by the time the hedge expires
+    //points to note; for call options cost can be high during high demand, and low during low demand for options
+    //for equity swaps; current value of hedged tokens should equal buyer collateral in base tokens
+    //& cost = swap value cap
+    //the maximum cost for a call option compared to value is?? we use it as cost cap for each option on creation and buying
+    function buyHedge(uint256 _optionId) public nonReentrant{
+        require(!locked, "Function is locked"); locked = true;
+        hedgingOption memory hedge = hedgeMap[_optionId];
         userBalance memory stk = userBalanceMap[hedge.paired][msg.sender];
-        require(getWithdrawableBalance(hedge.paired, msg.sender) >= hedge.cost, 'Insufficient base balance');
-        require(_optionId < optionID, "Invalid option ID");
-        //calc fee from deal
-        uint256 fee = calculateFee(hedge.cost);
-        uint256 amountIn = hedge.cost.sub(fee);
-        //transfer fee
-        require(IERC20(hedge.paired).transferFrom(address(this), address(feeReserveAddress), fee), 'Transfer failed');
+        require(getWithdrawableBalance(hedge.paired, msg.sender) >= hedge.cost, "Insufficient free base balance");
+        require(_optionId < optionID && msg.sender != hedge.owner, "Invalid option ID | Owner cant buy");
         //taker lockedinuse increases until settlement
-        stk.lockedinuse = stk.lockedinuse.add(amountIn);
+        stk.lockedinuse = stk.lockedinuse.add(hedge.cost);
         hedge.taker = msg.sender;
         hedge.status = 2;
-        (hedge.startvalue, ) = getUnderlyingValue(hedge.token, hedge.amount);
-        require(hedge.startvalue > 0,'math error whilst getting price');
+        if (hedge.hedgeType == HedgeType.CALL) {
+          (hedge.startvalue, ) = getUnderlyingValue(hedge.token, hedge.amount);
+          hedge.startvalue += hedge.cost;
+        }else{
+          (hedge.startvalue, ) = getUnderlyingValue(hedge.token, hedge.amount);
+        }
+        //price check
+        require(hedge.startvalue > 0,"Math error whilst getting price");
         hedge.dt_started = block.timestamp;
         //store updated structs
         userBalanceMap[hedge.paired][msg.sender] = stk;
-        hedges[_optionId] = hedge;
+        hedgeMap[_optionId] = hedge;
         //update user hedges taken array
+        myhedgesHistory[msg.sender].push(optionID);
         myhedgesTaken[msg.sender].push(_optionId);
         hedgesTaken.push(_optionId);
         takesCount +1;
         //emit
         emit hedgePurchased(hedge.token, _optionId, hedge.amount, hedge.hedgeType, msg.sender);
+        locked = false;
     }
     
     //settle hedge
     //this is a variable loss approach not textbook maximum loss approach, as calculated using 'getOptionValue' function
     //techically equity swaps have max loss of collateral at max strike, option calls have max loss of cost only
-    //strike value = strike price, start price = start value
+    //strike value is starting value when option was bought, less start value to determine if in the money
     //funds moved from locked in use to deposit balances for both parties, settlement in base or equivalent underlying
+    //fees are collected on settlement and credited to contract balances
     function settleHedge(uint256 _optionId) external {
         require(_optionId < optionID, "Invalid option ID");
-        hedgingOption memory option = hedges[_optionId];
+        hedgingOption memory option = hedgeMap[_optionId];
         require(block.timestamp >= option.dt_expiry, "Option has not expired");
 
         uint256 startValue = option.startvalue;
@@ -353,7 +374,7 @@ contract POLContract {
         userBalanceMap[option.token][option.owner] = otiU;
         userBalanceMap[option.paired][option.taker] = tti;
         userBalanceMap[option.token][option.taker] = ttiU;
-        hedges[_optionId] = option;        
+        hedgeMap[_optionId] = option;        
         //emit
         emit hedgeSettled(option.token, _optionId, option.amount, payOff, underlying);
     }
@@ -362,29 +383,30 @@ contract POLContract {
         uint256 withdrawable = getWithdrawableBalance(token, msg.sender);
         userBalance memory uto = userBalanceMap[token][msg.sender];
         uto.withdrawn = uto.withdrawn.add(amount);
-        require(withdrawable >= amount, "Insufficient balance.");
-        require(amount <= withdrawable, 'Your attempting to withdraw more than you have available');
-        require(IERC20(token).transfer(msg.sender, amount), 'Transfer failed');
+        require(withdrawable >= amount, "Insufficient balance");
+        require(amount <= withdrawable, "Your attempting to withdraw more than you have available");
+        require(IERC20(token).transfer(msg.sender, amount), "Transfer failed");
         //track each token amounts
         contractBalanceMap[token].withdrawn -= amount;
         //emit
         emit onWithdraw(token, amount, msg.sender);
     }
 
-    //utility helpers and getters
+    //utility functions
     function updateFee(uint256 numerator, uint256 denominator) onlyOwner public {
       feeNumerator = numerator;
       feeDenominator = denominator;
     }
     
     function calculateFee(uint256 amount) public view returns (uint256){
-      require(amount >= feeDenominator, 'Deposit is too small');    
+      require(amount >= feeDenominator, "Deposit is too small");    
       uint256 amountInLarge = amount.mul(feeDenominator.sub(feeNumerator));
       uint256 amountIn = amountInLarge.div(feeDenominator);
       uint256 fee = amount.sub(amountIn);
       return (fee);
     }
 
+    //Getter functions start here.
     struct PairInfo {
         address pairAddress;
         address pairedCurrency;
@@ -396,18 +418,18 @@ contract POLContract {
         uint256 token1Decimals;
     }
     
+    //get base value for amount of tokens, or value in paired currency.
+    //base value is always the pair address of the token provided. get pair using UniswapV2 standard.
     function getUnderlyingValue(address _tokenAddress, uint256 _tokenAmount) public view returns (uint256, address) {
         PairInfo memory pairInfo;
         (pairInfo.pairAddress, pairInfo.pairedCurrency) = getPairAddressZK(_tokenAddress);
         IUniswapV2Pair pair = IUniswapV2Pair(pairInfo.pairAddress);
-        //base currency check
         if (pair.token0() == address(0) || pair.token1() == address(0)) { return (0, address(0));}
         pairInfo.token0 = ERC20(pair.token0());
         pairInfo.token1 = ERC20(pair.token1());
         (pairInfo.reserve0, pairInfo.reserve1, ) = pair.getReserves();
         pairInfo.token0Decimals = uint256(10) ** pairInfo.token0.decimals();
         pairInfo.token1Decimals = uint256(10) ** pairInfo.token1.decimals();
-
         uint256 tokenValue;
         if (_tokenAddress == pair.token0()) {
             tokenValue = (_tokenAmount * pairInfo.reserve1 * pairInfo.token0Decimals) / (pairInfo.reserve0 * pairInfo.token1Decimals);
@@ -420,6 +442,7 @@ contract POLContract {
         }
     }
     
+    //current account 
     function getWithdrawableBalance(address token, address user) public view returns (uint256) {
       userBalance memory uto = userBalanceMap[token][address(user)];
       uint256 withdrawable = 0;
@@ -450,44 +473,97 @@ contract POLContract {
     }
 
     //users token balances
-    function getuserBalances (address token, address user) public view returns (uint256, uint256, uint256, uint256, uint256, address) {
+    function getuserTokenBalances (address token, address user) public view returns (uint256, uint256, uint256, uint256, uint256, address) {
       userBalance memory uto = userBalanceMap[address(token)][address(user)];
       uint256 deposited = uto.deposited;
       uint256 withdrawn = uto.withdrawn;
       uint256 lockedinuse = uto.lockedinuse;
       uint256 withdrawableBalance = getWithdrawableBalance(token, msg.sender);
-      (uint256 withdrawableValue, address paired) = getUnderlyingValue(token, withdrawableBalance);
+      uint256 withdrawableValue; address paired;
+      if(token != wethAddress && token != usdtAddress && token != usdcAddress ){
+        (withdrawableValue, paired) = getUnderlyingValue(token, withdrawableBalance);
+      }else{
+        (withdrawableValue, paired) = (withdrawableBalance, address(0));
+      }
       return (deposited, withdrawn, lockedinuse, withdrawableBalance, withdrawableValue, paired);
     }
     
     //contract balances
-    function getTokenBalances(address _token) public view returns (uint256, uint256) {
+    function getContractTokenBalances(address _token) public view returns (uint256, uint256) {
         return (contractBalanceMap[_token].deposited, contractBalanceMap[_token].withdrawn);
     }
 
-    //user tokens transacted/interacted with
-    function getUserTokensList(address user) public view returns(address[] memory){
-      return userhedgedTokens[user];
-    }
-    
-    //all hedges created
-    function getAllHedgesCreated() public view returns(uint[] memory){
-      return hedgesCreated;
+    //user's erc20 history interacted or traded
+    function getUserHistory(address user, uint limit) public view returns (address[] memory) {
+        address[] memory tokens = userERC20s[user];
+        uint length = tokens.length;
+        uint actualLimit = length < limit ? length : limit;
+        address[] memory result = new address[](actualLimit);
+        for (uint i = 0; i < actualLimit; i++) {
+            result[i] = tokens[i];
+        }
+        return result;
     }
 
-    //all hedges taken
-    function getAllHedgesTaken() public view returns(uint[] memory){
-      return hedgesTaken;
+    //user hedge positions created/taken
+    function getUserPositionsSubset(address user, uint limit) public view returns (uint[] memory) {
+        uint[] memory fullArray = myhedgesHistory[user];
+        uint length = fullArray.length;
+        uint actualLimit = length < limit ? length : limit;
+        uint[] memory subset = new uint[](actualLimit);
+        for (uint i = 0; i < actualLimit; i++) {
+            subset[i] = fullArray[i];
+        }
+        return subset;
     }
 
     //user hedges created
-    function getUserHedgesCreated(address user) public view returns(uint[] memory){
-      return myhedgesCreated[user];
+    function getUserHedgesCreated(address user, uint limit) public view returns(uint[] memory){
+        uint[] memory fullArray = myhedgesCreated[user];
+        uint length = fullArray.length;
+        uint actualLimit = length < limit ? length : limit;
+        uint[] memory subset = new uint[](actualLimit);
+        for (uint i = 0; i < actualLimit; i++) {
+            subset[i] = fullArray[i];
+        }
+        return subset;
     }
 
     //user hedges taken
-    function getUserHedgesTaken(address user) public view returns(uint[] memory){
-      return myhedgesTaken[user];
+    function getUserHedgesTaken(address user, uint limit) public view returns(uint[] memory){
+        uint[] memory fullArray = myhedgesTaken[user];
+        uint length = fullArray.length;
+        uint actualLimit = length < limit ? length : limit;
+        uint[] memory subset = new uint[](actualLimit);
+        for (uint i = 0; i < actualLimit; i++) {
+            subset[i] = fullArray[i];
+        }
+        return subset;
+    }
+
+    //all hedges created
+    function getAllHedges(uint limit) public view returns (uint[] memory) {
+        uint[] memory allHedges = hedgesCreated;
+        uint[] memory result = new uint[](limit);
+        for (uint i = 0; i < limit && i < allHedges.length; i++) {
+            result[i] = allHedges[i];
+        }
+        return result;
+    }
+
+    //all hedges taken
+    function getAllHedgesTaken(uint limit) public view returns (uint[] memory) {
+        uint[] memory allHedgesTaken = hedgesTaken;
+        uint[] memory result = new uint[](limit);
+        for (uint i = 0; i < limit && i < allHedgesTaken.length; i++) {
+            result[i] = allHedgesTaken[i];
+        }
+        return result;
+    }
+
+    //deposited tokens
+    function getDepositedTokens() external view returns (address[] memory) {
+        return depositedTokens;
     }
 
     function getDepositedTokensLength() external view returns (uint) {
@@ -496,16 +572,16 @@ contract POLContract {
 
     //hedges array under specific token
     function getTokenHedgesCount(address _token) public view returns (uint256) {
-        return hedgesArray[_token].length;
+        return tokenHedges[_token].length;
     }
 
     function getTokenHedgesList(address _token) public view returns(uint[] memory){
-      return hedgesArray[_token];
+      return tokenHedges[_token];
     }
 
     function getHedgeDetails(uint256 _optionId) public view returns (hedgingOption memory) {
-        hedgingOption memory hedge = hedges[_optionId];
-        require(hedge.owner != address(0), "Option does not exist.");
+        hedgingOption memory hedge = hedgeMap[_optionId];
+        require(hedge.owner != address(0), "Option does not exist");
         return hedge;
     }
 
@@ -513,7 +589,7 @@ contract POLContract {
     function getHedgesFromXY(address token, uint x, uint y) public view returns (uint[] memory) {
         uint[] memory result = new uint[](y - x + 1);
         for (uint i = x; i <= y; i++) {
-            result[i - x] = hedgesArray[token][i];
+            result[i - x] = tokenHedges[token][i];
         }
         return result;
     }
@@ -528,7 +604,6 @@ contract POLContract {
         }
         return result;
     }
-    
 
     receive() external payable {
         emit Received(msg.sender, msg.value);
