@@ -124,6 +124,9 @@ contract HEDGEFUND {
     
     // mapping of all tokens transacted by user
     mapping(address => address[]) public userERC20s;
+
+     // mapping bookmarks of each user
+    mapping(address => mapping(uint256 => bool)) public bookmarks;
     
     // all hedges
     uint[] private hedgesCreated;
@@ -154,7 +157,9 @@ contract HEDGEFUND {
     event hedgeCreated(address indexed token, uint256 indexed optionId, uint256 amount, HedgeType hedgeType, uint256 cost);
     event hedgePurchased(address indexed token, uint256 indexed optionId, uint256 amount, HedgeType hedgeType, address buyer);
     event hedgeSettled(address indexed token, uint256 indexed optionId, uint256 amount, uint256 indexed payOff, uint256 endvalue);
-    
+    event bookmarkToggle(address indexed user, uint256 hedgeId, bool bookmarked);
+
+
     constructor() public {
       IUniswapV2Router02 router = IUniswapV2Router02(UNISWAP_ROUTER_ADDRESS);
       wethAddress = router.WETH();
@@ -197,8 +202,9 @@ contract HEDGEFUND {
     //cap the max cost of option to the market standard for X years
     //this virtually means we have x max year options based on this cap
     //and we can calculate proportion for a lessor duration
-    function createHedge(bool tool, address token, uint256 amount, uint256 cost, uint256 deadline) public nonReentrant  {
-        require(!locked, "Function is locked"); locked = true;
+    function createHedge(bool tool, address token, uint256 amount, uint256 cost, uint256 deadline) public nonReentrant {
+        require(!locked, "Function is locked");
+        locked = true;
         require(amount > 0 && cost > 0 && deadline > block.timestamp, "Invalid option parameters");
         uint256 withdrawable = getWithdrawableBalance(token, msg.sender);
         require(withdrawable > 0, "Insufficient free balance");
@@ -206,8 +212,9 @@ contract HEDGEFUND {
         require(token != UNISWAP_ROUTER_ADDRESS, "Token address cannot be router address");
         require(token != UNISWAP_FACTORY_ADDRESS, "Token address cannot be factory address");
         require(token != address(this), "Token address cannot be contract address");
-        //assign option values
-        hedgingOption memory newOption = hedgeMap[optionID];
+
+        // Assign option values directly to the struct
+        hedgingOption storage newOption = hedgeMap[optionID];
         newOption.owner = msg.sender;
         newOption.token = token;
         newOption.status = 1;
@@ -216,65 +223,73 @@ contract HEDGEFUND {
         newOption.cost = cost;
         newOption.dt_expiry = deadline;
         newOption.dt_created = block.timestamp;
-        if(tool){
-          newOption.hedgeType = HedgeType.CALL;
-        }else{
-          newOption.hedgeType = HedgeType.SWAP;
-        }
-        //store; only stores changed or added data to the struct
+        newOption.hedgeType = tool ? HedgeType.CALL : HedgeType.SWAP; // Use ternary operator for conditional assignment
+
+        // Store only if data has changed or added to the struct
         hedgeMap[optionID] = newOption;
-        //update user balances for token in hedge
-        userBalance memory hto = userBalanceMap[token][msg.sender];
-        //modify the property of hto in memory
-        hto.lockedinuse += amount;
-        //store the updated hto value in storage
-        userBalanceMap[token][msg.sender] = hto;
-        //save hedges
+
+        // Update user balances for token in hedge
+        userBalance storage hto = userBalanceMap[token][msg.sender]; // Use storage instead of memory for hto
+        hto.lockedinuse += amount; // Modify the property of hto directly in storage
+        // Emit events and update arrays
         myhedgesHistory[msg.sender].push(optionID);
         myhedgesCreated[msg.sender].push(optionID);
         hedgesCreated.push(optionID);
         tokenHedges[token].push(optionID);
-        //emit
         emit hedgeCreated(token, optionID, amount, newOption.hedgeType, cost);
-        optionID ++;
+
+        optionID++;
         locked = false;
     }
 
-    //when buying a hedge; cost deposited by taker should be in underlying token
-    //cost is OTC, factors in current value vs expected value by the time the hedge expires
-    //points to note; for call options cost can be high during high demand, and low during low demand for options
-    //for equity swaps; current value of hedged tokens should equal buyer collateral in base tokens
-    //& cost = swap value cap
-    //the maximum cost for a call option compared to value is?? we use it as cost cap for each option on creation and buying
-    function buyHedge(uint256 _optionId) public nonReentrant{
-        require(!locked, "Function is locked"); locked = true;
-        hedgingOption memory hedge = hedgeMap[_optionId];
-        userBalance memory stk = userBalanceMap[hedge.paired][msg.sender];
+    function buyHedge(uint256 _optionId) public nonReentrant {
+        // Use the nonReentrant modifier to prevent reentrancy attacks 
+        // Locked as a manual lock to prevent concurrent execution of the same function by multiple users.
+        require(!locked, "Function is locked");
+        locked = true;
+
+        hedgingOption storage hedge = hedgeMap[_optionId];
+        userBalance storage stk = userBalanceMap[hedge.paired][msg.sender];
+
+        // Check if the user has sufficient free base balance to buy the hedge
         require(getWithdrawableBalance(hedge.paired, msg.sender) >= hedge.cost, "Insufficient free base balance");
+
+        // Check if the option ID is valid and the buyer is not the owner of the hedge
         require(_optionId < optionID && msg.sender != hedge.owner, "Invalid option ID | Owner cant buy");
-        //taker lockedinuse increases until settlement
+
+        // Update the taker's lockedinuse balance
         stk.lockedinuse = stk.lockedinuse.add(hedge.cost);
+
+        // Update the hedge details
         hedge.taker = msg.sender;
         hedge.status = 2;
+
+        // Calculate the start value based on the hedge type
+        (hedge.startvalue, ) = getUnderlyingValue(hedge.token, hedge.amount);
         if (hedge.hedgeType == HedgeType.CALL) {
-          (hedge.startvalue, ) = getUnderlyingValue(hedge.token, hedge.amount);
-          hedge.startvalue += hedge.cost;
-        }else{
-          (hedge.startvalue, ) = getUnderlyingValue(hedge.token, hedge.amount);
+            hedge.startvalue += hedge.cost;
         }
-        //price check
-        require(hedge.startvalue > 0,"Math error whilst getting price");
+
+        // Check if the start value is greater than 0
+        require(hedge.startvalue > 0, "Math error whilst getting price");
+
+        // Update the hedge timestamp
         hedge.dt_started = block.timestamp;
-        //store updated structs
+
+        // Store the updated structs
         userBalanceMap[hedge.paired][msg.sender] = stk;
         hedgeMap[_optionId] = hedge;
-        //update user hedges taken array
+
+        // Update user's hedges taken array and hedgesTaken count
         myhedgesHistory[msg.sender].push(optionID);
         myhedgesTaken[msg.sender].push(_optionId);
         hedgesTaken.push(_optionId);
-        takesCount +1;
-        //emit
+        takesCount += 1;
+
+        // Emit the hedgePurchased event
         emit hedgePurchased(hedge.token, _optionId, hedge.amount, hedge.hedgeType, msg.sender);
+
+        // Unlock the function
         locked = false;
     }
     
@@ -284,84 +299,92 @@ contract HEDGEFUND {
     //strike value is starting value when option was bought, less start value to determine if in the money
     //funds moved from locked in use to deposit balances for both parties, settlement in base or equivalent underlying
     //fees are collected on settlement and credited to contract balances
+    struct HedgeInfo {
+        uint256 payOff;
+        uint256 priceNow;
+        uint256 tokensDue;
+        uint256 tokenfee;
+        uint256 costfee;
+    }
     function settleHedge(uint256 _optionId) external {
+        HedgeInfo memory hedgeInfo;
         require(_optionId < optionID, "Invalid option ID");
-        hedgingOption memory option = hedgeMap[_optionId];
+        hedgingOption storage option = hedgeMap[_optionId];
         require(block.timestamp >= option.dt_expiry, "Option has not expired");
 
+        // Initialize local variables
+        bool isPayOffGreaterThanCost;
         uint256 startValue = option.startvalue;
         (uint256 underlying, ) = getUnderlyingValue(option.token, option.amount);
-        uint256 payOff;
-
-        userBalance memory oti = userBalanceMap[option.paired][option.owner];
-        userBalance memory otiU = userBalanceMap[option.token][option.owner];
-        userBalance memory tti = userBalanceMap[option.paired][option.taker];
-        userBalance memory ttiU = userBalanceMap[option.token][option.taker];
+        
+        // Get the user balances for the owner, taker, and contract
+        userBalance storage oti = userBalanceMap[option.paired][option.owner];
+        userBalance storage otiU = userBalanceMap[option.token][option.owner];
+        userBalance storage tti = userBalanceMap[option.paired][option.taker];
+        userBalance storage ttiU = userBalanceMap[option.token][option.taker];
         userBalance storage ccBT = userBalanceMap[option.paired][address(this)];
         userBalance storage ccUT = userBalanceMap[option.token][address(this)];
 
         if (option.hedgeType == HedgeType.CALL) {
-          //in the money, factor cost in calculation of call option profit
-            if (underlying > startValue.add(option.cost)) {
-                //taker profit = underlying - cost - strikevalue
-                payOff = underlying.sub(startValue.add(option.cost));
-                //convert to equiv tokens lockedinuse by owner, factor fee
-                (uint256 priceNow, ) = getUnderlyingValue(option.token, 1);
-                uint256 tokensDue = payOff.div(priceNow);
-                //move money - take full gains from owner, give taxed amount to taker, pocket difference
-                otiU.lockedinuse -= tokensDue;
-                ttiU.deposited += tokensDue.sub(calculateFee(tokensDue));
-                //move money - pay cost to owner from taker
+            isPayOffGreaterThanCost = underlying > startValue.add(option.cost);
+            if (isPayOffGreaterThanCost) {
+                // Taker profit = underlying - cost - strikevalue
+                hedgeInfo.payOff = underlying.sub(startValue.add(option.cost));
+                // Convert to equiv tokens lockedinuse by owner, factor fee
+                (hedgeInfo.priceNow, ) = getUnderlyingValue(option.token, 1);
+                hedgeInfo.tokensDue = hedgeInfo.payOff.div(hedgeInfo.priceNow);
+                uint256 tokenfee = calculateFee(hedgeInfo.tokensDue);
+                uint256 costfee = calculateFee(option.cost);
+                // Move money - take full gains from owner, give taxed amount to taker, pocket difference
+                otiU.lockedinuse -= hedgeInfo.tokensDue;
+                ttiU.deposited += hedgeInfo.tokensDue.sub(tokenfee);
+                // Move money - pay cost to owner from taker
                 tti.lockedinuse -= option.cost;
-                oti.deposited += option.cost.sub(calculateFee(option.cost));
-                //restore initials - continue from balance of oti.lockedinuse
-                oti.lockedinuse -= option.amount - tokensDue;
-                //move money - take taxes from settlement
-                ccUT.deposited += calculateFee(tokensDue);
-                ccBT.deposited += calculateFee(option.cost);
+                oti.deposited += option.cost.sub(costfee);
+                // Restore initials - continue from balance of oti.lockedinuse
+                oti.lockedinuse -= option.amount - hedgeInfo.tokensDue;
+                // Move money - take taxes from settlement
+                ccUT.deposited += tokenfee;
+                ccBT.deposited += costfee;
             } else {
-                //move money - maximum loss of base cost to taker only, owner loses nothing
+                // Move money - maximum loss of base cost to taker only, owner loses nothing
                 tti.lockedinuse -= option.cost;
                 oti.deposited += option.cost.sub(calculateFee(option.cost));
-                //restore initials - continue from balance of oti.lockedinuse
+                // Restore initials - continue from balance of oti.lockedinuse
                 oti.lockedinuse -= option.amount;
-                //move money - take taxes from settlement
+                // Move money - take taxes from settlement
                 ccBT.deposited += calculateFee(option.cost);
             }
         } else {
             if (underlying > startValue) {
-                payOff = underlying.sub(startValue);
-                //max loss config
-                if(payOff > option.cost){
-                  payOff = option.cost;
+                hedgeInfo.payOff = underlying.sub(startValue);
+                // Max loss config
+                if (hedgeInfo.payOff > option.cost) {
+                    hedgeInfo.payOff = option.cost;
                 }
-                //taker gains underlying tokens equiv
-                (uint256 priceNow, ) = getUnderlyingValue(option.token, 1);
-                uint256 tokensDue = payOff.div(priceNow);
-                //move money - take full gains from owner, give taxed to taker, pocket difference
+                // Taker gains underlying tokens equiv
+                (hedgeInfo.priceNow, ) = getUnderlyingValue(option.token, 1);
+                uint256 tokensDue = hedgeInfo.payOff.div(hedgeInfo.priceNow);
+                uint256 tokenfee = calculateFee(hedgeInfo.tokensDue);
+                uint256 costfee = calculateFee(option.cost);
+                // Move money - take full gains from owner, give taxed amount to taker, pocket difference
                 otiU.lockedinuse -= tokensDue;
-                ttiU.deposited += tokensDue.sub(calculateFee(tokensDue));
-                //move money - price is up: moving equiv cost lost from taker to owner
+                ttiU.deposited += tokensDue.sub(tokenfee);
+                // Move money - pay cost to owner from taker
+                tti.lockedinuse -= option.cost;
+                oti.deposited += option.cost.sub(costfee);
+                // Restore initials - continue from balance of oti.lockedinuse
+                oti.lockedinuse -= option.amount - tokensDue;
+                // Move money - take taxes from settlement
+                ccUT.deposited += tokenfee;
+                ccBT.deposited += costfee;
+            } else {
+                // Move money - maximum loss of base cost to taker only, owner loses nothing
                 tti.lockedinuse -= option.cost;
                 oti.deposited += option.cost.sub(calculateFee(option.cost));
-                //restore initials - continue from balance of oti.lockedinuse
-                oti.lockedinuse -= option.amount - tokensDue;
-                //move money - take taxes from settlement
-                ccUT.deposited += calculateFee(tokensDue);
-                ccBT.deposited += calculateFee(option.cost);
-            } else {
-                //owner loses nothing, max loss to taker collateral only
-                payOff = startValue.sub(underlying);
-                //max loss config
-                if(payOff > option.cost){
-                  payOff = option.cost;
-                }
-                //price is down: taker loses equiv in base
-                tti.lockedinuse -= payOff;
-                oti.deposited += payOff.sub(calculateFee(option.cost));
-                //restore initials - continue from balance of oti.lockedinuse
+                // Restore initials - continue from balance of oti.lockedinuse
                 oti.lockedinuse -= option.amount;
-                //move money - take taxes from settlement
+                // Move money - take taxes from settlement
                 ccBT.deposited += calculateFee(option.cost);
             }
         }
@@ -369,26 +392,25 @@ contract HEDGEFUND {
         option.status = 3;
         option.endvalue = underlying;
         option.dt_settled = block.timestamp;
-        //store updated structs
-        userBalanceMap[option.paired][option.owner] = oti;
-        userBalanceMap[option.token][option.owner] = otiU;
-        userBalanceMap[option.paired][option.taker] = tti;
-        userBalanceMap[option.token][option.taker] = ttiU;
-        hedgeMap[_optionId] = option;        
         //emit
-        emit hedgeSettled(option.token, _optionId, option.amount, payOff, underlying);
+        emit hedgeSettled(option.token, _optionId, option.amount, hedgeInfo.payOff, underlying);
     }
 
     function withdrawToken(address token, uint256 amount) public {
+        userBalance storage uto = userBalanceMap[token][msg.sender];
         uint256 withdrawable = getWithdrawableBalance(token, msg.sender);
-        userBalance memory uto = userBalanceMap[token][msg.sender];
+        require(amount <= withdrawable, "You are attempting to withdraw more than you have available");
+
+        // Update user's withdrawn balance
         uto.withdrawn = uto.withdrawn.add(amount);
-        require(withdrawable >= amount, "Insufficient balance");
-        require(amount <= withdrawable, "Your attempting to withdraw more than you have available");
+
+        // Transfer tokens to the user
         require(IERC20(token).transfer(msg.sender, amount), "Transfer failed");
-        //track each token amounts
+
+        // Update contract's withdrawn balance for the token
         contractBalanceMap[token].withdrawn -= amount;
-        //emit
+
+        // Emit withdrawal event
         emit onWithdraw(token, amount, msg.sender);
     }
 
@@ -404,6 +426,17 @@ contract HEDGEFUND {
       uint256 amountIn = amountInLarge.div(feeDenominator);
       uint256 fee = amount.sub(amountIn);
       return (fee);
+    }
+
+    // Function to toggle a bookmark for a Hedge by its ID
+    function bookmarkHedge(uint256 _optionId) public {
+        bool bookmarked = bookmarks[msg.sender][_optionId];
+        bookmarks[msg.sender][_optionId] = !bookmarked;
+        emit bookmarkToggle(msg.sender, _optionId, !bookmarked);
+    }
+
+    function getBookmark(address user, uint256 _optionId) public view returns (bool) {
+        return bookmarks[user][_optionId];
     }
 
     //Getter functions start here.
@@ -493,70 +526,126 @@ contract HEDGEFUND {
         return (contractBalanceMap[_token].deposited, contractBalanceMap[_token].withdrawn);
     }
 
-    //user's erc20 history interacted or traded
-    function getUserHistory(address user, uint limit) public view returns (address[] memory) {
+    /*user's erc20 history interacted or traded: targeted search
+    ~ user is the address of the user whose history is being searched in the userERC20s mapping. 
+    ~ startIndex is used to specify the starting index in the tokens array for the user, 
+    ~ and limit is used to determine the number of items to search. 
+    ~ The loop iterates from startIndex to startIndex + actualLimit (exclusive) 
+    ~ and populates the result array with the values from tokens starting from index startIndex to startIndex + actualLimit - 1. 
+    ~ The startIndex is used to calculate the correct index in the result array by subtracting it from the loop variable i. 
+    ~ Additionally, a check is added to ensure that startIndex is within the bounds of the tokens array using a require statement, 
+    ~ and actualLimit is calculated as the minimum of length - startIndex and limit to avoid exceeding the length of tokens.
+    */
+    function getUserHistory(address user, uint startIndex, uint limit) public view returns (address[] memory) {
         address[] memory tokens = userERC20s[user];
         uint length = tokens.length;
-        uint actualLimit = length < limit ? length : limit;
+        require(startIndex < length, "Invalid start index");
+        uint actualLimit = length - startIndex < limit ? length - startIndex : limit;
         address[] memory result = new address[](actualLimit);
-        for (uint i = 0; i < actualLimit; i++) {
-            result[i] = tokens[i];
+        for (uint i = startIndex; i < startIndex + actualLimit; i++) {
+            result[i - startIndex] = tokens[i];
         }
         return result;
     }
 
-    //user hedge positions created/taken
-    function getUserPositionsSubset(address user, uint limit) public view returns (uint[] memory) {
+    /*user hedge positions created/taken: targeted search
+    ~  user is the address of the user whose positions are being searched in the myhedgesHistory mapping. 
+    ~ startIndex is used to specify the starting index in the fullArray for the user, 
+    ~ and limit is used to determine the number of items to search. 
+    ~ The loop iterates from startIndex to startIndex + actualLimit (exclusive) 
+    ~ and populates the subset array with the values from fullArray starting from index startIndex to startIndex + actualLimit - 1. 
+    ~ The startIndex is used to calculate the correct index in the subset array by subtracting it from the loop variable i. 
+    ~ Additionally, a check is added to ensure that startIndex is within the bounds of the fullArray using a require statement, 
+    ~ and actualLimit is calculated as the minimum of length - startIndex and limit to avoid exceeding the length of fullArray.
+    */
+        function getUserPositionsSubset(address user, uint startIndex, uint limit) public view returns (uint[] memory) {
         uint[] memory fullArray = myhedgesHistory[user];
         uint length = fullArray.length;
-        uint actualLimit = length < limit ? length : limit;
+        require(startIndex < length, "Invalid start index");
+        uint actualLimit = length - startIndex < limit ? length - startIndex : limit;
         uint[] memory subset = new uint[](actualLimit);
-        for (uint i = 0; i < actualLimit; i++) {
-            subset[i] = fullArray[i];
+        for (uint i = startIndex; i < startIndex + actualLimit; i++) {
+            subset[i - startIndex] = fullArray[i];
         }
         return subset;
     }
 
-    //user hedges created
-    function getUserHedgesCreated(address user, uint limit) public view returns(uint[] memory){
+    /*user hedges created: targeted search
+    ~ user is the address of the user whose hedges are being searched in the myhedgesCreated mapping. 
+    ~ startIndex is used to specify the starting index in the fullArray for the user, 
+    ~ and limit is used to determine the number of items to search. 
+    ~ The loop iterates from startIndex to startIndex + actualLimit (exclusive) 
+    ~ and populates the subset array with the values from fullArray starting from index startIndex to startIndex + actualLimit - 1. 
+    ~ The startIndex is used to calculate the correct index in the subset array by subtracting it from the loop variable i. 
+    ~ Additionally, a check is added to ensure that startIndex is within the bounds of the fullArray using a require statement, 
+    ~ and actualLimit is calculated as the minimum of length - startIndex and limit to avoid exceeding the length of fullArray.
+    */
+    function getUserHedgesCreated(address user, uint startIndex, uint limit) public view returns(uint[] memory){
         uint[] memory fullArray = myhedgesCreated[user];
         uint length = fullArray.length;
-        uint actualLimit = length < limit ? length : limit;
+        require(startIndex < length, "Invalid start index");
+        uint actualLimit = length - startIndex < limit ? length - startIndex : limit;
         uint[] memory subset = new uint[](actualLimit);
-        for (uint i = 0; i < actualLimit; i++) {
-            subset[i] = fullArray[i];
+        for (uint i = startIndex; i < startIndex + actualLimit; i++) {
+            subset[i - startIndex] = fullArray[i];
         }
         return subset;
     }
 
-    //user hedges taken
-    function getUserHedgesTaken(address user, uint limit) public view returns(uint[] memory){
+    /*user hedges taken: targeted search
+     ~ user is the address of the user whose hedges are being searched in the myhedgesTaken mapping. 
+     ~ startIndex is used to specify the starting index in the fullArray for the user, and limit is used to determine the number of items to search. 
+     ~ The loop iterates from startIndex to startIndex + actualLimit (exclusive) 
+     ~ and populates the subset array with the values from fullArray starting from index startIndex to startIndex + actualLimit - 1. 
+     ~ The startIndex is used to calculate the correct index in the subset array by subtracting it from the loop variable i. 
+     ~ Additionally, a check is added to ensure that startIndex is within the bounds of the fullArray using a require statement, 
+     ~ and actualLimit is calculated as the minimum of length - startIndex and limit to avoid exceeding the length of fullArray.
+     */
+    function getUserHedgesTaken(address user, uint startIndex, uint limit) public view returns(uint[] memory){
         uint[] memory fullArray = myhedgesTaken[user];
         uint length = fullArray.length;
-        uint actualLimit = length < limit ? length : limit;
+        require(startIndex < length, "Invalid start index");
+        uint actualLimit = length - startIndex < limit ? length - startIndex : limit;
         uint[] memory subset = new uint[](actualLimit);
-        for (uint i = 0; i < actualLimit; i++) {
-            subset[i] = fullArray[i];
+        for (uint i = startIndex; i < startIndex + actualLimit; i++) {
+            subset[i - startIndex] = fullArray[i];
         }
         return subset;
     }
 
-    //all hedges created
-    function getAllHedges(uint limit) public view returns (uint[] memory) {
+
+    /* all hedges created: targeted search
+    ~ startIndex is used to specify the starting index in the hedgesCreated array, 
+    ~ and limit is used to determine the number of items to search. 
+    ~ The loop iterates from startIndex to startIndex + limit (exclusive) 
+    ~ and populates the result array with the values from hedgesCreated array starting from index startIndex to startIndex + limit - 1. 
+    ~ The startIndex is used to calculate the correct index in the result array by subtracting it from the loop variable i. 
+    ~ Additionally, a check is added to ensure that startIndex is within the bounds of the hedgesCreated array using a require statement.
+    */
+    function getAllHedges(uint startIndex, uint limit) public view returns (uint[] memory) {
+        require(startIndex < hedgesCreated.length, "Invalid start index");
         uint[] memory allHedges = hedgesCreated;
         uint[] memory result = new uint[](limit);
-        for (uint i = 0; i < limit && i < allHedges.length; i++) {
-            result[i] = allHedges[i];
+        for (uint i = startIndex; i < startIndex + limit && i < allHedges.length; i++) {
+            result[i - startIndex] = allHedges[i];
         }
         return result;
     }
 
-    //all hedges taken
-    function getAllHedgesTaken(uint limit) public view returns (uint[] memory) {
+    /* all hedges taken: targeted search
+    ~ startIndex is used to specify the starting index in the hedgesTaken array, 
+    ~ and limit is used to determine the number of items to search. 
+    ~ The loop iterates from startIndex to startIndex + limit (exclusive) 
+    ~ and populates the result array with the values from hedgesTaken array starting from index startIndex to startIndex + limit - 1. 
+    ~ The startIndex is used to calculate the correct index in the result array by subtracting it from the loop variable i. 
+    ~ Additionally, a check is added to ensure that startIndex is within the bounds of the hedgesTaken array using a require statement.
+    */
+    function getAllHedgesTaken(uint startIndex, uint limit) public view returns (uint[] memory) {
+        require(startIndex < hedgesTaken.length, "Invalid start index");
         uint[] memory allHedgesTaken = hedgesTaken;
         uint[] memory result = new uint[](limit);
-        for (uint i = 0; i < limit && i < allHedgesTaken.length; i++) {
-            result[i] = allHedgesTaken[i];
+        for (uint i = startIndex; i < startIndex + limit && i < allHedgesTaken.length; i++) {
+            result[i - startIndex] = allHedgesTaken[i];
         }
         return result;
     }
@@ -575,8 +664,24 @@ contract HEDGEFUND {
         return tokenHedges[_token].length;
     }
 
-    function getTokenHedgesList(address _token) public view returns(uint[] memory){
-      return tokenHedges[_token];
+    /* hedges list under specific ERC20 address: targeted search
+    ~ the startIndex parameter is used to specify the starting index of the array, 
+    ~ and the limit parameter is used to determine the number of items to include in the result. 
+    ~ The endIndex is calculated as the minimum value between startIndex + limit and the length of the full array to ensure that it does not exceed the array bounds. 
+    ~ Then, the actualLimit is calculated as the difference between endIndex and startIndex, 
+    ~ which represents the actual number of items in the result array. 
+    ~ Finally, the subset array is populated with the elements from the fullArray using the calculated indices based on startIndex and actualLimit.
+    */
+    function getTokenHedgesList(address _token, uint startIndex, uint limit) public view returns(uint[] memory){
+        uint[] memory fullArray = tokenHedges[_token];
+        require(startIndex < fullArray.length, "Start index exceeds array length");
+        uint endIndex = startIndex + limit > fullArray.length ? fullArray.length : startIndex + limit;
+        uint actualLimit = endIndex - startIndex;
+        uint[] memory subset = new uint[](actualLimit);
+        for (uint i = 0; i < actualLimit; i++) {
+            subset[i] = fullArray[startIndex + i];
+        }
+        return subset;
     }
 
     function getHedgeDetails(uint256 _optionId) public view returns (hedgingOption memory) {
@@ -608,7 +713,6 @@ contract HEDGEFUND {
     receive() external payable {
         emit Received(msg.sender, msg.value);
     }
-    
 }
 
 
