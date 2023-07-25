@@ -1,0 +1,1228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<!-- favicons -->
+	<link rel="apple-touch-icon" sizes="180x180" href="./imgs/fav/apple-touch-icon.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="./imgs/fav/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="./imgs/fav/favicon-16x16.png">
+	<link rel="manifest" href="./imgs/fav/site.webmanifest">
+	<link rel="mask-icon" href="./imgs/fav/safari-pinned-tab.svg" color="#5bbad5">
+	<link rel="shortcut icon" href="./imgs/fav/favicon.ico">
+	<meta name="msapplication-TileColor" content="#da532c">
+	<meta name="msapplication-config" content="./imgs/fav/browserconfig.xml">
+	<meta name="theme-color" content="#ffffff">
+	<meta name="author" content="Kaveman-x">
+	<!-- title page & SEO meta -->
+	<title>NEON - Wallet</title>
+	<meta name="description" content="neon hedge is a universal ERC20 hedging and lending platform">
+	<meta name="keywords" content="erc20, crypto, hedging, call options, swaps, lending, collateral, website, html, html5, css">
+	<!-- google fonts -->
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700&family=Space+Grotesk:wght@300;400;600;700&display=swap" rel="stylesheet">
+	<!-- css -->
+	<link rel="stylesheet" href="./css/fontawesome.min.css" />
+	<link rel="stylesheet" href="./css/aos.css" />
+	<link rel="stylesheet" href="./css/style.css">
+	<link rel="stylesheet" href="./css/custom.css">
+	<!-- portfolio windows styling -->
+	<link rel="stylesheet" type="text/css" href="css/_menu.css">
+	<link rel="stylesheet" type="text/css" href="css/_portfolio.css">
+	<link rel="stylesheet" type="text/css" href="css/sweetalert/sweetalert.css">
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+	<!-- portfolio windows scripts -->
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js"></script>
+	<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+	<script type="text/javascript" src="js/_walletstatus.js"></script>
+	<script type="text/javascript" src="js/_portfolio.js"></script>
+	<script type="application/javascript" src="js/sweetalert/sweetalert.min.js"></script>
+</head>
+
+<body>
+	<!-- Accessibility: Skip to content -->
+	<a href="#main" class="skip-to-content">Skip to content</a>
+	<!-- Preload page -->
+	<div id="preload">neon hedge loading...</div>
+
+
+	<header>
+		<div class="container grid" data-aos="fade-up">
+			<!-- your logo here -->
+			<a href="./">
+				<img src="./imgs/maskot3.webp" alt="logo">
+			</a>
+
+			<!-- mobile navbar toggle button -->
+			<button class="mobile-nav-toggle" aria-controls="navbar">
+				<span class="sr-only" aria-expanded="false">Menu</span>
+				<div class="bar1"></div>
+				<div class="bar2"></div>
+				<div class="bar3"></div>
+			</button>
+			
+			<!-- navbar with page links -->
+			<nav id="navbar" data-visible="false">
+				<ul>
+                    <li><a href="docs.html">Docs</a></li>
+					<li><a href="trade.html">Marketplace</a></li>
+					<li><a href="wallet.html">Wallet</a></li>
+                    <li><a href="analytics.html">Analytics</a></li>
+				</ul>
+				<!-- navbar buttons -->
+				<div class="account">
+					<button class="btn-cta blockstatehold" id="blockstatehold">
+						<div class="showingshold">
+							<div class="wallets walletpur" style="display:none;">
+								<div class="wallet_tab">
+									<span id="wallet_balance">...</span><img src="imgs/walletimg.svg" /><span id="wallet_id">0x...</span>
+								</div>
+							 </div>
+							 <div class="wallets waiting_init">-----</div>
+							 <div class="wallets wallet_connect">Connect Wallet</div>
+							 <div class="wallets network_switch">Switch Network</div>
+						</div>
+					</button>
+				</div>
+			</nav>
+		</div>
+        <!-- chain stat-->
+        <div class="chainstat">
+            <div id="blocknumber" class="blockel">-------</div><div class="dot blockel"></div>
+        </div>
+	</header>
+	
+	
+	<main id="main">
+		
+		
+		<!-- main section: portfolio forms section -->
+		<section id="activities" class="claimsSect">
+			<div class="chainstat">
+				<div id="blocknumber" class="blockel">-------</div><div class="dot blockel"></div>
+			</div>
+            <div class="netWorthHold">
+				<div class="section-title list-header" style="padding: 30px 20px 0;">
+					<img src="./imgs/playful.webp" alt="Neon">
+					<h2>Assets UM</h2>
+				</div>
+				<div class="nw-rectangle">
+					<div class="nw-left">
+						<!-- Add your cool neon background image here -->
+						<div class="userWalletCont">
+							<div class="user-card">
+								<div class="icon"><i class="fa-solid fa-user-astronaut"></i></div>
+							</div>
+							<div class="userWallet">0X3fe...h986</div>
+							<!-- userWallet alt location -->				
+						</div>
+						<div class="walletStates">
+							<!-- userWallet alt location -->	
+							<div class="walletStatesDiv">
+							  <span class="dot dot_idle"></span>staked
+							  <a href="#jump-to-section" class="walletStateLink"><i class="fa fa-link" aria-hidden="true"></i></a>
+							  <div class="volume-widget">
+								<div class="volume-bars vertical">
+								  <div class="volume-bar red"></div>
+								  <div class="volume-bar blue"></div>
+								  <div class="volume-bar green"></div>
+								</div>
+								<div class="volume-count">27,000,000</div>
+							  </div>
+							</div>
+							
+							<div class="walletStatesDiv">
+								<span class="dot dot_idle"></span>liquidity 
+								<a href="#jump-to-section" class="walletStateLink"><i class="fa fa-link" aria-hidden="true"></i></a>
+								<div class="volume-widget">
+									<div class="volume-bars horizontal">
+										<div class="volume-bar red"></div>
+										<div class="volume-bar blue"></div>
+										<div class="volume-bar green"></div>
+									</div>
+									<div class="volume-count">5,000,000</div>
+								</div>
+							</div>
+						  
+							<div class="walletStatesDiv">
+							  <span class="dot dot_idle"></span>wallet
+							  <a href="#jump-to-section" class="walletStateLink"><i class="fa fa-link" aria-hidden="true"></i></a>
+							  <div class="volume-widget">
+								<div class="volume-icon">
+								  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20px" height="20px">
+									<path d="M8.277 16.055h2.808v-9.649h-2.808v9.649zm3.731 0h2.808v-6.822h-2.808v6.822zm-7.462 0h2.808v-3.487h-2.808v3.487zm16.357-17.11v17.11c0 1.19-.966 2.155-2.155 2.155h-17.11c-1.19 0-2.155-.965-2.155-2.155v-17.11c0-1.19.965-2.155 2.155-2.155h17.11c1.189 0 2.155.965 2.155 2.155zm-2.154 0h-17.11v17.11h17.11v-17.11z"/>
+								  </svg>
+								</div>
+								<div class="volume-count">2,800,000</div>
+							  </div>
+							</div>
+						  </div>
+					</div>						  
+					<div class="nw-right">
+					  <div class="nw-text nwtextFirst">
+						<span class="nw-text-title nwPrimary-ttitle"><img src="imgs/moon5.webp" title="net worth of all assets">Net Worth</span>
+						<span class="nw-text-value">$10,000.00</span>
+					  </div>
+					  <div class="nw-text">
+						<span class="nw-text-title"><i class="fa fa-info-circle" aria-hidden="true"  title="net value of tokens deposited to platform: in base"></i>Deposits</span>
+						<span class="nw-text-value">$3,785.02</span>
+					  </div>
+					  <div class="nw-text">
+						<span class="nw-text-title"><i class="fa fa-info-circle" aria-hidden="true"  title="net value currently locked in hedge / swap / loan"></i>LockedUse</span>
+						<span class="nw-text-value">$5.125.00</span>
+					  </div>
+					  <div class="nw-text">
+						<span class="nw-text-title"><i class="fa fa-info-circle" aria-hidden="true"  title="net value of tokens withdrawn from platform: in base"></i>Withdrawn</span>
+						<span class="nw-text-value">$1800.00</span>
+					  </div>
+					  <!--
+					  <div class="nw-text">
+						<span class="nw-text-title"><img src="imgs/info.png" title="tokens held in wallet">Wallet</span>
+						<span class="nw-text-value">670,000 NEON</span>
+					  </div>-->
+					  
+					  <div class="nw-text">
+						<span class="nw-text-title"><i class="fa fa-info-circle" aria-hidden="true"  title="count of tokens deposited or transacted by wallet"></i>Tokens</span>
+						<span class="nw-text-value">57</span>
+					  </div>
+					</div>
+
+					
+				  </div>
+
+				  <div class="walletTransact">
+					<form>
+					  <div class="form-group">
+						<!-- Rounded switch -->
+						<label class="switch" title="default mode: Deposit, click to switch to Withdraw">
+							<input type="checkbox">
+							<span class="slider round"></span>
+							<span class="mode">Cashier: Deposit Mode</span>
+						</label>
+						<div class="input-group">
+						  <input type="text" id="erc20-address" name="erc20-address" placeholder="Paste address...">
+						  <span class="or">OR</span>
+						  <select id="erc20-select" name="erc20-select">
+							<option value="">Select token...</option>
+							<option value="erc20-1">ERC20-1</option>
+							<option value="erc20-2">ERC20-2</option>
+							<option value="erc20-3">ERC20-3</option>
+						  </select>
+						</div>
+					  </div>
+					  <div class="form-group">
+						<input type="number" class="transact-amount" placeholder="amount">
+					  </div>
+					  <button type="submit" id="transactSubmit">Transact</button>
+					</form>
+				  </div>
+				  
+				  
+				  <div class="list-section">
+					<div class="section-title list-header">
+						<img src="./imgs/playful.webp" alt="Neon">
+					  <h2>Token Balances</h2>
+					</div>
+					<li class="trade-item t-i-lead">
+						<div class="token-icon"></div>
+						<div class="token-info">
+							<div class="token-name t-i-heading">NAME</div>
+							<div class="token-symbol t-i-heading">SYMB</div>
+							<div class="token-address t-i-heading">ADDR</div>
+							<div class="token-copy"></div>
+							<div class="token-tamount t-i-heading">AMNT</div>
+						</div>
+						<div class="trade-amount t-i-heading">VALUE</div>
+					</li>
+					<ul class="trade-list">
+						<li class="trade-item">
+							<div class="token-icon" style="background: url('./imgs/cosmicsettled.webp');"></div>
+							<div class="token-info">
+								<div class="token-name">Tsuka</div>
+								<div class="token-symbol">TKA</div>
+								<div class="token-address">0x1234567890123456789012345678901234567890</div>
+								<div class="token-copy"><i class="far fa-copy"></i></div>
+								<div class="token-tamount">123456</div>
+							</div>
+							<div class="trade-amount">1.23 ETH</div>
+						</li>
+						
+						<li class="trade-item">
+							<div class="token-icon" style="background: url('./imgs/moon4.webp');"></div>
+							<div class="token-info">
+								<div class="token-name">Blockchain Bets</div>
+								<div class="token-symbol">BBET</div>
+								<div class="token-address">0x1234567890123456789012345678901234567890</div>
+								<div class="token-copy"><i class="far fa-copy"></i></div>
+								<div class="token-tamount">123456</div>
+							</div>
+							<div class="trade-amount">4.56 ETH</div>
+						</li>
+						
+						<li class="trade-item">
+							<div class="token-icon" style="background: url('./imgs/loanprep.webp');"></div>
+							<div class="token-info">
+								<div class="token-name">Vela</div>
+								<div class="token-symbol">VEL</div>
+								<div class="token-address">0x1234567890123456789012345678901234567890</div>
+								<div class="token-copy"><i class="far fa-copy"></i></div>
+								<div class="token-tamount">123456</div>
+							</div>
+							<div class="trade-amount">7.89 ETH</div>
+						</li>
+
+						<li class="trade-item">
+							<div class="token-icon" style="background: url('./imgs/cosmicsettled.webp');"></div>
+							<div class="token-info">
+								<div class="token-name">Tsuka</div>
+								<div class="token-symbol">TKA</div>
+								<div class="token-address">0x1234567890123456789012345678901234567890</div>
+								<div class="token-copy"><i class="far fa-copy"></i></div>
+								<div class="token-tamount">123456</div>
+							</div>
+							<div class="trade-amount">1.23 ETH</div>
+						</li>
+							
+						<li class="trade-item">
+							<div class="token-icon" style="background: url('./imgs/moon4.webp');"></div>
+							<div class="token-info">
+								<div class="token-name">Blockchain Bets</div>
+								<div class="token-symbol">BBET</div>
+								<div class="token-address">0x1234567890123456789012345678901234567890</div>
+								<div class="token-copy"><i class="far fa-copy"></i></div>
+								<div class="token-tamount">123456</div>
+							</div>
+							<div class="trade-amount">4.56 ETH</div>
+						</li>
+							
+						<li class="trade-item">
+							<div class="token-icon" style="background: url('./imgs/loanprep.webp');"></div>
+							<div class="token-info">
+								<div class="token-name">Vela</div>
+								<div class="token-symbol">VEL</div>
+								<div class="token-address">0x1234567890123456789012345678901234567890</div>
+								<div class="token-copy"><i class="far fa-copy"></i></div>
+								<div class="token-tamount">123456</div>
+							</div>
+							<div class="trade-amount">7.89 ETH</div>
+						</li>
+
+						<li class="trade-item">
+							<div class="token-icon" style="background: url('./imgs/cosmicsettled.webp');"></div>
+							<div class="token-info">
+								<div class="token-name">Tsuka</div>
+								<div class="token-symbol">TKA</div>
+								<div class="token-address">0x1234567890123456789012345678901234567890</div>
+								<div class="token-copy"><i class="far fa-copy"></i></div>
+								<div class="token-tamount">123456</div>
+							</div>
+							<div class="trade-amount">1.23 ETH</div>
+						</li>
+						
+						<li class="trade-item">
+							<div class="token-icon" style="background: url('./imgs/moon4.webp');"></div>
+							<div class="token-info">
+								<div class="token-name">Blockchain Bets</div>
+								<div class="token-symbol">BBET</div>
+								<div class="token-address">0x1234567890123456789012345678901234567890</div>
+								<div class="token-copy"><i class="far fa-copy"></i></div>
+								<div class="token-tamount">123456</div>
+							</div>
+							<div class="trade-amount">4.56 ETH</div>
+						</li>
+						
+						<li class="trade-item">
+							<div class="token-icon" style="background: url('./imgs/loanprep.webp');"></div>
+							<div class="token-info">
+								<div class="token-name">Vela</div>
+								<div class="token-symbol">VEL</div>
+								<div class="token-address">0x1234567890123456789012345678901234567890</div>
+								<div class="token-copy"><i class="far fa-copy"></i></div>
+								<div class="token-tamount">123456</div>
+							</div>
+							<div class="trade-amount">7.89 ETH</div>
+						</li>
+
+						<li class="trade-item">
+							<div class="token-icon" style="background: url('./imgs/cosmicsettled.webp');"></div>
+							<div class="token-info">
+								<div class="token-name">Tsuka</div>
+								<div class="token-symbol">TKA</div>
+								<div class="token-address">0x1234567890123456789012345678901234567890</div>
+								<div class="token-copy"><i class="far fa-copy"></i></div>
+								<div class="token-tamount">123456</div>
+							</div>
+							<div class="trade-amount">1.23 ETH</div>
+						</li>
+							
+						<li class="trade-item">
+							<div class="token-icon" style="background: url('./imgs/moon4.webp');"></div>
+							<div class="token-info">
+								<div class="token-name">Blockchain Bets</div>
+								<div class="token-symbol">BBET</div>
+								<div class="token-address">0x1234567890123456789012345678901234567890</div>
+								<div class="token-copy"><i class="far fa-copy"></i></div>
+								<div class="token-tamount">123456</div>
+							</div>
+							<div class="trade-amount">4.56 ETH</div>
+						</li>
+							
+						<li class="trade-item">
+							<div class="token-icon" style="background: url('./imgs/loanprep.webp');"></div>
+							<div class="token-info">
+								<div class="token-name">Vela</div>
+								<div class="token-symbol">VEL</div>
+								<div class="token-address">0x1234567890123456789012345678901234567890</div>
+								<div class="token-copy"><i class="far fa-copy"></i></div>
+								<div class="token-tamount">123456</div>
+							</div>
+							<div class="trade-amount">7.89 ETH</div>
+						</li>
+
+						<li class="trade-item">
+							<div class="token-icon" style="background: url('./imgs/cosmicsettled.webp');"></div>
+							<div class="token-info">
+								<div class="token-name">Tsuka</div>
+								<div class="token-symbol">TKA</div>
+								<div class="token-address">0x1234567890123456789012345678901234567890</div>
+								<div class="token-copy"><i class="far fa-copy"></i></div>
+								<div class="token-tamount">123456</div>
+							</div>
+							<div class="trade-amount">1.23 ETH</div>
+						</li>
+							
+						<li class="trade-item">
+							<div class="token-icon" style="background: url('./imgs/moon4.webp');"></div>
+							<div class="token-info">
+								<div class="token-name">Blockchain Bets</div>
+								<div class="token-symbol">BBET</div>
+								<div class="token-address">0x1234567890123456789012345678901234567890</div>
+								<div class="token-copy"><i class="far fa-copy"></i></div>
+								<div class="token-tamount">123456</div>
+							</div>
+							<div class="trade-amount">4.56 ETH</div>
+						</li>
+							
+						<li class="trade-item">
+							<div class="token-icon" style="background: url('./imgs/loanprep.webp');"></div>
+							<div class="token-info">
+								<div class="token-name">Vela</div>
+								<div class="token-symbol">VEL</div>
+								<div class="token-address">0x1234567890123456789012345678901234567890</div>
+								<div class="token-copy"><i class="far fa-copy"></i></div>
+								<div class="token-tamount">123456</div>
+							</div>
+							<div class="trade-amount">7.89 ETH</div>
+						</li>
+
+						<li class="trade-item">
+							<div class="token-icon" style="background: url('./imgs/cosmicsettled.webp');"></div>
+							<div class="token-info">
+								<div class="token-name">Tsuka</div>
+								<div class="token-symbol">TKA</div>
+								<div class="token-address">0x1234567890123456789012345678901234567890</div>
+								<div class="token-copy"><i class="far fa-copy"></i></div>
+								<div class="token-tamount">123456</div>
+							</div>
+							<div class="trade-amount">1.23 ETH</div>
+						</li>
+							
+						<li class="trade-item">
+							<div class="token-icon" style="background: url('./imgs/moon4.webp');"></div>
+							<div class="token-info">
+								<div class="token-name">Blockchain Bets</div>
+								<div class="token-symbol">BBET</div>
+								<div class="token-address">0x1234567890123456789012345678901234567890</div>
+								<div class="token-copy"><i class="far fa-copy"></i></div>
+								<div class="token-tamount">123456</div>
+							</div>
+							<div class="trade-amount">4.56 ETH</div>
+						</li>
+							
+						<li class="trade-item">
+							<div class="token-icon" style="background: url('./imgs/loanprep.webp');"></div>
+							<div class="token-info">
+								<div class="token-name">Vela</div>
+								<div class="token-symbol">VEL</div>
+								<div class="token-address">0x1234567890123456789012345678901234567890</div>
+								<div class="token-copy"><i class="far fa-copy"></i></div>
+								<div class="token-tamount">123456</div>
+							</div>
+							<div class="trade-amount">7.89 ETH</div>
+						</li>
+												
+					</ul>
+					<div class="earnMoreWidget">
+						<div class="staking-widget">
+							<div class="icon"><i class="fas fa-coins"></i></div>
+							<h4>Stake $NEON Tokens</h4>
+							<p>Earn rewards by staking your $NEON tokens. Rewards come from option mining fees, staked erc20 liquidity fees, and taxes from dex trading volume.</p>
+							<button>Stake Now</button>
+						  </div>
+						  <div class="farming-widget">
+							<div class="icon"><i class="fas fa-seedling"></i></div>
+							<h4>Farm ERC20 tokens</h4>
+							<p>Deposit any ERC20 token into our protocol to provide put option liquidity and lending liquidity. In return, you will also earn an APY based on options revenue.</p>
+							<button>Coming Soon..</button>
+						  </div>					  
+					</div>
+				</div>
+            </div>
+
+			<div class="hedgesPanelHold">
+				<div class="dashboard-section">
+					<div class="section-title">
+						<img src="./imgs/playful.webp" alt="Neon">
+						<h2>Hedges Panel</h2>
+					</div>
+					  
+					<div class="data-cards">
+						<div class="data-card hedge-created">
+							<h3 class="card-title">Hs.Created</h3>
+							<p class="card-value">10</p>
+							<div class="card-extra" title="options to swaps ratio">
+								<text text-anchor="middle" style="color:#33856b;">15</text>
+								<a href="#jump-to-section" class="walletStateLink"><text text-anchor="middle"  style="color:#188dd6;"> erc20s <i class="fa fa-link" aria-hidden="true"></i></text></a>								
+							</div>				
+						</div>
+						<div class="data-card hedge-taken">
+							<h3 class="card-title">Hs.Taken</h3>
+							<p class="card-value">7</p>
+							<div class="card-extra" title="options to swaps ratio">
+								<text text-anchor="middle" style="color:#33856b;">3</text>
+								<a href="#jump-to-section" class="walletStateLink"><text text-anchor="middle"  style="color:#188dd6;"> erc20s <i class="fa fa-link" aria-hidden="true"></i></text></a>								
+							</div>	
+						</div>
+						<div class="data-card hedge-volume">
+							<h3 class="card-title">Hedge Volume</h3>
+							<p class="card-value">15 ETH</p>
+						</div>
+						<div class="data-card buy-volume">
+							<h3 class="card-title">Buy Volume</h3>
+							<p class="card-value">2.4 ETH</p>
+						</div>
+					
+						<div class="data-card hedge-created">
+							<h3 class="card-title">Call Options</h3>
+							<p class="card-value">5</p>
+							<div class="card-extra" title="hedge type"><img src="./imgs/call-option.svg"></div>
+						</div>
+						<div class="data-card hedge-taken">
+							<h3 class="card-title">Equity Swaps</h3>
+							<p class="card-value">5</p>
+							<div class="card-extra" title="hedge type"><img src="./imgs/put-option.svg"></div>
+						</div>
+						<div class="data-card hedge-volume">
+							<h3 class="card-title">Gains</h3>
+							<p class="card-value" style="color:#33856b;">15 ETH</p>
+						</div>
+						<div class="data-card buy-volume">
+							<h3 class="card-title">Losses</h3>
+							<p class="card-value" style="color:#d6188a;">2.4 ETH</p>
+						</div>
+					</div>
+				</div>
+				  
+				  <!--  HEDGES; TAKEN, CREATED, BOOKMARKED, WON, LOST -->
+				<div class="hedges-list-section">
+					<div class="hedges-load-section">
+							<div class="list-toggle">
+								<button class="active">Options Created</button>
+								<button>Options Taken</button>
+								<button>Options Bookmarks</button>
+								<button>Swaps Created</button>
+								<button>Swaps Taken</button>
+								<button>Swaps Bookmarks</button>
+							</div>
+						</div>
+						<li class="trade-item t-i-lead hedges-trade-list">
+							<div class="hedge-info">
+								<div class="hedge-type hedge-i-cat">TYPE</div>
+								<div class="hedge-symbol hedge-i-cat">SYMB</div>
+								<div class="hedge-valuetitle hedge-i-cat">VALUE</div>
+								<div class="hedge-time hedge-i-cat">START</div>
+								<div class="hedge-time hedge-i-cat">EXPIRE</div>
+								<div class="token-address hedge-i-cat">PARTYB</div>
+							</div>
+							<div class="hedge-i-cat">BTN</div>
+						</li>
+						<ul class="trade-list hedges-trade-list">
+							<li class="hedge-item">
+								<div class="hedge-type hedge-i-cat hedgeType">CALL</div>
+								<div class="token-info">
+									<div class="hedge-symbol hedge-i-cat">TKA</div>
+									<div class="hedge-value hedge-i-cat">0.72 ETH</div>
+									<div class="hedge-time hedge-i-cat">11/05/2023</div>
+									<div class="hedge-time hedge-i-cat">18/05/2023</div>
+									<div class="token-address">0x123...90</div>
+								</div>
+								<div class="hedge-i-cat"><button class="hedgeTxBtn">Tx</button></div>
+							</li>
+							
+							<li class="hedge-item">
+								<div class="hedge-i-cat hedgeType flux highlightOption">CALL</div>
+								<div class="token-info">
+									<div class="hedge-symbol hedge-i-cat">BBET</div>
+									<div class="hedge-value hedge-i-cat">0.42 ETH</div>
+									<div class="hedge-time hedge-i-cat">11/05/2023</div>
+									<div class="hedge-time hedge-i-cat">18/05/2023</div>
+									<div class="token-address">0x123...90</div>
+								</div>
+								<div class="hedge-i-cat"><button class="hedgeTxBtn">Tx</button></div>
+							</li>
+							
+							<li class="hedge-item">
+								<div class="hedge-i-cat hedgeType flux highlightOption">SWAP</div>
+								<div class="token-info">
+									<div class="hedge-symbol hedge-i-cat">VELA</div>
+									<div class="hedge-value hedge-i-cat">0.72 ETH</div>
+									<div class="hedge-time hedge-i-cat">11/05/2023</div>
+									<div class="hedge-time hedge-i-cat">18/05/2023</div>
+									<div class="token-address">0x123...90</div>
+								</div>
+								<div class="hedge-i-cat"><button class="hedgeTxBtn">Tx</button></div>
+							</li>
+
+							<li class="hedge-item">
+								<div class="hedge-i-cat hedgeType flux highlightOption">CALL</div>
+								<div class="token-info">
+									<div class="hedge-symbol hedge-i-cat">FTM</div>
+									<div class="hedge-value hedge-i-cat">0.72 ETH</div>
+									<div class="hedge-time hedge-i-cat">11/05/2023</div>
+									<div class="hedge-time hedge-i-cat">18/05/2023</div>
+									<div class="token-address">0x123...90</div>
+								</div>
+								<div class="hedge-i-cat"><button class="hedgeTxBtn">Tx</button></div>
+							</li>
+								
+							<li class="hedge-item">
+								<div class="hedge-i-cat hedgeType flux highlightOption">SWAP</div>
+								<div class="token-info">
+									<div class="hedge-symbol hedge-i-cat">SHIB</div>
+									<div class="hedge-value hedge-i-cat">0.72 ETH</div>
+									<div class="hedge-time hedge-i-cat">11/05/2023</div>
+									<div class="hedge-time hedge-i-cat">18/05/2023</div>
+									<div class="token-address">0x123...90</div>
+								</div>
+								<div class="hedge-i-cat"><button class="hedgeTxBtn">Tx</button></div>
+							</li>
+								
+							<li class="hedge-item">
+								<div class="hedge-i-cat hedgeType flux highlightOption">CALL</div>
+								<div class="token-info">
+									<div class="hedge-symbol hedge-i-cat">TKA</div>
+									<div class="hedge-value hedge-i-cat">0.72 ETH</div>
+									<div class="hedge-time hedge-i-cat">11/05/2023</div>
+									<div class="hedge-time hedge-i-cat">18/05/2023</div>
+									<div class="token-address">0x123...90</div>
+								</div>
+								<div class="hedge-i-cat"><button class="hedgeTxBtn">Tx</button></div>
+							</li>
+							
+							
+							<li class="hedge-item">
+								<div class="hedge-i-cat hedgeType flux highlightOption">CALL</div>
+								<div class="token-info">
+									<div class="hedge-symbol hedge-i-cat">BBET</div>
+									<div class="hedge-value hedge-i-cat">0.42 ETH</div>
+									<div class="hedge-time hedge-i-cat">11/05/2023</div>
+									<div class="hedge-time hedge-i-cat">18/05/2023</div>
+									<div class="token-address">0x123...90</div>
+								</div>
+								<div class="hedge-i-cat"><button class="hedgeTxBtn">Tx</button></div>
+							</li>
+							
+							<li class="hedge-item">
+								<div class="hedge-i-cat hedgeType flux highlightOption">SWAP</div>
+								<div class="token-info">
+									<div class="hedge-symbol hedge-i-cat">VELA</div>
+									<div class="hedge-value hedge-i-cat">0.72 ETH</div>
+									<div class="hedge-time hedge-i-cat">11/05/2023</div>
+									<div class="hedge-time hedge-i-cat">18/05/2023</div>
+									<div class="token-address">0x123...90</div>
+								</div>
+								<div class="hedge-i-cat"><button class="hedgeTxBtn">Tx</button></div>
+							</li>
+
+							<li class="hedge-item">
+								<div class="hedge-i-cat hedgeType flux highlightOption">CALL</div>
+								<div class="token-info">
+									<div class="hedge-symbol hedge-i-cat">FTM</div>
+									<div class="hedge-value hedge-i-cat">0.72 ETH</div>
+									<div class="hedge-time hedge-i-cat">11/05/2023</div>
+									<div class="hedge-time hedge-i-cat">18/05/2023</div>
+									<div class="token-address">0x123...90</div>
+								</div>
+								<div class="hedge-i-cat"><button class="hedgeTxBtn">Tx</button></div>
+							</li>
+								
+							<li class="hedge-item">
+								<div class="hedge-i-cat hedgeType flux highlightOption">SWAP</div>
+								<div class="token-info">
+									<div class="hedge-symbol hedge-i-cat">SHIB</div>
+									<div class="hedge-value hedge-i-cat">0.72 ETH</div>
+									<div class="hedge-time hedge-i-cat">11/05/2023</div>
+									<div class="hedge-time hedge-i-cat">18/05/2023</div>
+									<div class="token-address">0x123...90</div>
+								</div>
+								<div class="hedge-i-cat"><button class="hedgeTxBtn">Tx</button></div>
+							</li>
+								
+							<li class="hedge-item">
+								<div class="hedge-i-cat hedgeType flux highlightOption">CALL</div>
+								<div class="token-info">
+									<div class="hedge-symbol hedge-i-cat">TKA</div>
+									<div class="hedge-value hedge-i-cat">0.72 ETH</div>
+									<div class="hedge-time hedge-i-cat">11/05/2023</div>
+									<div class="hedge-time hedge-i-cat">18/05/2023</div>
+									<div class="token-address">0x123...90</div>
+								</div>
+								<div class="hedge-i-cat"><button class="hedgeTxBtn">Tx</button></div>
+							</li>
+
+							
+							<li class="hedge-item">
+								<div class="hedge-i-cat hedgeType flux highlightOption">CALL</div>
+								<div class="token-info">
+									<div class="hedge-symbol hedge-i-cat">BBET</div>
+									<div class="hedge-value hedge-i-cat">0.42 ETH</div>
+									<div class="hedge-time hedge-i-cat">11/05/2023</div>
+									<div class="hedge-time hedge-i-cat">18/05/2023</div>
+									<div class="token-address">0x123...90</div>
+								</div>
+								<div class="hedge-i-cat"><button class="hedgeTxBtn">Tx</button></div>
+							</li>
+							
+							<li class="hedge-item">
+								<div class="hedge-i-cat hedgeType flux highlightOption">SWAP</div>
+								<div class="token-info">
+									<div class="hedge-symbol hedge-i-cat">VELA</div>
+									<div class="hedge-value hedge-i-cat">0.72 ETH</div>
+									<div class="hedge-time hedge-i-cat">11/05/2023</div>
+									<div class="hedge-time hedge-i-cat">18/05/2023</div>
+									<div class="token-address">0x123...90</div>
+								</div>
+								<div class="hedge-i-cat"><button class="hedgeTxBtn">Tx</button></div>
+							</li>
+
+							<li class="hedge-item">
+								<div class="hedge-i-cat hedgeType flux highlightOption">CALL</div>
+								<div class="token-info">
+									<div class="hedge-symbol hedge-i-cat">FTM</div>
+									<div class="hedge-value hedge-i-cat">0.72 ETH</div>
+									<div class="hedge-time hedge-i-cat">11/05/2023</div>
+									<div class="hedge-time hedge-i-cat">18/05/2023</div>
+									<div class="token-address">0x123...90</div>
+								</div>
+								<div class="hedge-i-cat"><button class="hedgeTxBtn">Tx</button></div>
+							</li>
+								
+							<li class="hedge-item">
+								<div class="hedge-i-cat hedgeType flux highlightOption">SWAP</div>
+								<div class="token-info">
+									<div class="hedge-symbol hedge-i-cat">SHIB</div>
+									<div class="hedge-value hedge-i-cat">0.72 ETH</div>
+									<div class="hedge-time hedge-i-cat">11/05/2023</div>
+									<div class="hedge-time hedge-i-cat">18/05/2023</div>
+									<div class="token-address">0x123...90</div>
+								</div>
+								<div class="hedge-i-cat"><button class="hedgeTxBtn">Tx</button></div>
+							</li>
+								
+							<li class="hedge-item">
+								<div class="hedge-i-cat hedgeType flux highlightOption">CALL</div>
+								<div class="token-info">
+									<div class="hedge-symbol hedge-i-cat">TKA</div>
+									<div class="hedge-value hedge-i-cat">0.72 ETH</div>
+									<div class="hedge-time hedge-i-cat">11/05/2023</div>
+									<div class="hedge-time hedge-i-cat">18/05/2023</div>
+									<div class="token-address">0x123...90</div>
+								</div>
+								<div class="hedge-i-cat"><button class="hedgeTxBtn">Tx</button></div>
+							</li>
+							
+							<li class="hedge-item">
+								<div class="hedge-i-cat hedgeType flux highlightOption">SWAP</div>
+								<div class="token-info">
+									<div class="hedge-symbol hedge-i-cat">SHIB</div>
+									<div class="hedge-value hedge-i-cat">0.72 ETH</div>
+									<div class="hedge-time hedge-i-cat">11/05/2023</div>
+									<div class="hedge-time hedge-i-cat">18/05/2023</div>
+									<div class="token-address">0x123...90</div>
+								</div>
+								<div class="hedge-i-cat"><button class="hedgeTxBtn">Tx</button></div>
+							</li>
+								
+							<li class="hedge-item">
+								<div class="hedge-i-cat hedgeType flux highlightOption">CALL</div>
+								<div class="token-info">
+									<div class="hedge-symbol hedge-i-cat">TKA</div>
+									<div class="hedge-value hedge-i-cat">0.72 ETH</div>
+									<div class="hedge-time hedge-i-cat">11/05/2023</div>
+									<div class="hedge-time hedge-i-cat">18/05/2023</div>
+									<div class="token-address">0x123...90</div>
+								</div>
+								<div class="hedge-i-cat"><button class="hedgeTxBtn">Tx</button></div>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+
+			<div class="hedgesPanelHold">
+				<div class="dashboard-section">
+					<div class="section-title">
+						<img src="./imgs/playful.webp" alt="Neon">
+						<h2>Rewards Panel</h2>
+					</div>
+
+					<div class="earnMoreWidget-rewards">
+						<div class="staking-widget-rewards">
+							<div class="icon"><i class="fas fa-coins"></i></div>
+							<h4>Staking for Rewards</h4>
+							<p>Stake NEON to gain a share of the hedge fees.<a href="#jump-to-section" class="walletStateLink"><text text-anchor="middle"  style="color:#188dd6;"> learn... <i class="fa fa-link" aria-hidden="true"></i></text></a>	</p>
+						  </div>
+						  <div class="staking-widget-rewards">
+							<div class="icon"><i class="fas fa-hammer"></i></div>
+							<h4>Mining for Rewards</h4>
+							<p>Mine Hedges to gain a share of the settlement revenue.<a href="#jump-to-section" class="walletStateLink"><text text-anchor="middle"  style="color:#188dd6;"> learn... <i class="fa fa-link" aria-hidden="true"></i></text></a>	</p>
+						  </div>	
+						  <div class="staking-widget-rewards">
+							<div class="icon"><i class="fas fa-diamond"></i></div>
+							<h4>Hold for Rewards</h4>
+							<p>HODL NEON to gain a share of our Dex trading revenue.<a href="#jump-to-section" class="walletStateLink"><text text-anchor="middle"  style="color:#188dd6;"> learn... <i class="fa fa-link" aria-hidden="true"></i></text></a>	</p>
+						  </div>					  
+					</div>
+
+					<div class="rewards-grid grid grid-cols-2 gap-5">
+						<div class="flex flex-col gap-4">
+							<div class="flex items-center justify-between gap-2">
+								<div class="grid-sect-title">Claimable Rewards</div>
+								<div class="grid-sect-title" style="color:#33856b !important;">0 ($0)</div>
+							</div>
+							<div class="grid grid-cols-2">
+								<div class="flex flex-col">
+									<div class="grid-sect-subtitle">eth from NEON holding</div>
+									<div class="grid-sect-subtitle-value">0 ($0)</div>
+								</div>
+								<button class="claim-button" disabled=""><span>Claim</span></button>
+							</div>
+							<hr class="line">
+							<div class="grid grid-cols-2">
+								<div class="flex flex-col">
+									<div class="grid-sect-subtitle">eth from NEON staking</div>
+									<div class="grid-sect-subtitle-value">0 ($0)</div>
+								</div>
+								<button class="claim-button" disabled=""><span>Claim</span></button>
+							</div>
+							<hr class="line">
+							<div class="grid grid-cols-2">
+								<div class="flex flex-col">
+									<div class="grid-sect-subtitle">eth from Mining hedges</div>
+									<div class="grid-sect-subtitle-value">0 ($0)</div>
+								</div>
+								<button class="claim-button" disabled=""><span>Claim</span></button>
+							</div>
+						</div>
+						<div class="flex flex-col gap-5">
+							<div class="flex items-center justify-between gap-2">
+								<div class="grid-sect-title">Rewards Claimed</div>
+								<div class="grid-sect-title" style="color:#33856b !important;">0 ($0)</div>
+							</div>
+							<div class="flex flex-col gap-1">
+								<div class="grid-sect-subtitle">eth claimed from NEON holding</div>
+								<div class="grid-sect-subtitle-value">0 ($0)</div>
+							</div>
+							<div class="flex flex-col gap-1">
+								<div class="grid-sect-subtitle">eth claimed from NEON staking</div>
+								<div class="grid-sect-subtitle-value">0 ($0)</div>
+							</div>
+							<div class="flex flex-col gap-1">
+								<div class="grid-sect-subtitle">eth claimed from Mining hedges</div>
+								<div class="grid-sect-subtitle-value">0 ($0)</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="hedgesPanelHold">
+				<div class="dashboard-section">
+					<div class="section-title">
+						<img src="./imgs/playful.webp" alt="Neon">
+						<h2>Staking Panel</h2>
+					</div>
+
+					<div class="staking-grid grid grid-cols-2 gap-5">
+						<div class="flex flex-col gap-4">
+							
+							<div class="grid grid-cols-2 stakeGrids">
+								<div class="stakeDataRow flex flex-col">
+									<div class="grid-sect-subtitle splitView stakedTitle"><span>my Staked Balance: </span><span>0 ($0)</span></div>
+									<div class="grid-sect-subtitle splitView"><span>my Total Holdings: </span><span>0 ($0)</span></div>
+								</div>
+								<div class="graph" style="--bluePercentage: 5;">
+									<p>5%</p>
+								</div>
+							</div>
+							<hr class="line">
+							<div class="grid grid-cols-2 stakeGrids">
+								<div class="stakeDataRow flex flex-col">
+									<div class="grid-sect-subtitle splitView stakedTitle"><span>Supply Staked: </span><span>0 ($0)</span></div>
+									<div class="grid-sect-subtitle splitView"><span>Circulating Supply: </span><span>0 ($0)</span></div>
+								</div>
+								<div class="graph" style="--bluePercentage: 40;">
+									<p>40%</p>
+								</div>
+							</div>
+							<hr class="line">
+							<div class="grid grid-cols-2 stakeGrids">
+								<div class="stakeDataRow flex flex-col">
+									<div class="grid-sect-subtitle splitView stakedTitle"><span>Dividents Distributed: </span><span>0 ($0)</span></div>
+									<div class="grid-sect-subtitle splitView"><span>Dividents Claimed: </span><span>0 ($0)</span></div>
+								</div>
+								<div class="graph" style="--bluePercentage: 85;">
+									<p>85%</p>
+								</div>
+							</div>
+						</div>
+						<div class="flex flex-col gap-5">
+							<div class="flex flex-col gap-1">
+								<div class="flex flex-col">
+									<div class="grid-sect-subtitle">NEON available</div>
+									<div class="grid-sect-subtitle-value">0</div>
+								</div>
+								<button class="claim-button" disabled=""><span>Stake NEON</span></button>
+							</div>
+							<div class="flex flex-col gap-1">
+								<div class="flex flex-col">
+									<div class="grid-sect-subtitle">NEON staked</div>
+									<div class="grid-sect-subtitle-value">0</div>
+								</div>
+								<button class="claim-button" disabled=""><span>unStake NEON</span></button>
+							</div>
+						</div>
+					</div>
+					<div class="section-title staking-assignments-title">
+						<!-- <div class="icon"><i class="fas fa-coins"></i></div> -->
+						<span class="sectionLabel aplAssignments">Manage Stake Assignments</span>
+					</div>
+					<div class="assignments-grid grid grid-cols-2 gap-5">
+						<div class="stakeGrids flex flex-col gap-4">
+							<div class="stakeDataRow flex items-center justify-between gap-2">
+								<div class="grid-sect-title">Staked Balance</div>
+								<div class="grid-sect-title" style="color:#33856b !important;">0 ($0)</div>
+							</div>
+
+							<hr class="line">
+							<div class="stakeDataRow flex items-center justify-between gap-2">
+								<div class="grid-sect-title">Assigned Stake</div>
+								<div class="grid-sect-title" style="color:#33856b !important;">0 ($0)</div>
+							</div>
+							
+							<hr class="line">
+							<div class="stakeDataRow flex items-center justify-between gap-2">
+								<div class="grid-sect-title">Unassigned Stake</div>
+								<div class="grid-sect-title" style="color:#33856b !important;">0 ($0)</div>
+							</div>
+
+						</div>
+						<div class="flex flex-col gap-5">
+							<div class="grid grid-cols-2 place-flexstart">
+								<div class="flex flex-col">
+									<div class="grid-sect-subtitle">Normal Staking</div>
+									<div class="grid-sect-subtitle-value">0 ($0)</div>
+								</div>
+								<button class="claim-button" disabled=""><span>Manage</span></button>
+							</div>
+							<hr class="line">
+							<div class="grid grid-cols-2 place-flexstart">
+								<div class="flex flex-col">
+									<div class="grid-sect-subtitle">Equity Swap Liquidity</div>
+									<div class="grid-sect-subtitle-value">0 ($0)</div>
+								</div>
+								<button class="claim-button" disabled=""><span>Manage</span></button>
+							</div>
+							<hr class="line">
+							<div class="grid grid-cols-2 place-flexstart">
+								<div class="flex flex-col">
+									<div class="grid-sect-subtitle">Protocol Collateral</div>
+									<div class="grid-sect-subtitle-value">0 ($0)</div>
+								</div>
+								<button class="claim-button" disabled=""><span>Manage</span></button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="actionablePort"><!-- state changing calls: stake, vote, bornfire -->
+				<span class="actionPortLabel">State Changing</span>
+				
+				<!-- stake -->
+				<div class="actionCard">
+					<div class="actCardTop">
+						<div class="actCardTop_title">Staked <div id="dot_lsrStk" class="dot blockel"></div>&nbsp;<img src="imgs/info.png" title="stake tokens to claim rewards and to vote. In future you cant participate in fundraising without a staking profile" /></div>
+						<div class="actCardTopData"><!-- card infor -->
+							<div class="inforview">
+								<div class="mpcard_details"><span class="_lsrT">Tokens:</span><span class="_lsrTData _respValue" id="_stk_tokens">---</span></div>
+								<div class="mpcard_details"><span class="_lsrT">Duration:</span><span class="_lsrTData _respValue" id="_stk_duration">---</span></div>
+								<div class="mpcard_details"><span class="_lsrT">Expires:</span><span class="_lsrTData _respValue" id="_stk_expiry">---</span></div>
+							</div>
+						</div>
+					</div>
+					<div id="stkBody" class="actCardBody"><!-- expandable form section -->
+						<!-- place form here -->
+						<div id="stats" class="shl_header">
+							<div class="shl_delegate">
+								<div class="shl_inputshold">
+									<input aria-invalid="false" autocomplete="off" id="stake_amnt" placeholder="tokens" type="number" pattern="[0-9]*" class="shldi shl_delegate_input" >
+									<button class="shl_max"><span id="stkmax">MAX</span></button>
+								</div>
+								<button id="stake" class="shl_stake_submit"><span>Stake</span></button>
+								<span id="stakedBal"> bal---</span>
+							</div>
+							<div class="shl_add_separator"></div>
+							<div id="shl_unstake" class="shl_create">
+								<div class="shl_inputshold">
+									<input aria-invalid="false" autocomplete="off" id="unstake_amnt" placeholder="tokens" type="number" pattern="[0-9]*" class="shldi shl_create_input" >
+									<button class="shl_max"><span id="unstkmax">MAX</span></button>
+								</div>
+								<button id="unstake" class="shl_stake_submit"><span>unStake</span></button>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- <div id="hypecard_poll" class="actionCard" rbw-include-html="https://cdn.jsdelivr.net/gh/braavos-wd/braavos-proxy@main/resources/_incl_rbw.html"></div> -->
+			</div>
+        </section>
+		<!-- static stats section -->
+		<section class="portfolioSect">
+			<div class="unactionablePort">
+				<span class="actionPortLabel">Static View</span>
+				<div class="mybankcard">
+					<div class="mbcard_title"><span class"">Token Cost</span><span class="mbcard_title"></span>&emsp;<img title="Average cost per token, in eth." src="imgs/info.png" /></div>
+					<div class="mbcard_detail mbcard_more">
+						<span id="mbcard_acpt" class="mbcard_more_span"> ---- </span>
+						<span id="mbcard_avgain" class="mbcard_more_span"> ---- </span>
+					</div>
+				</div>
+				<div class="mybankcard">
+					<div class="mbcard_title"><span class"">myWallet Tax Status</span><span class="mbcard_title"></span>&emsp;<img title="check your tax status here." src="imgs/info.png" /></div>
+					<div class="mbcard_detail mbcard_more">
+						<span id="mbcard_taxstatus_buy" class="mbcard_more_span"> ---- </span>
+						<span id="mbcard_taxstatus_sell" class="mbcard_more_span"> ---- </span>
+					</div>
+				</div>
+				<div class="mybankcard">
+					<div class="mbcard_title"><span class"">Blacklist Status</span><span class="mbcard_title"></span>&emsp;<img title="If youre blacklisted it means your wallet is a bot account. Or your wallet was involved in some crime. You cant sell or transfer them. You cant claim rewards from them either." src="imgs/info.png" /></div>
+					<div class="mbcard_detail mbcard_more">
+						<span id="mbcard_blacklisted" class="mbcard_more_span"> ---- </span>
+						<span id="mbcard_blacklistRights" class="mbcard_more_span"> ---- </span>
+					</div>
+				</div>
+				<div class="mybankcard">
+					<div class="mbcard_title"><span class"">myAssets</span><span class="mbcard_title"></span></div>
+					<div class="mbcard_detail mbcard_more">
+						<span id="mbcard_netassets" class="mbcard_more_span"> ---- </span>
+						<span id="mbcard_netassetsValue" class="mbcard_more_span"> ---- </span>
+					</div>
+				</div>
+				<div class="mybankcard">
+					<div class="mbcard_title"><span class"">netRewards Claimed</span><span class="mbcard_title"></span>&emsp;<img title="Sum of all rewards claimed to date. Wallet & from Benefactors who assigned your wallet." src="imgs/info.png" /></div>
+					<div class="mbcard_detail mbcard_more">
+						<span id="mbcard_netrewards" class="mbcard_more_span"> ---- </span>
+						<span id="mbcard_netrewardsBreakdown" class="mbcard_more_span"> ---- </span>
+					</div>
+				</div>
+				<div id="next" class="mybankcard">
+					<div class="mbcard_title"><span class"">netRewards Due</span><span class="mbcard_title"></span>&emsp;<img title="All combined rewards due from: Wallet, Donors" src="imgs/info.png" /></div>
+					<div class="mbcard_detail mbcard_more">
+						<span id="mbcard_netrewardsD" class="mbcard_more_span"> ---- </span>
+						<span id="mbcard_netrewardsDBreakdown" class="mbcard_more_span"> ---- </span>
+					</div>
+				</div>
+			</div>
+		</section>
+		<!-- call to action -->
+		<section class="cta">
+			<div class="container">
+				<div>
+					<h1 data-aos="fade-right">Coming <span class="txt-gradient">Soon</span></h1>
+					<p data-aos="fade-down" data-aos-delay="100">We will build our dashboard live, as we go and add functionality to the Dapp.</p>
+					<p data-aos="fade-down" data-aos-delay="100"></br>An exclusive Membership Tier: Billionaire Shiba Club. You have to own rare NFTs to gain membership into the BSC 👑. Once in, you can deposit money into our cash vaults, and that money will be used to fund top tier project launches.</p>
+				</div>
+				<!-- space vortex -->
+				<div class="space-vortex vortex-sm" data-aos="zoom-out-down" data-aos-delay="400">
+					<!-- space vortex external arc -->
+					<div class="arc">
+						<!-- space vortex center acr -->
+						<div class="arc">
+							<!-- space vortex inside arc -->
+							<div class="arc"></div>
+						</div>
+					</div>
+					<!-- call to action button -->				
+					<a href="#" target="_blank" class="btn btn-cta" data-aos="fade-left" data-aos-delay="200">Buy $Woof Now</a>
+				</div>
+			</div>
+		</section>
+	</main>
+
+	<div id="popupNotify" style="display:none;">
+		<div id="pNotifyX">x</div>
+		<div class="popupSuccess"></div>
+		<div class="popupBody">
+			<span class="popupText" id="popupTitle"></span>
+			<span class="popupText" id="popupAmounts"></span>
+			<span class="popupText" id="popupTxhash"></span>
+		</div>
+		<div id="pNt" class="popupNotify_timer"></div>
+	</div>
+	<!-- footer -->
+	<footer>
+		<div class="container grid" data-aos="fade-up">
+			<div>
+				<!-- your logo here -->
+				<a href="/">	
+					<img src="./imgs/maskot3.webp" alt="neon hedge logo">
+				</a>
+				<p class="mb-2">Neon Hedge</p>
+
+				<!-- social links -->
+				<ul class="inline-list">
+					<li>
+						<a href="https://twitter.com/neonhedge" target="_self">
+							<i class="fa-brands fa-twitter"></i>
+						</a>
+					</li>
+					<li>
+						<a href="https://t.me/neonhedge" target="_self">
+							<i class="fa-solid fa-paper-plane"></i>
+						</a>
+					</li>
+				</ul>
+			</div>
+
+			<!-- links -->
+			<div>
+				<h3>Navigate</h3>
+				<ul>
+					<li><a href="#" title="coming soon">Portfolio</a></li>
+				</ul>
+			</div>
+
+			<!-- links -->
+			<div>
+				<h3>Links</h3>
+				<ul>
+					<li><a href="#">Whitepaper</a></li>
+					<li><a href="#">DexTools</a></li>
+					<li><a href="#">Uniswap</a></li>
+				</ul>
+			</div>
+
+			<!-- links -->
+			<div>
+				<h3>Socials</h3>
+				<ul>
+					<li><a href="https://twitter.com/neonhedge">Twitter</a></li>
+					<li><a href="https://t.me/neonhedge">Telegram</a></li>
+					<li><a href="mailto:info@neonhedge.com">Mail</a></li>
+				</ul>
+			</div>
+
+			<!-- copyrights -->
+			<p>&copy; Neon Hedge <span id="#thisYear"></span>. All Rights Reserved. 2023.</p>
+		</div>
+	</footer>
+	
+	
+	<!-- login modal -->
+	<div id="loginModal">
+		<div class="modal">
+			<!-- close modal icon -->
+			<span class="close-modal">x</span>
+			<!-- your logo here -->
+			<img src="./imgs/logo.webp" alt="Astro theme logo">
+			
+			<h2>Login with your account</h2>
+			<!-- login form -->
+			<form id="loginForm" action="javascript:void(0)">
+				<input type="email" name="emailLogin" id="emailLogin" placeholder="Your Email" required>
+				<input type="password" name="passwordLogin" id="passwordLogin" placeholder="Your Password" required>
+				<button type="submit" class="btn-cta">Login</button>
+			</form>
+			
+			<p>or continue</p>
+			<!-- login with Google account -->
+			<button class="btn-border">
+				with <strong>Google</strong>
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 488 512"><path d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z"/></svg>
+			</button>
+			<!-- login with Facebook account -->
+			<button class="btn-border">
+				with <strong>Facebook</strong>
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 310 512"><path d="M279.14 288l14.22-92.66h-88.91v-60.13c0-25.35 12.42-50.06 52.24-50.06h40.42V6.26S260.43 0 225.36 0c-73.22 0-121.08 44.38-121.08 124.72v70.62H22.89V288h81.39v224h100.17V288z"/></svg>
+			</button>
+			
+			<!-- link to registration modal -->
+			<small>Don't have an account? <a href="javascript:void(0)" id="changeSignUp">Sign up</a></small>
+		</div>
+	</div>
+
+
+	<!-- registration modal -->
+	<div id="signUpModal">
+		<div class="modal">
+			<!-- close modal icon -->
+			<span class="close-modal">x</span>
+			<!-- your logo here -->
+			<img src="./imgs/logo.webp" alt="Astro theme logo">
+			
+			<h2>Sign Up now!</h2>
+			<!-- registration form -->
+			<form id="signUpForm" action="javascript:void(0)">
+				<input type="text" name="usernameSignUp" id="usernameSignUp" placeholder="Your Username" required>
+				<input type="email" name="emailSignUp" id="emailSignUp" placeholder="Your Email" required>
+				<input type="password" name="passwordSignUp" id="passwordSignUp" placeholder="Your Password" required>
+				<button type="submit" class="btn-cta">Sign Up</button>
+			</form>
+
+			<p>or Sign Up</p>
+			<!-- registration with Google account -->
+			<button class="btn-border">
+				with <strong>Google</strong>
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 488 512"><path d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z"/></svg>
+			</button>
+			<!-- registration with Facebook account -->
+			<button class="btn-border">
+				with <strong>Facebook</strong>
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 310 512"><path d="M279.14 288l14.22-92.66h-88.91v-60.13c0-25.35 12.42-50.06 52.24-50.06h40.42V6.26S260.43 0 225.36 0c-73.22 0-121.08 44.38-121.08 124.72v70.62H22.89V288h81.39v224h100.17V288z"/></svg>
+			</button>
+			
+			<!-- link to login modal -->
+			<small>Already have an account? <a href="javascript:void(0)" id="changeLogin">Login</a></small>
+		</div>
+	</div>
+	
+	
+	<!-- scrool to top button -->
+	<button id="goTop" title="Scrool to top">
+		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 450"><path d="M168.5 164.2l148 146.8c4.7 4.7 4.7 12.3 0 17l-19.8 19.8c-4.7 4.7-12.3 4.7-17 0L160 229.3 40.3 347.8c-4.7 4.7-12.3 4.7-17 0L3.5 328c-4.7-4.7-4.7-12.3 0-17l148-146.8c4.7-4.7 12.3-4.7 17 0z"></path></svg>
+	</button>
+
+
+	<!-- Whats App button -->
+	<button class="wa-chat" href="https://wa.me/YOUR_NUMBER?text=Good+Morning,+I+would+need+to+" target="_blank">
+		<span class="wa-msg">Hello, Can we help you?</span>
+	</button>
+
+
+	<!-- js -->
+	<script src="./js/aos.js"></script>
+	<script src="./js/main.js" defer></script>
+</body>
+</html>

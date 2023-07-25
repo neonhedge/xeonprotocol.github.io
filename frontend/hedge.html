@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<!-- favicons -->
+	<link rel="apple-touch-icon" sizes="180x180" href="./imgs/fav/apple-touch-icon.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="./imgs/fav/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="./imgs/fav/favicon-16x16.png">
+	<link rel="manifest" href="./imgs/fav/site.webmanifest">
+	<link rel="mask-icon" href="./imgs/fav/safari-pinned-tab.svg" color="#5bbad5">
+	<link rel="shortcut icon" href="./imgs/fav/favicon.ico">
+	<meta name="msapplication-TileColor" content="#da532c">
+	<meta name="msapplication-config" content="./imgs/fav/browserconfig.xml">
+	<meta name="theme-color" content="#ffffff">
+	<meta name="author" content="Kaveman-x">
+	<!-- title page & SEO meta -->
+	<title>NEON - Wallet</title>
+	<meta name="description" content="neon hedge is a universal ERC20 hedging and lending platform">
+	<meta name="keywords" content="erc20, crypto, hedging, call options, swaps, lending, collateral, website, html, html5, css">
+	<!-- google fonts -->
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700&family=Space+Grotesk:wght@300;400;600;700&display=swap" rel="stylesheet">
+	<!-- css -->
+	<link rel="stylesheet" href="./css/fontawesome.min.css" />
+	<link rel="stylesheet" href="./css/aos.css" />
+	<link rel="stylesheet" href="./css/style.css">
+	<link rel="stylesheet" href="./css/custom.css">
+	<!-- portfolio windows styling -->
+	<link rel="stylesheet" type="text/css" href="css/_menu.css">
+	<link rel="stylesheet" type="text/css" href="css/_fund.css">
+	<link rel="stylesheet" type="text/css" href="css/sweetalert/sweetalert.css">
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+	<!-- portfolio windows scripts -->
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js"></script>
+	<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+	<script type="text/javascript" src="js/_walletstatus.js"></script>
+	<script type="text/javascript" src="js/_portfolio.js"></script>	
+	<script type="text/javascript" src="js/_fund.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+	<script type="application/javascript" src="js/sweetalert/sweetalert.min.js"></script>
+	<script>
+
+$(document).ready(async function(){
+	// Retrieve the canvas element
+	var ctx = document.getElementById('chart').getContext('2d');
+	var ctx2 = document.getElementById('chart2').getContext('2d');
+
+	// Prepare the data for the pie chart
+	var plData = {
+	labels: ['Profit', 'Loss', 'Break'],
+	datasets: [{
+		/*label: 'Dapp Analytics',*/
+		data: [30, 65, 5],
+		backgroundColor: ['#39f', 'black', 'white'], // Set custom colors for the parts
+		borderColor: 'rgba(0, 123, 255, 1)', // Customize the chart colors
+		borderWidth: 1, // Customize the chart line width
+	}]
+	};
+
+	// Prepare the data for the cashflow chart
+	var cashingData = {
+	labels: ['CashIn', 'CashOut'],
+	datasets: [{
+		/*label: 'Dapp Analytics',*/
+		data: [60, 40],
+		backgroundColor: ['#39f', 'black'], // Set custom colors for the parts
+		borderColor: 'rgba(0, 123, 255, 1)', // Customize the chart colors
+		borderWidth: 1, // Customize the chart line width
+	}]
+	};
+
+	// Create the P/L chart
+	var chart = new Chart(ctx, {
+		type: 'pie', // Choose the chart type (e.g., line, bar, pie)
+		data: plData, // Assign the P/L data
+		options: {
+			plugins: {
+			legend: {
+				display: false // Hide the labels
+			}
+			}
+		}
+	});
+
+	// Create the Cashing pie chart
+	var chart2 = new Chart(ctx2, {
+		type: 'pie',
+		data: cashingData,
+		options: {
+			plugins: {
+			legend: {
+				display: false // Hide the labels
+			}
+			}
+		}
+	});
+
+});
+
+	</script>
+</head>
+
+<body>
+	<!-- Accessibility: Skip to content -->
+	<a href="#main" class="skip-to-content">Skip to content</a>
+	<!-- Preload page -->
+	<div id="preload">neon hedge loading...</div>
+
+
+	<header>
+		<div class="container grid" data-aos="fade-up">
+			<!-- your logo here -->
+			<a href="./">
+				<img src="./imgs/maskot3.webp" alt="logo">
+			</a>
+
+			<!-- mobile navbar toggle button -->
+			<button class="mobile-nav-toggle" aria-controls="navbar">
+				<span class="sr-only" aria-expanded="false">Menu</span>
+				<div class="bar1"></div>
+				<div class="bar2"></div>
+				<div class="bar3"></div>
+			</button>
+			
+			<!-- navbar with page links -->
+			<nav id="navbar" data-visible="false">
+				<ul>
+					<li><a href="docs.html">Docs</a></li>
+					<li><a href="floor.html">Floor</a></li>
+					<li><a href="dashboard.html">Dashboard</a></li>
+					
+				</ul>
+				<!-- navbar buttons -->
+				<div class="account">
+					<button class="btn-cta blockstatehold" id="blockstatehold">
+						<div class="showingshold">
+							<div class="wallets walletpur" style="display:none;">
+								<div class="wallet_tab">
+									<span id="wallet_balance">...</span><img src="imgs/walletimg.svg" /><span id="wallet_id">0x...</span>
+								</div>
+							 </div>
+							 <div class="wallets waiting_init">-----</div>
+							 <div class="wallets wallet_connect">Connect Wallet</div>
+							 <div class="wallets network_switch">Switch Network</div>
+						</div>
+					</button>
+				</div>
+			</nav>
+		</div>
+        <!-- chain stat-->
+        <div class="chainstat">
+            <div id="blocknumber" class="blockel">-------</div><div class="dot blockel"></div>
+        </div>
+	</header>
+	
+	
+	<main id="main">	
+		<!-- page title section -->
+		<section class="page-title"></section>
+		<!-- main section: project cards -->
+		<section class="sectionCenter">
+			<!--  ai assistant-->
+			<div class="aiAnalysis">
+				<div class="aicontainer">
+					<div class="aishape">
+						<div class="aiHead"></div>
+						<div class="intro_cont"><div class="aiverdict">AI Assist</div></div>
+						<div class="aiDataCard">
+							<div class="flex-col">
+									<div class="flex flex-col">
+										<div class="grid-sect-subtitle">token base address</div>
+										<div class="grid-sect-subtitle-value">0X000....0000</div>
+									</div>
+								<hr class="line">
+								
+									<div class="flex items-center justify-between gap-2">
+										<div class="grid-sect-title">Hedge Volume:</div>
+									</div>
+									<div class="flex flex-col">
+										<div class="grid-sect-subtitle">Base amount</div>
+										<div class="grid-sect-subtitle-value">20 ETH</div>
+									</div>
+								<hr class="line">
+								<div class="grid-chartable">
+									<div class="flex flex-col">
+										<div class="grid-sect-subtitle-value">Net P/L</div>
+									</div>
+									<div class="hedgeCharts">
+										<canvas id="chart"></canvas>
+									</div>
+								</div>
+								<div class="grid-chartable">
+									<div class="flex flex-col">
+										<div class="grid-sect-subtitle-value">Cashflows</div>
+									</div>
+									<div class="hedgeCharts">
+										<canvas id="chart2"></canvas>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="hedgeCore">
+				<div class="hedgeCard statemark_ill_wish">				
+					<div class="hedgeGrid">
+						<div class="tokenLogoLeft" style="background-image:url('imgs/monkeytrain.png')"></div>
+						<div class="tokenName">
+							<div>TSUKA</div>
+							<div class="bagsize">1,660,500 BAG</div>
+						</div>
+					</div>
+					<div class="valueHold">
+						<div class="optionMarketValue flux highlightOption">10.2 ETH</div>
+						<div class="optionType flux highlightOption">CALL</div>
+					</div>
+					<div class="optionMark"><span>Start Value:</span><span class="oMfigure">-- ETH</span></div>
+					<div class="optionMark"><span>Strike Value:</span><span class="oMfigure">10.7 ETH</span></div>
+					<div class="optionMark"><span>Hedge Cost:</span><span class="oMfigure">0.5 ETH</span></div>
+					<div class="optionMark"><span>Date Create:</span><span class="oMfigure">18/05/2023</span></div>
+					<div class="optionMark"><span>Date Taken:</span><span class="oMfigure">18/05/2023</span></div>
+					<div class="optionMark"><span>Date Expire:</span><span class="oMfigure">25/05/2023</span></div>
+					<div class="optionSummary">
+					</div>
+					<div style="display: block;">
+						<h5>Manage your risk:</h5>
+                        <div class="raiseSummary">							
+							<div class="kickoff">TOPUP </div>
+							<div class="projectRaiseTarget">Hedge Cost</div>
+							
+                            <span class="status-dot inprogress">
+								<i class="fa-solid fa-bolt"></i><span style="white-space: nowrap;" title="top up the cost, icnrease your risk/profit. other party has to accept before contract is settled.">Zap</span>
+							</span>
+							<div class="mbcard_detail rb_detail">
+								<div class="parent_meter">
+									<div id="meter_guage"></div><span class="measure">90%</span>
+								</div>
+							</div>
+                        </div>
+					</div>
+				</div>
+				
+			
+				<div class="hedgeStatusCard">
+					<div class="partyCont partyContTop">
+						<div class="ownerHold">
+							<div class="user-card">
+								<div class="icon"><i class="fa-solid fa-user-astronaut"></i></div>
+							</div>
+							<div class="userWallet ownerMark">0X3fe...h986</div>
+						</div>						
+						<!-- graphic svg -->	
+						<div class="ownerProfitabil">
+							<span>+ 0.00$</span>
+							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 100">
+								<rect x="0" y="0" width="100%" height="100%" fill="none" />
+								<defs>
+								  <marker id="arrowup" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto">
+									<path d="M0,4 L4,0 L8,4 L4,8 Z" fill="#25d366" />
+								  </marker>
+								</defs>
+								<path d="M10 90 L50 20 L90 70 L130 10" stroke="#25d366" fill="none" stroke-width="0.65" marker-end="url(#arrowup)" />
+							  </svg>
+						</div>		
+					</div>
+					<div class="partiesAction">
+						<div class="option_S_tab actionButton buyButton">
+							Action Option
+						</div>
+						<div class="">
+							<div class='option_S_tab _bookmarkjump'><img src='imgs/bookmark_.png' width='18px'/></div>
+						</div>
+					</div>					
+					<div class="partyCont">
+						<div class="ownerHold">
+							<div class="user-card">
+								<div class="icon"><i class="fa-solid fa-user-astronaut"></i></div>
+							</div>
+							<div class="userWallet ownerMark">0X000...0000</div>
+						</div>						
+						<!-- graphic svg -->	
+						<div class="ownerProfitabil">
+							<span>+ 0.00$</span>
+							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 100">
+								<rect x="0" y="0" width="100%" height="100%" fill="none" />
+								<defs>
+								  <marker id="arrowdown" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto">
+									<path d="M0,4 L4,0 L8,4 L4,8 Z" fill="red" />
+								  </marker>
+								</defs>
+								<path d="M10 10 L50 80 L90 30 L130 90" stroke="red" fill="none" stroke-width="0.65" marker-end="url(#arrowdown)" />
+							  </svg>
+						</div>		
+					</div>
+				</div>
+			</div><!--hedge core-->
+			
+        </section>
+		
+		<!-- call to action -->
+		<section class="cta">
+			<div class="container">
+				<div>
+					<h1 data-aos="fade-right">Coming <span class="txt-gradient">Soon</span></h1>
+					<p data-aos="fade-down" data-aos-delay="100">Play to Hedge - passive income games, each play is a hedge traded</p>
+					<p data-aos="fade-down" data-aos-delay="100">Liquidity Mining - deposit any erc20 token and start providing options liquidity</p>
+					<p data-aos="fade-down" data-aos-delay="100">Hedges Mining - settle hedges as they expire and earn 5% of the fees</p>
+				</div>
+				<!-- space vortex -->
+				<div class="space-vortex vortex-sm" data-aos="zoom-out-down" data-aos-delay="400">
+					<!-- space vortex external arc -->
+					<div class="arc">
+						<!-- space vortex center acr -->
+						<div class="arc">
+							<!-- space vortex inside arc -->
+							<div class="arc"></div>
+						</div>
+					</div>
+					<!-- call to action button -->				
+					<a href="#" target="_blank" class="btn btn-cta" data-aos="fade-left" data-aos-delay="200">Buy $NEON Now</a>
+				</div>
+			</div>
+		</section>
+	</main>
+
+	<div id="popupNotify" style="display:none;">
+		<div id="pNotifyX">x</div>
+		<div class="popupSuccess"></div>
+		<div class="popupBody">
+			<span class="popupText" id="popupTitle"></span>
+			<span class="popupText" id="popupAmounts"></span>
+			<span class="popupText" id="popupTxhash"></span>
+		</div>
+		<div id="pNt" class="popupNotify_timer"></div>
+	</div>
+	<!-- footer -->
+	<footer>
+		<div class="container grid" data-aos="fade-up">
+			<div>
+				<!-- your logo here -->
+				<a href="/">	
+					<img src="./imgs/maskot3.webp" alt="neon hedge logo">
+				</a>
+				<p class="mb-2 text-align-center">Neon Hedge</p>
+
+				<!-- social links -->
+				<ul class="inline-list text-align-center">
+					<li>
+						<a href="https://twitter.com/neonhedge" target="_self">
+							<i class="fa-brands fa-twitter"></i>
+						</a>
+					</li>
+					<li>
+						<a href="https://t.me/neonhedge" target="_self">
+							<i class="fa-solid fa-paper-plane"></i>
+						</a>
+					</li>
+				</ul>
+			</div>
+
+			<!-- links -->
+			<div>
+				<h3>Navigate</h3>
+				<ul>
+					<li><a href="#" title="coming soon">Portfolio</a></li>
+				</ul>
+			</div>
+
+			<!-- links -->
+			<div>
+				<h3>Links</h3>
+				<ul>
+					<li><a href="#">Whitepaper</a></li>
+					<li><a href="#">DexTools</a></li>
+					<li><a href="#">Uniswap</a></li>
+				</ul>
+			</div>
+
+			<!-- links -->
+			<div>
+				<h3>Socials</h3>
+				<ul>
+					<li><a href="https://twitter.com/neonhedge">Twitter</a></li>
+					<li><a href="https://t.me/neonhedge">Telegram</a></li>
+					<li><a href="mailto:info@neonhedge.com">Mail</a></li>
+				</ul>
+			</div>
+
+			<!-- copyrights -->
+			<p>&copy; Neon Hedge <span id="#thisYear"></span>. All Rights Reserved. 2023.</p>
+		</div>
+	</footer>
+	
+	
+	<!-- login modal -->
+	<div id="loginModal">
+		<div class="modal">
+			<!-- close modal icon -->
+			<span class="close-modal">x</span>
+			<!-- your logo here -->
+			<img src="./imgs/logo.webp" alt="Astro theme logo">
+			
+			<h2>Login with your account</h2>
+			<!-- login form -->
+			<form id="loginForm" action="javascript:void(0)">
+				<input type="email" name="emailLogin" id="emailLogin" placeholder="Your Email" required>
+				<input type="password" name="passwordLogin" id="passwordLogin" placeholder="Your Password" required>
+				<button type="submit" class="btn-cta">Login</button>
+			</form>
+			
+			<p>or continue</p>
+			<!-- login with Google account -->
+			<button class="btn-border">
+				with <strong>Google</strong>
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 488 512"><path d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z"/></svg>
+			</button>
+			<!-- login with Facebook account -->
+			<button class="btn-border">
+				with <strong>Facebook</strong>
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 310 512"><path d="M279.14 288l14.22-92.66h-88.91v-60.13c0-25.35 12.42-50.06 52.24-50.06h40.42V6.26S260.43 0 225.36 0c-73.22 0-121.08 44.38-121.08 124.72v70.62H22.89V288h81.39v224h100.17V288z"/></svg>
+			</button>
+			
+			<!-- link to registration modal -->
+			<small>Don't have an account? <a href="javascript:void(0)" id="changeSignUp">Sign up</a></small>
+		</div>
+	</div>
+
+
+	<!-- registration modal -->
+	<div id="signUpModal">
+		<div class="modal">
+			<!-- close modal icon -->
+			<span class="close-modal">x</span>
+			<!-- your logo here -->
+			<img src="./imgs/logo.webp" alt="Astro theme logo">
+			
+			<h2>Sign Up now!</h2>
+			<!-- registration form -->
+			<form id="signUpForm" action="javascript:void(0)">
+				<input type="text" name="usernameSignUp" id="usernameSignUp" placeholder="Your Username" required>
+				<input type="email" name="emailSignUp" id="emailSignUp" placeholder="Your Email" required>
+				<input type="password" name="passwordSignUp" id="passwordSignUp" placeholder="Your Password" required>
+				<button type="submit" class="btn-cta">Sign Up</button>
+			</form>
+
+			<p>or Sign Up</p>
+			<!-- registration with Google account -->
+			<button class="btn-border">
+				with <strong>Google</strong>
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 488 512"><path d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z"/></svg>
+			</button>
+			<!-- registration with Facebook account -->
+			<button class="btn-border">
+				with <strong>Facebook</strong>
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 310 512"><path d="M279.14 288l14.22-92.66h-88.91v-60.13c0-25.35 12.42-50.06 52.24-50.06h40.42V6.26S260.43 0 225.36 0c-73.22 0-121.08 44.38-121.08 124.72v70.62H22.89V288h81.39v224h100.17V288z"/></svg>
+			</button>
+			
+			<!-- link to login modal -->
+			<small>Already have an account? <a href="javascript:void(0)" id="changeLogin">Login</a></small>
+		</div>
+	</div>
+	
+	
+	<!-- scrool to top button -->
+	<button id="goTop" title="Scrool to top">
+		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 450"><path d="M168.5 164.2l148 146.8c4.7 4.7 4.7 12.3 0 17l-19.8 19.8c-4.7 4.7-12.3 4.7-17 0L160 229.3 40.3 347.8c-4.7 4.7-12.3 4.7-17 0L3.5 328c-4.7-4.7-4.7-12.3 0-17l148-146.8c4.7-4.7 12.3-4.7 17 0z"></path></svg>
+	</button>
+
+
+	<!-- Whats App button -->
+	<button class="wa-chat" href="https://wa.me/YOUR_NUMBER?text=Good+Morning,+I+would+need+to+" target="_blank">
+		<span class="wa-msg">Hello, Can we help you?</span>
+	</button>
+
+
+	<!-- js -->
+	<script src="./js/aos.js"></script>
+	<script src="./js/main.js" defer></script>
+</body>
+</html>

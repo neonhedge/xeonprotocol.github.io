@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<!-- favicons -->
+	<link rel="apple-touch-icon" sizes="180x180" href="./imgs/fav/apple-touch-icon.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="./imgs/fav/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="./imgs/fav/favicon-16x16.png">
+	<link rel="manifest" href="./imgs/fav/site.webmanifest">
+	<link rel="mask-icon" href="./imgs/fav/safari-pinned-tab.svg" color="#5bbad5">
+	<link rel="shortcut icon" href="./imgs/fav/favicon.ico">
+	<meta name="msapplication-TileColor" content="#da532c">
+	<meta name="msapplication-config" content="./imgs/fav/browserconfig.xml">
+	<meta name="theme-color" content="#ffffff">
+	<meta name="author" content="Kaveman-x">
+	<!-- title page & SEO meta -->
+	<title>NEON - Stream</title>
+	<meta name="description" content="neon hedge is a universal ERC20 hedging and lending platform">
+	<meta name="keywords" content="erc20, crypto, hedging, call options, swaps, lending, collateral, website, html, html5, css">
+	<!-- google fonts -->
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700&family=Space+Grotesk:wght@300;400;600;700&display=swap" rel="stylesheet">
+	<!-- css -->
+	<link rel="stylesheet" href="./css/fontawesome.min.css" />
+	<link rel="stylesheet" href="./css/aos.css" />
+	<link rel="stylesheet" href="./css/style.css">
+	<link rel="stylesheet" href="./css/custom.css">
+	<!-- portfolio windows styling -->
+	<link rel="stylesheet" type="text/css" href="css/_menu.css">
+    <link rel="stylesheet" type="text/css" href="css/_floor.css">
+    <link rel="stylesheet" type="text/css" href="css/sweetalert/sweetalert.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+	<!-- floor scripts -->
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js"></script>
+	<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+	<script type="text/javascript" src="js/_walletstatus.js"></script>
+	<script type="text/javascript" src="js/_floor.js"></script>
+	<script type="application/javascript" src="js/sweetalert/sweetalert.min.js"></script>
+
+    <script>
+        //which tab is highlighted
+        $(document).ready(function(){
+			$('#callOptions').css({'background' : '#d6188a'});//left panel
+			$('#discoverTab').css({'border' : '1px solid #d6188a'});//try #87CEFA
+			//set global
+			window.nav = 1;
+			window.filters = 1;
+			window.readLimit = 30;
+			//check load continuation
+			MyGlobals.outputArray = [];
+			MyGlobals.startIndex = 0;
+			MyGlobals.lastItemIndex = 0;
+			loadOptions(startIndex, readLimit);
+       });
+       $(document).on('click', '#callOptions', function(e){
+            $('.asideNavsinside').removeAttr('style'); //reset styles
+            $(this).css({'border' : '1px solid #d6188a', 'background' : '#d6188a'});//set style
+            //set global
+			window.nav = 1;
+			window.filters = 1;
+			//check load continuation
+			MyGlobals.outputArray = [];
+			MyGlobals.startIndex = 0;
+			MyGlobals.lastItemIndex = 0;
+			loadOptions(startIndex, readLimit);
+        });
+        $(document).on('click', '#equitySwaps', function(e){
+            $('.asideNavsinside').removeAttr('style'); //reset styles
+            $(this).css({'border' : '1px solid #d6188a', 'background' : '#d6188a'});//set style
+            //set global
+			window.nav = 2;
+			window.filters = 1;
+			//check load continuation
+			MyGlobals.outputArray = [];
+			MyGlobals.startIndex = 0;
+			MyGlobals.lastItemIndex = 0;
+			loadOptions(startIndex, readLimit);
+        });
+        $(document).on('click', '#walletloans', function(e){
+            $('.asideNavsinside').removeAttr('style'); //reset styles
+            $(this).css({'border' : '1px solid #d6188a', 'background' : '#d6188a'});//set style
+            //set global
+			window.nav = 3;
+			window.filters = 1;
+			//check load continuation
+			MyGlobals.outputArray = [];
+			MyGlobals.startIndex = 0;
+			MyGlobals.lastItemIndex = 0;
+			loadOptions(startIndex, readLimit);
+        });
+        $(document).on('click', '#socialstream', function(e){
+            $('.asideNavsinside').removeAttr('style'); //reset styles
+            $(this).css({'border' : '1px solid #d6188a', 'background' : '#d6188a'});//set style
+            //set global
+              
+        });
+        //filters
+        $(document).on('click', '#discoverTab', function(e){
+            $('.streamtype').removeAttr('style'); //reset styles
+            $(this).css({'border' : '1px solid #d6188a'});//set style
+            //set global
+			window.filters = 1;
+			//check load continuation
+			MyGlobals.outputArray = [];
+			MyGlobals.startIndex = 0;
+			MyGlobals.lastItemIndex = 0;
+			loadOptions(startIndex, readLimit);
+        });
+        $(document).on('click', '#mypositionsTabs', function(e){
+            $('.streamtype').removeAttr('style'); //reset styles
+            $(this).css({'border' : '1px solid #d6188a'});//set style
+            //set global
+			window.filters = 2;
+			//check load continuation
+			MyGlobals.outputArray = [];
+			MyGlobals.startIndex = 0;
+			MyGlobals.lastItemIndex = 0;
+			loadOptions(startIndex, readLimit);
+        });
+        $(document).on('click', '#bookmarksTab', function(e){
+            $('.streamtype').removeAttr('style'); //reset styles
+            $(this).css({'border' : '1px solid #d6188a'});//set style
+            //set global
+			window.filters = 3;
+			//check load continuation
+			MyGlobals.outputArray = [];
+			MyGlobals.startIndex = 0;
+			MyGlobals.lastItemIndex = 0;
+			loadOptions(startIndex, readLimit);
+        });
+
+       //notes:
+	   //looping script to update options card
+	   //script takes a global new array of optionIDs at any time then uses those IDs to update value, settlement state
+	   //option cards are fetched on nav or tab click or results subset tabs in sets of 30
+	   //each subset fetch stores the last array index to know where it left when fetching more results
+
+    </script>
+</head>
+
+<body>
+	<!-- Accessibility: Skip to content -->
+	<a href="#main" class="skip-to-content">Skip to content</a>
+	<!-- Preload page -->
+	<div id="preload">neon hedge loading...</div>
+
+
+	<header>
+		<div class="container grid" data-aos="fade-up">
+			<!-- your logo here -->
+			<a href="./">
+				<img src="./imgs/maskot3.webp" alt="logo">
+			</a>
+
+			<!-- mobile navbar toggle button -->
+			<button class="mobile-nav-toggle" aria-controls="navbar">
+				<span class="sr-only" aria-expanded="false">Menu</span>
+				<div class="bar1"></div>
+				<div class="bar2"></div>
+				<div class="bar3"></div>
+			</button>
+			
+			<!-- navbar with page links -->
+			<nav id="navbar" data-visible="false">
+				<ul>
+                    <li><a href="docs.html">Docs</a></li>
+					<li><a href="trade.html">Marketplace</a></li>
+					<li><a href="wallet.html">Wallet</a></li>
+                    <li><a href="analytics.html">Analytics</a></li>
+				</ul>
+				<!-- navbar buttons -->
+				<div class="account">
+					<button class="btn-cta blockstatehold" id="blockstatehold">
+						<div class="showingshold">
+							<div class="wallets walletpur" style="display:none;">
+								<div class="wallet_tab">
+									<span id="wallet_balance">...</span><img src="imgs/walletimg.svg" /><span id="wallet_id">0x...</span>
+								</div>
+							 </div>
+							 <div class="wallets waiting_init">-----</div>
+							 <div class="wallets wallet_connect">Connect Wallet</div>
+							 <div class="wallets network_switch">Switch Network</div>
+						</div>
+					</button>
+				</div>
+			</nav>
+		</div>
+        <!-- chain stat-->
+        <div class="chainstat">
+            <div id="blocknumber" class="blockel">-------</div><div class="dot blockel"></div>
+        </div>
+	</header>
+	
+	
+	<main id="main">	
+		<!-- page title section -->
+		<section class="page-title"></section>
+		<!-- main section: project cards -->
+		<section class="sectionCenter">
+            <aside id="leftpaner">
+                <div class="clubSinnage">
+                    <h4 title="P2P options market place">> navigation</h4>
+                </div>
+                <div class="asideNavs">
+                    <div class="asideNavsinside" id="callOptions" title="create - buy - discover and track OTC ERC20 Call Options">Options</div>
+                </div>
+                <div class="asideNavs">
+                    <div class="asideNavsinside" id="equitySwaps" title="create - buy - discover and track OTC ERC20 Equity Swaps">Swaps</div>
+                </div>
+                <div class="asideNavs">
+                    <div class="asideNavsinside" id="clubloans" title="create or discover OTC loan requests, collateralized by ERC20 tokens">Loans</div>
+                </div>
+                <div class="asideNavs">
+                    <div class="asideNavsinside" id="socialstream">Social</div>
+                </div>
+                <section id="footerSideNavs">
+                    <div class="contacts_cont">
+                        </br>
+                        <a class="our_social_links" href="https://twitter.com/neonhedge" target="_blank" alt="Twitter Page" title="Go to Twitter page"><img src="imgs/twitter.svg" width="32px"/></a>
+                        <a class="our_social_links" href="https://t.me/neonhedge" target="_blank" alt="Telegram Group" title="Go to Telegram group"><img src="imgs/telegram.svg" width="32px"/></a>
+                        </br>
+                        <span>reach us:</span>
+                    </div>
+                </section>
+            </aside>
+            <!-- timeline of projects funded|loans|repaying -->
+            <div class="timelineHold">
+                <!-- navigate timelines -->
+                <div class="feedsfilterDockHold">					  
+                    <div  class="streamtype" id="discoverTab"><div class="eventAct" ><a href="#">Discover</a></div></div>
+                    <div  class="streamtype" id="mypositionsTabs"><div class="eventAct" ><a href="#">MyPositions</a></div></div>
+                    <div  class="streamtype" id="bookmarksTab"><div class="eventAct"><a href="#">Bookmarks</a></div></div>
+                    <button id="create_button" class="neon-button">
+						<span class="neon-button-icon">+</span>
+					</button>
+                    <div class="sitesearchhold" id="feedsearchhold">
+                        <form id="swap_searcher" action="" method="post" onsubmit="onSearchSubmit(event);">
+                        <input id="swapsearch" class="search-input" type="text" name="search" placeholder=" filter token address.." autocomplete="off" spellcheck="false"  /> 
+                        <input type="submit" id="searchaddress" class="site_search_btn" value="" />
+                        </form>
+                        <div id="searchresult"></div>
+                    </div>
+                </div>
+                <div id="hedgesTimeline" class="hedgesTimeline">
+                    <!-- project cards in here -->
+                </div>
+            </div>
+         </section>
+		<!-- call to action -->
+		<section class="cta">
+			<div class="container">
+				<div>
+					<h1 data-aos="fade-right">Coming <span class="txt-gradient">Soon</span></h1>
+					<p data-aos="fade-down" data-aos-delay="100">Dapp Dashboard to track the health of our Dapp and market trends, this will help our users better visualise ERC20 hedging and be able to make more informed decisions on our OTC market. Our dashboard will also help the team gather data that helps in improving our platform / project.</p>
+				</div>
+				<!-- space vortex -->
+				<div class="neon-background space-vortex vortex-sm" data-aos="zoom-out-down" data-aos-delay="400">
+					<!-- space vortex external arc -->
+					<div class="arc">
+						<!-- space vortex center acr -->
+						<div class="arc">
+							<!-- space vortex inside arc -->
+							<div class="arc"></div>
+						</div>
+					</div>
+					<!-- call to action button -->				
+					<a href="#" target="_blank" class="ndiripano btn btn-cta" data-aos="fade-left" data-aos-delay="200">Buy $NEON</a>
+				</div>
+			</div>
+		</section>
+	</main>
+
+	<div id="popupNotify" style="display:none;">
+		<div id="pNotifyX">x</div>
+		<div class="popupSuccess"></div>
+		<div class="popupBody">
+			<span class="popupText" id="popupTitle"></span>
+			<span class="popupText" id="popupAmounts"></span>
+			<span class="popupText" id="popupTxhash"></span>
+		</div>
+		<div id="pNt" class="popupNotify_timer"></div>
+	</div>
+	<!-- footer -->
+	<footer>
+		<div class="container grid" data-aos="fade-up">
+			<div>
+				<!-- your logo here -->
+				<a href="/">	
+					<img src="./imgs/maskot3.webp" alt="neon hedge logo">
+				</a>
+				<p class="mb-2">Neon Hedge</p>
+
+				<!-- social links -->
+				<ul class="inline-list">
+					<li>
+						<a href="https://twitter.com/neonhedge" target="_self">
+							<i class="fa-brands fa-twitter"></i>
+						</a>
+					</li>
+					<li>
+						<a href="https://t.me/neonhedge" target="_self">
+							<i class="fa-solid fa-paper-plane"></i>
+						</a>
+					</li>
+				</ul>
+			</div>
+
+			<!-- links -->
+			<div>
+				<h3>Navigate</h3>
+				<ul>
+					<li><a href="#" title="coming soon">Portfolio</a></li>
+				</ul>
+			</div>
+
+			<!-- links -->
+			<div>
+				<h3>Links</h3>
+				<ul>
+					<li><a href="#">Whitepaper</a></li>
+					<li><a href="#">DexTools</a></li>
+					<li><a href="#">Uniswap</a></li>
+				</ul>
+			</div>
+
+			<!-- links -->
+			<div>
+				<h3>Socials</h3>
+				<ul>
+					<li><a href="https://twitter.com/neonhedge">Twitter</a></li>
+					<li><a href="https://t.me/neonhedge">Telegram</a></li>
+					<li><a href="mailto:info@neonhedge.com">Mail</a></li>
+				</ul>
+			</div>
+
+			<!-- copyrights -->
+			<p>&copy; Neon Hedge <span id="#thisYear"></span>. All Rights Reserved. 2023.</p>
+		</div>
+	</footer>
+	
+	
+	<!-- login modal -->
+	<div id="loginModal">
+		<div class="modal">
+			<!-- close modal icon -->
+			<span class="close-modal">x</span>
+			<!-- your logo here -->
+			<img src="./imgs/logo.webp" alt="Astro theme logo">
+			
+			<h2>Login with your account</h2>
+			<!-- login form -->
+			<form id="loginForm" action="javascript:void(0)">
+				<input type="email" name="emailLogin" id="emailLogin" placeholder="Your Email" required>
+				<input type="password" name="passwordLogin" id="passwordLogin" placeholder="Your Password" required>
+				<button type="submit" class="btn-cta">Login</button>
+			</form>
+			
+			<p>or continue</p>
+			<!-- login with Google account -->
+			<button class="btn-border">
+				with <strong>Google</strong>
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 488 512"><path d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z"/></svg>
+			</button>
+			<!-- login with Facebook account -->
+			<button class="btn-border">
+				with <strong>Facebook</strong>
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 310 512"><path d="M279.14 288l14.22-92.66h-88.91v-60.13c0-25.35 12.42-50.06 52.24-50.06h40.42V6.26S260.43 0 225.36 0c-73.22 0-121.08 44.38-121.08 124.72v70.62H22.89V288h81.39v224h100.17V288z"/></svg>
+			</button>
+			
+			<!-- link to registration modal -->
+			<small>Don't have an account? <a href="javascript:void(0)" id="changeSignUp">Sign up</a></small>
+		</div>
+	</div>
+
+
+	<!-- registration modal -->
+	<div id="signUpModal">
+		<div class="modal">
+			<!-- close modal icon -->
+			<span class="close-modal">x</span>
+			<!-- your logo here -->
+			<img src="./imgs/logo.webp" alt="Astro theme logo">
+			
+			<h2>Sign Up now!</h2>
+			<!-- registration form -->
+			<form id="signUpForm" action="javascript:void(0)">
+				<input type="text" name="usernameSignUp" id="usernameSignUp" placeholder="Your Username" required>
+				<input type="email" name="emailSignUp" id="emailSignUp" placeholder="Your Email" required>
+				<input type="password" name="passwordSignUp" id="passwordSignUp" placeholder="Your Password" required>
+				<button type="submit" class="btn-cta">Sign Up</button>
+			</form>
+
+			<p>or Sign Up</p>
+			<!-- registration with Google account -->
+			<button class="btn-border">
+				with <strong>Google</strong>
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 488 512"><path d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z"/></svg>
+			</button>
+			<!-- registration with Facebook account -->
+			<button class="btn-border">
+				with <strong>Facebook</strong>
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 310 512"><path d="M279.14 288l14.22-92.66h-88.91v-60.13c0-25.35 12.42-50.06 52.24-50.06h40.42V6.26S260.43 0 225.36 0c-73.22 0-121.08 44.38-121.08 124.72v70.62H22.89V288h81.39v224h100.17V288z"/></svg>
+			</button>
+			
+			<!-- link to login modal -->
+			<small>Already have an account? <a href="javascript:void(0)" id="changeLogin">Login</a></small>
+		</div>
+	</div>
+	
+	
+	<!-- scrool to top button -->
+	<button id="goTop" title="Scrool to top">
+		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 450"><path d="M168.5 164.2l148 146.8c4.7 4.7 4.7 12.3 0 17l-19.8 19.8c-4.7 4.7-12.3 4.7-17 0L160 229.3 40.3 347.8c-4.7 4.7-12.3 4.7-17 0L3.5 328c-4.7-4.7-4.7-12.3 0-17l148-146.8c4.7-4.7 12.3-4.7 17 0z"></path></svg>
+	</button>
+
+
+	<!-- Whats App button -->
+	<button class="wa-chat" href="https://wa.me/YOUR_NUMBER?text=Good+Morning,+I+would+need+to+" target="_blank">
+		<span class="wa-msg">Hello, Can we help you?</span>
+	</button>
+
+
+	<!-- js -->
+	<script src="./js/aos.js"></script>
+	<script src="./js/main.js" defer></script>
+</body>
+</html>
