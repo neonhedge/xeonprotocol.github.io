@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity 0.8.4;
 // NEON HEDGE - hedge any ERC20 token. borrow with any ERC20 token.
-// We aim is to push hedging and crypto lending beyond just BTC & ETH as underlying assets.
+// Expanding beyonunderlying assets.
 
 //Call Options Functionality
 //1. to receive any ERC20 token as collateral/assets
@@ -77,7 +77,7 @@ contract HEDGEFUND {
       uint256 withdrawn; // incremented on successful withdrawl
       uint256 lockedinuse; // adjust on hedge creation or buy or settle
     }
-    struct contractBalances {
+    struct contractBalance {
       uint256 deposited;
       uint256 withdrawn;
     }
@@ -88,6 +88,7 @@ contract HEDGEFUND {
       address paired;
       uint status;//0 - none, 1 - created, 2 - taken, 3 - settled
       uint256 amount;
+      uint256 createValue;
       uint256 startvalue;
       uint256 endvalue;
       uint256 cost;
@@ -106,34 +107,52 @@ contract HEDGEFUND {
     mapping(address => mapping(address => uint[])) private userHedgesForTokenMap;
 
     // track all erc20 deposits and withdrawals to contract
-    mapping(address => contractBalances) public contractBalanceMap;
-    
-    // mapped addresses erc20s hedged/traded
-    mapping(address => bool) public hedgedTokenLookup;
+    mapping(address => contractBalance) public protocolBalanceMap;
 
     // mapping of all hedge storages by Id
     mapping(uint => hedgingOption) private hedgeMap;
 
-    // mapping of all hedges for each erc20
+    // mapping of all hedges & swaps for each erc20
     mapping(address => uint[]) private tokenHedges;
+    mapping(address => uint[]) private tokenSwaps;
 
     // mapping of all hedges for user by Id
     mapping(address => uint[]) myhedgesHistory;
+    mapping(address => uint[]) myswapsHistory;
     mapping(address => uint[]) myhedgesCreated;
     mapping(address => uint[]) myhedgesTaken;
+    mapping(address => uint[]) myswapsCreated;
+    mapping(address => uint[]) myswapsTaken;
     
     // mapping of all tokens transacted by user
     mapping(address => address[]) public userERC20s;
+    mapping(address => address[]) public baseERC20s;
 
-     // mapping bookmarks of each user
+    // mapping of all protocol profits and fees collected from hedges
+    mapping(address => uint256) public protocolHedgeProfitsTokens;//liquidated to bases at discount
+    mapping(address => uint256) public protocolHedgeProfitsBases;
+    mapping(address => uint256) public protocolHedgeFeesTokens;//liquidated to bases at discount
+    mapping(address => uint256) public protocolHedgeFeesBases;
+    mapping(address => uint256) public protocolHedgesCreateValue;
+    mapping(address => uint256) public protocolHedgesTakenValue;
+    mapping(address => uint256) public protocolHedgesCostValue;
+    mapping(address => uint256) public protocolHedgesSwapsValue;
+    mapping(address => uint256) public protocolHedgesOptionsValue;
+    mapping(address => uint256) public protocolHedgeSettleValue;
+
+    // other protocol analytics mappings
+    mapping(address => uint256) public protocolCashierFees;
+    mapping(address => uint256) public protocolTokenTaxFees; // in WETH only
+
+    // mapping bookmarks of each user
     mapping(address => mapping(uint256 => bool)) public bookmarks;
+    mapping(address => uint256[]) public bookmarkedOptions; // Array to store bookmarked optionIds for each user
     
     // all hedges
     uint[] private hedgesCreated;
     uint[] private hedgesTaken;
-
-    // array of currently deposited tokens
-    address[] private depositedTokens;
+    uint[] private equityswapsCreated;
+    uint[] private equityswapsTaken;
     
     uint public optionID;
     uint public takesCount;
@@ -141,6 +160,16 @@ contract HEDGEFUND {
     // fee variables
     uint256 public feeNumerator;
     uint256 public feeDenominator;
+
+    // erc20 deposits equiv in base currencies
+    uint256 public wethEquivDeposits;
+    uint256 public usdtEquivDeposits;
+    uint256 public usdcEquivDeposits;
+
+    // erc20 withdrawals equiv in base currencies
+    uint256 public wethEquivWithdrawals;
+    uint256 public usdtEquivWithdrawals;
+    uint256 public usdcEquivWithdrawals;
     
     address public feeReserveAddress;
     address public owner;
@@ -150,6 +179,7 @@ contract HEDGEFUND {
     address public wethAddress;
     address public usdtAddress;
     address public usdcAddress;
+    address public neonAddress;
 
     event Received(address, uint);
     event onDeposit(address indexed token, uint256 indexed amount, address indexed wallet);
@@ -157,6 +187,7 @@ contract HEDGEFUND {
     event hedgeCreated(address indexed token, uint256 indexed optionId, uint256 amount, HedgeType hedgeType, uint256 cost);
     event hedgePurchased(address indexed token, uint256 indexed optionId, uint256 amount, HedgeType hedgeType, address buyer);
     event hedgeSettled(address indexed token, uint256 indexed optionId, uint256 amount, uint256 indexed payOff, uint256 endvalue);
+    event minedHedge(uint256 optionId, address indexed miner, address indexed token, address indexed paired, uint256 tokenFee, uint256 baseFee);
     event bookmarkToggle(address indexed user, uint256 hedgeId, bool bookmarked);
 
 
@@ -165,7 +196,7 @@ contract HEDGEFUND {
       wethAddress = router.WETH();
       usdtAddress = 0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9; // USDT address on Arb
       usdcAddress = 0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d; // USDC address on Arb
-      //BUSD 0xeD24FC36d5Ee211Ea25A80239Fb8C4Cfd80f12Ee
+      neonAddress = 0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d;
 
       feeNumerator = 3;
       feeDenominator = 1000;
@@ -175,33 +206,85 @@ contract HEDGEFUND {
 
     function depositToken(address _token, uint256 _amount) public payable {
         require(_amount > 0, "Your attempting to transfer 0 tokens");
-        if (!hedgedTokenLookup[_token]) {
-            depositedTokens.push(_token);
-            hedgedTokenLookup[_token] = true;
-        }
+        
+        // Deposit token to contract
         uint256 allowance = IERC20(_token).allowance(msg.sender, address(this));
         require(allowance >= _amount, "You need to set a higher allowance");
-        //transfer tokens from sender to contract
         require(IERC20(_token).transferFrom(msg.sender, address(this), _amount), "Transfer failed");
-        //global tracker for tokens on contract
-        contractBalanceMap[_token].deposited += _amount;
-        //personal tracker for user tokens on contract
+        
+        // Log user balance & tokens
         userBalance storage uto = userBalanceMap[_token][msg.sender];
+        uto.deposited = uto.deposited.add(_amount);
         if(uto.deposited == 0){
           userERC20s[msg.sender].push(_token);
         }
-        uto.deposited = uto.deposited.add(_amount);
-        //store in storage
-        userBalanceMap[_token][msg.sender] = uto;
-        //emit
+        // Log contract balance & tokens
+        // protocolBalanceMap ia analytics only. userBalanceMap stores withdrawable balance
+        if(protocolBalanceMap[_token].deposited == 0){
+          userERC20s[address(this)].push(_token);
+        }
+        protocolBalanceMap[_token].deposited += _amount;
+        
+        // Log erc20 base equivalents
+        (uint256 marketValue, address paired) = getUnderlyingValue(_token, _amount);
+        if(paired == wethAddress){wethEquivDeposits += marketValue;}
+        if(paired == usdtAddress){usdtEquivDeposits += marketValue;}
+        if(paired == usdcAddress){usdcEquivDeposits += marketValue;}        
+        
+        // Emit deposit event
         emit onDeposit(_token, _amount, msg.sender);
     }
 
+    // Neon token tax deposits in WETH only
+    function depositTokenTax(address _token, uint256 _amount) public payable {
+        require(_token == wethAddress, "WETH only accepted");
+        require(msg.sender == neonAddress,"Depositor not allowed");
+        require(_amount > 0, "Attempting to deposit 0 ETHER");
+        
+        userBalanceMap[_token][address(this)].deposited.add(_amount);
+        // Log token tax ether before conversion to WETH
+        protocolTokenTaxFees[_token] += _amount;
+        
+        // Log erc20 base equivalents
+        wethEquivDeposits += _amount;    
+        
+        // Emit deposit event
+        emit onDeposit(_token, _amount, msg.sender);
+    }
+
+    function withdrawToken(address token, uint256 amount) public {
+        userBalance storage uto = userBalanceMap[token][msg.sender];
+        uint256 withdrawable = getWithdrawableBalance(token, msg.sender);
+        require(amount <= withdrawable && amount > 0, "You have Insufficient available balance");
+        require(msg.sender != address(this), "Not allowed");
+
+        // Update user's withdrawn balance
+        uint256 tokenFee;
+        if(token == wethAddress || token == usdtAddress || token == usdcAddress) {
+            tokenFee = calculateFee(amount) / 10;
+        }
+        uto.withdrawn = uto.withdrawn.add(amount);
+        require(IERC20(token).transfer(msg.sender, amount - tokenFee), "Transfer failed");
+
+        // log protocol cashier fees
+        if(tokenFee > 0) {
+            protocolCashierFees[token].add(tokenFee);
+            userBalanceMap[token][address(this)].deposited.add(tokenFee);
+        }
+
+        //--for erc20 base equivalent
+        (uint256 marketValue, address paired) = getUnderlyingValue(token, amount);
+        if(paired == wethAddress){wethEquivWithdrawals += marketValue;}
+        if(paired == usdtAddress){usdtEquivWithdrawals += marketValue;}
+        if(paired == usdcAddress){usdcEquivWithdrawals += marketValue;}
+
+        // Emit withdrawal event
+        emit onWithdraw(token, amount, msg.sender);
+    }
+
     //covers both call options and equity swaps
-    //uses withdrawable balance as the current account
-    //cap the max cost of option to the market standard for X years
-    //this virtually means we have x max year options based on this cap
-    //and we can calculate proportion for a lessor duration
+    //cost is in base currency or pair token
+    //swap collateral must  be equal, settle function relies on this implementation here
     function createHedge(bool tool, address token, uint256 amount, uint256 cost, uint256 deadline) public nonReentrant {
         require(!locked, "Function is locked");
         locked = true;
@@ -219,72 +302,100 @@ contract HEDGEFUND {
         newOption.token = token;
         newOption.status = 1;
         newOption.amount = amount;
-        (, newOption.paired) = getUnderlyingValue(token, amount);
+        (newOption.createValue, newOption.paired) = getUnderlyingValue(token, amount);
         newOption.cost = cost;
         newOption.dt_expiry = deadline;
         newOption.dt_created = block.timestamp;
-        newOption.hedgeType = tool ? HedgeType.CALL : HedgeType.SWAP; // Use ternary operator for conditional assignment
-
-        // Store only if data has changed or added to the struct
-        hedgeMap[optionID] = newOption;
+        newOption.hedgeType = tool ? HedgeType.CALL : HedgeType.SWAP;
 
         // Update user balances for token in hedge
         userBalance storage hto = userBalanceMap[token][msg.sender]; // Use storage instead of memory for hto
         hto.lockedinuse += amount; // Modify the property of hto directly in storage
         // Emit events and update arrays
-        myhedgesHistory[msg.sender].push(optionID);
-        myhedgesCreated[msg.sender].push(optionID);
-        hedgesCreated.push(optionID);
-        tokenHedges[token].push(optionID);
+        if (newOption.hedgeType == HedgeType.SWAP) {
+            // diff maker
+            require(cost >= newOption.createValue, " Swap collateral must be equal value");
+            myswapsHistory[msg.sender].push(optionID);
+            equityswapsCreated.push(optionID);
+            myswapsCreated[msg.sender].push(optionID);
+            tokenHedges[token].push(optionID);
+        } else if(newOption.hedgeType == HedgeType.CALL) {
+            myhedgesHistory[msg.sender].push(optionID);
+            hedgesCreated.push(optionID);
+            myhedgesCreated[msg.sender].push(optionID);
+            tokenSwaps[token].push(optionID);         
+        }
+
+        // Log protocol analytics
+        optionID++;
+        protocolHedgesCreateValue[newOption.paired].add(newOption.createValue);
+
+        // Emit
         emit hedgeCreated(token, optionID, amount, newOption.hedgeType, cost);
 
-        optionID++;
         locked = false;
     }
 
     function buyHedge(uint256 _optionId) public nonReentrant {
-        // Use the nonReentrant modifier to prevent reentrancy attacks 
-        // Locked as a manual lock to prevent concurrent execution of the same function by multiple users.
         require(!locked, "Function is locked");
         locked = true;
-
         hedgingOption storage hedge = hedgeMap[_optionId];
         userBalance storage stk = userBalanceMap[hedge.paired][msg.sender];
 
         // Check if the user has sufficient free base balance to buy the hedge
         require(getWithdrawableBalance(hedge.paired, msg.sender) >= hedge.cost, "Insufficient free base balance");
 
-        // Check if the option ID is valid and the buyer is not the owner of the hedge
+        // Check if option ID is valid and the buyer is not the owner of the hedge
         require(_optionId < optionID && msg.sender != hedge.owner, "Invalid option ID | Owner cant buy");
 
-        // Update the taker's lockedinuse balance
+        // Update taker's lockedinuse balance
         stk.lockedinuse = stk.lockedinuse.add(hedge.cost);
 
-        // Update the hedge details
+        // Update hedge details
         hedge.taker = msg.sender;
         hedge.status = 2;
 
-        // Calculate the start value based on the hedge type
+        // Calculate start value based on the hedge type
         (hedge.startvalue, ) = getUnderlyingValue(hedge.token, hedge.amount);
         if (hedge.hedgeType == HedgeType.CALL) {
             hedge.startvalue += hedge.cost;
         }
 
-        // Check if the start value is greater than 0
+        // Check if start value is greater than 0
         require(hedge.startvalue > 0, "Math error whilst getting price");
 
-        // Update the hedge timestamp
+        // Update hedge timestamp
         hedge.dt_started = block.timestamp;
 
-        // Store the updated structs
+        // Store updated structs
         userBalanceMap[hedge.paired][msg.sender] = stk;
         hedgeMap[_optionId] = hedge;
 
-        // Update user's hedges taken array and hedgesTaken count
-        myhedgesHistory[msg.sender].push(optionID);
-        myhedgesTaken[msg.sender].push(_optionId);
-        hedgesTaken.push(_optionId);
+        // Update arrays and takes count
+        if (hedge.hedgeType == HedgeType.SWAP) {
+            myswapsHistory[msg.sender].push(_optionId);
+            equityswapsTaken.push(_optionId);
+            myswapsTaken[msg.sender].push(_optionId);
+        } else if(hedge.hedgeType == HedgeType.CALL) {
+            myhedgesHistory[msg.sender].push(_optionId);
+            hedgesTaken.push(_optionId);
+            myhedgesTaken[msg.sender].push(_optionId);            
+        }
+
+        // Log array of both token & base tokens involved in protocol revenue
+        if(protocolHedgesTakenValue[hedge.paired] == 0){
+          baseERC20s[address(this)].push(hedge.paired);
+        }
+
+        // Protocol trackers
         takesCount += 1;
+        protocolHedgesTakenValue[hedge.paired].add(hedge.startvalue);
+        protocolHedgesCostValue[hedge.paired].add(hedge.cost);
+        if (hedge.hedgeType == HedgeType.SWAP) {
+            protocolHedgesSwapsValue[hedge.paired].add(hedge.startvalue);
+        } else if(hedge.hedgeType == HedgeType.CALL) {
+            protocolHedgesOptionsValue[hedge.paired].add(hedge.startvalue);
+        }
 
         // Emit the hedgePurchased event
         emit hedgePurchased(hedge.token, _optionId, hedge.amount, hedge.hedgeType, msg.sender);
@@ -295,16 +406,25 @@ contract HEDGEFUND {
     
     //settle hedge
     //this is a variable loss approach not textbook maximum loss approach, as calculated using 'getOptionValue' function
-    //techically equity swaps have max loss of collateral at max strike, option calls have max loss of cost only
-    //strike value is starting value when option was bought, less start value to determine if in the money
-    //funds moved from locked in use to deposit balances for both parties, settlement in base or equivalent underlying
-    //fees are collected on settlement and credited to contract balances
+    //strike value is determined by creator, thus pegging a strike price inherently. Start value is set when hedge is taken
+    //for options cost is non-refundable i.e. remains in lockedinuse for taker 
+    //for swaps the cost is the underlying value when hedge was created, this acts as collateral rather than hedge cost
+    //funds moved from locked in use to deposit balances for both parties, settlement in base or equivalent underlying tokens
+    //fees are collected on base tokens; if option cost was paid to owner as winning, if swap cost used as PayOff
+    //fees are collected on underlying tokens; if option and swap PayOffs were done in underlying tokens
+    //hedge fees are collected into address(this) userBalanceMap and manually distributed as dividents to a staking contract
+    //miners are the ones who settle hedges. Stake tokens to be able to mine hedges.
+    //miners can pick hedges with tokens and amounts they wish to mine & avoid accumulating mining rewards in unwanted tokens
+    //miner dust can be deposited into mining dust liquidation pools that sell the tokens at a discount & miners claim their share
     struct HedgeInfo {
+        uint256 startValue;
+        uint256 underlyingValue;
         uint256 payOff;
         uint256 priceNow;
         uint256 tokensDue;
-        uint256 tokenfee;
-        uint256 costfee;
+        uint256 tokenFee;
+        uint256 baseFee;
+        bool isPayoffOverCost;
     }
     function settleHedge(uint256 _optionId) external {
         HedgeInfo memory hedgeInfo;
@@ -313,9 +433,8 @@ contract HEDGEFUND {
         require(block.timestamp >= option.dt_expiry, "Option has not expired");
 
         // Initialize local variables
-        bool isPayOffGreaterThanCost;
-        uint256 startValue = option.startvalue;
-        (uint256 underlying, ) = getUnderlyingValue(option.token, option.amount);
+        hedgeInfo.startValue = option.startvalue;
+        (hedgeInfo.underlyingValue, ) = getUnderlyingValue(option.token, option.amount);
         
         // Get the user balances for the owner, taker, and contract
         userBalance storage oti = userBalanceMap[option.paired][option.owner];
@@ -324,97 +443,117 @@ contract HEDGEFUND {
         userBalance storage ttiU = userBalanceMap[option.token][option.taker];
         userBalance storage ccBT = userBalanceMap[option.paired][address(this)];
         userBalance storage ccUT = userBalanceMap[option.token][address(this)];
+        userBalance storage minrT = userBalanceMap[option.token][address(this)];
+        userBalance storage minrB = userBalanceMap[option.paired][address(this)];
+
+        hedgeInfo.baseFee = calculateFee(option.cost);
 
         if (option.hedgeType == HedgeType.CALL) {
-            isPayOffGreaterThanCost = underlying > startValue.add(option.cost);
-            if (isPayOffGreaterThanCost) {
-                // Taker profit = underlying - cost - strikevalue
-                hedgeInfo.payOff = underlying.sub(startValue.add(option.cost));
+            hedgeInfo.isPayoffOverCost = hedgeInfo.underlyingValue > hedgeInfo.startValue.add(option.cost);
+            if (hedgeInfo.isPayoffOverCost) {
+                // Taker profit in base = underlying - cost - strikevalue
+                hedgeInfo.payOff = hedgeInfo.underlyingValue.sub(hedgeInfo.startValue.add(option.cost));
                 // Convert to equiv tokens lockedinuse by owner, factor fee
                 (hedgeInfo.priceNow, ) = getUnderlyingValue(option.token, 1);
                 hedgeInfo.tokensDue = hedgeInfo.payOff.div(hedgeInfo.priceNow);
-                uint256 tokenfee = calculateFee(hedgeInfo.tokensDue);
-                uint256 costfee = calculateFee(option.cost);
-                // Move money - take full gains from owner, give taxed amount to taker, pocket difference
-                otiU.lockedinuse -= hedgeInfo.tokensDue;
-                ttiU.deposited += hedgeInfo.tokensDue.sub(tokenfee);
-                // Move money - pay cost to owner from taker
-                tti.lockedinuse -= option.cost;
-                oti.deposited += option.cost.sub(costfee);
-                // Restore initials - continue from balance of oti.lockedinuse
-                oti.lockedinuse -= option.amount - hedgeInfo.tokensDue;
-                // Move money - take taxes from settlement
-                ccUT.deposited += tokenfee;
-                ccBT.deposited += costfee;
+                hedgeInfo.tokenFee = calculateFee(hedgeInfo.tokensDue);                
+                // Move money - in underlying, take full gains from owner, credit taxed amount to taker, pocket difference
+                // ********** Motion to have lockedinuse not decremented when a party loses
+                // this is because if we decrement that withdrawable balance increases
+                // we do not decrement lockinuse for losing party, this locks the tokens forever. 
+                // we then credit the tokens to winners deposited balance
+                ttiU.deposited += hedgeInfo.tokensDue.sub(hedgeInfo.tokenFee);
+                // Move money - pay cost to owner from taker. lockedinuse lock principle
+                oti.deposited += option.cost.sub(hedgeInfo.baseFee);
+                // Restore initials - for owner, lock the loss only using lockedinuse. for taker option cost is not repaid
+                otiU.lockedinuse -= option.amount - hedgeInfo.tokensDue;
+                // Move money - credit taxes in both, as profit is in underlying and cost is in base
+                ccUT.deposited += (hedgeInfo.tokenFee * 85).div(100);
+                ccBT.deposited += (hedgeInfo.baseFee * 85).div(100);
+                // Miner fee - 15% of protocol fee for settling option. Mining call options always comes with 2 token fees
+                minrT.deposited += (hedgeInfo.tokenFee * 15).div(100);
+                minrB.deposited += (hedgeInfo.baseFee * 15).div(100);
             } else {
-                // Move money - maximum loss of base cost to taker only, owner loses nothing
-                tti.lockedinuse -= option.cost;
-                oti.deposited += option.cost.sub(calculateFee(option.cost));
-                // Restore initials - continue from balance of oti.lockedinuse
+                // Move money - maximum loss of base cost to taker only, owner loses nothing. lockedinuse principle applies
+                oti.deposited += option.cost.sub(hedgeInfo.baseFee);
+                // Restore initials - underlying collateral to owner. none to taker as cost always lost in options
                 oti.lockedinuse -= option.amount;
-                // Move money - take taxes from settlement
-                ccBT.deposited += calculateFee(option.cost);
+                // Move money - credit base fees only as profit and cost is in base. 
+                ccBT.deposited += (hedgeInfo.baseFee * 85).div(100);
+                // Miner fee - 15% of protocol fee for settling option
+                minrB.deposited += (hedgeInfo.baseFee * 15).div(100);
             }
-        } else {
-            if (underlying > startValue) {
-                hedgeInfo.payOff = underlying.sub(startValue);
+        } else if (option.hedgeType == HedgeType.SWAP) {
+            if (hedgeInfo.underlyingValue > hedgeInfo.startValue) {
+                hedgeInfo.payOff = hedgeInfo.underlyingValue.sub(hedgeInfo.startValue);
                 // Max loss config
                 if (hedgeInfo.payOff > option.cost) {
                     hedgeInfo.payOff = option.cost;
                 }
                 // Taker gains underlying tokens equiv
                 (hedgeInfo.priceNow, ) = getUnderlyingValue(option.token, 1);
-                uint256 tokensDue = hedgeInfo.payOff.div(hedgeInfo.priceNow);
-                uint256 tokenfee = calculateFee(hedgeInfo.tokensDue);
-                uint256 costfee = calculateFee(option.cost);
-                // Move money - take full gains from owner, give taxed amount to taker, pocket difference
-                otiU.lockedinuse -= tokensDue;
-                ttiU.deposited += tokensDue.sub(tokenfee);
-                // Move money - pay cost to owner from taker
+                hedgeInfo.tokensDue = hedgeInfo.payOff.div(hedgeInfo.priceNow);
+                hedgeInfo.tokenFee = calculateFee(hedgeInfo.tokensDue);
+                // Move money - in underlying, take full gains from owner, credit taxed amount to taker, pocket difference
+                // ********** Motion to have lockedinuse not decremented when a party loses
+                // this is because if we decrement that withdrawable balance increases
+                // we do not decrement lockinuse for losing party, this locks the tokens forever. 
+                // we then credit the tokens to winners deposited balance
+                ttiU.deposited += hedgeInfo.tokensDue.sub(hedgeInfo.tokenFee);
+                // Restore initials - for owner, lock the loss only using lockedinuse. for taker restore full cost in base
+                otiU.lockedinuse -= option.amount.sub(hedgeInfo.tokensDue);
                 tti.lockedinuse -= option.cost;
-                oti.deposited += option.cost.sub(costfee);
-                // Restore initials - continue from balance of oti.lockedinuse
-                oti.lockedinuse -= option.amount - tokensDue;
-                // Move money - take taxes from settlement
-                ccUT.deposited += tokenfee;
-                ccBT.deposited += costfee;
+                // Move money - take taxes from winnings in underlying. none in base coz taker won underlying tokens
+                ccUT.deposited += (hedgeInfo.tokenFee * 85).div(100);
+                // Miner fee - 15% of protocol fee for settling option. none in base coz taker won underlying tokens
+                minrT.deposited += (hedgeInfo.tokenFee * 15).div(100);
             } else {
-                // Move money - maximum loss of base cost to taker only, owner loses nothing
-                tti.lockedinuse -= option.cost;
-                oti.deposited += option.cost.sub(calculateFee(option.cost));
-                // Restore initials - continue from balance of oti.lockedinuse
-                oti.lockedinuse -= option.amount;
-                // Move money - take taxes from settlement
-                ccBT.deposited += calculateFee(option.cost);
+                // Move money - equivalent loss of base cost to taker only, owner loses nothing
+                hedgeInfo.payOff = hedgeInfo.startValue.sub(hedgeInfo.underlyingValue);
+                // Max loss config
+                if (hedgeInfo.payOff > option.cost) {
+                    hedgeInfo.payOff = option.cost;
+                }
+                // taker losses equivalent cost (payoff) in base to owner. 
+                // lockedinuse principle applies, lost tokens locked forever
+                oti.deposited += hedgeInfo.payOff.sub(hedgeInfo.baseFee);
+                // Restore initials - for owner, all underlying tokens. For taker, cost in base less payoff that was locked forever
+                otiU.lockedinuse -= option.amount;
+                tti.lockedinuse -= option.cost.sub(hedgeInfo.payOff);
+                // Move money - winnings in base so only base fees credited
+                ccBT.deposited += (hedgeInfo.baseFee * 85).div(100);
+                // Miner fee - 15% of protocol fee for settling option. none in underlying tokens
+                minrB.deposited += (hedgeInfo.baseFee * 15).div(100);
             }
         }
-        //update hedge
+        // Log analytics
+        logAnalyticsFees(option.token, hedgeInfo.tokenFee, hedgeInfo.baseFee, hedgeInfo.tokensDue, option.cost, hedgeInfo.underlyingValue);
+        
+        // Update hedge
         option.status = 3;
-        option.endvalue = underlying;
+        option.endvalue = hedgeInfo.underlyingValue;
         option.dt_settled = block.timestamp;
-        //emit
-        emit hedgeSettled(option.token, _optionId, option.amount, hedgeInfo.payOff, underlying);
+
+        // Emit
+        emit hedgeSettled(option.token, _optionId, option.amount, hedgeInfo.payOff, hedgeInfo.underlyingValue);
+        emit minedHedge(_optionId, msg.sender, option.token, option.paired, hedgeInfo.tokenFee, hedgeInfo.baseFee);
     }
 
-    function withdrawToken(address token, uint256 amount) public {
-        userBalance storage uto = userBalanceMap[token][msg.sender];
-        uint256 withdrawable = getWithdrawableBalance(token, msg.sender);
-        require(amount <= withdrawable, "You are attempting to withdraw more than you have available");
-
-        // Update user's withdrawn balance
-        uto.withdrawn = uto.withdrawn.add(amount);
-
-        // Transfer tokens to the user
-        require(IERC20(token).transfer(msg.sender, amount), "Transfer failed");
-
-        // Update contract's withdrawn balance for the token
-        contractBalanceMap[token].withdrawn -= amount;
-
-        // Emit withdrawal event
-        emit onWithdraw(token, amount, msg.sender);
+    // Log Analytics
+    // - total profit to protocol
+    // - total profit to miner
+    // - split in weth, usdc, usdt
+    // - use userBalanceMap to get raw revenue balances and populate sums frontend
+    function logAnalyticsFees(address token, uint256 tokenFee, uint256 baseFee, uint256 tokenProfit, uint256 baseProfit, uint256 endValue) internal {
+       (address paired, ) = getPairAddressZK(token);
+        protocolHedgeProfitsTokens[token].add(tokenProfit);
+        protocolHedgeProfitsBases[paired].add(baseProfit);
+        protocolHedgeFeesTokens[token].add(tokenFee);
+        protocolHedgeFeesBases[paired].add(baseFee);
+        protocolHedgeSettleValue[paired].add(endValue);
     }
 
-    //utility functions
+    // Utility functions
     function updateFee(uint256 numerator, uint256 denominator) onlyOwner public {
       feeNumerator = numerator;
       feeDenominator = denominator;
@@ -428,17 +567,38 @@ contract HEDGEFUND {
       return (fee);
     }
 
-    // Function to toggle a bookmark for a Hedge by its ID
+    // Toggle a bookmark for a Hedge by its ID
     function bookmarkHedge(uint256 _optionId) public {
         bool bookmarked = bookmarks[msg.sender][_optionId];
         bookmarks[msg.sender][_optionId] = !bookmarked;
         emit bookmarkToggle(msg.sender, _optionId, !bookmarked);
+        // Update the bookmarkedOptions array for the user
+        if (!bookmarked) {
+            bookmarkedOptions[msg.sender].push(_optionId);
+        } else {
+            uint256[] storage options = bookmarkedOptions[msg.sender];
+            for (uint256 i = 0; i < options.length; i++) {
+                if (options[i] == _optionId) {
+                    // Remove the optionId from the bookmarkedOptions array
+                    if (i < options.length - 1) {
+                        options[i] = options[options.length - 1];
+                    }
+                    options.pop();
+                    break;
+                }
+            }
+        }
     }
 
+    // Get Bookmarks
     function getBookmark(address user, uint256 _optionId) public view returns (bool) {
         return bookmarks[user][_optionId];
     }
 
+    function getmyBookmarks(address user) public view returns (uint256[] memory) {
+        return bookmarkedOptions[user];
+    }
+    
     //Getter functions start here.
     struct PairInfo {
         address pairAddress;
@@ -475,7 +635,7 @@ contract HEDGEFUND {
         }
     }
     
-    //current account 
+    // balance of tokens on protocol
     function getWithdrawableBalance(address token, address user) public view returns (uint256) {
       userBalance memory uto = userBalanceMap[token][address(user)];
       uint256 withdrawable = 0;
@@ -483,7 +643,7 @@ contract HEDGEFUND {
       return withdrawable;
     }
 
-    //zero knowledge pair addr generator
+    // zero knowledge pair addr generator
     function getPairAddressZK(address tokenAddress) public view returns (address pairAddress, address pairedCurrency) {
       IUniswapV2Factory factory = IUniswapV2Factory(UNISWAP_FACTORY_ADDRESS);
       address wethPairAddress = factory.getPair(tokenAddress, wethAddress);
@@ -500,12 +660,62 @@ contract HEDGEFUND {
       }
     }
 
-    //users base balances
-    function getUserBases(address user) public view returns (uint256,uint256,uint256) {
-      return (userBalanceMap[wethAddress][user].deposited, userBalanceMap[usdtAddress][user].deposited, userBalanceMap[usdcAddress][user].deposited);
+    // get analytics - hedge created value; weth, usdt, usdc
+    function getHedgesCreatedValue() public view returns (uint256, uint256, uint256) {
+        return (protocolHedgesCreateValue[wethAddress], protocolHedgesCreateValue[usdtAddress], protocolHedgesCreateValue[usdcAddress]);
+    }
+    function getHedgesTakenValue() public view returns (uint256, uint256, uint256) {
+        return (protocolHedgesTakenValue[wethAddress], protocolHedgesTakenValue[usdtAddress], protocolHedgesTakenValue[usdcAddress]);
+    }
+    function getHedgesCostValue() public view returns (uint256, uint256, uint256) {
+        return (protocolHedgesCostValue[wethAddress], protocolHedgesCostValue[usdtAddress], protocolHedgesCostValue[usdcAddress]);
+    }
+    function getHedgesOptionsValue() public view returns (uint256, uint256, uint256) {
+        return (protocolHedgesOptionsValue[wethAddress], protocolHedgesOptionsValue[usdtAddress], protocolHedgesOptionsValue[usdcAddress]);
+    }
+    function getHedgesSwapsValue() public view returns (uint256, uint256, uint256) {
+        return (protocolHedgesSwapsValue[wethAddress], protocolHedgesSwapsValue[usdtAddress], protocolHedgesSwapsValue[usdcAddress]);
+    }
+    function getHedgesSettledValue() public view returns (uint256, uint256, uint256) {
+        return (protocolHedgeSettleValue[wethAddress], protocolHedgeSettleValue[usdtAddress], protocolHedgeSettleValue[usdcAddress]);
+    }
+    function getHedgesProfitsValue() public view returns (uint256, uint256, uint256) {
+        return (protocolHedgeProfitsBases[wethAddress], protocolHedgeProfitsBases[usdtAddress], protocolHedgeProfitsBases[usdcAddress]);
+    }
+    function getHedgesFeesValue() public view returns (uint256, uint256, uint256) {
+        return (protocolHedgeFeesBases[wethAddress], protocolHedgeFeesBases[usdtAddress], protocolHedgeFeesBases[usdcAddress]);
+    }
+    function getProtocolRevenue() public view returns (uint256, uint256, uint256) {
+        return (userBalanceMap[wethAddress][address(this)].deposited, userBalanceMap[usdtAddress][address(this)].deposited, userBalanceMap[usdcAddress][address(this)].deposited);
+    }
+    function getProtocolRevenueERC20(address token) public view returns (uint256) {
+        return (userBalanceMap[token][address(this)].deposited);
+    }
+    // Cashier fees on base tokens only
+    function getCashierFeesValue() public view returns (uint256, uint256, uint256) {
+        return (protocolCashierFees[wethAddress], protocolCashierFees[usdtAddress], protocolCashierFees[usdcAddress]);
+    }
+    function getTokenTaxesValue() public view returns (uint256) {// returns weth only
+        return (protocolTokenTaxFees[wethAddress]);
+    }
+    // Distributed revenue; withdrawn to staking contract for revenue
+    function getTotalDistributed() public view returns (uint256) {
+        return (userBalanceMap[wethAddress][address(this)].withdrawn);
+    }
+    // Contract balances for token
+    function getContractTokenBalances(address _token) public view returns (uint256, uint256) {
+        return (userBalanceMap[_token][address(this)].deposited, userBalanceMap[_token][address(this)].withdrawn);
+    }
+    // Contract base balances
+    function getErc20Deposits() public view returns (uint256,uint256,uint256) {
+      return (wethEquivDeposits, usdtEquivDeposits, usdcEquivDeposits);
+    }
+    // Contract base balances
+    function getErc20Withdrawals() public view returns (uint256,uint256,uint256) {
+      return (wethEquivWithdrawals, usdtEquivWithdrawals, usdcEquivWithdrawals);
     }
 
-    //users token balances
+    // Users token balances
     function getuserTokenBalances (address token, address user) public view returns (uint256, uint256, uint256, uint256, uint256, address) {
       userBalance memory uto = userBalanceMap[address(token)][address(user)];
       uint256 deposited = uto.deposited;
@@ -521,10 +731,7 @@ contract HEDGEFUND {
       return (deposited, withdrawn, lockedinuse, withdrawableBalance, withdrawableValue, paired);
     }
     
-    //contract balances
-    function getContractTokenBalances(address _token) public view returns (uint256, uint256) {
-        return (contractBalanceMap[_token].deposited, contractBalanceMap[_token].withdrawn);
-    }
+    
 
     /*user's erc20 history interacted or traded: targeted search
     ~ user is the address of the user whose history is being searched in the userERC20s mapping. 
@@ -558,7 +765,7 @@ contract HEDGEFUND {
     ~ Additionally, a check is added to ensure that startIndex is within the bounds of the fullArray using a require statement, 
     ~ and actualLimit is calculated as the minimum of length - startIndex and limit to avoid exceeding the length of fullArray.
     */
-        function getUserPositionsSubset(address user, uint startIndex, uint limit) public view returns (uint[] memory) {
+    function getUserPositionsSubset(address user, uint startIndex, uint limit) public view returns (uint[] memory) {
         uint[] memory fullArray = myhedgesHistory[user];
         uint length = fullArray.length;
         require(startIndex < length, "Invalid start index");
@@ -592,6 +799,18 @@ contract HEDGEFUND {
         return subset;
     }
 
+    function getUserSwapsCreated(address user, uint startIndex, uint limit) public view returns(uint[] memory){
+        uint[] memory fullArray = myswapsCreated[user];
+        uint length = fullArray.length;
+        require(startIndex < length, "Invalid start index");
+        uint actualLimit = length - startIndex < limit ? length - startIndex : limit;
+        uint[] memory subset = new uint[](actualLimit);
+        for (uint i = startIndex; i < startIndex + actualLimit; i++) {
+            subset[i - startIndex] = fullArray[i];
+        }
+        return subset;
+    }
+
     /*user hedges taken: targeted search
      ~ user is the address of the user whose hedges are being searched in the myhedgesTaken mapping. 
      ~ startIndex is used to specify the starting index in the fullArray for the user, and limit is used to determine the number of items to search. 
@@ -613,6 +832,17 @@ contract HEDGEFUND {
         return subset;
     }
 
+    function getUserSwapsTaken(address user, uint startIndex, uint limit) public view returns(uint[] memory){
+        uint[] memory fullArray = myswapsTaken[user];
+        uint length = fullArray.length;
+        require(startIndex < length, "Invalid start index");
+        uint actualLimit = length - startIndex < limit ? length - startIndex : limit;
+        uint[] memory subset = new uint[](actualLimit);
+        for (uint i = startIndex; i < startIndex + actualLimit; i++) {
+            subset[i - startIndex] = fullArray[i];
+        }
+        return subset;
+    }
 
     /* all hedges created: targeted search
     ~ startIndex is used to specify the starting index in the hedgesCreated array, 
@@ -650,18 +880,80 @@ contract HEDGEFUND {
         return result;
     }
 
+    /* all swaps created: targeted search
+    ~ startIndex is used to specify the starting index in the equityswapsCreated array, 
+    ~ and limit is used to determine the number of items to search. 
+    ~ The loop iterates from startIndex to startIndex + limit (exclusive) 
+    ~ and populates the result array with the values from equityswapsCreated array starting from index startIndex to startIndex + limit - 1. 
+    ~ The startIndex is used to calculate the correct index in the result array by subtracting it from the loop variable i. 
+    ~ Additionally, a check is added to ensure that startIndex is within the bounds of the equityswapsCreated array using a require statement.
+    */
+    function getAllSwaps(uint startIndex, uint limit) public view returns (uint[] memory) {
+        require(startIndex < equityswapsCreated.length, "Invalid start index");
+        uint[] memory allSwaps = equityswapsCreated;
+        uint[] memory result = new uint[](limit);
+        for (uint i = startIndex; i < startIndex + limit && i < allSwaps.length; i++) {
+            result[i - startIndex] = allSwaps[i];
+        }
+        return result;
+    }
+
+    /* all swaps taken: targeted search
+    ~ startIndex is used to specify the starting index in the equityswapsTaken array, 
+    ~ and limit is used to determine the number of items to search. 
+    ~ The loop iterates from startIndex to startIndex + limit (exclusive) 
+    ~ and populates the result array with the values from equityswapsTaken array starting from index startIndex to startIndex + limit - 1. 
+    ~ The startIndex is used to calculate the correct index in the result array by subtracting it from the loop variable i. 
+    ~ Additionally, a check is added to ensure that startIndex is within the bounds of the equityswapsTaken array using a require statement.
+    */
+    function getAllSwapsTaken(uint startIndex, uint limit) public view returns (uint[] memory) {
+        require(startIndex < equityswapsTaken.length, "Invalid start index");
+        uint[] memory allSwapsTaken = equityswapsTaken;
+        uint[] memory result = new uint[](limit);
+        for (uint i = startIndex; i < startIndex + limit && i < allSwapsTaken.length; i++) {
+            result[i - startIndex] = allSwapsTaken[i];
+        }
+        return result;
+    }
+
     //deposited tokens
     function getDepositedTokens() external view returns (address[] memory) {
-        return depositedTokens;
+        return userERC20s[address(this)];
     }
 
+    //get deposited tokens count
     function getDepositedTokensLength() external view returns (uint) {
-        return depositedTokens.length;
+        return userERC20s[address(this)].length;
     }
 
-    //hedges array under specific token
-    function getTokenHedgesCount(address _token) public view returns (uint256) {
+    //get all hedges count
+    function getAllHedgesLength() public view returns (uint256) {
+        return hedgesCreated.length;
+    }
+
+    //get all equity swaps count
+    function getAllSwapsLength() public view returns (uint256) {
+        return equityswapsCreated.length;
+    }
+
+    //get user hedges count
+    function getUserHedgesLength(address user) public view returns (uint256) {
+        return myhedgesHistory[user].length;
+    }
+
+    //get user equity swaps count
+    function getUserSwapsLength(address user) public view returns (uint256) {
+        return myswapsHistory[user].length;
+    }
+
+    //hedges count under specific token
+    function getHedgesForTokenCount(address _token) public view returns (uint256) {
         return tokenHedges[_token].length;
+    }
+
+    //swaps count under specific token
+    function getSwapsForTokenCount(address _token) public view returns (uint256) {
+        return tokenSwaps[_token].length;
     }
 
     /* hedges list under specific ERC20 address: targeted search
@@ -672,8 +964,20 @@ contract HEDGEFUND {
     ~ which represents the actual number of items in the result array. 
     ~ Finally, the subset array is populated with the elements from the fullArray using the calculated indices based on startIndex and actualLimit.
     */
-    function getTokenHedgesList(address _token, uint startIndex, uint limit) public view returns(uint[] memory){
+    function getHedgesForToken(address _token, uint startIndex, uint limit) public view returns(uint[] memory){
         uint[] memory fullArray = tokenHedges[_token];
+        require(startIndex < fullArray.length, "Start index exceeds array length");
+        uint endIndex = startIndex + limit > fullArray.length ? fullArray.length : startIndex + limit;
+        uint actualLimit = endIndex - startIndex;
+        uint[] memory subset = new uint[](actualLimit);
+        for (uint i = 0; i < actualLimit; i++) {
+            subset[i] = fullArray[startIndex + i];
+        }
+        return subset;
+    }
+
+     function getSwapsForToken(address _token, uint startIndex, uint limit) public view returns(uint[] memory){
+        uint[] memory fullArray = tokenSwaps[_token];
         require(startIndex < fullArray.length, "Start index exceeds array length");
         uint endIndex = startIndex + limit > fullArray.length ? fullArray.length : startIndex + limit;
         uint actualLimit = endIndex - startIndex;
@@ -690,14 +994,7 @@ contract HEDGEFUND {
         return hedge;
     }
 
-    //iterate array from index x to y
-    function getHedgesFromXY(address token, uint x, uint y) public view returns (uint[] memory) {
-        uint[] memory result = new uint[](y - x + 1);
-        for (uint i = x; i <= y; i++) {
-            result[i - x] = tokenHedges[token][i];
-        }
-        return result;
-    }
+    //iterate users hedges from index x to y
     function getmyHedgesFromXY(address user, uint x, uint y, bool arrayType) public view returns (uint[] memory) {
         uint[] memory result = new uint[](y - x + 1);
         for (uint i = x; i <= y; i++) {
@@ -705,6 +1002,17 @@ contract HEDGEFUND {
             result[i - x] = myhedgesCreated[user][i];
           }else{
             result[i - x] = myhedgesTaken[user][i];
+          }
+        }
+        return result;
+    }
+    function getmySwapsFromXY(address user, uint x, uint y, bool arrayType) public view returns (uint[] memory) {
+        uint[] memory result = new uint[](y - x + 1);
+        for (uint i = x; i <= y; i++) {
+          if(arrayType){
+            result[i - x] = myswapsCreated[user][i];
+          }else{
+            result[i - x] = myswapsTaken[user][i];
           }
         }
         return result;
@@ -725,7 +1033,7 @@ contract HEDGEFUND {
       uint256 fee = calculateFee(msg.value);
       uint256 amountIn = amount.sub(fee);
       // track each token amounts
-      contractBalanceMap[_tokenAddress].deposited += amountIn;
+      protocolBalanceMap[_tokenAddress].deposited += amountIn;
       //track users added tokens
       userTokenMap[msg.sender][_tokenAddress] = true;
       // token mapped to user
