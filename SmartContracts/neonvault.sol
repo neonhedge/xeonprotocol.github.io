@@ -38,15 +38,16 @@ pragma solidity 0.8.4;
 // 1. getReserves Uniswap
 
 //dev guides
+// - addresses can deposit or withdraw tokens 
 // - all tokens are treated as ERC20
-// - uniswap version 2 router in beta
-// - deposits, lockedinuse and withdrawals track user balance
-// - lockedinuse is the current account (+-) on trades. it is also escrow
+// - uniswap version 2 router is used in beta protocol
+// - deposits, lockedinuse and withdrawals track wallets balances
+// - lockedinuse is the current account (+-) on trades, and acts as escrow for each deal
 // - only base currencies :weth, usdt and usdc contract balance tracked
-// - getUnderlyingValue is variable loss/gain equally for both parties
+// - getUnderlyingValue fetches value of tokens & returns base value & pair
 // - unified creating, buying and settling functions
-// - user taxes only calculated on settlement not deposits, withdrawals or buys
-// - contract taxes credited to fee wallet on buy (call option cost , & equity swao collateral is cost)
+// - each trade / deal is taxed on settlement, in relevant tokens (base or underlying)
+// - contract taxes credited in mappings under address(this) and send out to staking/rewards contract
 
 import "./SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
@@ -336,6 +337,8 @@ contract HEDGEFUND {
         locked = false;
     }
 
+    // all hedges bought in base or paired currency
+    // hence keep log of users erc20 list 
     function buyHedge(uint256 _optionId) public nonReentrant {
         require(!locked, "Function is locked");
         locked = true;
@@ -416,6 +419,12 @@ contract HEDGEFUND {
     //miners are the ones who settle hedges. Stake tokens to be able to mine hedges.
     //miners can pick hedges with tokens and amounts they wish to mine & avoid accumulating mining rewards in unwanted tokens
     //miner dust can be deposited into mining dust liquidation pools that sell the tokens at a discount & miners claim their share
+    //each wallet has to log each token interacted with for the sake of pulling all balances credited to it on settlement. This allows for net worth valuations on wallets
+    //protocol revenues are stored under userBalanceMap[address(this)] storage
+    //on revenue; protocol revenue from taxing hedges ARE moved to staking contract as staking dividents
+    //on revenue; proceeds for mining a hedge, are NOT moved to staking contract
+    //on revenue; native equity swap liquidity proceeds ARE moved to staking contract
+    //on revenue; revenue for providing native-collateral ARE transferred to staking contract
     struct HedgeInfo {
         uint256 startValue;
         uint256 underlyingValue;
@@ -425,6 +434,7 @@ contract HEDGEFUND {
         uint256 tokenFee;
         uint256 baseFee;
         bool isPayoffOverCost;
+        bool newAddressFlag;
     }
     function settleHedge(uint256 _optionId) external {
         HedgeInfo memory hedgeInfo;
@@ -447,6 +457,8 @@ contract HEDGEFUND {
         userBalance storage minrB = userBalanceMap[option.paired][address(this)];
 
         hedgeInfo.baseFee = calculateFee(option.cost);
+        
+        if(ttiU.deposited == 0){ hedgeInfo.newAddressFlag = true; }
 
         if (option.hedgeType == HedgeType.CALL) {
             hedgeInfo.isPayoffOverCost = hedgeInfo.underlyingValue > hedgeInfo.startValue.add(option.cost);
@@ -533,6 +545,12 @@ contract HEDGEFUND {
         option.status = 3;
         option.endvalue = hedgeInfo.underlyingValue;
         option.dt_settled = block.timestamp;
+
+        // catch new erc20 address so that wallet can log all underlying token balances credited to it
+        // base addresses already caught on deposit by wallet
+        if(hedgeInfo.tokensDue > 0 && hedgeInfo.newAddressFlag) {            
+            userERC20s[option.taker].push(option.token);            
+        }
 
         // Emit
         emit hedgeSettled(option.token, _optionId, option.amount, hedgeInfo.payOff, hedgeInfo.underlyingValue);
@@ -733,7 +751,7 @@ contract HEDGEFUND {
     
     
 
-    /*user's erc20 history interacted or traded: targeted search
+    /*user's erc20 history deposited and traded, targeted search
     ~ user is the address of the user whose history is being searched in the userERC20s mapping. 
     ~ startIndex is used to specify the starting index in the tokens array for the user, 
     ~ and limit is used to determine the number of items to search. 
