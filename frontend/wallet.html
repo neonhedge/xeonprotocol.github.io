@@ -115,7 +115,7 @@
 							<div class="user-card">
 								<div class="icon"><i class="fa-solid fa-user-astronaut"></i></div>
 							</div>
-							<div class="userWallet">0X3fe...h986</div>
+							<div id="walletAddress" class="userWallet">0X3fe...h986</div>
 							<!-- userWallet alt location -->				
 						</div>
 						<div class="walletStates">
@@ -129,12 +129,12 @@
 								  <div class="volume-bar blue"></div>
 								  <div class="volume-bar green"></div>
 								</div>
-								<div class="volume-count">27,000,000</div>
+								<div id="stakedBalance" class="volume-count green-value">27,000,000</div>
 							  </div>
 							</div>
 							
 							<div class="walletStatesDiv">
-								<span class="dot dot_idle"></span>liquidity 
+								<span class="dot dot_idle"></span>wallet 
 								<a href="#jump-to-section" class="walletStateLink"><i class="fa fa-link" aria-hidden="true"></i></a>
 								<div class="volume-widget">
 									<div class="volume-bars horizontal">
@@ -142,12 +142,12 @@
 										<div class="volume-bar blue"></div>
 										<div class="volume-bar green"></div>
 									</div>
-									<div class="volume-count">5,000,000</div>
+									<div id="walletBalance" class="volume-count green-value">5,000,000</div>
 								</div>
 							</div>
 						  
 							<div class="walletStatesDiv">
-							  <span class="dot dot_idle"></span>wallet
+							  <span class="dot dot_idle"></span>airdrop
 							  <a href="#jump-to-section" class="walletStateLink"><i class="fa fa-link" aria-hidden="true"></i></a>
 							  <div class="volume-widget">
 								<div class="volume-icon">
@@ -155,7 +155,7 @@
 									<path d="M8.277 16.055h2.808v-9.649h-2.808v9.649zm3.731 0h2.808v-6.822h-2.808v6.822zm-7.462 0h2.808v-3.487h-2.808v3.487zm16.357-17.11v17.11c0 1.19-.966 2.155-2.155 2.155h-17.11c-1.19 0-2.155-.965-2.155-2.155v-17.11c0-1.19.965-2.155 2.155-2.155h17.11c1.189 0 2.155.965 2.155 2.155zm-2.154 0h-17.11v17.11h17.11v-17.11z"/>
 								  </svg>
 								</div>
-								<div class="volume-count">2,800,000</div>
+								<div class="volume-count green-value">0</div>
 							  </div>
 							</div>
 						  </div>
@@ -163,19 +163,19 @@
 					<div class="nw-right">
 					  <div class="nw-text nwtextFirst">
 						<span class="nw-text-title nwPrimary-ttitle"><img src="imgs/moon5.webp" title="net worth of all assets">Net Worth</span>
-						<span class="nw-text-value">$10,000.00</span>
+						<span id="netWorthUSD" class="nw-text-value">$10,000.00</span>
 					  </div>
 					  <div class="nw-text">
-						<span class="nw-text-title"><i class="fa fa-info-circle" aria-hidden="true"  title="net value of tokens deposited to platform: in base"></i>Deposits</span>
-						<span class="nw-text-value">$3,785.02</span>
+						<span class="nw-text-title"><i class="fa fa-info-circle" aria-hidden="true"  title="net value of user tokens currently deposited into protocol: in base"></i>Deposits</span>
+						<span id="netDepositsUSD" class="nw-text-value">$3,785.02</span>
 					  </div>
 					  <div class="nw-text">
-						<span class="nw-text-title"><i class="fa fa-info-circle" aria-hidden="true"  title="net value currently locked in hedge / swap / loan"></i>LockedUse</span>
-						<span class="nw-text-value">$5.125.00</span>
+						<span class="nw-text-title"><i class="fa fa-info-circle" aria-hidden="true"  title="net rewards due from staking NEON tokens on our protocol."></i>Dividents</span>
+						<span id="netRewardsUSD" class="nw-text-value">$5,125.00</span>
 					  </div>
 					  <div class="nw-text">
-						<span class="nw-text-title"><i class="fa fa-info-circle" aria-hidden="true"  title="net value of tokens withdrawn from platform: in base"></i>Withdrawn</span>
-						<span class="nw-text-value">$1800.00</span>
+						<span class="nw-text-title"><i class="fa fa-info-circle" aria-hidden="true"  title="net earnings from providing native swap liquidity and settling hedges or loans."></i>Commission</span>
+						<span id="netCommissionUSD" class="nw-text-value">$1,800.00</span>
 					  </div>
 					  <!--
 					  <div class="nw-text">
@@ -185,7 +185,7 @@
 					  
 					  <div class="nw-text">
 						<span class="nw-text-title"><i class="fa fa-info-circle" aria-hidden="true"  title="count of tokens deposited or transacted by wallet"></i>Tokens</span>
-						<span class="nw-text-value">57</span>
+						<span id="tokensCount" class="nw-text-value">57</span>
 					  </div>
 					</div>
 
@@ -202,7 +202,7 @@
 							<span class="mode">Cashier: Deposit Mode</span>
 						</label>
 						<div class="input-group">
-						  <input type="text" id="erc20-address" name="erc20-address" placeholder="Paste address...">
+						  <input type="text" class="erc20-address-input" id="erc20-address" name="erc20-address" placeholder="Paste address...">
 						  <span class="or">OR</span>
 						  <select id="erc20-select" name="erc20-select">
 							<option value="">Select token...</option>
@@ -214,9 +214,28 @@
 					  </div>
 					  <div class="form-group">
 						<input type="number" class="transact-amount" placeholder="amount">
+						<div id="balancesSection" class="hidden">
+							<div id="expandClose" class="expand-button">
+								<i class="fa fa-expand" aria-hidden="true"></i>
+							  </div>
+							<div class="balgrid">
+							  <strong>Deposited:</strong> <span id="depositedBalance">0</span>
+							</div>
+							<div class="balgrid">
+							  <strong>Withdrawn:</strong> <span id="withdrawnBalance">0</span>
+							</div>
+							<div class="balgrid">
+							  <strong>Locked:</strong> <span id="lockedInUseBalance">0</span>
+							</div>
+							<div class="balgrid">
+							  <strong>Withdrawable:</strong> <span id="withdrawableBalance">0</span>
+							</div>
+						</div>
 					  </div>
-					  <button type="submit" id="transactSubmit">Transact</button>
+					  <button type="submit" id="transactSubmit">Submit</button>
 					</form>
+
+					
 				  </div>
 				  
 				  
@@ -457,14 +476,14 @@
 					<div class="earnMoreWidget">
 						<div class="staking-widget">
 							<div class="icon"><i class="fas fa-coins"></i></div>
-							<h4>Stake $NEON Tokens</h4>
-							<p>Earn rewards by staking your $NEON tokens. Rewards come from option mining fees, staked erc20 liquidity fees, and taxes from dex trading volume.</p>
+							<h4>Stake $NEON</h4>
+							<p>Earn dividents for supporting our ecosystem by staking our native token NEON. Protocol revenue from fees and taxes is distributed monthly to all stakers.</p>
 							<button>Stake Now</button>
 						  </div>
 						  <div class="farming-widget">
 							<div class="icon"><i class="fas fa-seedling"></i></div>
-							<h4>Farm ERC20 tokens</h4>
-							<p>Deposit any ERC20 token into our protocol to provide put option liquidity and lending liquidity. In return, you will also earn an APY based on options revenue.</p>
+							<h4>Farm & Mine ERC20s</h4>
+							<p>Settle hedges and earn mining commissions in token's underlying or base currency. Provide hedge liquidity, or protocol collateral and earn a share of the farming revenue.</p>
 							<button>Coming Soon..</button>
 						  </div>					  
 					</div>
@@ -782,17 +801,17 @@
 						<div class="staking-widget-rewards">
 							<div class="icon"><i class="fas fa-coins"></i></div>
 							<h4>Staking for Rewards</h4>
-							<p>Stake NEON to gain a share of the hedge fees.<a href="#jump-to-section" class="walletStateLink"><text text-anchor="middle"  style="color:#188dd6;"> learn... <i class="fa fa-link" aria-hidden="true"></i></text></a>	</p>
+							<p>Stake NEON to be aligible for revenue sharing.<a href="#jump-to-section" class="walletStateLink"><text text-anchor="middle"  style="color:#188dd6;"> learn... <i class="fa fa-link" aria-hidden="true"></i></text></a>	</p>
 						  </div>
 						  <div class="staking-widget-rewards">
 							<div class="icon"><i class="fas fa-hammer"></i></div>
-							<h4>Mining for Rewards</h4>
-							<p>Mine Hedges to gain a share of the settlement revenue.<a href="#jump-to-section" class="walletStateLink"><text text-anchor="middle"  style="color:#188dd6;"> learn... <i class="fa fa-link" aria-hidden="true"></i></text></a>	</p>
+							<h4>Mining Rights</h4>
+							<p>Stake and assign tokens to mining, in order to settle deals.<a href="#jump-to-section" class="walletStateLink"><text text-anchor="middle"  style="color:#188dd6;"> learn... <i class="fa fa-link" aria-hidden="true"></i></text></a>	</p>
 						  </div>	
 						  <div class="staking-widget-rewards">
 							<div class="icon"><i class="fas fa-diamond"></i></div>
-							<h4>Hold for Rewards</h4>
-							<p>HODL NEON to gain a share of our Dex trading revenue.<a href="#jump-to-section" class="walletStateLink"><text text-anchor="middle"  style="color:#188dd6;"> learn... <i class="fa fa-link" aria-hidden="true"></i></text></a>	</p>
+							<h4>Stake to Farm</h4>
+							<p>Provide lending collateral or seasonal hedge liquidity.<a href="#jump-to-section" class="walletStateLink"><text text-anchor="middle"  style="color:#188dd6;"> learn... <i class="fa fa-link" aria-hidden="true"></i></text></a>	</p>
 						  </div>					  
 					</div>
 
@@ -802,25 +821,33 @@
 								<div class="grid-sect-title">Claimable Rewards</div>
 								<div class="grid-sect-title" style="color:#33856b !important;">0 ($0)</div>
 							</div>
-							<div class="grid grid-cols-2">
+							<div class="grid grid-cols-2 stakeBlock">
 								<div class="flex flex-col">
-									<div class="grid-sect-subtitle">eth from NEON holding</div>
+									<div class="grid-sect-subtitle">Protocol Revenue Share</div>
 									<div class="grid-sect-subtitle-value">0 ($0)</div>
 								</div>
 								<button class="claim-button" disabled=""><span>Claim</span></button>
 							</div>
 							<hr class="line">
-							<div class="grid grid-cols-2">
+							<div class="grid grid-cols-2 stakeBlock">
 								<div class="flex flex-col">
-									<div class="grid-sect-subtitle">eth from NEON staking</div>
+									<div class="grid-sect-subtitle">Farming - Loan Collateral</div>
 									<div class="grid-sect-subtitle-value">0 ($0)</div>
 								</div>
 								<button class="claim-button" disabled=""><span>Claim</span></button>
 							</div>
 							<hr class="line">
-							<div class="grid grid-cols-2">
+							<div class="grid grid-cols-2 stakeBlock">
 								<div class="flex flex-col">
-									<div class="grid-sect-subtitle">eth from Mining hedges</div>
+									<div class="grid-sect-subtitle">Farming - Hedge Liquidity</div>
+									<div class="grid-sect-subtitle-value">0 ($0)</div>
+								</div>
+								<button class="claim-button" disabled=""><span>Claim</span></button>
+							</div>
+							<hr class="line">
+							<div class="grid grid-cols-2 stakeBlock">
+								<div class="flex flex-col">
+									<div class="grid-sect-subtitle">Mining - Settle Hedges</div>
 									<div class="grid-sect-subtitle-value">0 ($0)</div>
 								</div>
 								<button class="claim-button" disabled=""><span>Claim</span></button>
@@ -832,15 +859,19 @@
 								<div class="grid-sect-title" style="color:#33856b !important;">0 ($0)</div>
 							</div>
 							<div class="flex flex-col gap-1">
-								<div class="grid-sect-subtitle">eth claimed from NEON holding</div>
+								<div class="grid-sect-subtitle">claimed from Revenue Sharing</div>
 								<div class="grid-sect-subtitle-value">0 ($0)</div>
 							</div>
 							<div class="flex flex-col gap-1">
-								<div class="grid-sect-subtitle">eth claimed from NEON staking</div>
+								<div class="grid-sect-subtitle">claimed from farming Collateral</div>
 								<div class="grid-sect-subtitle-value">0 ($0)</div>
 							</div>
 							<div class="flex flex-col gap-1">
-								<div class="grid-sect-subtitle">eth claimed from Mining hedges</div>
+								<div class="grid-sect-subtitle">claimed from farming Liquidity</div>
+								<div class="grid-sect-subtitle-value">0 ($0)</div>
+							</div>
+							<div class="flex flex-col gap-1">
+								<div class="grid-sect-subtitle">claimed from mining Hedges</div>
 								<div class="grid-sect-subtitle-value">0 ($0)</div>
 							</div>
 						</div>
@@ -1051,8 +1082,7 @@
 			<div class="container">
 				<div>
 					<h1 data-aos="fade-right">Coming <span class="txt-gradient">Soon</span></h1>
-					<p data-aos="fade-down" data-aos-delay="100">We will build our dashboard live, as we go and add functionality to the Dapp.</p>
-					<p data-aos="fade-down" data-aos-delay="100"></br>An exclusive Membership Tier: Billionaire Shiba Club. You have to own rare NFTs to gain membership into the BSC 👑. Once in, you can deposit money into our cash vaults, and that money will be used to fund top tier project launches.</p>
+					<p data-aos="fade-down" data-aos-delay="100">Lending.</p>
 				</div>
 				<!-- space vortex -->
 				<div class="space-vortex vortex-sm" data-aos="zoom-out-down" data-aos-delay="400">
@@ -1065,7 +1095,7 @@
 						</div>
 					</div>
 					<!-- call to action button -->				
-					<a href="#" target="_blank" class="btn btn-cta" data-aos="fade-left" data-aos-delay="200">Buy $Woof Now</a>
+					<a href="#" target="_blank" class="btn btn-cta" data-aos="fade-left" data-aos-delay="200">Buy $NEON Now</a>
 				</div>
 			</div>
 		</section>
