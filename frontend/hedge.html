@@ -37,8 +37,7 @@
 	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js"></script>
 	<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
 	<script type="text/javascript" src="js/_walletstatus.js"></script>
-	<script type="text/javascript" src="js/_portfolio.js"></script>	
-	<script type="text/javascript" src="js/_fund.js"></script>
+	<script type="text/javascript" src="js/_hedge.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 	<script type="application/javascript" src="js/sweetalert/sweetalert.min.js"></script>
@@ -207,99 +206,114 @@ $(document).ready(async function(){
 				</div>
 			</div>
 			<div class="hedgeCore">
-				<div class="hedgeCard statemark_ill_wish">				
+				<div class="hedgeCard statemark_ill_wish">
 					<div class="hedgeGrid">
 						<div class="tokenLogoLeft" style="background-image:url('imgs/monkeytrain.png')"></div>
 						<div class="tokenName">
-							<div>TSUKA</div>
-							<div class="bagsize">1,660,500 BAG</div>
+						<div>TSUKA <span class="additionalTokens">+6 other <a href="#" class="tokenLink"><i class="fa-solid fa-link"></i></a></span></div>
+						<div class="bagsize">1,660,500 Tokens</div>
 						</div>
 					</div>
 					<div class="valueHold">
+						<div class="optionValue">
+						<div class="valueTitle">VALUE</div>
 						<div class="optionMarketValue flux highlightOption">10.2 ETH</div>
-						<div class="optionType flux highlightOption">CALL</div>
+						</div>
+						<div class="optionType">
+						<div class="typeTitle">TYPE</div>
+						<div class="optionTypeValue flux highlightOption">Call Option</div>
+						</div>
+						<div class="optionComposition">
+						<div class="compositionTitle">ERC20s</div>
+						<div class="compositionValue">Mixed</div>
+						</div>
 					</div>
-					<div class="optionMark"><span>Start Value:</span><span class="oMfigure">-- ETH</span></div>
-					<div class="optionMark"><span>Strike Value:</span><span class="oMfigure">10.7 ETH</span></div>
-					<div class="optionMark"><span>Hedge Cost:</span><span class="oMfigure">0.5 ETH</span></div>
-					<div class="optionMark"><span>Date Create:</span><span class="oMfigure">18/05/2023</span></div>
-					<div class="optionMark"><span>Date Taken:</span><span class="oMfigure">18/05/2023</span></div>
-					<div class="optionMark"><span>Date Expire:</span><span class="oMfigure">25/05/2023</span></div>
-					<div class="optionSummary">
-					</div>
-					<div style="display: block;">
-						<h5>Manage your risk:</h5>
-                        <div class="raiseSummary">							
-							<div class="kickoff">TOPUP </div>
-							<div class="projectRaiseTarget">Hedge Cost</div>
-							
-                            <span class="status-dot inprogress">
-								<i class="fa-solid fa-bolt"></i><span style="white-space: nowrap;" title="top up the cost, icnrease your risk/profit. other party has to accept before contract is settled.">Zap</span>
-							</span>
-							<div class="mbcard_detail rb_detail">
-								<div class="parent_meter">
-									<div id="meter_guage"></div><span class="measure">90%</span>
-								</div>
-							</div>
-                        </div>
+					<div class="optionMarkContainer">
+						<div class="optionMark"><span>Start Value:</span><span class="oMfigure">-- ETH</span></div>
+						<div class="optionMark"><span>Strike Value:</span><span class="oMfigure">10.7 ETH</span></div>
+						<div class="optionMark"><span>Hedge Cost:</span><span class="oMfigure">0.5 ETH</span></div>
+						<div class="optionMark"><span>Date Create:</span><span class="oMfigure">18/05/2023</span></div>
+						<div class="optionMark"><span>Date Taken:</span><span class="oMfigure">18/05/2023</span></div>
+						<div class="optionMark"><span>Date Expire:</span><span class="oMfigure">25/05/2023</span></div>
 					</div>
 				</div>
-				
-			
-				<div class="hedgeStatusCard">
-					<div class="partyCont partyContTop">
-						<div class="ownerHold">
-							<div class="user-card">
-								<div class="icon"><i class="fa-solid fa-user-astronaut"></i></div>
+				<div class="progressSect">
+					<h5>Tracking Section</h5>
+					<div class="progressSummary">
+						<div class="kickoff status-dot">time to expiry..</div>
+						<span class="status-dot inprogress">
+							<span style="white-space: nowrap;" title="hours left until this hedge expires"> 246 hrs</span>
+							<i class="fa-solid fa-hourglass-start"></i>
+						</span>
+						<div class="mbcard_detail rb_detail">
+							<div class="parent_meter">
+								<div id="meter_guage"></div><span class="measure">90%</span>
 							</div>
-							<div class="userWallet ownerMark">0X3fe...h986</div>
-						</div>						
-						<!-- graphic svg -->	
-						<div class="ownerProfitabil">
-							<span>+ 0.00$</span>
-							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 100">
-								<rect x="0" y="0" width="100%" height="100%" fill="none" />
-								<defs>
-								  <marker id="arrowup" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto">
-									<path d="M0,4 L4,0 L8,4 L4,8 Z" fill="#25d366" />
-								  </marker>
-								</defs>
-								<path d="M10 90 L50 20 L90 70 L130 10" stroke="#25d366" fill="none" stroke-width="0.65" marker-end="url(#arrowup)" />
-							  </svg>
-						</div>		
+						</div>
 					</div>
-					<div class="partiesAction">
-						<div class="option_S_tab actionButton buyButton">
-							Action Option
-						</div>
-						<div class="">
-							<div class='option_S_tab _bookmarkjump'><img src='imgs/bookmark_.png' width='18px'/></div>
-						</div>
-					</div>					
-					<div class="partyCont">
-						<div class="ownerHold">
-							<div class="user-card">
-								<div class="icon"><i class="fa-solid fa-user-astronaut"></i></div>
-							</div>
-							<div class="userWallet ownerMark">0X000...0000</div>
-						</div>						
-						<!-- graphic svg -->	
-						<div class="ownerProfitabil">
-							<span>+ 0.00$</span>
-							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 100">
-								<rect x="0" y="0" width="100%" height="100%" fill="none" />
-								<defs>
-								  <marker id="arrowdown" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto">
-									<path d="M0,4 L4,0 L8,4 L4,8 Z" fill="red" />
-								  </marker>
-								</defs>
-								<path d="M10 10 L50 80 L90 30 L130 90" stroke="red" fill="none" stroke-width="0.65" marker-end="url(#arrowdown)" />
-							  </svg>
-						</div>		
+					<div id="refreshButton" class="status-dot inprogress">Refresh <i class="fa-solid fa-refresh"></i></div>
+					<!-- Price change chart container -->
+					<div class="priceChangeSect">
+						<div id="priceChangeTag" class="price-tag"></div>
+
+						<!-- HTML Canvas Element -->
+						<canvas id="priceChangeChart" width="300" height="300"></canvas>
 					</div>
 				</div>
-			</div><!--hedge core-->
-			
+			</div>
+			<div class="gainsSect hedgeStatusCard">
+				<h5>Gains Section</h5>
+				<div class="partyCont partyContTop">
+					<div class="ownerHold">
+						<div class="user-card">
+							<div class="icon"><i class="fa-solid fa-user-astronaut"></i></div>
+						</div>
+						<div class="userWallet ownerMark">0X3fe...h986</div>
+					</div>						
+					<!-- graphic svg -->	
+					<div class="ownerProfitabil">
+						<span>+ 0.00$</span>
+						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 100">
+							<rect x="0" y="0" width="100%" height="100%" fill="none" />
+							<defs>
+							<marker id="arrowup" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto">
+								<path d="M0,4 L4,0 L8,4 L4,8 Z" fill="#25d366" />
+							</marker>
+							</defs>
+							<path d="M10 90 L50 20 L90 70 L130 10" stroke="#25d366" fill="none" stroke-width="0.65" marker-end="url(#arrowup)" />
+						</svg>
+					</div>		
+				</div>
+				<div class="partiesAction">
+					<div class="option_S_tab actionButton buyButton" title="top up the cost, increase your risk/profit. other party has to accept before the contract is settled.">
+						Take / Zap Hedge
+					</div>
+					<div class="">
+						<div class='option_S_tab _bookmarkjump'><img src='imgs/bookmark_.png' width='18px'/></div>
+					</div>
+				</div>					
+				<div class="partyCont">
+					<div class="ownerHold">
+						<div class="user-card">
+							<div class="icon"><i class="fa-solid fa-user-astronaut"></i></div>
+						</div>
+						<div class="userWallet ownerMark">0X000...0000</div>
+					</div>						
+					<!-- graphic svg -->	
+					<div class="ownerProfitabil">
+						<span>+ 0.00$</span>
+						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 100">
+							<rect x="0" y="0" width="100%" height="100%" fill="none" />
+							<defs>
+							<marker id="arrowdown" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto">
+								<path d="M0,4 L4,0 L8,4 L4,8 Z" fill="red" />
+							</marker>
+							</defs>
+							<path d="M10 10 L50 80 L90 30 L130 90" stroke="red" fill="none" stroke-width="0.65" marker-end="url(#arrowdown)" />
+						</svg>
+					</div>		
+				</div>
+			</div>			
         </section>
 		
 		<!-- call to action -->
