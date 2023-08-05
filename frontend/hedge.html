@@ -28,79 +28,20 @@
 	<link rel="stylesheet" href="./css/aos.css" />
 	<link rel="stylesheet" href="./css/style.css">
 	<link rel="stylesheet" href="./css/custom.css">
-	<!-- portfolio windows styling -->
+	<!-- hedge window styling -->
 	<link rel="stylesheet" type="text/css" href="css/_menu.css">
 	<link rel="stylesheet" type="text/css" href="css/_fund.css">
 	<link rel="stylesheet" type="text/css" href="css/sweetalert/sweetalert.css">
-	<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-	<!-- portfolio windows scripts -->
+	
+	<!-- hedge window scripts -->
+	<script src="https://kit.fontawesome.com/13f07506fc.js" crossorigin="anonymous"></script>
 	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js"></script>
 	<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
 	<script type="text/javascript" src="js/_walletstatus.js"></script>
 	<script type="text/javascript" src="js/_hedge.js"></script>
-	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.17.1/matter.min.js"></script> <!-- ASSET BASKET-->
 
 	<script type="application/javascript" src="js/sweetalert/sweetalert.min.js"></script>
-	<script>
-
-$(document).ready(async function(){
-	// Retrieve the canvas element
-	var ctx = document.getElementById('chart').getContext('2d');
-	var ctx2 = document.getElementById('chart2').getContext('2d');
-
-	// Prepare the data for the pie chart
-	var plData = {
-	labels: ['Profit', 'Loss', 'Break'],
-	datasets: [{
-		/*label: 'Dapp Analytics',*/
-		data: [30, 65, 5],
-		backgroundColor: ['#39f', 'black', 'white'], // Set custom colors for the parts
-		borderColor: 'rgba(0, 123, 255, 1)', // Customize the chart colors
-		borderWidth: 1, // Customize the chart line width
-	}]
-	};
-
-	// Prepare the data for the cashflow chart
-	var cashingData = {
-	labels: ['CashIn', 'CashOut'],
-	datasets: [{
-		/*label: 'Dapp Analytics',*/
-		data: [60, 40],
-		backgroundColor: ['#39f', 'black'], // Set custom colors for the parts
-		borderColor: 'rgba(0, 123, 255, 1)', // Customize the chart colors
-		borderWidth: 1, // Customize the chart line width
-	}]
-	};
-
-	// Create the P/L chart
-	var chart = new Chart(ctx, {
-		type: 'pie', // Choose the chart type (e.g., line, bar, pie)
-		data: plData, // Assign the P/L data
-		options: {
-			plugins: {
-			legend: {
-				display: false // Hide the labels
-			}
-			}
-		}
-	});
-
-	// Create the Cashing pie chart
-	var chart2 = new Chart(ctx2, {
-		type: 'pie',
-		data: cashingData,
-		options: {
-			plugins: {
-			legend: {
-				display: false // Hide the labels
-			}
-			}
-		}
-	});
-
-});
-
-	</script>
 </head>
 
 <body>
@@ -108,7 +49,6 @@ $(document).ready(async function(){
 	<a href="#main" class="skip-to-content">Skip to content</a>
 	<!-- Preload page -->
 	<div id="preload">neon hedge loading...</div>
-
 
 	<header>
 		<div class="container grid" data-aos="fade-up">
@@ -167,7 +107,7 @@ $(document).ready(async function(){
 				<div class="aicontainer">
 					<div class="aishape">
 						<div class="aiHead"></div>
-						<div class="intro_cont"><div class="aiverdict">AI Assist</div></div>
+						<div class="intro_cont"><div class="aiverdict">Future AI Assist</div></div>
 						<div class="aiDataCard">
 							<div class="flex-col">
 									<div class="flex flex-col">
@@ -175,26 +115,36 @@ $(document).ready(async function(){
 										<div class="grid-sect-subtitle-value">0X000....0000</div>
 									</div>
 								<hr class="line">
-								
 									<div class="flex items-center justify-between gap-2">
 										<div class="grid-sect-title">Hedge Volume:</div>
 									</div>
 									<div class="flex flex-col">
-										<div class="grid-sect-subtitle">Base amount</div>
 										<div class="grid-sect-subtitle-value">20 ETH</div>
 									</div>
 								<hr class="line">
 								<div class="grid-chartable">
 									<div class="flex flex-col">
-										<div class="grid-sect-subtitle-value">Net P/L</div>
-									</div>
-									<div class="hedgeCharts">
-										<canvas id="chart"></canvas>
+										<div class="grid-sect-subtitle-value">7 Day Change</div>
 									</div>
 								</div>
 								<div class="grid-chartable">
 									<div class="flex flex-col">
-										<div class="grid-sect-subtitle-value">Cashflows</div>
+										<div class="grid-sect-subtitle-value">30 Day Change</div>
+									</div>
+								</div>
+								<div class="grid-chartable">
+									<div class="flex flex-col">
+										<div class="grid-sect-subtitle-value">Volatility Score</div>
+									</div>
+								</div>
+								<div class="grid-chartable">
+									<div class="flex flex-col">
+										<div class="grid-sect-subtitle-value">Market Sentiment</div>
+									</div>
+								</div>
+								<div class="grid-chartable">
+									<div class="flex flex-col">
+										<div class="grid-sect-subtitle-value">AI Degen Opinion</div>
 									</div>
 									<div class="hedgeCharts">
 										<canvas id="chart2"></canvas>
@@ -210,31 +160,74 @@ $(document).ready(async function(){
 					<div class="hedgeGrid">
 						<div class="tokenLogoLeft" style="background-image:url('imgs/monkeytrain.png')"></div>
 						<div class="tokenName">
-						<div>TSUKA <span class="additionalTokens">+6 other <a href="#" class="tokenLink"><i class="fa-solid fa-link"></i></a></span></div>
+						<div>TSUKA <span class="additionalTokens">+6 others</span></div>
 						<div class="bagsize">1,660,500 Tokens</div>
 						</div>
 					</div>
 					<div class="valueHold">
-						<div class="optionValue">
-						<div class="valueTitle">VALUE</div>
-						<div class="optionMarketValue flux highlightOption">10.2 ETH</div>
-						</div>
 						<div class="optionType">
-						<div class="typeTitle">TYPE</div>
-						<div class="optionTypeValue flux highlightOption">Call Option</div>
+							<div class="typeTitle">HEDGE</div>
+							<div class="optionTypeValue flux highlightOption">Call Option</div>
+						</div>
+						<div class="optionValue">
+							<div class="valueTitle">VALUE</div>
+							<div class="optionMarketValue flux highlightOption">10.2 ETH</div>
 						</div>
 						<div class="optionComposition">
-						<div class="compositionTitle">ERC20s</div>
-						<div class="compositionValue">Mixed</div>
+							<div class="compositionTitle">Assets</div>
+							<div class="compositionValue">Mixed</div>
 						</div>
 					</div>
+					<div class="basketCont">
+						<!-- <h5>ERC20s</h5> -->
+						<div id="assetBasket"></div>
+					</div>
 					<div class="optionMarkContainer">
-						<div class="optionMark"><span>Start Value:</span><span class="oMfigure">-- ETH</span></div>
-						<div class="optionMark"><span>Strike Value:</span><span class="oMfigure">10.7 ETH</span></div>
-						<div class="optionMark"><span>Hedge Cost:</span><span class="oMfigure">0.5 ETH</span></div>
-						<div class="optionMark"><span>Date Create:</span><span class="oMfigure">18/05/2023</span></div>
-						<div class="optionMark"><span>Date Taken:</span><span class="oMfigure">18/05/2023</span></div>
-						<div class="optionMark"><span>Date Expire:</span><span class="oMfigure">25/05/2023</span></div>
+						<div class="hedgeDetails">
+							<div class="optionMark"><span>Start Value:</span><span class="oMfigure">-- ETH</span></div>
+							<div class="optionMark"><span>Strike Value:</span><span class="oMfigure">10.7 ETH</span></div>
+							<div class="optionMark"><span>Hedge Cost:</span><span class="oMfigure">0.5 ETH</span></div>
+							<div class="optionMark"><span>Date Create:</span><span class="oMfigure">18/05/2023</span></div>
+							<div class="optionMark"><span>Date Taken:</span><span class="oMfigure">18/05/2023</span></div>
+							<div class="optionMark"><span>Date Expire:</span><span class="oMfigure">25/05/2023</span></div>
+						</div>
+						<div class="dealRequests">
+							<h5>Deal Requests..</h5>
+							<div class="requestWin">
+								<button class="requestButton">Topup <i class="fa-solid fa-dashboard"></i></button>
+								<button class="requestButton">Zap-it <i class="fa-solid fa-bolt"></i></button><span>Send a request to party B to Zap (settle hedge now as things stand), or to increase hedge collateral (risk more).</span>
+							</div>
+							<div class="requestList">
+								<span><i class="fa fa-superpowers"></i> Topup Request Pending <button class="requestButton actonRequest">Accept</button></span>
+								<span><i class="fa fa-handshake-o"></i> Topup Accepted 20/05/2023</span>
+								<span><i class="fa fa-handshake-o"></i> Topup Accepted 19/05/2023</span>
+								<span><i class="fa fa-handshake-o"></i> Topup Accepted 18/05/2023</span>
+								<span><i class="fa fa-handshake-o"></i> Topup Accepted 18/05/2023</span>
+								<span><i class="fa fa-handshake-o"></i> Topup Accepted 18/05/2023</span>
+								<span><i class="fa fa-handshake-o"></i> Topup Accepted 18/05/2023</span>
+								<span><i class="fa fa-handshake-o"></i> Topup Accepted 18/05/2023</span>
+								<span><i class="fa fa-handshake-o"></i> Topup Accepted 18/05/2023</span>
+								<span><i class="fa fa-handshake-o"></i> Topup Accepted 18/05/2023</span>
+								<span><i class="fa fa-handshake-o"></i> Topup Accepted 18/05/2023</span>
+								<span><i class="fa fa-handshake-o"></i> Topup Accepted 18/05/2023</span>
+								<span><i class="fa fa-handshake-o"></i> Topup Accepted 18/05/2023</span>
+								<span><i class="fa fa-handshake-o"></i> Topup Accepted 18/05/2023</span>
+								<span><i class="fa fa-handshake-o"></i> Topup Accepted 18/05/2023</span>
+								<span><i class="fa fa-handshake-o"></i> Topup Accepted 18/05/2023</span>
+								<span><i class="fa fa-handshake-o"></i> Topup Accepted 18/05/2023</span>
+								<span><i class="fa fa-handshake-o"></i> Topup Accepted 18/05/2023</span>
+								<span><i class="fa fa-handshake-o"></i> Topup Accepted 18/05/2023</span>
+								<span><i class="fa fa-handshake-o"></i> Topup Accepted 18/05/2023</span>
+								<span><i class="fa fa-handshake-o"></i> Topup Accepted 18/05/2023</span>
+								<span><i class="fa fa-handshake-o"></i> Topup Accepted 18/05/2023</span>
+								<span><i class="fa fa-handshake-o"></i> Topup Accepted 18/05/2023</span>
+								<span><i class="fa fa-handshake-o"></i> Topup Accepted 18/05/2023</span>
+								<span><i class="fa fa-handshake-o"></i> Topup Accepted 18/05/2023</span>
+								<span><i class="fa fa-handshake-o"></i> Topup Accepted 18/05/2023</span>
+								<span><i class="fa fa-handshake-o"></i> Topup Accepted 18/05/2023</span>
+								<span><i class="fa fa-handshake-o"></i> Topup Accepted 18/05/2023</span>
+							</div>
+						</div>
 					</div>
 				</div>
 				<div class="progressSect">
@@ -285,9 +278,9 @@ $(document).ready(async function(){
 					</div>		
 				</div>
 				<div class="partiesAction">
-					<div class="option_S_tab actionButton buyButton" title="top up the cost, increase your risk/profit. other party has to accept before the contract is settled.">
-						Take / Zap Hedge
-					</div>
+					<button class="dealButton btn-cta" title="speed up expiry. request instant spot settlement to the other party.">
+						<i class="fa-solid fa-bolt"></i> Zap Request
+					</button>
 					<div class="">
 						<div class='option_S_tab _bookmarkjump'><img src='imgs/bookmark_.png' width='18px'/></div>
 					</div>
