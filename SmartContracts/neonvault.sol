@@ -59,7 +59,6 @@ import "@uniswap/v2-periphery/contracts/interfaces/IUniswapV2Router02.sol";
 contract HEDGEFUND {
 
     using SafeMath for uint256;
-
     bool private locked = false;
     bool private isExecuting;
 
@@ -75,7 +74,7 @@ contract HEDGEFUND {
     }
     struct userBalance {
       uint256 deposited; // incremented on successful deposit
-      uint256 withdrawn; // incremented on successful withdrawl
+      uint256 withdrawn; // incremented on successful withdrawal
       uint256 lockedinuse; // adjust on hedge creation or buy or settle
     }
     struct contractBalance {
@@ -114,7 +113,7 @@ contract HEDGEFUND {
     mapping(uint => hedgingOption) private hedgeMap;
 
     // mapping of all hedges & swaps for each erc20
-    mapping(address => uint[]) private tokenHedges;
+    mapping(address => uint[]) private tokenOptions;
     mapping(address => uint[]) private tokenSwaps;
 
     // mapping of all hedges for user by Id
@@ -155,8 +154,8 @@ contract HEDGEFUND {
     uint[] private equityswapsCreated;
     uint[] private equityswapsTaken;
     
+    // global counters
     uint public optionID;
-    uint public takesCount;
     
     // fee variables
     uint256 public feeNumerator;
@@ -172,16 +171,16 @@ contract HEDGEFUND {
     uint256 public usdtEquivWithdrawals;
     uint256 public usdcEquivWithdrawals;
     
-    address public feeReserveAddress;
-    address public owner;
-
+    // core addresses
     address private constant UNISWAP_FACTORY_ADDRESS = 0xc35DADB65012eC5796536bD9864eD8773aBc74C4;
     address private constant UNISWAP_ROUTER_ADDRESS = 0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506;
     address public wethAddress;
     address public usdtAddress;
     address public usdcAddress;
     address public neonAddress;
+    address public owner;
 
+    //events
     event Received(address, uint);
     event onDeposit(address indexed token, uint256 indexed amount, address indexed wallet);
     event onWithdraw(address indexed token, uint256 indexed amount, address indexed wallet);
@@ -191,18 +190,16 @@ contract HEDGEFUND {
     event minedHedge(uint256 optionId, address indexed miner, address indexed token, address indexed paired, uint256 tokenFee, uint256 baseFee);
     event bookmarkToggle(address indexed user, uint256 hedgeId, bool bookmarked);
 
-
     constructor() public {
-      IUniswapV2Router02 router = IUniswapV2Router02(UNISWAP_ROUTER_ADDRESS);
-      wethAddress = router.WETH();
-      usdtAddress = 0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9; // USDT address on Arb
-      usdcAddress = 0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d; // USDC address on Arb
-      neonAddress = 0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d;
-
-      feeNumerator = 3;
-      feeDenominator = 1000;
-      feeReserveAddress = msg.sender;
-      owner = msg.sender;
+        IUniswapV2Router02 router = IUniswapV2Router02(UNISWAP_ROUTER_ADDRESS);
+        wethAddress = router.WETH();
+        usdtAddress = 0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9; // USDT address on Arb
+        usdcAddress = 0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d; // USDC address on Arb
+        neonAddress = 0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d;
+        // Profile
+        feeNumerator = 5;
+        feeDenominator = 1000;
+        owner = msg.sender;
     }
 
     function depositToken(address _token, uint256 _amount) public payable {
@@ -219,7 +216,7 @@ contract HEDGEFUND {
         if(uto.deposited == 0){
           userERC20s[msg.sender].push(_token);
         }
-        // Log contract balance & tokens
+        // Log new token address
         // protocolBalanceMap ia analytics only. userBalanceMap stores withdrawable balance
         if(protocolBalanceMap[_token].deposited == 0){
           userERC20s[address(this)].push(_token);
@@ -236,44 +233,26 @@ contract HEDGEFUND {
         emit onDeposit(_token, _amount, msg.sender);
     }
 
-    // Neon token tax deposits in WETH only
-    function depositTokenTax(address _token, uint256 _amount) public payable {
-        require(_token == wethAddress, "WETH only accepted");
-        require(msg.sender == neonAddress,"Depositor not allowed");
-        require(_amount > 0, "Attempting to deposit 0 ETHER");
-        
-        userBalanceMap[_token][address(this)].deposited.add(_amount);
-        // Log token tax ether before conversion to WETH
-        protocolTokenTaxFees[_token] += _amount;
-        
-        // Log erc20 base equivalents
-        wethEquivDeposits += _amount;    
-        
-        // Emit deposit event
-        emit onDeposit(_token, _amount, msg.sender);
-    }
-
     function withdrawToken(address token, uint256 amount) public {
         userBalance storage uto = userBalanceMap[token][msg.sender];
         uint256 withdrawable = getWithdrawableBalance(token, msg.sender);
         require(amount <= withdrawable && amount > 0, "You have Insufficient available balance");
         require(msg.sender != address(this), "Not allowed");
 
-        // Update user's withdrawn balance
+        // Tax withdrawals on bases only; WETH, USDT, USDC. 1/10 of settle tax
         uint256 tokenFee;
         if(token == wethAddress || token == usdtAddress || token == usdcAddress) {
             tokenFee = calculateFee(amount) / 10;
         }
-        uto.withdrawn = uto.withdrawn.add(amount);
-        require(IERC20(token).transfer(msg.sender, amount - tokenFee), "Transfer failed");
-
-        // log protocol cashier fees
         if(tokenFee > 0) {
             protocolCashierFees[token].add(tokenFee);
             userBalanceMap[token][address(this)].deposited.add(tokenFee);
         }
+        // Withdraw
+        uto.withdrawn = uto.withdrawn.add(amount);
+        require(IERC20(token).transfer(msg.sender, amount - tokenFee), "Transfer failed");
 
-        //--for erc20 base equivalent
+        // Token's base value equivalent
         (uint256 marketValue, address paired) = getUnderlyingValue(token, amount);
         if(paired == wethAddress){wethEquivWithdrawals += marketValue;}
         if(paired == usdtAddress){usdtEquivWithdrawals += marketValue;}
@@ -283,7 +262,7 @@ contract HEDGEFUND {
         emit onWithdraw(token, amount, msg.sender);
     }
 
-    //covers both call options and equity swaps. put options to be enabled in Beta V2
+    // Create Hedge: covers both call options and equity swaps. put options to be enabled in Beta V2
     //cost is in base currency or pair token
     //swap collateral must  be equal, settle function relies on this implementation here
     //put options will have amax loss check to only accept a strike price 50% away max
@@ -297,18 +276,17 @@ contract HEDGEFUND {
         require(token != UNISWAP_ROUTER_ADDRESS, "Token address cannot be router address");
         require(token != UNISWAP_FACTORY_ADDRESS, "Token address cannot be factory address");
         require(token != address(this), "Token address cannot be contract address");
-
         // Assign option values directly to the struct
         hedgingOption storage newOption = hedgeMap[optionID];
-        newOption.owner = msg.sender;
-        newOption.token = token;
-        newOption.status = 1;
-        newOption.amount = amount;
+            newOption.owner = msg.sender;
+            newOption.token = token;
+            newOption.status = 1;
+            newOption.amount = amount;
         (newOption.createValue, newOption.paired) = getUnderlyingValue(token, amount);
-        newOption.cost = cost;
-        newOption.dt_expiry = deadline;
-        newOption.dt_created = block.timestamp;
-        newOption.hedgeType = tool ? HedgeType.CALL : HedgeType.SWAP;
+            newOption.cost = cost;
+            newOption.dt_expiry = deadline;
+            newOption.dt_created = block.timestamp;
+            newOption.hedgeType = tool ? HedgeType.CALL : HedgeType.SWAP;
 
         // Update user balances for token in hedge
         userBalance storage hto = userBalanceMap[token][msg.sender]; 
@@ -316,14 +294,14 @@ contract HEDGEFUND {
         // Update arrays
         if (newOption.hedgeType == HedgeType.SWAP) {
             require(cost >= newOption.createValue, " Swap collateral must be equal value");
-            myswapsHistory[msg.sender].push(optionID);
-            equityswapsCreated.push(optionID);
+            myswapsHistory[msg.sender].push(optionID);            
             myswapsCreated[msg.sender].push(optionID);
-            tokenHedges[token].push(optionID);
+            equityswapsCreated.push(optionID);
+            tokenOptions[token].push(optionID);
         } else {
             myhedgesHistory[msg.sender].push(optionID);
-            hedgesCreated.push(optionID);
             myhedgesCreated[msg.sender].push(optionID);
+            hedgesCreated.push(optionID);
             tokenSwaps[token].push(optionID);         
         }
         // Log protocol analytics
@@ -342,12 +320,9 @@ contract HEDGEFUND {
         locked = true;
         hedgingOption storage hedge = hedgeMap[_optionId];
         userBalance storage stk = userBalanceMap[hedge.paired][msg.sender];
-        // Check if the user has sufficient free base balance to buy the hedge
         require(getWithdrawableBalance(hedge.paired, msg.sender) >= hedge.cost, "Insufficient free base balance");
-        // Check if option ID is valid and the buyer is not the owner of the hedge
         require(_optionId < optionID && msg.sender != hedge.owner, "Invalid option ID | Owner cant buy");
-
-        // Update taker's lockedinuse balance
+        // Update lockedinuse storage
         stk.lockedinuse = stk.lockedinuse.add(hedge.cost);
         hedge.taker = msg.sender;
         hedge.status = 2;
@@ -363,7 +338,6 @@ contract HEDGEFUND {
         // Store updated structs
         userBalanceMap[hedge.paired][msg.sender] = stk;
         hedgeMap[_optionId] = hedge;
-
         // Update arrays and takes count
         if (hedge.hedgeType == HedgeType.SWAP) {
             myswapsHistory[msg.sender].push(_optionId);
@@ -374,14 +348,11 @@ contract HEDGEFUND {
             hedgesTaken.push(_optionId);
             myhedgesTaken[msg.sender].push(_optionId);            
         }
-
-        // Log array of both token & base tokens involved in protocol revenue
+        // Log base tokens involved in protocol revenue
         if(protocolHedgesTakenValue[hedge.paired] == 0){
           baseERC20s[address(this)].push(hedge.paired);
         }
-
-        // Protocol trackers
-        takesCount += 1;
+        // Protocol Revenue Trackers
         protocolHedgesTakenValue[hedge.paired].add(hedge.startvalue);
         protocolHedgesCostValue[hedge.paired].add(hedge.cost);
         if (hedge.hedgeType == HedgeType.SWAP) {
@@ -392,8 +363,6 @@ contract HEDGEFUND {
 
         // Emit the hedgePurchased event
         emit hedgePurchased(hedge.token, _optionId, hedge.amount, hedge.hedgeType, msg.sender);
-
-        // Unlock the function
         locked = false;
     }
     
@@ -593,7 +562,6 @@ contract HEDGEFUND {
         emit minedHedge(_optionId, msg.sender, option.token, option.paired, hedgeInfo.tokenFee, hedgeInfo.baseFee);
     }
 
-
     // Log Analytics
     // - total profit to protocol
     // - total profit to miner
@@ -607,15 +575,14 @@ contract HEDGEFUND {
         protocolHedgeFeesBases[paired].add(baseFee);
         protocolHedgeSettleValue[paired].add(endValue);
     }
-
-    // Utility functions
+    
     function updateFee(uint256 numerator, uint256 denominator) onlyOwner public {
       feeNumerator = numerator;
       feeDenominator = denominator;
     }
     
     function calculateFee(uint256 amount) public view returns (uint256){
-      require(amount >= feeDenominator, "Deposit is too small");    
+      require(amount >= feeDenominator, "Revenue is too small");    
       uint256 amountInLarge = amount.mul(feeDenominator.sub(feeNumerator));
       uint256 amountIn = amountInLarge.div(feeDenominator);
       uint256 fee = amount.sub(amountIn);
@@ -746,12 +713,9 @@ contract HEDGEFUND {
     function getProtocolRevenueERC20(address token) public view returns (uint256) {
         return (userBalanceMap[token][address(this)].deposited);
     }
-    // Cashier fees on base tokens only
+    // Cashier fees are collected in base tokens only
     function getCashierFeesValue() public view returns (uint256, uint256, uint256) {
         return (protocolCashierFees[wethAddress], protocolCashierFees[usdtAddress], protocolCashierFees[usdcAddress]);
-    }
-    function getTokenTaxesValue() public view returns (uint256) {// returns weth only
-        return (protocolTokenTaxFees[wethAddress]);
     }
     // Distributed revenue; withdrawn to staking contract for revenue
     function getTotalDistributed() public view returns (uint256) {
@@ -786,8 +750,6 @@ contract HEDGEFUND {
       return (deposited, withdrawn, lockedinuse, withdrawableBalance, withdrawableValue, paired);
     }
     
-    
-
     /*user's erc20 history deposited and traded, targeted search
     ~ user is the address of the user whose history is being searched in the userERC20s mapping. 
     ~ startIndex is used to specify the starting index in the tokens array for the user, 
@@ -809,8 +771,16 @@ contract HEDGEFUND {
         }
         return result;
     }
+    // All User Tokens
+    function getWalletTokenList(address wallet) external view returns (address[] memory) {
+        return userERC20s[wallet];
+    }
+    // All Protocol Deposited Tokens
+    function getDepositedTokens() external view returns (address[] memory) {
+        return userERC20s[address(this)];
+    }
 
-    /*user hedge positions created/taken: targeted search
+    /*All user hedge positions created + taken: targeted search
     ~  user is the address of the user whose positions are being searched in the myhedgesHistory mapping. 
     ~ startIndex is used to specify the starting index in the fullArray for the user, 
     ~ and limit is used to determine the number of items to search. 
@@ -820,8 +790,20 @@ contract HEDGEFUND {
     ~ Additionally, a check is added to ensure that startIndex is within the bounds of the fullArray using a require statement, 
     ~ and actualLimit is calculated as the minimum of length - startIndex and limit to avoid exceeding the length of fullArray.
     */
-    function getUserPositionsSubset(address user, uint startIndex, uint limit) public view returns (uint[] memory) {
+    function getUserHedgesSubset(address user, uint startIndex, uint limit) public view returns (uint[] memory) {
         uint[] memory fullArray = myhedgesHistory[user];
+        uint length = fullArray.length;
+        require(startIndex < length, "Invalid start index");
+        uint actualLimit = length - startIndex < limit ? length - startIndex : limit;
+        uint[] memory subset = new uint[](actualLimit);
+        for (uint i = startIndex; i < startIndex + actualLimit; i++) {
+            subset[i - startIndex] = fullArray[i];
+        }
+        return subset;
+    }
+
+    function getUserSwapsSubset(address user, uint startIndex, uint limit) public view returns (uint[] memory) {
+        uint[] memory fullArray = myswapsHistory[user];
         uint length = fullArray.length;
         require(startIndex < length, "Invalid start index");
         uint actualLimit = length - startIndex < limit ? length - startIndex : limit;
@@ -909,13 +891,17 @@ contract HEDGEFUND {
     */
     function getAllHedges(uint startIndex, uint limit) public view returns (uint[] memory) {
         require(startIndex < hedgesCreated.length, "Invalid start index");
-        uint[] memory allHedges = hedgesCreated;
-        uint[] memory result = new uint[](limit);
-        for (uint i = startIndex; i < startIndex + limit && i < allHedges.length; i++) {
-            result[i - startIndex] = allHedges[i];
+        uint endIndex = startIndex + limit;
+        if (endIndex > hedgesCreated.length) {
+            endIndex = hedgesCreated.length;
         }
+        uint[] memory result = new uint[](endIndex - startIndex);
+        for (uint i = startIndex; i < endIndex; i++) {
+            result[i - startIndex] = hedgesCreated[i];
+        }        
         return result;
     }
+
 
     /* all hedges taken: targeted search
     ~ startIndex is used to specify the starting index in the hedgesTaken array, 
@@ -927,11 +913,14 @@ contract HEDGEFUND {
     */
     function getAllHedgesTaken(uint startIndex, uint limit) public view returns (uint[] memory) {
         require(startIndex < hedgesTaken.length, "Invalid start index");
-        uint[] memory allHedgesTaken = hedgesTaken;
-        uint[] memory result = new uint[](limit);
-        for (uint i = startIndex; i < startIndex + limit && i < allHedgesTaken.length; i++) {
-            result[i - startIndex] = allHedgesTaken[i];
+        uint endIndex = startIndex + limit;
+        if (endIndex > hedgesTaken.length) {
+            endIndex = hedgesTaken.length;
         }
+        uint[] memory result = new uint[](endIndex - startIndex);
+        for (uint i = startIndex; i < endIndex; i++) {
+            result[i - startIndex] = hedgesTaken[i];
+        }        
         return result;
     }
 
@@ -945,10 +934,13 @@ contract HEDGEFUND {
     */
     function getAllSwaps(uint startIndex, uint limit) public view returns (uint[] memory) {
         require(startIndex < equityswapsCreated.length, "Invalid start index");
-        uint[] memory allSwaps = equityswapsCreated;
-        uint[] memory result = new uint[](limit);
-        for (uint i = startIndex; i < startIndex + limit && i < allSwaps.length; i++) {
-            result[i - startIndex] = allSwaps[i];
+        uint endIndex = startIndex + limit;
+        if (endIndex > equityswapsCreated.length) {
+            endIndex = equityswapsCreated.length;
+        }
+        uint[] memory result = new uint[](endIndex - startIndex);
+        for (uint i = startIndex; i < endIndex; i++) {
+            result[i - startIndex] = equityswapsCreated[i];
         }
         return result;
     }
@@ -963,56 +955,15 @@ contract HEDGEFUND {
     */
     function getAllSwapsTaken(uint startIndex, uint limit) public view returns (uint[] memory) {
         require(startIndex < equityswapsTaken.length, "Invalid start index");
-        uint[] memory allSwapsTaken = equityswapsTaken;
-        uint[] memory result = new uint[](limit);
-        for (uint i = startIndex; i < startIndex + limit && i < allSwapsTaken.length; i++) {
-            result[i - startIndex] = allSwapsTaken[i];
+        uint endIndex = startIndex + limit;
+        if (endIndex > equityswapsTaken.length) {
+            endIndex = equityswapsTaken.length;
         }
+        uint[] memory result = new uint[](endIndex - startIndex);
+        for (uint i = startIndex; i < endIndex; i++) {
+            result[i - startIndex] = equityswapsTaken[i];
+        }        
         return result;
-    }
-
-    //wallet's tokens
-    function getWalletTokenList(address wallet) external view returns (address[] memory) {
-        return userERC20s[wallet];
-    }
-    //deposited tokens
-    function getDepositedTokens() external view returns (address[] memory) {
-        return userERC20s[address(this)];
-    }
-
-    //get deposited tokens count
-    function getDepositedTokensLength() external view returns (uint) {
-        return userERC20s[address(this)].length;
-    }
-
-    //get all hedges count
-    function getAllHedgesLength() public view returns (uint256) {
-        return hedgesCreated.length;
-    }
-
-    //get all equity swaps count
-    function getAllSwapsLength() public view returns (uint256) {
-        return equityswapsCreated.length;
-    }
-
-    //get user hedges count
-    function getUserHedgesLength(address user) public view returns (uint256) {
-        return myhedgesHistory[user].length;
-    }
-
-    //get user equity swaps count
-    function getUserSwapsLength(address user) public view returns (uint256) {
-        return myswapsHistory[user].length;
-    }
-
-    //hedges count under specific token
-    function getHedgesForTokenCount(address _token) public view returns (uint256) {
-        return tokenHedges[_token].length;
-    }
-
-    //swaps count under specific token
-    function getSwapsForTokenCount(address _token) public view returns (uint256) {
-        return tokenSwaps[_token].length;
     }
 
     /* hedges list under specific ERC20 address: targeted search
@@ -1023,8 +974,8 @@ contract HEDGEFUND {
     ~ which represents the actual number of items in the result array. 
     ~ Finally, the subset array is populated with the elements from the fullArray using the calculated indices based on startIndex and actualLimit.
     */
-    function getHedgesForToken(address _token, uint startIndex, uint limit) public view returns(uint[] memory){
-        uint[] memory fullArray = tokenHedges[_token];
+    function getOptionsForToken(address _token, uint startIndex, uint limit) public view returns(uint[] memory){
+        uint[] memory fullArray = tokenOptions[_token];
         require(startIndex < fullArray.length, "Start index exceeds array length");
         uint endIndex = startIndex + limit > fullArray.length ? fullArray.length : startIndex + limit;
         uint actualLimit = endIndex - startIndex;
@@ -1077,66 +1028,42 @@ contract HEDGEFUND {
         return result;
     }
 
+    //get deposited tokens count
+    function getDepositedTokensLength() external view returns (uint) {
+        return userERC20s[address(this)].length;
+    }
+
+    //get all hedges count
+    function getAllHedgesLength() public view returns (uint256) {
+        return hedgesCreated.length;
+    }
+
+    //get all equity swaps count
+    function getAllSwapsLength() public view returns (uint256) {
+        return equityswapsCreated.length;
+    }
+
+    //get user hedges count
+    function getUserHedgesLength(address user) public view returns (uint256) {
+        return myhedgesHistory[user].length;
+    }
+
+    //get user equity swaps count
+    function getUserSwapsLength(address user) public view returns (uint256) {
+        return myswapsHistory[user].length;
+    }
+
+    //hedges count under specific token
+    function getHedgesForTokenCount(address _token) public view returns (uint256) {
+        return tokenOptions[_token].length;
+    }
+
+    //swaps count under specific token
+    function getSwapsForTokenCount(address _token) public view returns (uint256) {
+        return tokenSwaps[_token].length;
+    }
+
     receive() external payable {
         emit Received(msg.sender, msg.value);
     }
 }
-
-
-     /* backup
-    // above approach better as it tokenises for all currencies
-    function depositBase(address _tokenAddress) public payable{
-      require(msg.value > 0, "zero deposit value");
-      uint256 amount = msg.value;
-      // charge a fee
-      uint256 fee = calculateFee(msg.value);
-      uint256 amountIn = amount.sub(fee);
-      // track each token amounts
-      protocolBalanceMap[_tokenAddress].deposited += amountIn;
-      //track users added tokens
-      userTokenMap[msg.sender][_tokenAddress] = true;
-      // token mapped to user
-      userBalance storage uto = userBalanceMap[_tokenAddress][msg.sender];
-      uto.deposited = uto.deposited.add(amountIn);
-      baseETH_in += amountIn;
-      emit onDeposit(_tokenAddress, msg.value, fee);
-    }
-    */
-
-    /* backup
-    function getOptionValueOG(address _tokenAddress, uint256 _tokenAmount) public view returns (uint256, address pairedCurrency) {
-      //address _pairAddress = getPairAddressBK(_tokenAddress, _baseAddress);
-      (address _pairAddress, address pairedCurrency) = getPairAddressZK(_tokenAddress);
-
-      IUniswapV2Pair pair = IUniswapV2Pair(_pairAddress); // Create an instance of the UniswapV2Pair contract
-      ERC20 token0 = ERC20(pair.token0()); // Create an instance of the Token0 contract
-      ERC20 token1 = ERC20(pair.token1()); // Create an instance of the Token1 contract
-
-      //base currency check
-      if(pair.token0() == address(0) || pair.token1() == address(0)){return (0,address(0));}
-
-      (uint256 reserve0, uint256 reserve1, ) = pair.getReserves(); // Get the reserves of Token0 and Token1
-      uint256 token0Decimals = uint256(10)**token0.decimals(); // Get the decimals of Token0
-      uint256 token1Decimals = uint256(10)**token1.decimals(); // Get the decimals of Token1
-
-      uint256 token0Value = (_tokenAmount * reserve0 * token1Decimals) / (reserve1 * token0Decimals); // Calculate the value of the tokens in Token0
-      uint256 token1Value = (_tokenAmount * reserve1 * token0Decimals) / (reserve0 * token1Decimals); // Calculate the value of the tokens in Token1
-
-      if (_tokenAddress == pair.token0()) {
-          return (token0Value,pairedCurrency);
-      } else if (_tokenAddress == pair.token1()) {
-          return (token1Value,pairedCurrency);
-      } else {
-          revert("Invalid token address");
-      }
-    }
-    */
-
-    /* backup 
-    // full knowledge pair addr generator
-    function getPairAddressBK(address _tokenAddress, address _baseAddress) public view returns(address pairAddress, address){
-      IUniswapV2Factory uniswapFactory = IUniswapV2Factory(UNISWAP_FACTORY_ADDRESS); // Address of the Uniswap factory on the Ethereum mainnet
-      pairAddress = uniswapFactory.getPair(_tokenAddress, _baseAddress); // Get the pair address of the token and WETH/USDT/USDC
-      return (pairAddress, _baseAddress);
-    }
-    */
