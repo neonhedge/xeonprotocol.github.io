@@ -117,10 +117,10 @@ contract HEDGEFUND {
     mapping(address => uint[]) private tokenSwaps;
 
     // mapping of all hedges for user by Id
-    mapping(address => uint[]) myhedgesHistory;
+    mapping(address => uint[]) myoptionsHistory;
     mapping(address => uint[]) myswapsHistory;
-    mapping(address => uint[]) myhedgesCreated;
-    mapping(address => uint[]) myhedgesTaken;
+    mapping(address => uint[]) myoptionsCreated;
+    mapping(address => uint[]) myoptionsTaken;
     mapping(address => uint[]) myswapsCreated;
     mapping(address => uint[]) myswapsTaken;
     
@@ -140,16 +140,22 @@ contract HEDGEFUND {
     mapping(address => uint256) public protocolHedgesOptionsValue;
     mapping(address => uint256) public protocolHedgeSettleValue;
 
-    // other protocol analytics mappings
+    // volume analytics mappings
     mapping(address => uint256) public protocolCashierFees;
-    mapping(address => uint256) public protocolTokenTaxFees; // in WETH only
+    mapping(address => uint256) public wethEquivUserHedged;
+    mapping(address => uint256) public usdtEquivUserHedged;
+    mapping(address => uint256) public usdcEquivUserHedged;
+    mapping(address => uint256) public wethEquivUserCosts;
+    mapping(address => uint256) public usdtEquivUserCosts;
+    mapping(address => uint256) public usdcEquivUserCosts;
+    
 
     // mapping bookmarks of each user
     mapping(address => mapping(uint256 => bool)) public bookmarks;
     mapping(address => uint256[]) public bookmarkedOptions; // Array to store bookmarked optionIds for each user
     
     // all hedges
-    uint[] private hedgesCreated;
+    uint[] private optionsCreated;
     uint[] private hedgesTaken;
     uint[] private equityswapsCreated;
     uint[] private equityswapsTaken;
@@ -299,14 +305,20 @@ contract HEDGEFUND {
             equityswapsCreated.push(optionID);
             tokenOptions[token].push(optionID);
         } else {
-            myhedgesHistory[msg.sender].push(optionID);
-            myhedgesCreated[msg.sender].push(optionID);
-            hedgesCreated.push(optionID);
+            myoptionsHistory[msg.sender].push(optionID);
+            myoptionsCreated[msg.sender].push(optionID);
+            optionsCreated.push(optionID);
             tokenSwaps[token].push(optionID);         
         }
         // Log protocol analytics
         optionID++;
         protocolHedgesCreateValue[newOption.paired].add(newOption.createValue);
+
+        // Wallet hedge volume analytics
+        if(newOption.paired == wethAddress){wethEquivUserHedged[msg.sender] += newOption.createValue;}
+        if(newOption.paired == usdtAddress){usdtEquivUserHedged[msg.sender] += newOption.createValue;}
+        if(newOption.paired == usdcAddress){usdcEquivUserHedged[msg.sender] += newOption.createValue;}
+
         // Emit
         emit hedgeCreated(token, optionID, amount, newOption.hedgeType, cost);
         locked = false;
@@ -322,19 +334,18 @@ contract HEDGEFUND {
         userBalance storage stk = userBalanceMap[hedge.paired][msg.sender];
         require(getWithdrawableBalance(hedge.paired, msg.sender) >= hedge.cost, "Insufficient free base balance");
         require(_optionId < optionID && msg.sender != hedge.owner, "Invalid option ID | Owner cant buy");
-        // Update lockedinuse storage
-        stk.lockedinuse = stk.lockedinuse.add(hedge.cost);
-        hedge.taker = msg.sender;
-        hedge.status = 2;
-        // Calculate start value based on the hedge type
+       
+        // Calculate, check and update start value based on the hedge type
         (hedge.startvalue, ) = getUnderlyingValue(hedge.token, hedge.amount);
         if (hedge.hedgeType == HedgeType.CALL) {
             hedge.startvalue += hedge.cost;
         }
-        // Check if start value is greater than 0
         require(hedge.startvalue > 0, "Math error whilst getting price");
-        // Update hedge timestamp
+        stk.lockedinuse = stk.lockedinuse.add(hedge.cost);
         hedge.dt_started = block.timestamp;
+        hedge.taker = msg.sender;
+        hedge.status = 2;
+
         // Store updated structs
         userBalanceMap[hedge.paired][msg.sender] = stk;
         hedgeMap[_optionId] = hedge;
@@ -344,13 +355,13 @@ contract HEDGEFUND {
             equityswapsTaken.push(_optionId);
             myswapsTaken[msg.sender].push(_optionId);
         } else if(hedge.hedgeType == HedgeType.CALL) {
-            myhedgesHistory[msg.sender].push(_optionId);
+            myoptionsHistory[msg.sender].push(_optionId);
             hedgesTaken.push(_optionId);
-            myhedgesTaken[msg.sender].push(_optionId);            
+            myoptionsTaken[msg.sender].push(_optionId);            
         }
         // Log base tokens involved in protocol revenue
         if(protocolHedgesTakenValue[hedge.paired] == 0){
-          baseERC20s[address(this)].push(hedge.paired);
+            baseERC20s[address(this)].push(hedge.paired);
         }
         // Protocol Revenue Trackers
         protocolHedgesTakenValue[hedge.paired].add(hedge.startvalue);
@@ -360,6 +371,11 @@ contract HEDGEFUND {
         } else if(hedge.hedgeType == HedgeType.CALL) {
             protocolHedgesOptionsValue[hedge.paired].add(hedge.startvalue);
         }
+
+        // Wallet hedge volume analytics
+        if(hedge.paired == wethAddress){wethEquivUserCosts[msg.sender] += hedge.startvalue;}
+        if(hedge.paired == usdtAddress){usdtEquivUserCosts[msg.sender] += hedge.startvalue;}
+        if(hedge.paired == usdcAddress){usdcEquivUserCosts[msg.sender] += hedge.startvalue;}
 
         // Emit the hedgePurchased event
         emit hedgePurchased(hedge.token, _optionId, hedge.amount, hedge.hedgeType, msg.sender);
@@ -562,10 +578,7 @@ contract HEDGEFUND {
         emit minedHedge(_optionId, msg.sender, option.token, option.paired, hedgeInfo.tokenFee, hedgeInfo.baseFee);
     }
 
-    // Log Analytics
-    // - total profit to protocol
-    // - total profit to miner
-    // - split in weth, usdc, usdt
+    // Log Protocol Revenue
     // - use userBalanceMap to get raw revenue balances and populate sums frontend
     function logAnalyticsFees(address token, uint256 tokenFee, uint256 baseFee, uint256 tokenProfit, uint256 baseProfit, uint256 endValue) internal {
        (address paired, ) = getPairAddressZK(token);
@@ -575,7 +588,7 @@ contract HEDGEFUND {
         protocolHedgeFeesBases[paired].add(baseFee);
         protocolHedgeSettleValue[paired].add(endValue);
     }
-    
+
     function updateFee(uint256 numerator, uint256 denominator) onlyOwner public {
       feeNumerator = numerator;
       feeDenominator = denominator;
@@ -601,7 +614,7 @@ contract HEDGEFUND {
             uint256[] storage options = bookmarkedOptions[msg.sender];
             for (uint256 i = 0; i < options.length; i++) {
                 if (options[i] == _optionId) {
-                    // Remove the optionId from the bookmarkedOptions array
+                    // When values match remove the optionId from array
                     if (i < options.length - 1) {
                         options[i] = options[options.length - 1];
                     }
@@ -683,7 +696,7 @@ contract HEDGEFUND {
     }
 
     // get analytics - hedge created value; weth, usdt, usdc
-    function getHedgesCreatedValue() public view returns (uint256, uint256, uint256) {
+    function getoptionsCreatedValue() public view returns (uint256, uint256, uint256) {
         return (protocolHedgesCreateValue[wethAddress], protocolHedgesCreateValue[usdtAddress], protocolHedgesCreateValue[usdcAddress]);
     }
     function getHedgesTakenValue() public view returns (uint256, uint256, uint256) {
@@ -707,34 +720,46 @@ contract HEDGEFUND {
     function getHedgesFeesValue() public view returns (uint256, uint256, uint256) {
         return (protocolHedgeFeesBases[wethAddress], protocolHedgeFeesBases[usdtAddress], protocolHedgeFeesBases[usdcAddress]);
     }
-    function getProtocolRevenue() public view returns (uint256, uint256, uint256) {
-        return (userBalanceMap[wethAddress][address(this)].deposited, userBalanceMap[usdtAddress][address(this)].deposited, userBalanceMap[usdcAddress][address(this)].deposited);
-    }
-    function getProtocolRevenueERC20(address token) public view returns (uint256) {
-        return (userBalanceMap[token][address(this)].deposited);
-    }
-    // Cashier fees are collected in base tokens only
+    
+    // Get withdrawal taxes collected, only base withdrawals are taxed
     function getCashierFeesValue() public view returns (uint256, uint256, uint256) {
         return (protocolCashierFees[wethAddress], protocolCashierFees[usdtAddress], protocolCashierFees[usdcAddress]);
     }
-    // Distributed revenue; withdrawn to staking contract for revenue
+    // Get distributed revenue; withdrawn to staking contract for revenue
     function getTotalDistributed() public view returns (uint256) {
         return (userBalanceMap[wethAddress][address(this)].withdrawn);
     }
-    // Contract balances for token
+    // Get protocol token balances
     function getContractTokenBalances(address _token) public view returns (uint256, uint256) {
         return (userBalanceMap[_token][address(this)].deposited, userBalanceMap[_token][address(this)].withdrawn);
     }
-    // Contract base balances
-    function getErc20Deposits() public view returns (uint256,uint256,uint256) {
-      return (wethEquivDeposits, usdtEquivDeposits, usdcEquivDeposits);
+    // Get protocol revenue across all 3 bases
+    function getProtocolRevenue() public view returns (uint256, uint256, uint256) {
+        return (userBalanceMap[wethAddress][address(this)].deposited, userBalanceMap[usdtAddress][address(this)].deposited, userBalanceMap[usdcAddress][address(this)].deposited);
     }
-    // Contract base balances
-    function getErc20Withdrawals() public view returns (uint256,uint256,uint256) {
-      return (wethEquivWithdrawals, usdtEquivWithdrawals, usdcEquivWithdrawals);
+    // Get cashier volume in base equivalent 
+    function getBaseEquivDeposits() public view returns (uint256,uint256,uint256) {
+        return (wethEquivDeposits, usdtEquivDeposits, usdcEquivDeposits);
     }
-
-    // Users token balances
+    function getBaseEquivWithdrawals() public view returns (uint256,uint256,uint256) {
+        return (wethEquivWithdrawals, usdtEquivWithdrawals, usdcEquivWithdrawals);
+    }
+    // Get wallet's hedge & costs volume in base equivalent
+    function getuserWriteVolume(address wallet) public view returns (uint256, uint256, uint256) {
+        return (wethEquivUserHedged[wallet], usdtEquivUserHedged[wallet], usdcEquivUserHedged[wallet]);
+    }
+    function getuserTakeVolume(address wallet) public view returns (uint256, uint256, uint256) {
+        return (wethEquivUserCosts[wallet], usdtEquivUserCosts[wallet], usdcEquivUserCosts[wallet]);
+    }
+    // Get array of user or wallet's ERC20 token interactions
+    function getUserTokenList(address wallet) external view returns (address[] memory) {
+        return userERC20s[wallet];
+    }
+    // Get array of all tokens ever deposited to protocol
+    function getAllTokenList() external view returns (address[] memory) {
+        return userERC20s[address(this)];
+    }
+    // Get token balances breakdown for wallet
     function getuserTokenBalances (address token, address user) public view returns (uint256, uint256, uint256, uint256, uint256, address) {
       userBalance memory uto = userBalanceMap[address(token)][address(user)];
       uint256 deposited = uto.deposited;
@@ -771,17 +796,9 @@ contract HEDGEFUND {
         }
         return result;
     }
-    // All User Tokens
-    function getWalletTokenList(address wallet) external view returns (address[] memory) {
-        return userERC20s[wallet];
-    }
-    // All Protocol Deposited Tokens
-    function getDepositedTokens() external view returns (address[] memory) {
-        return userERC20s[address(this)];
-    }
 
     /*All user hedge positions created + taken: targeted search
-    ~  user is the address of the user whose positions are being searched in the myhedgesHistory mapping. 
+    ~  user is the address of the user whose positions are being searched in the myoptionsHistory mapping. 
     ~ startIndex is used to specify the starting index in the fullArray for the user, 
     ~ and limit is used to determine the number of items to search. 
     ~ The loop iterates from startIndex to startIndex + actualLimit (exclusive) 
@@ -790,8 +807,8 @@ contract HEDGEFUND {
     ~ Additionally, a check is added to ensure that startIndex is within the bounds of the fullArray using a require statement, 
     ~ and actualLimit is calculated as the minimum of length - startIndex and limit to avoid exceeding the length of fullArray.
     */
-    function getUserHedgesSubset(address user, uint startIndex, uint limit) public view returns (uint[] memory) {
-        uint[] memory fullArray = myhedgesHistory[user];
+    function getUserOptionsSubset(address user, uint startIndex, uint limit) public view returns (uint[] memory) {
+        uint[] memory fullArray = myoptionsHistory[user];
         uint length = fullArray.length;
         require(startIndex < length, "Invalid start index");
         uint actualLimit = length - startIndex < limit ? length - startIndex : limit;
@@ -815,7 +832,7 @@ contract HEDGEFUND {
     }
 
     /*user hedges created: targeted search
-    ~ user is the address of the user whose hedges are being searched in the myhedgesCreated mapping. 
+    ~ user is the address of the user whose hedges are being searched in the myoptionsCreated mapping. 
     ~ startIndex is used to specify the starting index in the fullArray for the user, 
     ~ and limit is used to determine the number of items to search. 
     ~ The loop iterates from startIndex to startIndex + actualLimit (exclusive) 
@@ -824,8 +841,8 @@ contract HEDGEFUND {
     ~ Additionally, a check is added to ensure that startIndex is within the bounds of the fullArray using a require statement, 
     ~ and actualLimit is calculated as the minimum of length - startIndex and limit to avoid exceeding the length of fullArray.
     */
-    function getUserHedgesCreated(address user, uint startIndex, uint limit) public view returns(uint[] memory){
-        uint[] memory fullArray = myhedgesCreated[user];
+    function getUserOptionsCreated(address user, uint startIndex, uint limit) public view returns(uint[] memory){
+        uint[] memory fullArray = myoptionsCreated[user];
         uint length = fullArray.length;
         require(startIndex < length, "Invalid start index");
         uint actualLimit = length - startIndex < limit ? length - startIndex : limit;
@@ -849,7 +866,7 @@ contract HEDGEFUND {
     }
 
     /*user hedges taken: targeted search
-     ~ user is the address of the user whose hedges are being searched in the myhedgesTaken mapping. 
+     ~ user is the address of the user whose hedges are being searched in the myoptionsTaken mapping. 
      ~ startIndex is used to specify the starting index in the fullArray for the user, and limit is used to determine the number of items to search. 
      ~ The loop iterates from startIndex to startIndex + actualLimit (exclusive) 
      ~ and populates the subset array with the values from fullArray starting from index startIndex to startIndex + actualLimit - 1. 
@@ -857,8 +874,8 @@ contract HEDGEFUND {
      ~ Additionally, a check is added to ensure that startIndex is within the bounds of the fullArray using a require statement, 
      ~ and actualLimit is calculated as the minimum of length - startIndex and limit to avoid exceeding the length of fullArray.
      */
-    function getUserHedgesTaken(address user, uint startIndex, uint limit) public view returns(uint[] memory){
-        uint[] memory fullArray = myhedgesTaken[user];
+    function getUserOptionsTaken(address user, uint startIndex, uint limit) public view returns(uint[] memory){
+        uint[] memory fullArray = myoptionsTaken[user];
         uint length = fullArray.length;
         require(startIndex < length, "Invalid start index");
         uint actualLimit = length - startIndex < limit ? length - startIndex : limit;
@@ -881,45 +898,23 @@ contract HEDGEFUND {
         return subset;
     }
 
-    /* all hedges created: targeted search
-    ~ startIndex is used to specify the starting index in the hedgesCreated array, 
+    /* all options created: targeted search
+    ~ startIndex is used to specify the starting index in the optionsCreated array, 
     ~ and limit is used to determine the number of items to search. 
     ~ The loop iterates from startIndex to startIndex + limit (exclusive) 
-    ~ and populates the result array with the values from hedgesCreated array starting from index startIndex to startIndex + limit - 1. 
+    ~ and populates the result array with the values from optionsCreated array starting from index startIndex to startIndex + limit - 1. 
     ~ The startIndex is used to calculate the correct index in the result array by subtracting it from the loop variable i. 
-    ~ Additionally, a check is added to ensure that startIndex is within the bounds of the hedgesCreated array using a require statement.
+    ~ Additionally, a check is added to ensure that startIndex is within the bounds of the optionsCreated array using a require statement.
     */
-    function getAllHedges(uint startIndex, uint limit) public view returns (uint[] memory) {
-        require(startIndex < hedgesCreated.length, "Invalid start index");
+    function getAllOptions(uint startIndex, uint limit) public view returns (uint[] memory) {
+        require(startIndex < optionsCreated.length, "Invalid start index");
         uint endIndex = startIndex + limit;
-        if (endIndex > hedgesCreated.length) {
-            endIndex = hedgesCreated.length;
+        if (endIndex > optionsCreated.length) {
+            endIndex = optionsCreated.length;
         }
         uint[] memory result = new uint[](endIndex - startIndex);
         for (uint i = startIndex; i < endIndex; i++) {
-            result[i - startIndex] = hedgesCreated[i];
-        }        
-        return result;
-    }
-
-
-    /* all hedges taken: targeted search
-    ~ startIndex is used to specify the starting index in the hedgesTaken array, 
-    ~ and limit is used to determine the number of items to search. 
-    ~ The loop iterates from startIndex to startIndex + limit (exclusive) 
-    ~ and populates the result array with the values from hedgesTaken array starting from index startIndex to startIndex + limit - 1. 
-    ~ The startIndex is used to calculate the correct index in the result array by subtracting it from the loop variable i. 
-    ~ Additionally, a check is added to ensure that startIndex is within the bounds of the hedgesTaken array using a require statement.
-    */
-    function getAllHedgesTaken(uint startIndex, uint limit) public view returns (uint[] memory) {
-        require(startIndex < hedgesTaken.length, "Invalid start index");
-        uint endIndex = startIndex + limit;
-        if (endIndex > hedgesTaken.length) {
-            endIndex = hedgesTaken.length;
-        }
-        uint[] memory result = new uint[](endIndex - startIndex);
-        for (uint i = startIndex; i < endIndex; i++) {
-            result[i - startIndex] = hedgesTaken[i];
+            result[i - startIndex] = optionsCreated[i];
         }        
         return result;
     }
@@ -942,6 +937,27 @@ contract HEDGEFUND {
         for (uint i = startIndex; i < endIndex; i++) {
             result[i - startIndex] = equityswapsCreated[i];
         }
+        return result;
+    }
+
+    /* all options taken: targeted search
+    ~ startIndex is used to specify the starting index in the hedgesTaken array, 
+    ~ and limit is used to determine the number of items to search. 
+    ~ The loop iterates from startIndex to startIndex + limit (exclusive) 
+    ~ and populates the result array with the values from hedgesTaken array starting from index startIndex to startIndex + limit - 1. 
+    ~ The startIndex is used to calculate the correct index in the result array by subtracting it from the loop variable i. 
+    ~ Additionally, a check is added to ensure that startIndex is within the bounds of the hedgesTaken array using a require statement.
+    */
+    function getAllOptionsTaken(uint startIndex, uint limit) public view returns (uint[] memory) {
+        require(startIndex < hedgesTaken.length, "Invalid start index");
+        uint endIndex = startIndex + limit;
+        if (endIndex > hedgesTaken.length) {
+            endIndex = hedgesTaken.length;
+        }
+        uint[] memory result = new uint[](endIndex - startIndex);
+        for (uint i = startIndex; i < endIndex; i++) {
+            result[i - startIndex] = hedgesTaken[i];
+        }        
         return result;
     }
 
@@ -1004,38 +1020,14 @@ contract HEDGEFUND {
         return hedge;
     }
 
-    //iterate users hedges from index x to y
-    function getmyHedgesFromXY(address user, uint x, uint y, bool arrayType) public view returns (uint[] memory) {
-        uint[] memory result = new uint[](y - x + 1);
-        for (uint i = x; i <= y; i++) {
-          if(arrayType){
-            result[i - x] = myhedgesCreated[user][i];
-          }else{
-            result[i - x] = myhedgesTaken[user][i];
-          }
-        }
-        return result;
-    }
-    function getmySwapsFromXY(address user, uint x, uint y, bool arrayType) public view returns (uint[] memory) {
-        uint[] memory result = new uint[](y - x + 1);
-        for (uint i = x; i <= y; i++) {
-          if(arrayType){
-            result[i - x] = myswapsCreated[user][i];
-          }else{
-            result[i - x] = myswapsTaken[user][i];
-          }
-        }
-        return result;
-    }
-
     //get deposited tokens count
     function getDepositedTokensLength() external view returns (uint) {
         return userERC20s[address(this)].length;
     }
 
-    //get all hedges count
-    function getAllHedgesLength() public view returns (uint256) {
-        return hedgesCreated.length;
+    //get all options count
+    function getAllOptionsLength() public view returns (uint256) {
+        return optionsCreated.length;
     }
 
     //get all equity swaps count
@@ -1043,9 +1035,9 @@ contract HEDGEFUND {
         return equityswapsCreated.length;
     }
 
-    //get user hedges count
-    function getUserHedgesLength(address user) public view returns (uint256) {
-        return myhedgesHistory[user].length;
+    //get user options count
+    function getUserOptionsLength(address user) public view returns (uint256) {
+        return myoptionsHistory[user].length;
     }
 
     //get user equity swaps count
@@ -1053,8 +1045,8 @@ contract HEDGEFUND {
         return myswapsHistory[user].length;
     }
 
-    //hedges count under specific token
-    function getHedgesForTokenCount(address _token) public view returns (uint256) {
+    //options count under specific token
+    function getOptionsForTokenCount(address _token) public view returns (uint256) {
         return tokenOptions[_token].length;
     }
 
