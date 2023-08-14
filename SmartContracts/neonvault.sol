@@ -135,26 +135,25 @@ contract HEDGEFUND {
     mapping(address => address[]) public baseERC20s;
 
     // mapping of all protocol profits and fees collected from hedges
-    mapping(address => uint256) public protocolHedgeProfitsTokens;//liquidated to bases at discount
-    mapping(address => uint256) public protocolHedgeProfitsBases;
-    mapping(address => uint256) public protocolHedgeFeesTokens;//liquidated to bases at discount
-    mapping(address => uint256) public protocolHedgeFeesBases;
-    mapping(address => uint256) public protocolHedgesCreateValue;
-    mapping(address => uint256) public protocolHedgesTakenValue;
-    mapping(address => uint256) public protocolHedgesCostValue;
-    mapping(address => uint256) public protocolHedgesSwapsValue;
-    mapping(address => uint256) public protocolHedgesOptionsValue;
-    mapping(address => uint256) public protocolHedgeSettleValue;
+    mapping(address => uint256) public protocolProfitsTokens;//liquidated to bases at discount
+    mapping(address => uint256) public protocolProfitsBases;
+    mapping(address => uint256) public protocolFeesTokens;//liquidated to bases at discount
+    mapping(address => uint256) public protocolFeesBases;
+    mapping(address => uint256) public protocolCreateValue;
+    mapping(address => uint256) public protocolTakenValue;
+    mapping(address => uint256) public protocolCostValue;
+    mapping(address => uint256) public protocolSwapsValue;
+    mapping(address => uint256) public protocolOptionsValue;
+    mapping(address => uint256) public protocolSettleValue;
 
-    // volume analytics mappings
+    // more volume mappings
     mapping(address => uint256) public protocolCashierFees;
     mapping(address => uint256) public wethEquivUserHedged;
     mapping(address => uint256) public usdtEquivUserHedged;
     mapping(address => uint256) public usdcEquivUserHedged;
     mapping(address => uint256) public wethEquivUserCosts;
     mapping(address => uint256) public usdtEquivUserCosts;
-    mapping(address => uint256) public usdcEquivUserCosts;
-    
+    mapping(address => uint256) public usdcEquivUserCosts;    
 
     // mapping bookmarks of each user
     mapping(address => mapping(uint256 => bool)) public bookmarks;
@@ -208,7 +207,7 @@ contract HEDGEFUND {
         usdtAddress = 0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9; // USDT address on Arb
         usdcAddress = 0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d; // USDC address on Arb
         neonAddress = 0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d;
-        // Profile
+        // variables
         feeNumerator = 5;
         feeDenominator = 1000;
         owner = msg.sender;
@@ -235,7 +234,7 @@ contract HEDGEFUND {
         }
         protocolBalanceMap[_token].deposited += _amount;
         
-        // Log erc20 base equivalents
+        // Log main base equivalents
         (uint256 marketValue, address paired) = getUnderlyingValue(_token, _amount);
         if(paired == wethAddress){wethEquivDeposits += marketValue;}
         if(paired == usdtAddress){usdtEquivDeposits += marketValue;}
@@ -264,7 +263,7 @@ contract HEDGEFUND {
         uto.withdrawn = uto.withdrawn.add(amount);
         require(IERC20(token).transfer(msg.sender, amount - tokenFee), "Transfer failed");
 
-        // Token's base value equivalent
+        // Log main base value equivalents
         (uint256 marketValue, address paired) = getUnderlyingValue(token, amount);
         if(paired == wethAddress){wethEquivWithdrawals += marketValue;}
         if(paired == usdtAddress){usdtEquivWithdrawals += marketValue;}
@@ -318,9 +317,9 @@ contract HEDGEFUND {
         }
         // Log protocol analytics
         optionID++;
-        protocolHedgesCreateValue[newOption.paired].add(newOption.createValue);
+        protocolCreateValue[newOption.paired].add(newOption.createValue);
 
-        // Wallet hedge volume analytics
+        // Wallet hedge volume in main bases only
         if(newOption.paired == wethAddress){wethEquivUserHedged[msg.sender] += newOption.createValue;}
         if(newOption.paired == usdtAddress){usdtEquivUserHedged[msg.sender] += newOption.createValue;}
         if(newOption.paired == usdcAddress){usdcEquivUserHedged[msg.sender] += newOption.createValue;}
@@ -366,18 +365,18 @@ contract HEDGEFUND {
             myoptionsTaken[msg.sender].push(_optionId);            
         }
         // Log base tokens involved in protocol revenue
-        if(protocolHedgesTakenValue[hedge.paired] == 0){
+        if(protocolTakenValue[hedge.paired] == 0){
             baseERC20s[address(this)].push(hedge.paired);
         }
         // Protocol Revenue Trackers
-        protocolHedgesTakenValue[hedge.paired].add(hedge.startvalue);
-        protocolHedgesCostValue[hedge.paired].add(hedge.cost);
+        protocolTakenValue[hedge.paired].add(hedge.startvalue);
+        protocolCostValue[hedge.paired].add(hedge.cost);
         if (hedge.hedgeType == HedgeType.SWAP) {
-            protocolHedgesSwapsValue[hedge.paired].add(hedge.startvalue);
+            protocolSwapsValue[hedge.paired].add(hedge.startvalue);
         } else if(hedge.hedgeType == HedgeType.CALL) {
-            protocolHedgesOptionsValue[hedge.paired].add(hedge.startvalue);
+            protocolOptionsValue[hedge.paired].add(hedge.startvalue);
         }
-        // Wallet hedge volume analytics
+        // Wallet hedge volume analytics in main bases only
         if(hedge.paired == wethAddress){wethEquivUserCosts[msg.sender] += hedge.startvalue;}
         if(hedge.paired == usdtAddress){usdtEquivUserCosts[msg.sender] += hedge.startvalue;}
         if(hedge.paired == usdcAddress){usdcEquivUserCosts[msg.sender] += hedge.startvalue;}
@@ -599,11 +598,11 @@ contract HEDGEFUND {
     // - use userBalanceMap to get raw revenue balances and populate sums frontend
     function logAnalyticsFees(address token, uint256 tokenFee, uint256 baseFee, uint256 tokenProfit, uint256 baseProfit, uint256 endValue) internal {
        (address paired, ) = getPairAddressZK(token);
-        protocolHedgeProfitsTokens[token].add(tokenProfit);
-        protocolHedgeProfitsBases[paired].add(baseProfit);
-        protocolHedgeFeesTokens[token].add(tokenFee);
-        protocolHedgeFeesBases[paired].add(baseFee);
-        protocolHedgeSettleValue[paired].add(endValue);
+        protocolProfitsTokens[token].add(tokenProfit);
+        protocolProfitsBases[paired].add(baseProfit);
+        protocolFeesTokens[token].add(tokenFee);
+        protocolFeesBases[paired].add(baseFee);
+        protocolSettleValue[paired].add(endValue);
     }
 
     // Log User PL in base value
@@ -1007,45 +1006,35 @@ contract HEDGEFUND {
     function getSwapsForTokenCount(address _token) public view returns (uint256) {
         return tokenSwaps[_token].length;
     }
-     // get protocol analytic values - hedge created value; weth, usdt, usdc
-    function getoptionsCreatedValue() public view returns (uint256, uint256, uint256) {
-        return (protocolHedgesCreateValue[wethAddress], protocolHedgesCreateValue[usdtAddress], protocolHedgesCreateValue[usdcAddress]);
+    
+    // get protocol analytic values - in fixed base sets
+    // --depracated to direct reading manually per address
+    function getHedgesCreatedVolume(address baseAddress) public view returns (uint256) {
+        return protocolCreateValue[baseAddress];
     }
-    function getHedgesTakenValue() public view returns (uint256, uint256, uint256) {
-        return (protocolHedgesTakenValue[wethAddress], protocolHedgesTakenValue[usdtAddress], protocolHedgesTakenValue[usdcAddress]);
+    function getHedgesTakenVolume(address baseAddress) public view returns (uint256) {
+        return protocolTakenValue[baseAddress];
     }
-    function getHedgesCostValue() public view returns (uint256, uint256, uint256) {
-        return (protocolHedgesCostValue[wethAddress], protocolHedgesCostValue[usdtAddress], protocolHedgesCostValue[usdcAddress]);
+    function getHedgesCostVolume(address baseAddress) public view returns (uint256) {
+        return protocolCostValue[baseAddress];
     }
-    function getHedgesOptionsValue() public view returns (uint256, uint256, uint256) {
-        return (protocolHedgesOptionsValue[wethAddress], protocolHedgesOptionsValue[usdtAddress], protocolHedgesOptionsValue[usdcAddress]);
+    function getHedgesOptionsVolume(address baseAddress) public view returns (uint256) {
+        return protocolOptionsValue[baseAddress];
     }
-    function getHedgesSwapsValue() public view returns (uint256, uint256, uint256) {
-        return (protocolHedgesSwapsValue[wethAddress], protocolHedgesSwapsValue[usdtAddress], protocolHedgesSwapsValue[usdcAddress]);
+    function getHedgesSwapsVolume(address baseAddress) public view returns (uint256) {
+        return protocolSwapsValue[baseAddress];
     }
-    function getHedgesSettledValue() public view returns (uint256, uint256, uint256) {
-        return (protocolHedgeSettleValue[wethAddress], protocolHedgeSettleValue[usdtAddress], protocolHedgeSettleValue[usdcAddress]);
+    function getHedgesSettledVolume(address baseAddress) public view returns (uint256) {
+        return protocolSettleValue[baseAddress];
     }
-    function getHedgesProfitsValue() public view returns (uint256, uint256, uint256) {
-        return (protocolHedgeProfitsBases[wethAddress], protocolHedgeProfitsBases[usdtAddress], protocolHedgeProfitsBases[usdcAddress]);
+    function getHedgesProfitVolume(address baseAddress) public view returns (uint256) {
+        return protocolProfitsBases[baseAddress];
     }
-    function getHedgesFeesValue() public view returns (uint256, uint256, uint256) {
-        return (protocolHedgeFeesBases[wethAddress], protocolHedgeFeesBases[usdtAddress], protocolHedgeFeesBases[usdcAddress]);
+    function getHedgesFeeVolume(address baseAddress) public view returns (uint256) {
+        return protocolFeesBases[baseAddress];
     }
-    function getCashierFeesValue() public view returns (uint256, uint256, uint256) {
-        return (protocolCashierFees[wethAddress], protocolCashierFees[usdtAddress], protocolCashierFees[usdcAddress]);
-    }
-    // Get distributed revenue; withdrawn to staking contract for revenue
-    function getTotalDistributed() public view returns (uint256) {
-        return (userBalanceMap[wethAddress][address(this)].withdrawn);
-    }
-    // Get protocol token balances
-    function getContractTokenBalances(address _token) public view returns (uint256, uint256) {
-        return (userBalanceMap[_token][address(this)].deposited, userBalanceMap[_token][address(this)].withdrawn);
-    }
-    // Get protocol revenue across all 3 bases
-    function getProtocolRevenue() public view returns (uint256, uint256, uint256) {
-        return (userBalanceMap[wethAddress][address(this)].deposited, userBalanceMap[usdtAddress][address(this)].deposited, userBalanceMap[usdcAddress][address(this)].deposited);
+    function getCashierFeeVolume(address baseAddress) public view returns (uint256) {
+        return protocolCashierFees[baseAddress];
     }
     // Get cashier deposit withdrawal volume in base equivalent 
     function getBaseEquivDeposits() public view returns (uint256,uint256,uint256) {
@@ -1061,6 +1050,26 @@ contract HEDGEFUND {
     function getuserTakeVolume(address wallet) public view returns (uint256, uint256, uint256) {
         return (wethEquivUserCosts[wallet], usdtEquivUserCosts[wallet], usdcEquivUserCosts[wallet]);
     }
+    // Get wallets profit & loss in base
+    function getUserProfits(address pairAddress, address walletAddress) public view returns (uint256) {
+        return userPLMap[pairAddress][walletAddress].profits;
+    }
+    function getUserLosses(address pairAddress, address walletAddress) public view returns (uint256) {
+        return userPLMap[pairAddress][walletAddress].losses;
+    }
+    // Get distributed revenue; withdrawn to staking contract for revenue
+    function getTotalDistributed() public view returns (uint256) {
+        return userBalanceMap[wethAddress][address(this)].withdrawn;
+    }
+    // Get protocol token balances
+    function getContractTokenBalances(address _token) public view returns (uint256, uint256, uint256) {
+        return (userBalanceMap[_token][address(this)].deposited, userBalanceMap[_token][address(this)].withdrawn);
+    }
+    // Get protocol revenue across all 3 bases
+    function getProtocolRevenue() public view returns (uint256, uint256, uint256) {
+        return (userBalanceMap[wethAddress][address(this)].deposited, userBalanceMap[usdtAddress][address(this)].deposited, userBalanceMap[usdcAddress][address(this)].deposited);
+    }
+    
     // Get array of user or wallet's ERC20 token interactions
     function getUserTokenList(address wallet) external view returns (address[] memory) {
         return userERC20s[wallet];
