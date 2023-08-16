@@ -18,7 +18,7 @@ const CONSTANTS = {
     Import modules
 ==========================================================================*/
 
-import { initWeb3 } from './hedge-web3-utils.js';
+import { initWeb3 } from './dapp-web3-utils.js';
 import { fetchSection_Networth, fetchSection_BalanceList, fetchSection_HedgePanel } from './module-wallet-section-fetchers.js';
 import { loadHedgesModule } from './module-wallet-section-hedgesList.js';
 
