@@ -37,7 +37,7 @@
 	<script src="https://kit.fontawesome.com/13f07506fc.js" crossorigin="anonymous"></script>
 	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js"></script>
 	<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
-	<script type="text/javascript" src="js/_walletstatus.js"></script>
+	<script type="text/javascript" src="js/web3-walletstatus-module.js"></script>
 	<script type="text/javascript" src="js/_hedge.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.17.1/matter.min.js"></script> <!-- ASSET BASKET-->
 
@@ -68,10 +68,10 @@
 			<!-- navbar with page links -->
 			<nav id="navbar" data-visible="false">
 				<ul>
-					<li><a href="docs.html">Docs</a></li>
-					<li><a href="floor.html">Floor</a></li>
-					<li><a href="dashboard.html">Dashboard</a></li>
-					
+                    <li><a href="docs.html">Docs</a></li>
+					<li><a href="trade.html">Marketplace</a></li>
+					<li><a href="wallet.html">Wallet</a></li>
+                    <li><a href="analytics.html">Analytics</a></li>
 				</ul>
 				<!-- navbar buttons -->
 				<div class="account">
@@ -210,22 +210,6 @@
 								<span><i class="fa fa-handshake-o"></i> Topup Accepted 18/05/2023</span>
 								<span><i class="fa fa-handshake-o"></i> Topup Accepted 18/05/2023</span>
 								<span><i class="fa fa-handshake-o"></i> Topup Accepted 18/05/2023</span>
-								<span><i class="fa fa-handshake-o"></i> Topup Accepted 18/05/2023</span>
-								<span><i class="fa fa-handshake-o"></i> Topup Accepted 18/05/2023</span>
-								<span><i class="fa fa-handshake-o"></i> Topup Accepted 18/05/2023</span>
-								<span><i class="fa fa-handshake-o"></i> Topup Accepted 18/05/2023</span>
-								<span><i class="fa fa-handshake-o"></i> Topup Accepted 18/05/2023</span>
-								<span><i class="fa fa-handshake-o"></i> Topup Accepted 18/05/2023</span>
-								<span><i class="fa fa-handshake-o"></i> Topup Accepted 18/05/2023</span>
-								<span><i class="fa fa-handshake-o"></i> Topup Accepted 18/05/2023</span>
-								<span><i class="fa fa-handshake-o"></i> Topup Accepted 18/05/2023</span>
-								<span><i class="fa fa-handshake-o"></i> Topup Accepted 18/05/2023</span>
-								<span><i class="fa fa-handshake-o"></i> Topup Accepted 18/05/2023</span>
-								<span><i class="fa fa-handshake-o"></i> Topup Accepted 18/05/2023</span>
-								<span><i class="fa fa-handshake-o"></i> Topup Accepted 18/05/2023</span>
-								<span><i class="fa fa-handshake-o"></i> Topup Accepted 18/05/2023</span>
-								<span><i class="fa fa-handshake-o"></i> Topup Accepted 18/05/2023</span>
-								<span><i class="fa fa-handshake-o"></i> Topup Accepted 18/05/2023</span>
 							</div>
 						</div>
 					</div>
@@ -314,9 +298,9 @@
 			<div class="container">
 				<div>
 					<h1 data-aos="fade-right">Coming <span class="txt-gradient">Soon</span></h1>
-					<p data-aos="fade-down" data-aos-delay="100">Play to Hedge - passive income games, each play is a hedge traded</p>
-					<p data-aos="fade-down" data-aos-delay="100">Liquidity Mining - deposit any erc20 token and start providing options liquidity</p>
-					<p data-aos="fade-down" data-aos-delay="100">Hedges Mining - settle hedges as they expire and earn 5% of the fees</p>
+					<p data-aos="fade-down" data-aos-delay="100">Put Options trading capabilities in Beta V2.</p>
+					<p data-aos="fade-down" data-aos-delay="100">Bundled Asset Basket capabilities in Beta V2.</p>
+					<p data-aos="fade-down" data-aos-delay="100">Leveraged OTC trading capabilities in Beta V2.</p>
 				</div>
 				<!-- space vortex -->
 				<div class="space-vortex vortex-sm" data-aos="zoom-out-down" data-aos-delay="400">
@@ -329,7 +313,7 @@
 						</div>
 					</div>
 					<!-- call to action button -->				
-					<a href="#" target="_blank" class="btn btn-cta" data-aos="fade-left" data-aos-delay="200">Buy $NEON Now</a>
+					<a href="#" target="_blank" class="btn btn-cta" data-aos="fade-left" data-aos-delay="200">Buy $NEON</a>
 				</div>
 			</div>
 		</section>
@@ -353,7 +337,7 @@
 				<a href="/">	
 					<img src="./imgs/maskot3.webp" alt="neon hedge logo">
 				</a>
-				<p class="mb-2 text-align-center">Neon Hedge</p>
+				<p class="mb-2 text-align-center">Neon Protocol</p>
 
 				<!-- social links -->
 				<ul class="inline-list text-align-center">
@@ -374,7 +358,7 @@
 			<div>
 				<h3>Navigate</h3>
 				<ul>
-					<li><a href="#" title="coming soon">Portfolio</a></li>
+					<li><a href="floor.html" title="coming soon">Marketplace</a></li>
 				</ul>
 			</div>
 
@@ -383,8 +367,8 @@
 				<h3>Links</h3>
 				<ul>
 					<li><a href="#">Whitepaper</a></li>
-					<li><a href="#">DexTools</a></li>
-					<li><a href="#">Uniswap</a></li>
+					<li><a href="#">GitHub</a></li>
+					<li><a href="#">Smart Contracts</a></li>
 				</ul>
 			</div>
 
@@ -399,7 +383,7 @@
 			</div>
 
 			<!-- copyrights -->
-			<p>&copy; Neon Hedge <span id="#thisYear"></span>. All Rights Reserved. 2023.</p>
+			<p>&copy; Neon Protocol <span id="#thisYear"></span>. All Rights Reserved. 2023.</p>
 		</div>
 	</footer>
 	
