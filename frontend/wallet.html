@@ -36,8 +36,8 @@
 	<!-- portfolio windows scripts -->
 	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js"></script>
 	<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
-	<script type="text/javascript" src="js/_walletstatus.js"></script>
-	<script type="text/javascript" src="js/_portfolio.js"></script>
+	<script type="text/javascript" src="js/web3-walletstatus-module.js"></script>
+	<script type="module" src="js/wallet.js"></script>
 	<script type="application/javascript" src="js/sweetalert/sweetalert.min.js"></script>
 </head>
 
@@ -109,84 +109,80 @@
 					<h2>Assets UM</h2>
 				</div>
 				<div class="nw-rectangle">
-					<div class="nw-left">
-						<!-- Add your cool neon background image here -->
-						<div class="userWalletCont">
-							<div class="user-card">
-								<div class="icon"><i class="fa-solid fa-user-astronaut"></i></div>
-							</div>
-							<div id="walletAddress" class="userWallet">0X3fe...h986</div>
-							<!-- userWallet alt location -->				
+					<!-- Add your cool neon background image here -->
+					<div class="userWalletCont">
+						<div class="user-card">
+							<div class="icon"><i class="fa-solid fa-user-astronaut"></i></div>
 						</div>
-						<div class="walletStates">
-							<!-- userWallet alt location -->	
-							<div class="walletStatesDiv">
-							  <span class="dot dot_idle"></span>staked
-							  <a href="#jump-to-section" class="walletStateLink"><i class="fa fa-link" aria-hidden="true"></i></a>
-							  <div class="volume-widget">
-								<div class="volume-bars vertical">
-								  <div class="volume-bar red"></div>
-								  <div class="volume-bar blue"></div>
-								  <div class="volume-bar green"></div>
-								</div>
-								<div id="stakedBalance" class="volume-count green-value">27,000,000</div>
-							  </div>
-							</div>
-							
-							<div class="walletStatesDiv">
-								<span class="dot dot_idle"></span>wallet 
+						<div id="walletAddress" class="userWallet">0X3fe...h986</div>
+						<!-- userWallet alt location -->				
+					</div>
+					<div class="userFundsCont">
+						<div class="nw-left">
+							<div class="walletStates">
+								<!-- userWallet alt location -->	
+								<div class="walletStatesDiv">
+								<span class="dot dot_idle"></span>staked
 								<a href="#jump-to-section" class="walletStateLink"><i class="fa fa-link" aria-hidden="true"></i></a>
 								<div class="volume-widget">
-									<div class="volume-bars horizontal">
-										<div class="volume-bar red"></div>
-										<div class="volume-bar blue"></div>
-										<div class="volume-bar green"></div>
+									<div class="volume-bars vertical">
+									<div class="volume-bar red"></div>
+									<div class="volume-bar blue"></div>
+									<div class="volume-bar green"></div>
 									</div>
-									<div id="walletBalance" class="volume-count green-value">5,000,000</div>
+									<div id="stakedBalance" class="volume-count green-value">27,000,000</div>
+								</div>
+								</div>
+								
+								<div class="walletStatesDiv">
+									<span class="dot dot_idle"></span>wallet 
+									<a href="#jump-to-section" class="walletStateLink"><i class="fa fa-link" aria-hidden="true"></i></a>
+									<div class="volume-widget">
+										<div class="volume-bars horizontal">
+											<div class="volume-bar red"></div>
+											<div class="volume-bar blue"></div>
+											<div class="volume-bar green"></div>
+										</div>
+										<div id="walletBalance" class="volume-count green-value">5,000,000</div>
+									</div>
+								</div>
+							
+								<div class="walletStatesDiv">
+								<span class="dot dot_idle"></span>airdrop
+								<a href="#jump-to-section" class="walletStateLink"><i class="fa fa-link" aria-hidden="true"></i></a>
+								<div class="volume-widget">
+									<div class="volume-icon">
+									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20px" height="20px">
+										<path d="M8.277 16.055h2.808v-9.649h-2.808v9.649zm3.731 0h2.808v-6.822h-2.808v6.822zm-7.462 0h2.808v-3.487h-2.808v3.487zm16.357-17.11v17.11c0 1.19-.966 2.155-2.155 2.155h-17.11c-1.19 0-2.155-.965-2.155-2.155v-17.11c0-1.19.965-2.155 2.155-2.155h17.11c1.189 0 2.155.965 2.155 2.155zm-2.154 0h-17.11v17.11h17.11v-17.11z"/>
+									</svg>
+									</div>
+									<div class="volume-count green-value">0</div>
+								</div>
 								</div>
 							</div>
-						  
-							<div class="walletStatesDiv">
-							  <span class="dot dot_idle"></span>airdrop
-							  <a href="#jump-to-section" class="walletStateLink"><i class="fa fa-link" aria-hidden="true"></i></a>
-							  <div class="volume-widget">
-								<div class="volume-icon">
-								  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20px" height="20px">
-									<path d="M8.277 16.055h2.808v-9.649h-2.808v9.649zm3.731 0h2.808v-6.822h-2.808v6.822zm-7.462 0h2.808v-3.487h-2.808v3.487zm16.357-17.11v17.11c0 1.19-.966 2.155-2.155 2.155h-17.11c-1.19 0-2.155-.965-2.155-2.155v-17.11c0-1.19.965-2.155 2.155-2.155h17.11c1.189 0 2.155.965 2.155 2.155zm-2.154 0h-17.11v17.11h17.11v-17.11z"/>
-								  </svg>
-								</div>
-								<div class="volume-count green-value">0</div>
-							  </div>
+						</div>						  
+						<div class="nw-right">
+							<div class="nw-text nwtextFirst">
+								<span class="nw-text-title nwPrimary-ttitle"><img src="imgs/moon5.webp" title="net worth of all assets">Net Worth</span>
+								<span id="netWorthUSD" class="nw-text-value">$10,000.00</span>
 							</div>
-						  </div>
-					</div>						  
-					<div class="nw-right">
-					  <div class="nw-text nwtextFirst">
-						<span class="nw-text-title nwPrimary-ttitle"><img src="imgs/moon5.webp" title="net worth of all assets">Net Worth</span>
-						<span id="netWorthUSD" class="nw-text-value">$10,000.00</span>
-					  </div>
-					  <div class="nw-text">
-						<span class="nw-text-title"><i class="fa fa-info-circle" aria-hidden="true"  title="net value of user tokens currently deposited into protocol: in base"></i>Deposits</span>
-						<span id="netDepositsUSD" class="nw-text-value">$3,785.02</span>
-					  </div>
-					  <div class="nw-text">
-						<span class="nw-text-title"><i class="fa fa-info-circle" aria-hidden="true"  title="net rewards due from staking NEON tokens on our protocol."></i>Dividents</span>
-						<span id="netRewardsUSD" class="nw-text-value">$5,125.00</span>
-					  </div>
-					  <div class="nw-text">
-						<span class="nw-text-title"><i class="fa fa-info-circle" aria-hidden="true"  title="net earnings from providing native swap liquidity and settling hedges or loans."></i>Commission</span>
-						<span id="netCommissionUSD" class="nw-text-value">$1,800.00</span>
-					  </div>
-					  <!--
-					  <div class="nw-text">
-						<span class="nw-text-title"><img src="imgs/info.png" title="tokens held in wallet">Wallet</span>
-						<span class="nw-text-value">670,000 NEON</span>
-					  </div>-->
-					  
-					  <div class="nw-text">
-						<span class="nw-text-title"><i class="fa fa-info-circle" aria-hidden="true"  title="count of tokens deposited or transacted by wallet"></i>Tokens</span>
-						<span id="tokensCount" class="nw-text-value">57</span>
-					  </div>
+							<div class="nw-text">
+								<span class="nw-text-title"><i class="fa fa-info-circle" aria-hidden="true"  title="net value of user tokens currently deposited into protocol: in base"></i>Deposits</span>
+								<span id="netDepositsUSD" class="nw-text-value">$3,785.02</span>
+							</div>
+							<div class="nw-text">
+								<span class="nw-text-title"><i class="fa fa-info-circle" aria-hidden="true"  title="net rewards due from staking NEON tokens on our protocol."></i>Dividents</span>
+								<span id="netRewardsUSD" class="nw-text-value">$5,125.00</span>
+							</div>
+							<div class="nw-text">
+								<span class="nw-text-title"><i class="fa fa-info-circle" aria-hidden="true"  title="net earnings from providing native swap liquidity and settling hedges or loans."></i>Commission</span>
+								<span id="netCommissionUSD" class="nw-text-value">$1,800.00</span>
+							</div>
+							<div class="nw-text">
+								<span class="nw-text-title"><i class="fa fa-info-circle" aria-hidden="true"  title="count of tokens deposited or transacted by wallet"></i>Tokens</span>
+								<span id="tokensCount" class="nw-text-value">57</span>
+							</div>
+						</div>
 					</div>
 
 					
@@ -491,7 +487,7 @@
             </div>
 
 			<div class="hedgesPanelHold">
-				<div class="dashboard-section">
+				<div id="hedgingSection" class="dashboard-section">
 					<div class="section-title">
 						<img src="./imgs/playful.webp" alt="Neon">
 						<h2>Hedges Panel</h2>
@@ -500,70 +496,71 @@
 					<div class="data-cards">
 						<div class="data-card hedge-created">
 							<h3 class="card-title">Hs.Created</h3>
-							<p class="card-value">10</p>
+							<p class="card-value" id="hedgesCreatedCount">10</p>
 							<div class="card-extra" title="options to swaps ratio">
-								<text text-anchor="middle" style="color:#33856b;">15</text>
+								<text id="usererc20Count" text-anchor="middle" style="color:#0b9455;">15</text>
 								<a href="#jump-to-section" class="walletStateLink"><text text-anchor="middle"  style="color:#188dd6;"> erc20s <i class="fa fa-link" aria-hidden="true"></i></text></a>								
 							</div>				
 						</div>
 						<div class="data-card hedge-taken">
 							<h3 class="card-title">Hs.Taken</h3>
-							<p class="card-value">7</p>
+							<p class="card-value" id="hedgesTakenCount">7</p>
 							<div class="card-extra" title="options to swaps ratio">
-								<text text-anchor="middle" style="color:#33856b;">3</text>
+								<text text-anchor="middle" style="color:#0b9455;">3</text>
 								<a href="#jump-to-section" class="walletStateLink"><text text-anchor="middle"  style="color:#188dd6;"> erc20s <i class="fa fa-link" aria-hidden="true"></i></text></a>								
 							</div>	
 						</div>
 						<div class="data-card hedge-volume">
-							<h3 class="card-title">Hedge Volume</h3>
-							<p class="card-value">15 ETH</p>
+							<h3 class="card-title">Write Volume</h3>
+							<p class="card-value" id="writeVolume">15 ETH</p>
 						</div>
 						<div class="data-card buy-volume">
-							<h3 class="card-title">Buy Volume</h3>
-							<p class="card-value">2.4 ETH</p>
+							<h3 class="card-title">Take Volume</h3>
+							<p class="card-value" id="takeVolume">2.4 ETH</p>
 						</div>
 					
 						<div class="data-card hedge-created">
-							<h3 class="card-title">Call Options</h3>
-							<p class="card-value">5</p>
+							<h3 class="card-title">Options</h3>
+							<p class="card-value" id="optionsCount">5</p>
 							<div class="card-extra" title="hedge type"><img src="./imgs/call-option.svg"></div>
 						</div>
 						<div class="data-card hedge-taken">
 							<h3 class="card-title">Equity Swaps</h3>
-							<p class="card-value">5</p>
+							<p class="card-value" id="swapsCount">5</p>
 							<div class="card-extra" title="hedge type"><img src="./imgs/put-option.svg"></div>
 						</div>
 						<div class="data-card hedge-volume">
 							<h3 class="card-title">Gains</h3>
-							<p class="card-value" style="color:#33856b;">15 ETH</p>
+							<p class="card-value" id="profitsETH" style="color:#0b9455;">15 ETH</p>
 						</div>
 						<div class="data-card buy-volume">
 							<h3 class="card-title">Losses</h3>
-							<p class="card-value" style="color:#d6188a;">2.4 ETH</p>
+							<p class="card-value" id="lossesETH" style="color:#d6188a;">2.4 ETH</p>
 						</div>
 					</div>
 				</div>
 				  
-				  <!--  HEDGES; TAKEN, CREATED, BOOKMARKED, WON, LOST -->
+				<!--  HEDGES; TAKEN, CREATED, BOOKMARKED, WON, LOST -->
 				<div class="hedges-list-section">
 					<div class="hedges-load-section">
 							<div class="list-toggle">
-								<button class="active">Options Created</button>
-								<button>Options Taken</button>
-								<button>Options Bookmarks</button>
-								<button>Swaps Created</button>
-								<button>Swaps Taken</button>
-								<button>Swaps Bookmarks</button>
+								<button data-type="Options Created" class="active">Options Created</button>
+								<button data-type="Options Taken">Options Taken</button>
+								<button data-type="Swaps Created">Swaps Created</button>
+								<button data-type="Swaps Taken">Swaps Taken</button>
+								<button data-type="My Bookmarks">Swaps Bookmarks</button>
 							</div>
 						</div>
 						<li class="trade-item t-i-lead hedges-trade-list">
 							<div class="hedge-info">
-								<div class="hedge-type hedge-i-cat">TYPE</div>
-								<div class="hedge-symbol hedge-i-cat">SYMB</div>
-								<div class="hedge-valuetitle hedge-i-cat">VALUE</div>
-								<div class="hedge-time hedge-i-cat">START</div>
-								<div class="hedge-time hedge-i-cat">EXPIRE</div>
-								<div class="token-address hedge-i-cat">PARTYB</div>
+								<div class="hlH hedge-type hedge-i-cat">TYPE</div>
+								<div class="hlH hedge-symbol hedge-i-cat">SYMB</div>
+								<div class="hlH hedge-valuetitle hedge-i-cat">VALUE</div>
+								<div class="hlH hedge-i-cat">COST</div>
+								<div class="hlH hedge-i-cat">STATE</div>
+								<div class="hlH hedge-time hedge-i-cat">START</div>
+								<div class="hlH hedge-time hedge-i-cat">EXPIRE</div>
+								<div class="hlH token-address hedge-i-cat">PARTYB</div>
 							</div>
 							<div class="hedge-i-cat">BTN</div>
 						</li>
@@ -573,6 +570,8 @@
 								<div class="token-info">
 									<div class="hedge-symbol hedge-i-cat">TKA</div>
 									<div class="hedge-value hedge-i-cat">0.72 ETH</div>
+									<div class="hedge-i-cat">0.02 ETH</div>
+									<div class="hedge-i-cat">OPEN</div>
 									<div class="hedge-time hedge-i-cat">11/05/2023</div>
 									<div class="hedge-time hedge-i-cat">18/05/2023</div>
 									<div class="token-address">0x123...90</div>
@@ -585,6 +584,8 @@
 								<div class="token-info">
 									<div class="hedge-symbol hedge-i-cat">BBET</div>
 									<div class="hedge-value hedge-i-cat">0.42 ETH</div>
+									<div class="hedge-i-cat">0.04 ETH</div>
+									<div class="hedge-i-cat">OPEN</div>
 									<div class="hedge-time hedge-i-cat">11/05/2023</div>
 									<div class="hedge-time hedge-i-cat">18/05/2023</div>
 									<div class="token-address">0x123...90</div>
@@ -597,6 +598,8 @@
 								<div class="token-info">
 									<div class="hedge-symbol hedge-i-cat">VELA</div>
 									<div class="hedge-value hedge-i-cat">0.72 ETH</div>
+									<div class="hedge-i-cat">0.07 ETH</div>
+									<div class="hedge-i-cat">CLOSED</div>
 									<div class="hedge-time hedge-i-cat">11/05/2023</div>
 									<div class="hedge-time hedge-i-cat">18/05/2023</div>
 									<div class="token-address">0x123...90</div>
@@ -609,6 +612,8 @@
 								<div class="token-info">
 									<div class="hedge-symbol hedge-i-cat">FTM</div>
 									<div class="hedge-value hedge-i-cat">0.72 ETH</div>
+									<div class="hedge-i-cat">0.07 ETH</div>
+									<div class="hedge-i-cat">OPEN</div>
 									<div class="hedge-time hedge-i-cat">11/05/2023</div>
 									<div class="hedge-time hedge-i-cat">18/05/2023</div>
 									<div class="token-address">0x123...90</div>
@@ -621,6 +626,8 @@
 								<div class="token-info">
 									<div class="hedge-symbol hedge-i-cat">SHIB</div>
 									<div class="hedge-value hedge-i-cat">0.72 ETH</div>
+									<div class="hedge-i-cat">0.02 ETH</div>
+									<div class="hedge-i-cat">CLOSED</div>
 									<div class="hedge-time hedge-i-cat">11/05/2023</div>
 									<div class="hedge-time hedge-i-cat">18/05/2023</div>
 									<div class="token-address">0x123...90</div>
@@ -633,6 +640,8 @@
 								<div class="token-info">
 									<div class="hedge-symbol hedge-i-cat">TKA</div>
 									<div class="hedge-value hedge-i-cat">0.72 ETH</div>
+									<div class="hedge-i-cat">0.12 ETH</div>
+									<div class="hedge-i-cat">CLOSED</div>
 									<div class="hedge-time hedge-i-cat">11/05/2023</div>
 									<div class="hedge-time hedge-i-cat">18/05/2023</div>
 									<div class="token-address">0x123...90</div>
@@ -646,6 +655,8 @@
 								<div class="token-info">
 									<div class="hedge-symbol hedge-i-cat">BBET</div>
 									<div class="hedge-value hedge-i-cat">0.42 ETH</div>
+									<div class="hedge-i-cat">0.04 ETH</div>
+									<div class="hedge-i-cat">CLOSED</div>
 									<div class="hedge-time hedge-i-cat">11/05/2023</div>
 									<div class="hedge-time hedge-i-cat">18/05/2023</div>
 									<div class="token-address">0x123...90</div>
@@ -658,6 +669,8 @@
 								<div class="token-info">
 									<div class="hedge-symbol hedge-i-cat">VELA</div>
 									<div class="hedge-value hedge-i-cat">0.72 ETH</div>
+									<div class="hedge-i-cat">0.03 ETH</div>
+									<div class="hedge-i-cat">OPEN</div>
 									<div class="hedge-time hedge-i-cat">11/05/2023</div>
 									<div class="hedge-time hedge-i-cat">18/05/2023</div>
 									<div class="token-address">0x123...90</div>
@@ -670,6 +683,8 @@
 								<div class="token-info">
 									<div class="hedge-symbol hedge-i-cat">FTM</div>
 									<div class="hedge-value hedge-i-cat">0.72 ETH</div>
+									<div class="hedge-i-cat">0.03 ETH</div>
+									<div class="hedge-i-cat">OPEN</div>
 									<div class="hedge-time hedge-i-cat">11/05/2023</div>
 									<div class="hedge-time hedge-i-cat">18/05/2023</div>
 									<div class="token-address">0x123...90</div>
@@ -682,6 +697,8 @@
 								<div class="token-info">
 									<div class="hedge-symbol hedge-i-cat">SHIB</div>
 									<div class="hedge-value hedge-i-cat">0.72 ETH</div>
+									<div class="hedge-i-cat">0.02 ETH</div>
+									<div class="hedge-i-cat">OPEN</div>
 									<div class="hedge-time hedge-i-cat">11/05/2023</div>
 									<div class="hedge-time hedge-i-cat">18/05/2023</div>
 									<div class="token-address">0x123...90</div>
@@ -694,6 +711,8 @@
 								<div class="token-info">
 									<div class="hedge-symbol hedge-i-cat">TKA</div>
 									<div class="hedge-value hedge-i-cat">0.72 ETH</div>
+									<div class="hedge-i-cat">0.02 ETH</div>
+									<div class="hedge-i-cat">OPEN</div>
 									<div class="hedge-time hedge-i-cat">11/05/2023</div>
 									<div class="hedge-time hedge-i-cat">18/05/2023</div>
 									<div class="token-address">0x123...90</div>
@@ -707,6 +726,8 @@
 								<div class="token-info">
 									<div class="hedge-symbol hedge-i-cat">BBET</div>
 									<div class="hedge-value hedge-i-cat">0.42 ETH</div>
+									<div class="hedge-i-cat">0.04 ETH</div>
+									<div class="hedge-i-cat">OPEN</div>
 									<div class="hedge-time hedge-i-cat">11/05/2023</div>
 									<div class="hedge-time hedge-i-cat">18/05/2023</div>
 									<div class="token-address">0x123...90</div>
@@ -719,6 +740,8 @@
 								<div class="token-info">
 									<div class="hedge-symbol hedge-i-cat">VELA</div>
 									<div class="hedge-value hedge-i-cat">0.72 ETH</div>
+									<div class="hedge-i-cat">0.02 ETH</div>
+									<div class="hedge-i-cat">OPEN</div>
 									<div class="hedge-time hedge-i-cat">11/05/2023</div>
 									<div class="hedge-time hedge-i-cat">18/05/2023</div>
 									<div class="token-address">0x123...90</div>
@@ -731,6 +754,8 @@
 								<div class="token-info">
 									<div class="hedge-symbol hedge-i-cat">FTM</div>
 									<div class="hedge-value hedge-i-cat">0.72 ETH</div>
+									<div class="hedge-i-cat">0.02 ETH</div>
+									<div class="hedge-i-cat">OPEN</div>
 									<div class="hedge-time hedge-i-cat">11/05/2023</div>
 									<div class="hedge-time hedge-i-cat">18/05/2023</div>
 									<div class="token-address">0x123...90</div>
@@ -743,6 +768,8 @@
 								<div class="token-info">
 									<div class="hedge-symbol hedge-i-cat">SHIB</div>
 									<div class="hedge-value hedge-i-cat">0.72 ETH</div>
+									<div class="hedge-i-cat">0.02 ETH</div>
+									<div class="hedge-i-cat">OPEN</div>
 									<div class="hedge-time hedge-i-cat">11/05/2023</div>
 									<div class="hedge-time hedge-i-cat">18/05/2023</div>
 									<div class="token-address">0x123...90</div>
@@ -755,6 +782,8 @@
 								<div class="token-info">
 									<div class="hedge-symbol hedge-i-cat">TKA</div>
 									<div class="hedge-value hedge-i-cat">0.72 ETH</div>
+									<div class="hedge-i-cat">0.02 ETH</div>
+									<div class="hedge-i-cat">OPEN</div>
 									<div class="hedge-time hedge-i-cat">11/05/2023</div>
 									<div class="hedge-time hedge-i-cat">18/05/2023</div>
 									<div class="token-address">0x123...90</div>
@@ -767,6 +796,8 @@
 								<div class="token-info">
 									<div class="hedge-symbol hedge-i-cat">SHIB</div>
 									<div class="hedge-value hedge-i-cat">0.72 ETH</div>
+									<div class="hedge-i-cat">0.02 ETH</div>
+									<div class="hedge-i-cat">OPEN</div>
 									<div class="hedge-time hedge-i-cat">11/05/2023</div>
 									<div class="hedge-time hedge-i-cat">18/05/2023</div>
 									<div class="token-address">0x123...90</div>
@@ -779,6 +810,8 @@
 								<div class="token-info">
 									<div class="hedge-symbol hedge-i-cat">TKA</div>
 									<div class="hedge-value hedge-i-cat">0.72 ETH</div>
+									<div class="hedge-i-cat">0.02 ETH</div>
+									<div class="hedge-i-cat">OPEN</div>
 									<div class="hedge-time hedge-i-cat">11/05/2023</div>
 									<div class="hedge-time hedge-i-cat">18/05/2023</div>
 									<div class="token-address">0x123...90</div>
@@ -819,7 +852,7 @@
 						<div class="flex flex-col gap-4">
 							<div class="flex items-center justify-between gap-2">
 								<div class="grid-sect-title">Claimable Rewards</div>
-								<div class="grid-sect-title" style="color:#33856b !important;">0 ($0)</div>
+								<div class="grid-sect-title" style="color:#0b9455 !important;">0 ($0)</div>
 							</div>
 							<div class="grid grid-cols-2 stakeBlock">
 								<div class="flex flex-col">
@@ -856,7 +889,7 @@
 						<div class="flex flex-col gap-5">
 							<div class="flex items-center justify-between gap-2">
 								<div class="grid-sect-title">Rewards Claimed</div>
-								<div class="grid-sect-title" style="color:#33856b !important;">0 ($0)</div>
+								<div class="grid-sect-title" style="color:#0b9455 !important;">0 ($0)</div>
 							</div>
 							<div class="flex flex-col gap-1">
 								<div class="grid-sect-subtitle">claimed from Revenue Sharing</div>
@@ -944,19 +977,19 @@
 						<div class="stakeGrids flex flex-col gap-4">
 							<div class="stakeDataRow flex items-center justify-between gap-2">
 								<div class="grid-sect-title">Staked Balance</div>
-								<div class="grid-sect-title" style="color:#33856b !important;">0 ($0)</div>
+								<div class="grid-sect-title" style="color:#0b9455 !important;">0 ($0)</div>
 							</div>
 
 							<hr class="line">
 							<div class="stakeDataRow flex items-center justify-between gap-2">
 								<div class="grid-sect-title">Assigned Stake</div>
-								<div class="grid-sect-title" style="color:#33856b !important;">0 ($0)</div>
+								<div class="grid-sect-title" style="color:#0b9455 !important;">0 ($0)</div>
 							</div>
 							
 							<hr class="line">
 							<div class="stakeDataRow flex items-center justify-between gap-2">
 								<div class="grid-sect-title">Unassigned Stake</div>
-								<div class="grid-sect-title" style="color:#33856b !important;">0 ($0)</div>
+								<div class="grid-sect-title" style="color:#0b9455 !important;">0 ($0)</div>
 							</div>
 
 						</div>
