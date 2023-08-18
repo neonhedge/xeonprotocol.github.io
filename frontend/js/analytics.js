@@ -1,46 +1,13 @@
-const CONSTANTS = {
-	network: "0x5", // goerli 0x5 // bsc: 0x56
-	etherScan: "https://goerli.etherscan.io", // https://goerli.etherscan.io // https://bscscan.com/
-	decimals: 18,
-    neonAddress: '0x135Ca6fff3EcCd186d1bb4B518679e17115d0867',
-	hedgingAddress: '0x135Ca6fff3EcCd186d1bb4B518679e17115d0867',
-    stakingAddress: '0x135Ca6fff3EcCd186d1bb4B518679e17115d0867',
-	wethAddress: '0xd0A1E359811322d97991E03f863a0C30C2cF029C',
-	usdtAddress: "0x07865c6E87B9F70255377e024ace6630C1Eaa37F",
-	usdcAddress: "0x07865c6E87B9F70255377e024ace6630C1Eaa37F",
-	UniswapUSDCETH_LP: "0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc",
-	popuptimer: 20,
-    neonContractABI: [],
-	hedgingContractABI: [],
-    hedgingInstanceABI: [],
-};
-
 /*=========================================================================
     Import modules
 ==========================================================================*/
 
 import { initWeb3 } from './dapp-web3-utils.js';
 import { setCurrent_TrafficSection, setCurrent_HedgeSection, setCurrent_EarningsSection, setCurrent_StakedSection, setCurrent_TokenomicsSection } from './module-analytics-section-fetchers.js';
-
+import { updateChartValues_Cash, updateChartValues_PIE, updateChartValues_hedges, updateChartValues_Revenue, updateChartValues_Dividents, updateChartValues_Claims, updateChartValues_Staking, updateChartValues_Tokenomics } from './module-analytics-chart-updaters.js';
 /*=========================================================================
     HELPER FUNCTIONS
 ==========================================================================*/
-// Set initial values in HTML, zeros on all widgets
-
-// Define CHART variables globally
-var netProfitChart = null;
-var netCashingChart = null;
-var cashingPieChart = null;
-var hedgeBarChartA = null;
-var hedgeBarChartB = null;
-var hedgeBarChartC = null;
-var hedgeBarChartD = null;
-var dividentsChart = null;
-var revenuePieChart = null;
-var claimsPieChart = null;
-var stakesBarChart = null;
-var tokenomicsPieChart = null;
-
 
 // FunctionS to set initial CHART values
 function setInitial_StakingChart() {
