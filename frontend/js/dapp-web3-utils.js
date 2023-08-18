@@ -1,5 +1,8 @@
+// Import the helper functions from main.js
+import { CONSTANTS } from './constants.js';
+
 // Initialize Web3
-export function initWeb3() {
+function initWeb3() {
   if (typeof window.ethereum == 'undefined') {
     swal({
       title: "Hold on!",
@@ -18,9 +21,4 @@ export function initWeb3() {
   }
 }
 
-
-// Other utility functions defined here if needed
-
-
-// Export the fetch functions
 export { initWeb3 };
