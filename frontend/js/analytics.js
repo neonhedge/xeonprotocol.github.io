@@ -5,6 +5,59 @@
 import { initWeb3 } from './dapp-web3-utils.js';
 import { setCurrent_TrafficSection, setCurrent_HedgeSection, setCurrent_EarningsSection, setCurrent_StakedSection, setCurrent_TokenomicsSection } from './module-analytics-section-fetchers.js';
 import { updateChartValues_Cash, updateChartValues_PIE, updateChartValues_hedges, updateChartValues_Revenue, updateChartValues_Dividents, updateChartValues_Claims, updateChartValues_Staking, updateChartValues_Tokenomics } from './module-analytics-chart-updaters.js';
+
+/*=========================================================================
+    INITIALIZE WEB3
+==========================================================================*/
+initWeb3();
+
+$(document).ready(async function () {
+    const accounts = await web3.eth.requestAccounts();
+	const userAddress = accounts[0];
+
+    const unlockState = await unlockedWallet();
+    if (unlockState === true) {
+        const setatmIntervalAsync = (fn, ms) => {
+            fn().then(() => {
+                setTimeout(() => setatmIntervalAsync(fn, ms), ms);
+            });
+        };
+        // Load sections automatically & periodically
+        const callPageTries = async () => {
+            const asyncFunctions = [setCurrent_TrafficSection, setCurrent_HedgeSection, setCurrent_EarningsSection, setCurrent_StakedSection, setCurrent_TokenomicsSection];
+            for (const func of asyncFunctions) {
+                await func();
+            }
+        };
+        setatmIntervalAsync(async () => {
+            await callPageTries();
+        }, 30000);
+
+        // Load more sections manually not automatically & periodically
+        // Create an IntersectionObserver to load sections when in view
+    } else {
+        reqConnect();
+    }
+});
+
+/**************************
+    ON PAGE LOAD CALLS 
+**************************/
+$(document).ready(function() {
+    
+    setInitial_CashingChart();
+    setInitial_CashingChartPie();
+    setInitial_hedgesChartA();
+    setInitial_hedgesChartB();
+    setInitial_hedgesChartC();
+    setInitial_hedgesChartD();
+    setInitial_dividentsChart();
+    setInitial_claimsChart();
+    setInitial_revenueChart();
+    setInitial_StakingChart();
+    setInitial_TokenomicsChart();
+});
+
 /*=========================================================================
     HELPER FUNCTIONS
 ==========================================================================*/
@@ -92,70 +145,4 @@ function setInitial_TokenomicsChart() {
     const circulatingSupplyTOKENS = 290000000;
 
     updateChartValues_Tokenomics(burntSupplyTOKENS, circulatingSupplyTOKENS);
-}
-
-/*=========================================================================
-    INITIALIZE WEB3
-==========================================================================*/
-initWeb3();
-
-$(document).ready(async function () {
-    const accounts = await web3.eth.requestAccounts();
-	const userAddress = accounts[0];
-
-    const unlockState = await unlockedWallet();
-    if (unlockState === true) {
-        const setatmIntervalAsync = (fn, ms) => {
-            fn().then(() => {
-                setTimeout(() => setatmIntervalAsync(fn, ms), ms);
-            });
-        };
-        // Load sections automatically & periodically
-        const callPageTries = async () => {
-            const asyncFunctions = [setCurrent_TrafficSection, setCurrent_HedgeSection, setCurrent_EarningsSection, setCurrent_StakedSection, setCurrent_TokenomicsSection];
-            for (const func of asyncFunctions) {
-                await func();
-            }
-        };
-        setatmIntervalAsync(async () => {
-            await callPageTries();
-        }, 30000);
-
-        // Load more sections manually not automatically & periodically
-        // Create an IntersectionObserver to load sections when in view
-    } else {
-        reqConnect();
-    }
-});
-
-/**************************
-    ON PAGE LOAD CALLS 
-**************************/
-$(document).ready(function() {
-    
-    setInitial_CashingChart();
-    setInitial_CashingChartPie();
-    setInitial_hedgesChartA();
-    setInitial_hedgesChartB();
-    setInitial_hedgesChartC();
-    setInitial_hedgesChartD();
-    setInitial_dividentsChart();
-    setInitial_claimsChart();
-    setInitial_revenueChart();
-    setInitial_StakingChart();
-    setInitial_TokenomicsChart();
-});
-
-/**************************
-    HELPERS 
-**************************/
-
-async function getCurrentEthUsdcPriceFromUniswapV2() {
-  const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd&include_market_cap=false&include_24hr_vol=false&include_24hr_change=false&include_last_updated_at=false'); // Replace with the actual API endpoint for fetching the price
-  const data = await response.json();
-
-  // Assuming the API response contains the price in the desired format
-  const ethUsdcPrice = data.price;
-
-  return ethUsdcPrice;
 }
