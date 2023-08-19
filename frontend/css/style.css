@@ -4,14 +4,18 @@
 @font-face {
 	font-family: bitwise;
 	src: url(../fonts/Bitwise-m19x.ttf);
-  }
+}
 @font-face {
   font-family: modeseven;
   src: url(../fonts/Modeseven-L3n5.ttf);
-  }
+}
+@font-face {
+  font-family: neon;
+  src: url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/707108/neon.ttf);
+}
 :root {  
   /* USED WITH EXO FONT --- Set neon color */
-  --neon-text-color: #f40;
+  --neon-text-color: #188dd6;
   --neon-border-color: #08f;
 }
 * {
@@ -309,27 +313,15 @@ iframe {
   z-index: -8;
   box-shadow: 0 0 .1rem #fff, inset 0 0 .1rem #fff, 0 0 0.7rem var(--neon-border-color), inset 0 0 0.5rem var(--neon-border-color), 0 0 0.3rem var(--neon-border-color), inset 0 0 0.3rem var(--neon-border-color);
 }
+
 .space-vortex .arc::after {
   /* other effects ~ border-color: transparent transparent #c3dbf9 transparent; */
 }
+
 .space-vortex:hover .arc::before,
 .space-vortex:hover .arc::after {
   border: none;
 }
-.ndiripano:hover + .space-vortex .arc::before,
-.ndiripano:hover + .space-vortex .arc::after {
-  border: none;
-  border-color: transparent transparent #188dd6 transparent;
-}
-.ndiripano{
-  color:#FFF !important;
-  transition: all 0.8s ease-in;
-}
-.ndiripano:hover{
-  text-shadow: 2px 2px 1px rgba(0,0,0,0.5), 0 0 6px #fff, 0 0 6px #d6188a, 0 0 30px #d6188a;
-  border:none !important;
-}
-
 
 @media (min-width: 55em) {
   .container {
@@ -357,7 +349,8 @@ iframe {
 }
 
 .calltoactionHold p{
-  padding:1vw;
+  padding-block:1vw;
+  box-sizing: content-box;
 }
 /*--------------------------------------------------------*/
 /*	3. FONTS */
@@ -428,6 +421,7 @@ footer {
 .txt-gradient {
   -webkit-text-fill-color: transparent;
   background: linear-gradient(5deg, #188dd6, #050c1c 100%);
+  background: none;
   -webkit-background-clip: text;
   display: inline-block;
 }
@@ -449,27 +443,25 @@ button, a.btn {
   padding: 0.8rem 2.5rem;
   transition: background-color 0.8s, color 0.5s;
   cursor: pointer;
-
   color: #08e7fe;
-  border: 1px solid #3399ff;
+  border: 0.5px solid #08e7fe;
   border-radius: 8px;
   background-color: rgba(29,78,216,.2);
 }
 button.btn-cta, a.btn.btn-cta, .btn-dext{
-  /* background-color: #09001d !important; */
-  border:2px solid #130f4e;
-
   color: #08e7fe;
-  border: 1px solid #3399ff;
+  border: 0.5px solid #3399ff;
   border-radius: 8px;
   background-color: rgba(29,78,216,.2);
 }
 button.btn-cta:hover, a.btn.btn-cta:hover {
   background-color: #09001d !important;
+  border: 0.5px solid #3399ff;
   color: #188dd6;
 }
 button.btn-border:hover, a.btn.btn-border:hover {
   background-color: #09001d !important;
+  border: 0.5px solid #3399ff;
   color: #0096f4;
 }
 button#goTop, a.btn#goTop {
@@ -485,6 +477,7 @@ button#goTop, a.btn#goTop {
           animation: fade ease 4s;
 
   border: 1px solid #3399ff;
+  border: 0.5px solid #08e7fe;
   border-radius: 50%;
   background-color: rgba(29,78,216,.2);
 }
@@ -508,6 +501,7 @@ button#goTop, a.btn#goTop {
 /* go to top */
 button#goTop svg, a.btn#goTop svg {
   fill: rgba(255, 255, 255, 0.9);
+  fill: #08e7fe;
 }
 button#goTop svg{
   width:25px;
@@ -593,9 +587,9 @@ header .container img {
 .mobile-nav-toggle .bar2,
 .mobile-nav-toggle .bar3 {
   width: 100%;
-  height: 0.12rem;
+  height: 0.5px;
   margin-block: 0.65rem;
-  background-color: rgba(255, 255, 255, 0.9);
+  background-color: #08e7fe;
   transition: all 0.8s ease;
 }
 .mobile-nav-toggle[aria-expanded=true] .bar1 {
@@ -834,7 +828,7 @@ section.er404 {
 }
 #slider h1 {
   margin-top: 2rem;
-  color: rgba(255, 255, 255, 0.9);
+  /* color: rgba(255, 255, 255, 0.9); */
   background: unset;
   -webkit-text-fill-color: unset;
   -webkit-background-clip: unset;
@@ -900,14 +894,19 @@ section.er404 {
 /*=======================================
     MOON MISSION
   =====================================*/
+#missionHold {
+  margin-block-end: 10vw;
+}
 .moonMission {
-  font-size: clamp(55px, 5vw, 75px);
+  font-size: clamp(50px, 4vw, 70px);
   text-align: center;
   margin-block: 2vw 5vw;
   color: #08e7fe;
+  color:#040115;
+  text-shadow: 0 0 2px #188dd6, 0 0 3px #188dd6, 0 0 10px #188dd6, 0 0 10px #38eeff, 0 0 3px #38eeff, 2px 2px 0.5px #38eeff !important;
 }
 .firstMoon {
-  font-size: clamp(25px, 3vw, 35px);
+  font-size: clamp(20px, 3vw, 30px);
   margin:2vw !important;
 }
 .moonMission {
@@ -920,6 +919,182 @@ section.er404 {
 .howitworks .moonMission {
   margin-bottom: 0;
 }
+#mission, #neon_protocol, #platform, #neon-howitworks, #hedgingTools, #uxDesign, #mediaH1, #timeline, #tokenomics {
+	font-size: clamp(25px, 5vw, 35px);
+	font-family: 'Neon',monospace, sans-serif, "Helvetica Neue", Helvetica, "Liberation Sans"!important;
+	font-weight:200;
+ /* color:#08e7fe; */
+ letter-spacing: 1px;
+}
+.neon-blue {
+  text-shadow: 0 0 2px #188dd6, 0 0 3px #188dd6, 0 0 15px #188dd6, 0 0 15px #188dd6, 0 0 3px #188dd6, 3px 3px 0.5px #0e567c !important;
+  color: #08e7fe !important;/* darker */
+  color: #92f1fc !important;
+}
+.howitworks img {
+  width: clamp(250px, 30vw, 400px) !important;
+}
+#trav {
+	-webkit-animation: blink 0.01s infinite alternate;
+	-moz-animation: blink 0.01s infinite alternate;
+	-o-animation: blink 0.01s infinite alternate;
+	animation: blink 0.01s infinite alternate;
+}
+#glitch {
+	text-shadow: 0 0 2px #188dd6, 0 0 3px #188dd6, 0 0 15px #188dd6, 0 0 15px #188dd6, 0 0 3px #188dd6, 3px 3px 0.5px #0e567c !important;
+  color: #08e7fe !important; /* darker */
+  color: #92f1fc !important;
+	-webkit-animation: fadee 7s infinite alternate;
+	-moz-animation: fadee 7s infinite alternate;
+	-o-animation: fadee 7s infinite alternate;
+	animation: fadee 7s infinite alternate;
+}
+.neon-purple {
+	font-family: monospace, sans-serif, "Helvetica Neue", Helvetica, "Liberation Sans"!important;
+	font-size: clamp(17px, 2vw, 30px);
+	margin: 0 auto;
+	text-align: center;
+	color: #38eeff;
+	text-shadow: 2px 2px 1px rgba(0,0,0,0.5), 0 0 6px #fff, 0 0 6px #38eeff, 0 0 30px #38eeff;
+}
+
+@-moz-keyframes blink {
+	70% {
+	opacity: 0.8;
+	}
+}
+@-webkit-keyframes blink {
+	45% {
+	opacity: 0.8;
+	}
+}
+@-o-keyframes blink {
+  70% {
+    opacity: 0.8;
+  }
+}
+@keyframes blink {
+  70% {
+    opacity: 0.8;
+  }
+}
+@-moz-keyframes fadee {
+  35% {
+    opacity: 0.8;
+  }
+  40% {
+    opacity: 0.7;
+  }
+  42% {
+    opacity: 0.6;
+  }
+  44% {
+    opacity: 0.4;
+  }
+  46% {
+    opacity: 0.8;
+  }
+  48% {
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 0.8;
+  }
+  52% {
+    opacity: 0.5;
+  }
+  53% {
+    opacity: 0.8;
+  }
+}
+@-webkit-keyframes fadee {
+  35% {
+    opacity: 0.8;
+  }
+  40% {
+    opacity: 0.7;
+  }
+  42% {
+    opacity: 0.6;
+  }
+  44% {
+    opacity: 0.4;
+  }
+  46% {
+    opacity: 0.8;
+  }
+  48% {
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 0.8;
+  }
+  52% {
+    opacity: 0.5;
+  }
+  53% {
+    opacity: 0.8;
+  }
+}
+@-o-keyframes fadee {
+  35% {
+    opacity: 0.8;
+  }
+  40% {
+    opacity: 0.7;
+  }
+  42% {
+    opacity: 0.6;
+  }
+  44% {
+    opacity: 0.4;
+  }
+  46% {
+    opacity: 0.8;
+  }
+  48% {
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 0.8;
+  }
+  52% {
+    opacity: 0.5;
+  }
+  53% {
+    opacity: 0.8;
+  }
+}
+@keyframes fadee {
+  35% {
+    opacity: 0.8;
+  }
+  40% {
+    opacity: 0.7;
+  }
+  42% {
+    opacity: 0.6;
+  }
+  44% {
+    opacity: 0.4;
+  }
+  46% {
+    opacity: 0.8;
+  }
+  48% {
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 0.8;
+  }
+  52% {
+    opacity: 0.5;
+  }
+  53% {
+    opacity: 0.8;
+  }
+}
+
 /*=======================================
     SOLAR SECTION
   =====================================*/
@@ -935,7 +1110,7 @@ section.er404 {
     min-height: 400px;
   }
 }
-.useCasesH1{
+.sectionH1{
   margin-block: 5vw;
   font-size: 40px !important;
   font-weight: 400;
@@ -969,16 +1144,18 @@ section.er404 {
   padding-block: 3vw 1vw;
 }
 .howitworks img{
-  max-width: 700px;
+  max-width: 600px;
   cursor: pointer;
+  /*
   box-shadow: 0 0 .05rem #fff, inset 0 0 .05rem #fff, 0 0 0.352rem var(--neon-border-color), inset 0 0 0.25rem var(--neon-border-color), 0 0 0.16rem var(--neon-border-color), inset 0 0 0.16rem var(--neon-border-color);
-
+  */
 }
-.howitworksDescrp{
+.sectDescription{
   padding-inline:3vw;
   box-sizing: border-box;
   margin:2vw auto;
   width: 100%;
+  max-width: 900px;
   font-size: clamp(16px, 2vw, 18px) !important;
   color: #FFF; 
 }
@@ -1093,6 +1270,7 @@ section.er404 {
   text-transform: uppercase;
 }
 .callDescription{
+  /*
   color:#000;
   width:100%;
   font-size: clamp(15px, 1vw, 16px);
@@ -1103,25 +1281,43 @@ section.er404 {
   box-sizing: border-box;
   background-color: #08E7FE;
   border-radius: 0.5vw;
+  */
+  color: #FFF;
+    width: 100%;
+    font-size: clamp(15px, 1vw, 16px);
+    text-align: left;
+    padding: 5px;
+    box-sizing: border-box;
+    border-radius: 0.5vw;
+    border:0.5px solid #050c1c;
+    box-shadow: 0 0 0.2rem #08E7FE, inset 0 0 0.2rem #08E7FE, 0 0 1.5rem var(--neon-border-color), inset 0 0 1rem var(--neon-border-color), 0 0 0.65rem var(--neon-border-color), inset 0 0 0.65rem var(--neon-border-color);
+    animation: 5s ease 0s infinite alternate none running flicker;
+    border-width: 1px;
+    border-style: solid;
+    border-color: rgb(8, 231, 254);
+    background-color: #10092a;
 }
 .row {
   display: flex;
   -ms-flex-wrap: wrap;
   flex-wrap: wrap;
-  margin-right: -15px;
+  margin-right: -15px;/* stretch out */
   margin-left: -15px;
+  margin-right: 0;
+  margin-left: 0;
 }
 .col-md-6 {
   position: relative;
   width: 100%;
   min-height: 1px;
-  padding-right: 15px;
-  padding-left: 15px;
+  padding-block: 5px;
+  padding-inline: 15px;
+  box-sizing: border-box;
 
   -webkit-box-flex: 0;
   -ms-flex: 0 0 50%;
   flex: 0 0 50%;
-  max-width: 50%;
+  flex-basis: 50%;
   text-align: left;
 }
 .counts{
@@ -1131,9 +1327,9 @@ section.er404 {
 .heading_right {
   color: #FFF;
   line-height: 30px;
-  font-size: 16px;
-  font-weight: 500;
+  font-size: clamp(14px, 2vw, 15px);
   padding-top: 5px;
+  box-sizing: border-box;
 }
 .text_p {
   font-size: 13px;

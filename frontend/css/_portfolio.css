@@ -54,7 +54,7 @@ body{
 	justify-content: space-between;
 	align-items: flex-start;
 
-	height:220px;
+	min-height:220px;
 	width:50%;
 	max-width: calc(50% - 20px); /* adjust the width here */
 	margin: 20px 10px;
@@ -74,7 +74,6 @@ body{
 
   .nw-left {
 	display: flex;
-	width: 50%;
   }
   
   .nw-left img {
@@ -84,11 +83,10 @@ body{
   }
   
   .nw-right {
-	width: 50%;
 	height: auto;
 	padding: 5px;
 	box-sizing: border-box;
-	background-color: rgba(0,0,0,0.2);
+	background-color: rgba(0,0,0,0.4);
 	border-radius: 10px;
   }
   
@@ -105,7 +103,7 @@ body{
   
   .nw-text-title {
 	display: inline-block;
-	width: 110px;
+	width: 120px;
 	padding-right: 5px;
 	font-size: clamp(13px, 1vw, 14px);
 	font-family: 'modeseven','bitwise', sans-serif, "Helvetica Neue", Helvetica, Arial !important;
@@ -148,10 +146,16 @@ body{
   }
   
   .userWalletCont {
-	width:40%;
 	height: auto;
 	margin-inline: 10px;
 	box-sizing: border-box;
+	flex-shrink: 1;
+  }
+
+  .userFundsCont {
+	display: flex;
+	flex-grow: 1;
+	justify-content: space-evenly;
   }
   
   .user-card {
@@ -197,10 +201,8 @@ body{
   
   .walletStates {
 	position: relative;
-	width: 50%;
 	padding:5px;
 	box-sizing: border-box;
-	border-left: 0.7px dotted #1b5644;
   }
   
   .walletStates .walletStatesDiv:nth-child(2) {
@@ -216,7 +218,7 @@ body{
 
 	display: flex;
 	flex-wrap: wrap;
-	justify-content: right; /* best view */
+	justify-content: center; /* right was best view */
   }
   
   .walletStatesDiv .dot {
@@ -244,22 +246,12 @@ body{
 	line-height: 21px;
   }
   
-  @media screen and (max-width: 768px) {
-	.userWalletCont {
-		width: 40%;
-	}
-	.userWallet{
-		font-size: 14px !important;
-		letter-spacing: -1px;
-	}
-  }
-  
   .volume-widget {
 	display: flex;
 	align-items: center;
 	border-radius: 5px;
 	height: 20px;
-	background-color: rgba(0,0,0,0.4);
+	background-color: rgba(0,0,0,0.3);
 	flex-basis: 80%;
 	justify-content: center;
 	margin-top:3px;
@@ -382,6 +374,33 @@ body{
   
   .green-value {
 	color:#33856b;
+	padding-inline-end: 1vw;
+  }
+
+  @media screen and (max-width: 1300px), screen and (max-width: 768px) {
+	.nw-rectangle {
+		display: block;
+		height: auto;
+	}
+	.walletStatesDiv {
+		justify-content: center;
+	}
+	.userWallet{
+		font-size: 14px !important;
+		letter-spacing: -1px;
+	}
+	.nw-right, .walletStates {
+		padding:unset;
+	}
+	.walletStates {
+		border-left: unset;
+	}
+	.nw-left {
+		justify-content: center;
+	}
+	.volume-widget {
+		flex-basis: 100%;
+	}
   }
 
   /*========================
@@ -636,7 +655,7 @@ button#transactSubmit{
 #balancesSection {
 	position: relative;
 	max-height: 0;
-	transition: max-height 0.3s ease-out;
+	transition: all 0.6s ease-in-out;
 	overflow: hidden;
 	padding:10px 0 20px;
 	box-sizing: border-box;
@@ -1149,7 +1168,7 @@ button#transactSubmit{
   
 /* ===================
   	USER HEDGES LISTS
-	=================*/
+=====================*/
 .hedges-list-section {
 	min-width: 350px;
 	display: flex;
@@ -1174,24 +1193,24 @@ button#transactSubmit{
 	overflow: hidden;
 	display: flex;
 	flex-wrap: nowrap;
-  }
+}
 
-  .hedge-list-header {
+.hedge-list-header {
 	color: #DDD;
 	display: flex;
 	flex-wrap: wrap;
 	justify-content: space-between;
 	align-items: center;
-  }
-  
-  .list-toggle {
+}
+
+.list-toggle {
 	margin-bottom: 15px;
 	display: flex;
 	flex-wrap: wrap;
 	justify-content: center;
-  }
-  
-  .list-toggle button {
+}
+
+.list-toggle button {
 	border: none;
 	color: #c4c1c1;
 	padding: 1vw;
@@ -1207,15 +1226,15 @@ button#transactSubmit{
 
 	background: transparent !important;
 	border-radius: inherit;
-  }
+}
 
-  @media only screen and (max-width: 700px) {
+@media only screen and (max-width: 700px) {
 	.list-toggle button {
 		margin-inline: 7px;
 	}
 }
-  
-  .list-toggle button::before {
+
+.list-toggle button::before {
 	content: "";
 	position: absolute;
 	top: 50%;
@@ -1227,27 +1246,20 @@ button#transactSubmit{
 	border:0.5px solid #fff;
 	background-color: #fff;
 	transition: all 0.3s ease;
-  }
-  
-  .list-toggle button:hover, .list-toggle button.active {
+}
+
+.list-toggle button:hover, .list-toggle button.active {
 	color: #0b9455;
 	opacity: 0.8;
 	box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 	border: 0.2px solid #0b9455;
-  }
-  
-  .list-toggle button.active::before {
+}
+
+.list-toggle button.active::before {
 	border:0.5px solid #000;
 	background-color: #0b9455;
 	box-shadow: 0 0 5px #4CAF50, 0 0 10px #4CAF50, 0 0 15px #4CAF50, 0 0 20px #4CAF50;
-  }
-
-  @media only screen and (max-width: 450px) {
-	.hedges-list-section {
-		padding:0 !important;
-	}
 }
-
   
 /*====================
  USER HEDGES LIST 
@@ -1270,6 +1282,7 @@ button#transactSubmit{
 
 .hedge-i-cat {
 	min-width: 70px;
+	min-width: 120px;
 	color: #999999 !important;
 	margin-right: 10px;
 	font-size: clamp(13px, 1vw, 14px) !important;
@@ -1307,7 +1320,8 @@ button#transactSubmit{
 
 .hedge-value {
 	flex-grow: 1;
-    color: #33856b !important;
+    color: #33856b;
+	color: #0b9455 !important;
     font-size: 13.5px;
     font-weight: bold;
 }
@@ -1343,6 +1357,33 @@ button#transactSubmit{
 	opacity: 0.6;
 	cursor: not-allowed;
   }
+
+@media only screen and (max-width: 450px) {
+	.hedges-list-section {
+		padding:0 !important;
+	}
+	.hedge-i-cat {
+		min-width: 33px ;
+		text-align: center !important;
+	}
+	.token-address {
+		display: none !important;
+	}
+	.hedgeTxBtn {
+		width:32px !important;
+	}
+	.hlH {
+		width:33px !important;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+	.hedge-valuetitle {
+		flex-grow: 0.4;
+	}
+	.list-toggle {
+		justify-content: space-between;
+	}
+}
 
 /* ===================
   REWARDS SECTION 
@@ -1446,13 +1487,9 @@ hr.line {
 	flex-direction: row;
 	justify-content: center;
 	align-items: center;
-
-	color:#02f0fe;
-	color: #60a5fa;
-	color:#fff;
+	
+	color: #FFF;
 	border: 1px solid #3399ff;
-	border-radius: 8px;
-	background-color: rgba(29,78,216,.2);
 	background: linear-gradient(220deg, #39f, #110f47 80%);
 }
 /* ===================
@@ -1830,6 +1867,7 @@ hr.line {
 	color: #38eeff;
 	text-shadow: 2px 2px 1px rgba(0,0,0,0.5), 0 0 6px #fff, 0 0 6px #38eeff, 0 0 30px #38eeff;
 }
+/* NORMAL BLINK;;;;
 @-moz-keyframes blink {
 	70% {
 	opacity: 0.7;
@@ -1848,6 +1886,95 @@ hr.line {
 @keyframes blink {
   70% {
     opacity: 0.7;
+  }
+}
+*/
+@-moz-keyframes blink {
+	70% {
+	opacity: 0.7;
+	}
+}
+@-webkit-keyframes blink {
+	45% {
+	opacity: 0.5;
+	}
+}
+@-o-keyframes blink {
+  70% {
+    opacity: 0.7;
+  }
+}
+@keyframes blink {
+  70% {
+    opacity: 0.7;
+  }
+}
+@-moz-keyframes fade {
+  40% {
+    opacity: 0.8;
+  }
+  42% {
+    opacity: 0.1;
+  }
+  43% {
+    opacity: 0.8;
+  }
+  45% {
+    opacity: 0.1;
+  }
+  46% {
+    opacity: 0.8;
+  }
+}
+@-webkit-keyframes fade {
+  40% {
+    opacity: 0.8;
+  }
+  42% {
+    opacity: 0.1;
+  }
+  43% {
+    opacity: 0.8;
+  }
+  45% {
+    opacity: 0.1;
+  }
+  46% {
+    opacity: 0.8;
+  }
+}
+@-o-keyframes fade {
+  40% {
+    opacity: 0.8;
+  }
+  42% {
+    opacity: 0.1;
+  }
+  43% {
+    opacity: 0.8;
+  }
+  45% {
+    opacity: 0.1;
+  }
+  46% {
+    opacity: 0.8;
+  }
+}
+@keyframes fade {
+  40% {
+    opacity: 0.8;
+  }
+  42% {
+    opacity: 0.1;
+  }
+  43% {
+    opacity: 0.8;
+  }
+  45% {
+    opacity: 0.1;
+  }
+  46% {
+    opacity: 0.8;
   }
 }
 
