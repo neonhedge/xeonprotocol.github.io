@@ -3,11 +3,10 @@ import { chartConfig } from './constants-charting.js';
 /*=========================================================================
     HELPERS
 ==========================================================================*/
-
 function updateDoughnutChart(canvasId, labels, data, backgroundColor, borderColor, legendPosition = 'left') {
     const chartCanvas = document.getElementById(canvasId).getContext('2d');
 
-    if (chartConfig[canvasId] !== null) {
+    if (chartConfig[canvasId] && chartConfig[canvasId] !== null) {
         chartConfig[canvasId].destroy();
     }
 
@@ -17,7 +16,7 @@ function updateDoughnutChart(canvasId, labels, data, backgroundColor, borderColo
 function updateBarChart(canvasId, labels, datasets, indexAxis, legendPosition, scalesConfig, aspectRatio) {
     const chartCanvas = document.getElementById(canvasId).getContext('2d');
 
-    if (chartConfig[canvasId] !== null) {
+    if (chartConfig[canvasId] && chartConfig[canvasId] !== null) {
         chartConfig[canvasId].destroy();
     }
 
