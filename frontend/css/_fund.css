@@ -11,14 +11,18 @@
   }
 /*========================================*/
 
-body{
+body {
 	background-size:contain !important;
 	background-position: center !important;
 	background-repeat: no-repeat !important;
+}
 
-	background: #130228;
-	background-image: url(../imgs/zap.webp); /* fallback */
-	background-image: url(../imgs/zap.webp), linear-gradient(#130228, #130228); 
+main {
+  background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.8)), url('../imgs/tgbconcept.png');
+  background-repeat: repeat, repeat;
+  background-size: cover;
+  background-repeat: no-repeat;
+  /*** remove background:none on .sectionCenter{ to enable cool blue BG */
 }
 
 /*==================================
@@ -226,6 +230,11 @@ hr.line {
 .sectionCenter {
   display: flex;
   justify-content: space-evenly;
+  padding-block:0.5vw 3vw !important;
+  /* ENABLE FOR COOL BG THEME 
+  
+  background: none !important;
+  */
 }
 
 .hedgeCore {
@@ -269,8 +278,7 @@ hr.line {
   font-size: clamp(14px, 2vw, 17px);
   padding: 1vw;
   box-sizing: border-box;
-  background: linear-gradient(45deg, #040115 0%, #5D6BF8 100%);
-  background: linear-gradient(45deg, #040115 0%, #32388a 100%);
+  background: radial-gradient(#000327e5 0%, #2a3082 100%) !important;
   color: #EEE;
 }
 
@@ -299,6 +307,7 @@ hr.line {
   line-height: 20px;
   font-size: 14px;
   color: #188dd6;
+  color:#FFF;
   text-align: left;
 }
 
@@ -773,6 +782,8 @@ font-size: clamp(12.2px, 1vw, 13.5px);
   margin-top: 20px;
   position: relative;
   background-color: #0f082e;
+  background-color: rgba(29,78,216,.2);
+  background: none;
   padding: 10px;
   border-radius: 5px;
   overflow: hidden;
