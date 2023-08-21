@@ -52,7 +52,7 @@ img {
 
 body {
   position: relative;
-  background-color: #091e31;
+  background-color: #040115 ;
   background: radial-gradient(#18142d, #040115 80%) !important;
   scroll-behavior: smooth;
   overflow-x: hidden;
@@ -352,6 +352,25 @@ iframe {
   padding-block:1vw;
   box-sizing: content-box;
 }
+/* new big font look - remove all the below lines if we discarding this small font look
+- also remember to remove the small text & restore commented last text */
+.introductionHold p{
+  font-size: clamp(24px, 5vw, 34px);
+  max-width: 550px;
+}
+.introductionHold small{
+  padding-block:1vw;
+  box-sizing: content-box;
+}
+.buttonsHold{
+  margin-top:1vh !important;
+}
+@media screen and (max-width: 600px) {
+  .buttonsHold{
+    margin-top:10vw !important;
+  }
+}
+
 /*--------------------------------------------------------*/
 /*	3. FONTS */
 /*--------------------------------------------------------*/
@@ -411,7 +430,7 @@ button, a.btn {
 }
 
 footer {
-  font-size: 1rem;
+  font-size: 0.9rem;
   font-weight: 400;
   line-height: 1.8;
   text-align: center;
@@ -575,7 +594,11 @@ header .container {
 header .container img {
   width: 4rem;
 }
-
+@media (max-width: 600px) {
+  header .container img  {
+    width:100%;
+  }
+}
 .mobile-nav-toggle {
   display: block;
   justify-self: end;
@@ -680,10 +703,12 @@ nav#navbar ul li ul.submenu li a {
   text-decoration: none;
 }
 .logoImg{
-  
+  max-width: 90px;
+  display: flex;
 }
 @media (max-width: 680px){
   .logoImg {
+    width:100%;
     border-radius:50%;
     border:1px solid var(--neon-border-color);
     box-shadow:
@@ -932,6 +957,10 @@ section.er404 {
     text-align: justify;
     padding-inline: 3vw;
   }
+  .buttonsHold {
+    display: grid;
+    grid-template-columns: repeat(2,1fr);
+  }
 }
 .neon-blue {
   text-shadow: 0 0 2px #188dd6, 0 0 3px #188dd6, 0 0 15px #188dd6, 0 0 15px #188dd6, 0 0 3px #188dd6, 3px 3px 0.5px #0e567c !important;
@@ -1136,16 +1165,24 @@ section.er404 {
   padding: 1.2vw 3vw;
   box-sizing: border-box;
 }
-.usecaseCont{
+.usecaseCont {
   margin-top:60px;
 }
-.usecaseCont img{
+.usecaseCont img {
   width: clamp(90px, 10vw, 270px);
   /* border: 0.5px solid var(--neon-border-color); */
   box-shadow:
           0 0 .1rem #38127c,
           0 0 2rem var(--neon-border-color),
           0 0 0.3rem var(--neon-border-color);  
+}
+.toolImage {
+  font-size: clamp(90px, 10vw, 150px);
+  border-radius: 50%;
+  color: #040115;
+  text-shadow: 0 0 2px var(--neon-border-color), 0 0 3px var(--neon-border-color), 0 0 10px var(--neon-border-color), 0 0 10px var(--neon-border-color), 0 0 3px var(--neon-border-color), 2px 2px 0.5px var(--neon-border-color) !important;
+
+  text-shadow: 0 0 2px #188dd6, 0 0 3px #188dd6, 0 0 10px #188dd6, 0 0 10px #188dd6, 0 0 3px #38eeff, 2px 2px 0.5px #38eeff !important;
 }
 .howitworks {
   padding-block: 3vw 1vw;
@@ -1157,7 +1194,12 @@ section.er404 {
   box-shadow: 0 0 .05rem #fff, inset 0 0 .05rem #fff, 0 0 0.352rem var(--neon-border-color), inset 0 0 0.25rem var(--neon-border-color), 0 0 0.16rem var(--neon-border-color), inset 0 0 0.16rem var(--neon-border-color);
   */
 }
-.sectDescription{
+.hedgingToolsNotes {
+  font-size: 0.95rem;
+  padding-inline: 5vw;
+  text-align: justify;
+}
+.sectDescription {
   padding-inline:3vw;
   box-sizing: border-box;
   margin:2vw auto;
@@ -1294,7 +1336,7 @@ section.er404 {
     width: 100%;
     font-size: clamp(15px, 1vw, 16px);
     text-align: left;
-    padding: 5px;
+    padding: 10px;
     box-sizing: border-box;
     border-radius: 0.5vw;
     border:0.5px solid #050c1c;
@@ -1309,10 +1351,10 @@ section.er404 {
   display: flex;
   -ms-flex-wrap: wrap;
   flex-wrap: wrap;
-  margin-right: -15px;/* stretch out */
-  margin-left: -15px;
-  margin-right: 0;
-  margin-left: 0;
+  /* stretch out
+  margin-right: -15px;
+  margin-left: -15px;  */
+  background-color: #040115;
 }
 .col-md-6 {
   position: relative;
@@ -1705,7 +1747,9 @@ section.er404 {
   background-image: url("../imgs/playful.webp"); /* fallback */
   background-image: url("../imgs/playful.webp"), radial-gradient(#18142d, #040115 80%); 
   background-size: contain;
+  background-size: 50%;
   background-position: center;
+  background-repeat:repeat-x;
 }
 .Container_container__WAGEk {
   width: 100%;
@@ -1763,21 +1807,26 @@ section.er404 {
   line-height: 50px;
   margin-bottom: 15px;
   text-align: right;
+  text-align: justify;
   
 }
 .Roadmap_roadmapItem__LU10a p {
   line-height: 160%;
   text-align: right;
+  text-align: justify;
   max-width: 364px;
 }
 .Roadmap_itemTwo__2bPYf h3, .Roadmap_itemTwo__2bPYf p {
   text-align: left;
+  text-align: justify;
 }
 .Roadmap_itemFour__4VmPh h3, .Roadmap_itemFour__4VmPh p {
   text-align: left;
+  text-align: justify;
 }
 .Roadmap_itemFive__3Pcy2F h3, .Roadmap_itemFive__3Pcy2F p{
   text-align: left;
+  text-align: justify;
 }
 /* BORDER GLOW TIMELINE */
 .glow1{
@@ -1970,14 +2019,14 @@ footer .container {
 }
 @media (min-width: 55em) {
   footer .container {
-    grid-template-columns: repeat(4, 1fr);
-    place-items: safe;
+    grid-template-columns: repeat(5, 1fr);
+    place-items:stretch;
   }
   footer .container p:last-child {
     width: 100%;
     margin-top: 2rem;
     text-align: center;
-    grid-column: span 4;
+    grid-column: span 5;
   }
 }
 footer .container img {
@@ -1998,6 +2047,10 @@ footer .container li a:hover {
 }
 .footerContainer {
   text-align: center;
+  padding-top: 5vw;
+}
+.badgeLeft {
+  margin-top:-5vw;
 }
 /*--------------------------------------------------------*/
 /*	11. MODALS */
