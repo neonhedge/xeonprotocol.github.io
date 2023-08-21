@@ -481,7 +481,7 @@ body{
 	/* text-shadow: 0 0 5px #ffd10c, 0 0 1px #fff, 0 0 12px #ffd10c, 0 0 12px #ffd10c, 0 0 1px #fff, 1px 0.5px 0.5px #000, -1px -0.5px 0.5px #000; */
 	color: #FFF;
 	text-transform: capitalize;
-	text-align: center;
+	text-align: left;
 }
 
 .input-group select option{
@@ -769,6 +769,7 @@ button#transactSubmit{
 
 .t-i-lead {
 	max-width: 63%;
+	font-size: 1rem;
 }
   
 .trade-list::-webkit-scrollbar {
@@ -1278,6 +1279,7 @@ button#transactSubmit{
 	box-sizing: border-box;
 	border-bottom: 0.7px dotted #354681;
 	background-color: rgba(0,0,0,0.5);
+	font-size: clamp(12px, 1vw, 13px) !important;
 }
 
 .hedge-i-cat {
@@ -1285,7 +1287,6 @@ button#transactSubmit{
 	min-width: 120px;
 	color: #999999 !important;
 	margin-right: 10px;
-	font-size: clamp(13px, 1vw, 14px) !important;
 }
 
 .hedge-type {
@@ -1309,31 +1310,26 @@ button#transactSubmit{
 
 .hedge-symbol {
     text-transform: uppercase;
-    font-size: 13px;
     color: #dbdbdb !important;
 }
 
 .hedge-valuetitle {
 	flex-grow: 1;
-    font-size: 13px;
 }
 
 .hedge-value {
 	flex-grow: 1;
     color: #33856b;
-	color: #0b9455 !important;
-    font-size: 13.5px;
+	color: #089353 !important;
     font-weight: bold;
 }
 
 .hedge-tamount {
     color: #BEBEBE;
-    font-size: 13px;
     text-align: right;
 }
 
 .hedge-time {
-    font-size: 13px;
     color: #999999;
     white-space: nowrap;
     overflow: hidden;
@@ -1343,9 +1339,9 @@ button#transactSubmit{
 .hedgeTxBtn {
 	border: 1px solid #3399ff;
 	padding: 3px;
-	font-size: clamp(12px, 1vw, 13px);
 	box-sizing: border-box;
 	width: 50px;
+	font-size: clamp(12px, 1vw, 13px) !important;
 }  
   /* CSS for thin border */
   .button-thin-border {
