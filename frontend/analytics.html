@@ -105,15 +105,23 @@
                         <p class="card-value" id="activeWalletsValue">-</p>
                     </div>
                     <div class="traffic-card">
-                        <h4 class="card-title">Active ERC20s</h4>
+                        <h4 class="card-title">Active ERC20 Tokens</h4>
                         <p class="card-value" id="activeTokensValue">-</p>
                     </div>
                     <div class="traffic-card">
-                        <h4 class="card-title">Transaction Volume</h4>
+                        <h4 class="card-title">Hedges Taken</h4>
                         <p class="card-value" id="swapsCountValue">-</p>
                     </div>
                     <div class="traffic-card">
-                        <h4 class="card-title">Hedge Volume</h4>
+                        <h4 class="card-title">Cashier Volume</h4>
+                        <p class="card-value" id="swapsCountValue">-</p>
+                    </div>
+                    <div class="traffic-card">
+                        <h4 class="card-title">Options Volume</h4>
+                        <p class="card-value" id="swapsCountValue">-</p>
+                    </div>
+                    <div class="traffic-card">
+                        <h4 class="card-title">Swaps Volume</h4>
                         <p class="card-value" id="swapsCountValue">-</p>
                     </div>
                 </div>
@@ -248,43 +256,43 @@
                 <div class="hedgingStats">
                     <div class="staking-grid grid grid-cols-2 gap-5">
 						<div class="flex flex-col gap-4">
-							<div class="grid grid-cols-2">
-								<div class="flex flex-col stakeDataRow">
+							<div class="cardDataRow grid grid-cols-2">
+								<div class="flex flex-col cardData">
                                     <div class="grid-sect-subtitle splitView stakedTitle"><span>created: </span><span id="hedgesCreated">$0</span></div>
 									<div class="grid-sect-subtitle splitView stakedTitle"><span>bought: </span><span id="hedgesTraded">$0</span></div>
 								</div>
-                                <div>
+                                <div class="hedgeChart">
                                     <canvas id="hedgeBarChartA"></canvas>
                                 </div>								
 							</div>
 							<hr class="line">
-							<div class="grid grid-cols-2">
-								<div class="flex flex-col stakeDataRow">
+							<div class="cardDataRow grid grid-cols-2">
+								<div class="flex flex-col cardData">
 									<div class="grid-sect-subtitle splitView stakedTitle"><span>swaps volume: </span><span id="swapsVolume">$0</span></div>
 									<div class="grid-sect-subtitle splitView stakedTitle"><span>options volume: </span><span id="optionsVolume">$0</span></div>
 								</div>
-								<div>
+								<div class="hedgeChart">
                                     <canvas id="hedgeBarChartB"></canvas>
                                 </div>	
 							</div>							
 						</div>
                         <div class="flex flex-col gap-4">
-							<div class="grid grid-cols-2">
-								<div class="flex flex-col stakeDataRow">
+							<div class="cardDataRow grid grid-cols-2">
+								<div class="flex flex-col cardData">
 									<div class="grid-sect-subtitle splitView stakedTitle"><span>hedge costs: </span><span id="hedgeCostsTotal">$0</span></div>
 									<div class="grid-sect-subtitle splitView stakedTitle"><span>hedge value: </span><span id="hedgesValueTotal">$0</span></div>
 								</div>
-								<div>
+								<div class="hedgeChart">
                                     <canvas id="hedgeBarChartC"></canvas>
                                 </div>	
 							</div>
                             <hr class="line">
-							<div class="grid grid-cols-2">
-								<div class="flex flex-col stakeDataRow">
+							<div class="cardDataRow grid grid-cols-2">
+								<div class="flex flex-col cardData">
 									<div class="grid-sect-subtitle splitView stakedTitle"><span>hedge profits: </span><span id="hedgeProfits">$0</span></div>
 									<div class="grid-sect-subtitle splitView stakedTitle"><span>hedge fees: </span><span id="hedgeFees">$0</span></div>
 								</div>
-								<div>
+								<div class="hedgeChart">
                                     <canvas id="hedgeBarChartD"></canvas>
                                 </div>	
 							</div>
@@ -501,7 +509,7 @@
                       <div class="staking-widget-rewards">
                         <div class="icon"><i class="fas fa-diamond"></i></div>
                         <h4>Stake to Farm</h4>
-                        <p>Native tokens are used to collateralize loans, or add liquidity for hedges.<a href="#jump-to-section" class="walletStateLink"><text text-anchor="middle"  style="color:#188dd6;"> learn... <i class="fa fa-link" aria-hidden="true"></i></text></a>	</p>
+                        <p>Native tokens are used by to provide Native Hedge Liquidity.<a href="#jump-to-section" class="walletStateLink"><text text-anchor="middle"  style="color:#188dd6;"> learn... <i class="fa fa-link" aria-hidden="true"></i></text></a>	</p>
                       </div>					  
                 </div>
 
