@@ -803,28 +803,6 @@ button#transactSubmit{
   .trade-list:hover::-webkit-scrollbar-track {
 	background-color: #2a2a2a;
   }
-  
-.earnMoreWidget {
-	flex-basis: 35%;
-	display: flex;
-	flex-direction: column;
-	justify-content: end;
-	align-items: end;
-
-	position: relative;
-	top: -30px;
-}
-
-.earnMoreWidget-rewards {
-	flex-basis: 35%;
-	display: flex;
-	flex-direction: row;
-	justify-content: space-around;
-	align-items: center;
-
-	position: relative;
-	top: 0;
-}
 
 .trade-item {
     width: 100%;
@@ -1281,7 +1259,10 @@ button#transactSubmit{
 	background-color: rgba(0,0,0,0.5);
 	font-size: clamp(12px, 1vw, 13px) !important;
 }
-
+.hlH {
+	font-size: clamp(13px, 1vw, 15px) !important;
+	color: #FFF !important;
+}
 .hedge-i-cat {
 	min-width: 70px;
 	min-width: 120px;
@@ -1354,30 +1335,35 @@ button#transactSubmit{
 	cursor: not-allowed;
   }
 
-@media only screen and (max-width: 450px) {
+@media only screen and (max-width: 720px) {
 	.hedges-list-section {
 		padding:0 !important;
 	}
 	.hedge-i-cat {
-		min-width: 33px ;
+		min-width: 60px !important;
 		text-align: center !important;
+		margin-right: 1vw !important;
 	}
-	.token-address {
+	.token-address, .hedge-start{
 		display: none !important;
 	}
 	.hedgeTxBtn {
-		width:32px !important;
+		width:35px !important;
 	}
 	.hlH {
-		width:33px !important;
 		overflow: hidden;
 		text-overflow: ellipsis;
 	}
-	.hedge-valuetitle {
-		flex-grow: 0.4;
+	.hedge-valuetitle, .hedgeValue {
+		flex-grow: 1;
 	}
 	.list-toggle {
 		justify-content: space-between;
+	}
+}
+@media only screen and (max-width: 500px) {
+	.hedge-cost{
+		display: none !important;
 	}
 }
 
@@ -1385,24 +1371,67 @@ button#transactSubmit{
   REWARDS SECTION 
 ====================*/
 
+.rewardsInformer {
+	width:92%;
+	margin:2vw auto;
+	margin-top: 0;
+	padding: 20px;
+	font-size: 1rem;
+	cursor:help;
+	transition: background-color 0.3s;
+	color: #08e7fe;
+	border: 1px solid rgba(51, 153, 255, 0.5);
+	border-radius: 8px;
+	background-color: rgba(29, 163, 216, 0.2);
+	background-color: rgba(29, 129, 216, 0.2);
+}
+.neon-real-yield-link {
+	color: #FFF;
+	font-weight:400;
+}
+/* shared from the tokenlist section on wallet dashboard */
+.earnMoreWidget {
+	flex-basis: 35%;
+	display: flex;
+	flex-direction: column;
+	justify-content: end;
+	align-items: end;
+
+	position: relative;
+	top: -30px;
+}
+
+.earnMoreWidget-rewards {
+	display: flex;
+	flex-wrap:wrap;
+	justify-content: space-around;
+	align-items:stretch;
+	gap:1vw;
+	position: relative;
+	top: 0;
+}
+
 .rewards-grid, .staking-grid, .assignments-grid {
-	align-items: flex-start;
-	place-items:center;
 	padding: 0 1vw;
 	box-sizing: border-box;
 	margin-block:2vw;
 }
 
 .rewards-grid {
+	display: flex;
+	place-content: center;
+	flex-wrap: wrap;
 	align-items: normal;
 }
 
 .staking-grid {
-	place-items:normal;
+	place-items:stretch;
+	max-width: 90%;
+	margin: 0px auto;
 }
 
 .assignments-grid {
-	
+	grid-template-columns: repeat(2, 1fr);
 }
 
 .grid {
@@ -1453,6 +1482,7 @@ button#transactSubmit{
 
 hr.line {
 	background-color: hsla(220, 45%, 26%, 0.8);
+	background: none;
 	border: 0;
 	height: 1px;
 }
@@ -1496,7 +1526,7 @@ hr.line {
 	color: #fff;
 	padding: 20px;
 	border-radius: 10px;
-	width: 300px;
+	max-width: 300px;
 	text-align: center;
 	margin-bottom: 20px;
   }
@@ -1506,7 +1536,7 @@ hr.line {
 	color: #fff;
 	padding: 0.5vw 1.5vw;
 	border-radius: 10px;
-	width: 350px;
+	max-width: 350px;
 	text-align: left;
 	margin-bottom: 20px;
   }
@@ -1619,6 +1649,7 @@ hr.line {
 
   .stakeDataRow {
 	width:100%;
+	min-width: 280px;
 	flex-direction: column;
   }
 
@@ -1645,6 +1676,16 @@ hr.line {
   .flex-item {
 	flex: 1;
   }
+
+  @media only screen and (max-width: 500px) {
+	.staking-widget-rewards, .staking-widget p, .staking-widget-rewards p{
+		font-size: 0.9rem;
+		margin-bottom:10px;
+	}
+	.staking-widget-rewards h4 {
+		font-size: 1rem;
+	}
+}
   /*=======================
   		LIQUIDITY MINING 
 =============================*/
