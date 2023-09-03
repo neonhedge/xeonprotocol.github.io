@@ -73,7 +73,7 @@ contract HEDGEFUND {
     struct userBalance {
       uint256 deposited; // incremented on successful deposit
       uint256 withdrawn; // incremented on successful withdrawal
-      uint256 lockedinuse; // adjust on hedge creation or buy or settle
+      uint256 lockedinuse; // adjust on deal creation or buy or settle
     }
     struct contractBalance {
       uint256 deposited;
@@ -99,7 +99,7 @@ contract HEDGEFUND {
     enum HedgeType {CALL, PUT, SWAP}
 
     struct userPL{
-        uint256 winnings;
+        uint256 profits;
         uint256 losses;
     }
 
@@ -399,7 +399,7 @@ contract HEDGEFUND {
     //premium is cost and paid in base currency of underlying token
     //for swaps the cost is 100% equal value to underlying start value, this acts as collateral rather than hedge premium
     //the payoff (difference between start and strike value) is paid in underlying or base
-    //losses are immediately debited from withdrawn. for winner, winnings are credited to deposited balance direct
+    //losses are immediately debited from withdrawn. for winner, profits are credited to deposited balance direct
     //restore initials for both parties, funds are moved from lockedinuse to deposit, reverse of creating or buying
     //fees are collected on base tokens; if option cost was paid to owner as winning, if swap cost used as PayOff
     //fees are collected on underlying tokens; if option and swap PayOffs were done in underlying tokens
@@ -560,7 +560,7 @@ contract HEDGEFUND {
                 otiU.withdrawn += hedgeInfo.tokensDue;
                 // Restore winner collateral - for taker restore cost (swaps have no premium)
                 tti.lockedinuse -= option.cost;
-                // Move money - take taxes from winnings in underlying. none in base because taker won underlying tokens
+                // Move money - take taxes from profits in underlying. none in base because taker won underlying tokens
                 ccUT.deposited += (hedgeInfo.tokenFee * 85).div(100);
                 // Miner fee - 15% of protocol fee for settling option. none in base because taker won underlying tokens
                 minrT.deposited += (hedgeInfo.tokenFee * 15).div(100);
@@ -580,7 +580,7 @@ contract HEDGEFUND {
                 tti.withdrawn += hedgeInfo.payOff;
                 // Restore winner collateral - for owner, all underlying tokens
                 otiU.lockedinuse -= option.amount;
-                // Move money - winnings in base so only base fees credited
+                // Move money - profits in base so only base fees credited
                 ccBT.deposited += (hedgeInfo.baseFee * 85).div(100);
                 // Miner fee - 15% of protocol fee for settling option. none in underlying tokens
                 minrB.deposited += (hedgeInfo.baseFee * 15).div(100);
@@ -621,10 +621,10 @@ contract HEDGEFUND {
     // Log User PL in base value
     function logPL(uint256 amount, address paired, address optionowner, address optiontaker, uint winner) internal {
         if(winner == 0) {
-            userPLMap[paired][optionowner].winnings += amount;
+            userPLMap[paired][optionowner].profits += amount;
             userPLMap[paired][optiontaker].losses += amount;
         }else if(winner == 1) {
-            userPLMap[paired][optiontaker].winnings += amount;
+            userPLMap[paired][optiontaker].profits += amount;
             userPLMap[paired][optionowner].losses += amount;
         }
     }
@@ -1067,7 +1067,7 @@ contract HEDGEFUND {
     }
     // Get wallets profit & loss in base
     function getUserProfits(address pairAddress, address walletAddress) public view returns (uint256) {
-        return userPLMap[pairAddress][walletAddress].winnings;
+        return userPLMap[pairAddress][walletAddress].profits;
     }
     function getUserLosses(address pairAddress, address walletAddress) public view returns (uint256) {
         return userPLMap[pairAddress][walletAddress].losses;
