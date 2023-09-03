@@ -422,7 +422,7 @@ contract HEDGEFUND {
         uint256 tokensDue;
         uint256 tokenFee;
         uint256 baseFee;
-        bool isPayoffOverCost;
+        bool marketOverStart;
         bool isBelowStrikeValue;
         bool newAddressFlag;
     }
@@ -452,8 +452,8 @@ contract HEDGEFUND {
         hedgeInfo.newAddressFlag = ttiU.deposited == 0;
 
         if (option.hedgeType == HedgeType.CALL) {
-            hedgeInfo.isPayoffOverCost = hedgeInfo.underlyingValue > hedgeInfo.startValue.add(option.cost);
-            if (hedgeInfo.isPayoffOverCost) {
+            hedgeInfo.marketOverStart = hedgeInfo.underlyingValue > hedgeInfo.startValue.add(option.cost);
+            if (hedgeInfo.marketOverStart) {
                 // Taker profit in base = underlying - cost - strike value
                 hedgeInfo.payOff = hedgeInfo.underlyingValue.sub(hedgeInfo.startValue.add(option.cost));
                 // DRAFT - for bundled underlying assets, take list of all tokens in basket & iterate payment code below until payOff is zero {
