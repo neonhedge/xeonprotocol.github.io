@@ -218,7 +218,7 @@ contract HEDGEFUND {
     event hedgeSettled(address indexed token, uint256 indexed optionId, uint256 amount, uint256 indexed payOff, uint256 endvalue);
     event minedHedge(uint256 optionId, address indexed miner, address indexed token, address indexed paired, uint256 tokenFee, uint256 baseFee);
     event bookmarkToggle(address indexed user, uint256 hedgeId, bool bookmarked);
-    event zapHedge(address indexed party, uint256 indexed hedgeId, uint256 zapAmount);
+    event zapHedge(address indexed party, uint256 indexed hedgeId, uint256 zapAmount, bool consent);
 
     constructor() public {
         IUniswapV2Router02 router = IUniswapV2Router02(UNISWAP_ROUTER_ADDRESS);
@@ -414,12 +414,21 @@ contract HEDGEFUND {
 
     // Zap Request & Accept function
     // any party can initiate & acceptor only matches amount
-    function zapHedge(uint _optionId, uint256 amount) public nonReentrant {
+    // Request can be incremented if untaken
+    function zapHedge(uint _optionId, uint _zapID, uint256 amount) public nonReentrant {
+        
+        require(!hedge.zapConsent, "request accepted already");
 
         hedgingOption storage hedge = hedgeMap[_optionId];
-        
+        require(msg.sender == hedge.owner || msg.sender == hedge.taker, "Invalid party to request");
+        bool requestAccept; 
+        if(zapMap[_zapID].amountWriter > 0 || zapMap_zap[_zapID].amountTaker > 0) {
+            requestAccept = true;
+        } else {
+            requestAccept = false;
+        }
+
         if(msg.sender == hedge.owner) {
-            require(!hedge.zapConsent, ")
             //topup underlying tokens
             require(getWithdrawableBalance(hedge.token, msg.sender) >= amount, "Insufficient token balance");
             //update lockedinuse
@@ -428,7 +437,6 @@ contract HEDGEFUND {
             userBalanceMap[hedge.token][msg.sender] = bal;
             //update hedge amount
             hedge.amount += amount;
-        
         }else {
             //topup base tokens
             require(getWithdrawableBalance(hedge.paired, msg.sender) >= amount, "Insufficient base balance");
@@ -439,14 +447,13 @@ contract HEDGEFUND {
             //update hedge cost
             hedge.cost += amount;
         }
-        
-        require(_optionId < optionID, "Invalid option ID");
-        
-        emit zapHedge(_optionId, amount, msg.sender);
+        emit zapHedge(_optionId, amount, msg.sender, requestAccept);
     }
 
     function cancelZapRequest(uint _optionId, uint _requestID) public {
-        
+        require(zapMap[_requestID].amountTaker == 0, "Request already accepted");
+        require(hedgeMap[_optionId].owner == msg.sender, "Only owner can cancel");
+        zapMap[_requestID].state = 2;
     }
     
     //Settlement 
