@@ -421,13 +421,14 @@ contract HEDGEFUND {
         require(msg.sender == hedge.owner || msg.sender == hedge.taker, "Invalid party to request");
 
         bool requestAccept; 
-        if(zapMap[_zapID].amountWriter > 0 || zapMap_zap[_zapID].amountTaker > 0) {
+        if (zapMap_zap[_zapID].amountTaker == 0) {
+            zapMap_zap[_zapID].amountTaker = amount;
             requestAccept = true;
         } else {
+            zapMap_zap[_zapID].amountWriter = amount;
             requestAccept = false;
         }
-
-        if(msg.sender == hedge.owner) {
+        if (msg.sender == hedge.owner) {
             //topup underlying tokens
             require(getWithdrawableBalance(hedge.token, msg.sender) >= amount, "Insufficient token balance");
             //update lockedinuse
@@ -436,7 +437,7 @@ contract HEDGEFUND {
             userBalanceMap[hedge.token][msg.sender] = bal;
             //update hedge amount
             hedge.amount += amount;
-        }else {
+        } else {
             //topup base tokens
             require(getWithdrawableBalance(hedge.paired, msg.sender) >= amount, "Insufficient base balance");
             //update lockedinuse
@@ -445,6 +446,11 @@ contract HEDGEFUND {
             userBalanceMap[hedge.paired][msg.sender] = bal;
             //update hedge cost
             hedge.cost += amount;
+        }
+        
+        if(requestAccept) {
+            hedge.zapConsent = true;
+        }else{
         }
         emit zapHedge(_optionId, amount, msg.sender, requestAccept);
     }
