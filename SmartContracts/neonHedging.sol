@@ -400,6 +400,27 @@ contract HEDGEFUND {
         emit hedgePurchased(hedge.token, _optionId, hedge.amount, hedge.hedgeType, msg.sender);
         locked = false;
     }
+
+    // Zap Request & Accept function
+    // any party can initiate & acceptor only matches amount
+    function zapHedge(uint _optionId, uint256 amount) public nonReentrant {
+
+        hedgingOption storage hedge = hedgeMap[_optionId];
+        userBalance storage stk = userBalanceMap[hedge.paired][msg.sender];
+        // check party
+        if(msg.sender == hedge.owner) {
+            //topup underlying tokens
+            require(getWithdrawableBalance(hedge.token, msg.sender) >= hedge.amount, "Insufficient token balance");
+
+        }else {
+            //topup base tokens
+            require(getWithdrawableBalance(hedge.paired, msg.sender) >= hedge.cost, "Insufficient base balance");
+
+        }
+        
+        require(_optionId < optionID && msg.sender != hedge.owner, "Invalid option ID | Owner cant buy");
+
+    }
     
     //Settlement 
     //value is calculated using 'getOptionValue' function
