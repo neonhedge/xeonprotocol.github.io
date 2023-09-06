@@ -2,50 +2,56 @@
 pragma solidity 0.8.4;
 
 // NEON Protocol - ERC20 based tools for hedging and lending.
-//Deposit, Withdraw ERC20 tokens
-//Get underlying value for tokens in WETH, USDT AND USDC
-//Create, Take Call Options, Put Options and Equity Swaps OTC
-//Settle trade in base or underlying value equivalent on maturity
-//Payout profits and fees to parties, protocol, miner
-//Distribute revenue or third party service stakes
-//Read hedging data storages; array lists, individual mappings and structs, collective mappings and variables
+// Deposit, Withdraw ERC20 tokens
+// Get underlying value for tokens in WETH, USDT AND USDC
+// Create, Take Call Options, Put Options and Equity Swaps OTC
+// Settle trade in base or underlying value equivalent on maturity
+// Payout profits and fees to parties, protocol, miner
+// Distribute revenue or third party service stakes
+// Read hedging data storages; array lists, individual mappings and structs, collective mappings and variables
 
-// Options Functionality
+//  Functionality targets
 //1. to receive any ERC20 token as collateral/underlying tokens
 //2. Price tokens in base currency via getUnderlyingValue
-//4. enable options writing using tokens as underlying assets
-//5. enable options buying in base currency for stipulated duration
+//4. enable hedge writing using tokens as underlying assets
+//5. enable hedge buying in base currency for stipulated duration
 //6. settlement based on price of assets in comparison to strike value & terms
-//7. payment and logging of proceeds, fees and commissions for protocol and parties involved
-//8. read smart contract data on wallet balances, hedge activity, revenue logs
+//7. allow settle-now or zap-topup consensus between parties during a deal
+//8. payment and logging of proceeds, fees and commissions for protocol and parties involved
+//9. read smart contract data on wallet balances, hedge activity, revenue logs
 
-//key functions
-// - value
+// key functions list
 // - deposit
 // - withdraw
-// - calculate fees
 // - get pair addresses of all erc20
+// - get underlying value of all erc20
+// - cashier fees calculation
 // - create hedge
 // - buy hedge
-// - settle hedge
-// - withdrawable versus locked
+// - settlement
+// - mine hedges / deals
+// - revenue and fees logging for all stakeholders
 // - get hedge details by id
-// - fetch hedges
+// - fetch hedges array; created, taken, settled
 
-//key dependencies
-// 1. getReserves Uniswap
+// key dependencies
+// 1. getReserves - Uniswap
+// 2. getPair - Uniswap
+// 3. getPairAddressZK - Custom
+// 4. getUnderlyingValue - Custom
 
-//dev guides
-// - addresses can deposit or withdraw tokens 
+//dev notes
+// - addresses can deposit or withdraw erc20 tokens 
 // - all tokens are treated as ERC20
 // - uniswap version 2 router is used in beta protocol
 // - deposits, lockedinuse and withdrawals track wallets balances
 // - lockedinuse is the current account (+-) on trades, and acts as escrow for each deal
 // - only base currencies :weth, usdt and usdc contract balance tracked
 // - getUnderlyingValue fetches value of tokens & returns base value & pair address
-// - unified writing, taking and settlement functions
+// - unified writing, taking and settlement functions for all hedge types
 // - each hedge is taxed upon settlement, in relevant tokens (base or underlying)
 // - contract taxes credited in mappings under address(this) and send out to staking/rewards contract
+// - optionID / optionId used loosely to refer to all hedge types: swaps, call, put
 
 import "./SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
@@ -67,8 +73,8 @@ contract HEDGEFUND {
         isExecuting = false;
     }
     modifier onlyOwner {
-      require(msg.sender == owner, "You are not the owner");
-      _;
+        require(msg.sender == owner, "You are not the owner");
+        _;
     }
     struct userBalance {
       uint256 deposited; // incremented on successful deposit
@@ -84,7 +90,7 @@ contract HEDGEFUND {
       address taker;
       address token;
       address paired;
-      uint status;//0 - none, 1 - created, 2 - taken, 3 - settled
+      uint status; //0 - none, 1 - created, 2 - taken, 3 - settled
       uint256 amount;
       uint256 createValue;
       uint256 startvalue;
@@ -95,6 +101,8 @@ contract HEDGEFUND {
       uint256 dt_expiry;
       uint256 dt_settled;
       HedgeType hedgeType;
+      bool zapConsent;
+      bool topupConsent;
     }
     enum HedgeType {CALL, PUT, SWAP}
 
@@ -395,7 +403,7 @@ contract HEDGEFUND {
     
     //Settlement 
     //value is calculated using 'getOptionValue' function
-    //strike value is determined by creator, thus pegging a strike price inherently. Start value is set when hedge is taken
+    //strike value is determined by writer, thus pegging a strike price inherently. Start value is set when hedge is taken
     //premium is cost and paid in base currency of underlying token
     //for swaps the cost is 100% equal value to underlying start value, this acts as collateral rather than hedge premium
     //the payoff (difference between start and strike value) is paid in underlying or base
@@ -432,6 +440,9 @@ contract HEDGEFUND {
         HedgeInfo memory hedgeInfo;
         require(_optionId < optionID, "Invalid option ID");
         hedgingOption storage option = hedgeMap[_optionId];
+
+        // 2 options; zap consensus  or expired
+        // zap consensus - check for zapconsent bool in hedge struct
         require(block.timestamp >= option.dt_expiry, "Option has not expired");
 
         // Initialize local variables
@@ -590,18 +601,15 @@ contract HEDGEFUND {
         }
         // Log analytics
         logAnalyticsFees(option.token, hedgeInfo.tokenFee, hedgeInfo.baseFee, hedgeInfo.tokensDue, option.cost, hedgeInfo.underlyingValue);
-        
         // Update hedge
         option.status = 3;
         option.endvalue = hedgeInfo.underlyingValue;
         option.dt_settled = block.timestamp;
-
         // catch new erc20 address so that wallet can log all underlying token balances credited to it
         // base addresses already caught on deposit by wallet
         if(hedgeInfo.tokensDue > 0 && hedgeInfo.newAddressFlag) {            
             userERC20s[option.taker].push(option.token);            
         }
-
         // Emit
         emit hedgeSettled(option.token, _optionId, option.amount, hedgeInfo.payOff, hedgeInfo.underlyingValue);
         emit minedHedge(_optionId, msg.sender, option.token, option.paired, hedgeInfo.tokenFee, hedgeInfo.baseFee);
@@ -629,6 +637,7 @@ contract HEDGEFUND {
         }
     }
 
+    // Fees
     function updateFee(uint256 numerator, uint256 denominator) onlyOwner public {
       feeNumerator = numerator;
       feeDenominator = denominator;
@@ -642,12 +651,12 @@ contract HEDGEFUND {
       return (fee);
     }
 
-    // Toggle a bookmark for a Hedge by its ID
+    // Toggle hedge bookmark using ID
     function bookmarkHedge(uint256 _optionId) public {
         bool bookmarked = bookmarks[msg.sender][_optionId];
         bookmarks[msg.sender][_optionId] = !bookmarked;
         emit bookmarkToggle(msg.sender, _optionId, !bookmarked);
-        // Update the bookmarkedOptions array for the user
+        // Update bookmarkedOptions array for wallet
         if (!bookmarked) {
             bookmarkedOptions[msg.sender].push(_optionId);
         } else {
@@ -689,8 +698,8 @@ contract HEDGEFUND {
         uint256 token1Decimals;
     }
     
-    //get base value for amount of tokens, or value in paired currency.
-    //base value is always the pair address of the token provided. get pair using UniswapV2 standard.
+    // get base value for amount of tokens, or value in paired currency.
+    // base value is always the pair address of the token provided. get pair using UniswapV2 standard.
     function getUnderlyingValue(address _tokenAddress, uint256 _tokenAmount) public view returns (uint256, address) {
         PairInfo memory pairInfo;
         (pairInfo.pairAddress, pairInfo.pairedCurrency) = getPairAddressZK(_tokenAddress);
@@ -712,14 +721,6 @@ contract HEDGEFUND {
             revert("Invalid token address");
         }
     }
-    
-    // balance of tokens on protocol
-    function getWithdrawableBalance(address token, address user) public view returns (uint256) {
-      userBalance memory uto = userBalanceMap[token][address(user)];
-      uint256 withdrawable = 0;
-      withdrawable = withdrawable.add(uto.deposited).sub(uto.withdrawn).sub(uto.lockedinuse);
-      return withdrawable;
-    }
 
     // zero knowledge pair addr generator
     function getPairAddressZK(address tokenAddress) public view returns (address pairAddress, address pairedCurrency) {
@@ -738,7 +739,16 @@ contract HEDGEFUND {
       }
     }
 
-    // Get token balances breakdown for wallet
+    
+    // Withdrawable token balance for wallet
+    function getWithdrawableBalance(address token, address user) public view returns (uint256) {
+      userBalance memory uto = userBalanceMap[token][address(user)];
+      uint256 withdrawable = 0;
+      withdrawable = withdrawable.add(uto.deposited).sub(uto.withdrawn).sub(uto.lockedinuse);
+      return withdrawable;
+    }
+
+    // Token balances breakdown for wallet
     function getuserTokenBalances (address token, address user) public view returns (uint256, uint256, uint256, uint256, uint256, address) {
       userBalance memory uto = userBalanceMap[address(token)][address(user)];
       uint256 deposited = uto.deposited;
