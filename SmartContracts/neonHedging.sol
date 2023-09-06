@@ -86,6 +86,9 @@ contract HEDGEFUND {
         uint256 withdrawn;
     }
     struct hedgingOption {
+        bool topupConsent;
+        bool zapTaker;
+        bool zapWriter;
         address owner;
         address taker;
         address token;
@@ -101,8 +104,6 @@ contract HEDGEFUND {
         uint256 dt_expiry;
         uint256 dt_settled;
         HedgeType hedgeType;
-        bool topupConsent;
-        bool topupConsent;
         uint256 [] topupRequests;
     }
     enum HedgeType {CALL, PUT, SWAP}
@@ -430,8 +431,7 @@ contract HEDGEFUND {
         } else {
             requestAccept = true;
             topupMap[topupRequestID].state = 1;
-        }        
-
+        }
         if (msg.sender == hedge.owner) {
             //topup underlying tokens
             require(getWithdrawableBalance(hedge.token, msg.sender) >= amount, "Insufficient token balance");
@@ -453,11 +453,9 @@ contract HEDGEFUND {
             hedge.cost += amount;
             topupMap[topupRequestID].amountTaker += amount;
         }
-        
         if(requestAccept) {
             hedge.topupConsent = true;
         }
-        
         emit topupHedge(_optionId, amount, msg.sender, requestAccept);
     }
 
@@ -474,6 +472,18 @@ contract HEDGEFUND {
         hedgingOption storage hedge = hedgeMap[_optionId];
         hedge.topupConsent = true;
         topupMap[_requestID].state = 2;
+    }
+
+    function zapRequest(uint _optionId) public {  
+        hedgingOption storage hedge = hedgeMap[_optionId];    
+        require(msg.sender == hedge.owner || msg.sender == hedge.taker, "Invalid party to request");
+        require(hedge.dt_started > block.timestamp, "Hedge has not started yet");
+        if(msg.sender == hedge.owner) {
+            hedge.zapWriter = true;
+        } else {
+            hedge.zapTaker = true;
+        }
+        emit zapRequest(_optionId, msg.sender);
     }
     
     //Settlement 
