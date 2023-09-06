@@ -16,7 +16,7 @@ pragma solidity 0.8.4;
 //4. enable hedge writing using tokens as underlying assets
 //5. enable hedge buying in base currency for stipulated duration
 //6. settlement based on price of assets in comparison to strike value & terms
-//7. allow settle-now or zap-topup consensus between parties during a deal
+//7. allow settle-now or topup-topup consensus between parties during a deal
 //8. payment and logging of proceeds, fees and commissions for protocol and parties involved
 //9. read smart contract data on wallet balances, hedge activity, revenue logs
 
@@ -101,9 +101,9 @@ contract HEDGEFUND {
         uint256 dt_expiry;
         uint256 dt_settled;
         HedgeType hedgeType;
-        bool zapConsent;
         bool topupConsent;
-        uint256 [] zapRequests;
+        bool topupConsent;
+        uint256 [] topupRequests;
     }
     enum HedgeType {CALL, PUT, SWAP}
 
@@ -112,7 +112,7 @@ contract HEDGEFUND {
         uint256 losses;
     }
 
-    struct zapZap {
+    struct topupData {
         uint256 amountWriter;
         uint256 amountTaker;
         uint state; // 0 - requested, 1 accepted, 2 rejected
@@ -133,8 +133,8 @@ contract HEDGEFUND {
     // mapping of all hedge storages by Id
     mapping(uint => hedgingOption) private hedgeMap;
 
-    // mapping zap requests 
-    mapping(uint => zapZap) public zapMap;
+    // mapping topup requests 
+    mapping(uint => topupData) public topupMap;
 
     // mapping of all hedges & swaps for each erc20
     mapping(address => uint[]) private tokenOptions;
@@ -186,7 +186,7 @@ contract HEDGEFUND {
     // global counters
     uint public optionID;
     uint public topupRequestIDuestID;
-    uint public zapRequestID;
+    uint public topupRequestID;
     
     // fee variables
     uint256 public feeNumerator;
@@ -220,7 +220,7 @@ contract HEDGEFUND {
     event hedgeSettled(address indexed token, uint256 indexed optionId, uint256 amount, uint256 indexed payOff, uint256 endvalue);
     event minedHedge(uint256 optionId, address indexed miner, address indexed token, address indexed paired, uint256 tokenFee, uint256 baseFee);
     event bookmarkToggle(address indexed user, uint256 hedgeId, bool bookmarked);
-    event zapHedge(address indexed party, uint256 indexed hedgeId, uint256 zapAmount, bool consent);
+    event topupHedge(address indexed party, uint256 indexed hedgeId, uint256 topupAmount, bool consent);
 
     constructor() public {
         IUniswapV2Router02 router = IUniswapV2Router02(UNISWAP_ROUTER_ADDRESS);
@@ -414,21 +414,22 @@ contract HEDGEFUND {
         locked = false;
     }
 
-    // Zap Request & Accept function
+    // topup Request & Accept function
     // any party can initiate & accepter only matches amount
     // Action is request (false) or accept (true)
     // Request amount can be incremented if not accepted yet
-    function zapHedge(uint _optionId, uint256 amount, bool action) public nonReentrant {
-        require(!hedge.zapConsent, "request accepted already");
+    function topupHedge(uint _optionId, uint256 amount, bool action) public nonReentrant {
+        require(!hedge.topupConsent, "request accepted already");
         hedgingOption storage hedge = hedgeMap[_optionId];
         require(msg.sender == hedge.owner || msg.sender == hedge.taker, "Invalid party to request");
 
         bool requestAccept; 
         if(!action) {
             topupRequestID += 1;
-            hedge.zapRequests.push(topupRequestID);
+            hedge.topupRequests.push(topupRequestID);
         } else {
             requestAccept = true;
+            topupMap[topupRequestID].state = 1;
         }        
 
         if (msg.sender == hedge.owner) {
@@ -440,7 +441,7 @@ contract HEDGEFUND {
             userBalanceMap[hedge.token][msg.sender] = bal;
             //update hedge amount
             hedge.amount += amount;
-            zapMap[topupRequestID].amountWriter += amount;
+            topupMap[topupRequestID].amountWriter += amount;
         } else {
             //topup base tokens
             require(getWithdrawableBalance(hedge.paired, msg.sender) >= amount, "Insufficient base balance");
@@ -450,20 +451,29 @@ contract HEDGEFUND {
             userBalanceMap[hedge.paired][msg.sender] = bal;
             //update hedge cost
             hedge.cost += amount;
-            zapMap[topupRequestID].amountTaker += amount;
+            topupMap[topupRequestID].amountTaker += amount;
         }
         
         if(requestAccept) {
-            hedge.zapConsent = true;
+            hedge.topupConsent = true;
         }
         
-        emit zapHedge(_optionId, amount, msg.sender, requestAccept);
+        emit topupHedge(_optionId, amount, msg.sender, requestAccept);
     }
 
-    function cancelZapRequest(uint _optionId, uint _requestID) public {
-        require(zapMap[_requestID].amountTaker == 0, "Request already accepted");
+    function rejectTopupRequest(uint _optionId, uint _requestID) public {
+        require(topupMap[_requestID].state == 0, "Request already accepted or rejected");
+        hedgingOption storage hedge = hedgeMap[_optionId];
+        hedge.topupConsent = true;
+        topupMap[_requestID].state = 2;
+    }
+
+    function cancelTopupRequest(uint _optionId, uint _requestID) public {
+        require(topupMap[_requestID].amountTaker == 0, "Request already accepted");
         require(hedgeMap[_optionId].owner == msg.sender, "Only owner can cancel");
-        zapMap[_requestID].state = 2;
+        hedgingOption storage hedge = hedgeMap[_optionId];
+        hedge.topupConsent = true;
+        topupMap[_requestID].state = 2;
     }
     
     //Settlement 
@@ -506,8 +516,8 @@ contract HEDGEFUND {
         require(_optionId < optionID, "Invalid option ID");
         hedgingOption storage option = hedgeMap[_optionId];
 
-        // 2 options; zap consensus  or expired
-        // zap consensus - check for zapconsent bool in hedge struct
+        // 2 options; topup consensus  or expired
+        // topup consensus - check for topupconsent bool in hedge struct
         require(block.timestamp >= option.dt_expiry, "Option has not expired");
 
         // Initialize local variables
