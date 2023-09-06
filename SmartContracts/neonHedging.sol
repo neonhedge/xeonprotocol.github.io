@@ -416,11 +416,10 @@ contract HEDGEFUND {
     // any party can initiate & acceptor only matches amount
     // Request can be incremented if untaken
     function zapHedge(uint _optionId, uint _zapID, uint256 amount) public nonReentrant {
-        
         require(!hedge.zapConsent, "request accepted already");
-
         hedgingOption storage hedge = hedgeMap[_optionId];
         require(msg.sender == hedge.owner || msg.sender == hedge.taker, "Invalid party to request");
+
         bool requestAccept; 
         if(zapMap[_zapID].amountWriter > 0 || zapMap_zap[_zapID].amountTaker > 0) {
             requestAccept = true;
