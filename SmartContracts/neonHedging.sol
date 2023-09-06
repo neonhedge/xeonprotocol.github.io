@@ -185,6 +185,8 @@ contract HEDGEFUND {
     
     // global counters
     uint public optionID;
+    uint public topupRequestIDuestID;
+    uint public zapRequestID;
     
     // fee variables
     uint256 public feeNumerator;
@@ -413,21 +415,22 @@ contract HEDGEFUND {
     }
 
     // Zap Request & Accept function
-    // any party can initiate & acceptor only matches amount
-    // Request can be incremented if untaken
-    function zapHedge(uint _optionId, uint _zapID, uint256 amount) public nonReentrant {
+    // any party can initiate & accepter only matches amount
+    // Action is request (false) or accept (true)
+    // Request amount can be incremented if not accepted yet
+    function zapHedge(uint _optionId, uint256 amount, bool action) public nonReentrant {
         require(!hedge.zapConsent, "request accepted already");
         hedgingOption storage hedge = hedgeMap[_optionId];
         require(msg.sender == hedge.owner || msg.sender == hedge.taker, "Invalid party to request");
 
         bool requestAccept; 
-        if (zapMap_zap[_zapID].amountTaker == 0) {
-            zapMap_zap[_zapID].amountTaker = amount;
-            requestAccept = true;
+        if(!action) {
+            topupRequestID += 1;
+            hedge.zapRequests.push(topupRequestID);
         } else {
-            zapMap_zap[_zapID].amountWriter = amount;
-            requestAccept = false;
-        }
+            requestAccept = true;
+        }        
+
         if (msg.sender == hedge.owner) {
             //topup underlying tokens
             require(getWithdrawableBalance(hedge.token, msg.sender) >= amount, "Insufficient token balance");
@@ -437,6 +440,7 @@ contract HEDGEFUND {
             userBalanceMap[hedge.token][msg.sender] = bal;
             //update hedge amount
             hedge.amount += amount;
+            zapMap[topupRequestID].amountWriter += amount;
         } else {
             //topup base tokens
             require(getWithdrawableBalance(hedge.paired, msg.sender) >= amount, "Insufficient base balance");
@@ -446,12 +450,13 @@ contract HEDGEFUND {
             userBalanceMap[hedge.paired][msg.sender] = bal;
             //update hedge cost
             hedge.cost += amount;
+            zapMap[topupRequestID].amountTaker += amount;
         }
         
         if(requestAccept) {
             hedge.zapConsent = true;
-        }else{
         }
+        
         emit zapHedge(_optionId, amount, msg.sender, requestAccept);
     }
 
