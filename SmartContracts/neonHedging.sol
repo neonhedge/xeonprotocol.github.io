@@ -77,32 +77,33 @@ contract HEDGEFUND {
         _;
     }
     struct userBalance {
-      uint256 deposited; // incremented on successful deposit
-      uint256 withdrawn; // incremented on successful withdrawal
-      uint256 lockedinuse; // adjust on deal creation or buy or settle
+        uint256 deposited; // incremented on successful deposit
+        uint256 withdrawn; // incremented on successful withdrawal
+        uint256 lockedinuse; // adjust on deal creation or buy or settle
     }
     struct contractBalance {
-      uint256 deposited;
-      uint256 withdrawn;
+        uint256 deposited;
+        uint256 withdrawn;
     }
-    struct hedgingOption{
-      address owner;
-      address taker;
-      address token;
-      address paired;
-      uint status; //0 - none, 1 - created, 2 - taken, 3 - settled
-      uint256 amount;
-      uint256 createValue;
-      uint256 startvalue;
-      uint256 endvalue;
-      uint256 cost;
-      uint256 dt_created;
-      uint256 dt_started;
-      uint256 dt_expiry;
-      uint256 dt_settled;
-      HedgeType hedgeType;
-      bool zapConsent;
-      bool topupConsent;
+    struct hedgingOption {
+        address owner;
+        address taker;
+        address token;
+        address paired;
+        uint status; //0 - none, 1 - created, 2 - taken, 3 - settled
+        uint256 amount;
+        uint256 createValue;
+        uint256 startvalue;
+        uint256 endvalue;
+        uint256 cost;
+        uint256 dt_created;
+        uint256 dt_started;
+        uint256 dt_expiry;
+        uint256 dt_settled;
+        HedgeType hedgeType;
+        bool zapConsent;
+        bool topupConsent;
+        uint256 [] zapRequests;
     }
     enum HedgeType {CALL, PUT, SWAP}
 
@@ -111,20 +112,29 @@ contract HEDGEFUND {
         uint256 losses;
     }
 
+    struct zapZap {
+        uint256 amountWriter;
+        uint256 amountTaker;
+        uint state; // 0 - requested, 1 accepted, 2 rejected
+    }
+
     // mapping of wallet token balances [token][user]
     mapping(address => mapping(address => userBalance)) private userBalanceMap;
 
-    // mapping of wallet profit & loss [pair][user]
-    mapping(address => mapping(address => userPL)) private userPLMap;
-
     //mapping of user-hedge-Ids array for each erc20 token
     mapping(address => mapping(address => uint[])) private userHedgesForTokenMap;
+
+    // mapping of wallet profit & loss [pair][user]
+    mapping(address => mapping(address => userPL)) private userPLMap;
 
     // track all erc20 deposits and withdrawals to contract
     mapping(address => contractBalance) public protocolBalanceMap;
 
     // mapping of all hedge storages by Id
     mapping(uint => hedgingOption) private hedgeMap;
+
+    // mapping zap requests 
+    mapping(uint => zapZap) public zapMap;
 
     // mapping of all hedges & swaps for each erc20
     mapping(address => uint[]) private tokenOptions;
@@ -208,6 +218,7 @@ contract HEDGEFUND {
     event hedgeSettled(address indexed token, uint256 indexed optionId, uint256 amount, uint256 indexed payOff, uint256 endvalue);
     event minedHedge(uint256 optionId, address indexed miner, address indexed token, address indexed paired, uint256 tokenFee, uint256 baseFee);
     event bookmarkToggle(address indexed user, uint256 hedgeId, bool bookmarked);
+    event zapHedge(address indexed party, uint256 indexed hedgeId, uint256 zapAmount);
 
     constructor() public {
         IUniswapV2Router02 router = IUniswapV2Router02(UNISWAP_ROUTER_ADDRESS);
@@ -408,7 +419,7 @@ contract HEDGEFUND {
         hedgingOption storage hedge = hedgeMap[_optionId];
         
         if(msg.sender == hedge.owner) {
-            require(hedge.)
+            require(!hedge.zapConsent, ")
             //topup underlying tokens
             require(getWithdrawableBalance(hedge.token, msg.sender) >= amount, "Insufficient token balance");
             //update lockedinuse
@@ -429,11 +440,13 @@ contract HEDGEFUND {
             hedge.cost += amount;
         }
         
-        require(_optionId < optionID && msg.sender != hedge.owner, "Invalid option ID | Owner cant buy");
-        // emit event for zap including parties and amounts
+        require(_optionId < optionID, "Invalid option ID");
+        
         emit zapHedge(_optionId, amount, msg.sender);
+    }
 
-
+    function cancelZapRequest(uint _optionId, uint _requestID) public {
+        
     }
     
     //Settlement 
