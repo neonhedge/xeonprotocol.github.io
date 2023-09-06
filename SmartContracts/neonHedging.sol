@@ -222,6 +222,7 @@ contract HEDGEFUND {
     event minedHedge(uint256 optionId, address indexed miner, address indexed token, address indexed paired, uint256 tokenFee, uint256 baseFee);
     event bookmarkToggle(address indexed user, uint256 hedgeId, bool bookmarked);
     event topupHedge(address indexed party, uint256 indexed hedgeId, uint256 topupAmount, bool consent);
+    event zapRequest(uint indexed hedgeId, address indexed party);
 
     constructor() public {
         IUniswapV2Router02 router = IUniswapV2Router02(UNISWAP_ROUTER_ADDRESS);
