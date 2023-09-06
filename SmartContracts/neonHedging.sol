@@ -357,7 +357,7 @@ contract HEDGEFUND {
        
         // Calculate, check and update start value based on the hedge type
         (hedge.startvalue, ) = getUnderlyingValue(hedge.token, hedge.amount);
-        if (hedge.hedgeType == HedgeType.CALL) {
+        if (hedge.hedgeType == HedgeType.SWAP) {
             hedge.startvalue += hedge.cost;
         }
         require(hedge.startvalue > 0, "Math error whilst getting price");
@@ -408,25 +408,31 @@ contract HEDGEFUND {
         hedgingOption storage hedge = hedgeMap[_optionId];
         
         if(msg.sender == hedge.owner) {
+            require(hedge.)
             //topup underlying tokens
-            require(getWithdrawableBalance(hedge.token, msg.sender) >= hedge.amount, "Insufficient token balance");
+            require(getWithdrawableBalance(hedge.token, msg.sender) >= amount, "Insufficient token balance");
             //update lockedinuse
             userBalance storage bal = userBalanceMap[hedge.token][msg.sender];
             bal.lockedinuse = bal.lockedinuse.add(hedge.cost);
-            userBalanceMap[hedge.paired][msg.sender] = bal;
+            userBalanceMap[hedge.token][msg.sender] = bal;
             //update hedge amount
-
+            hedge.amount += amount;
+        
         }else {
             //topup base tokens
-            require(getWithdrawableBalance(hedge.paired, msg.sender) >= hedge.cost, "Insufficient base balance");
+            require(getWithdrawableBalance(hedge.paired, msg.sender) >= amount, "Insufficient base balance");
             //update lockedinuse
             userBalance storage bal = userBalanceMap[hedge.paired][msg.sender];
             bal.lockedinuse = bal.lockedinuse.add(hedge.cost);
             userBalanceMap[hedge.paired][msg.sender] = bal;
             //update hedge cost
+            hedge.cost += amount;
         }
         
         require(_optionId < optionID && msg.sender != hedge.owner, "Invalid option ID | Owner cant buy");
+        // emit event for zap including parties and amounts
+        emit zapHedge(_optionId, amount, msg.sender);
+
 
     }
     
