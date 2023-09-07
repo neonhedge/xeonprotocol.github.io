@@ -527,9 +527,8 @@ contract HEDGEFUND {
         require(_optionId < optionID, "Invalid option ID");
         hedgingOption storage option = hedgeMap[_optionId];
 
-        // 2 options; topup consensus  or expired
-        // topup consensus - check for topupconsent bool in hedge struct
-        require(block.timestamp >= option.dt_expiry, "Option has not expired");
+        // Check if either zapWriter or zapTaker flags are true, or if the hedge has expired
+        require(option.zapWriter || option.zapTaker || block.timestamp >= option.dt_expiry, "Hedge cannot be settled yet");
 
         // Initialize local variables
         hedgeInfo.startValue = option.startvalue;
