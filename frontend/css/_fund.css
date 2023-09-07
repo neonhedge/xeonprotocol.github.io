@@ -57,7 +57,7 @@ main {
     margin:2vw auto;
     width: 100%;
     font-family: "Space Grotesk", sans-serif !important;
-	  font-size: clamp(14px, 1vw, 16px) !important;
+	  font-size: clamp(13px, 1vw, 14px) !important;
     font-weight: 600;
     text-align: center;
     color: rgba(255, 255, 255, 0.8); 
@@ -177,7 +177,7 @@ hr.line {
 }
 
 .grid-sect-title{
-	font-size: clamp(16px, 1vw, 20px);
+	font-size: clamp(15px, 1vw, 16px);
 	color:#FFF;
 	line-height: 1;
 }
@@ -275,12 +275,12 @@ hr.line {
   border-radius: 5px;
   line-height: 1.5;
   font-family: 'modeseven', 'bitwise', sans-serif, "Helvetica Neue", Helvetica, Arial;
-  font-size: clamp(14px, 2vw, 17px);
+  font-size: clamp(14px, 1vw, 16px);
   padding: 1vw;
   box-sizing: border-box;
   background: radial-gradient(#000327e5 0%, #1d1f56 100%) !important;
   background-color: rgba(0, 0, 0, 0);
-  background-image: radial-gradient(#18142d, #1d1f56 100%) !important);
+  background-image: radial-gradient(#18142d, #1d1f56 100%) !important;
   color: #EEE;
 }
 
@@ -577,7 +577,7 @@ hr.line {
 }
 
 .progressSect h5, .gainsSect h5 {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: bold;
   /* color: #188dd6; */
   text-align: center;
@@ -762,14 +762,11 @@ font-size: clamp(12.2px, 1vw, 13.5px);
 }
 
 #refreshButton {
-  padding:6px;
   margin:2px auto;
   border-radius: 5px;
   border: 1px solid #3399ff;
   border: none;
   cursor: pointer;
-  font-size: clamp(14px, 1vw, 15px);
-  color:#FFF;
   color: #08e7fe;
   display: flex;
   justify-content: space-between;
