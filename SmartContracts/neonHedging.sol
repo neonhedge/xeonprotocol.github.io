@@ -849,6 +849,17 @@ contract HEDGEFUND {
       return (deposited, withdrawn, lockedinuse, withdrawableBalance, withdrawableValue, paired);
     }
     
+    // Internal function to retrieve a subset of an array based on startIndex and limit
+    function getSubset(uint[] storage fullArray, uint startIndex, uint limit) internal view returns (uint[] memory) {
+        uint length = fullArray.length;
+        require(startIndex < length, "Invalid start index");
+        uint actualLimit = length - startIndex < limit ? length - startIndex : limit;
+        uint[] memory subset = new uint[](actualLimit);
+        for (uint i = startIndex; i < startIndex + actualLimit; i++) {
+            subset[i - startIndex] = fullArray[i];
+        }
+        return subset;
+    }
     /*user's erc20 history deposited and traded, targeted search
     ~ user is the address of the user whose history is being searched in the userERC20s mapping. 
     ~ startIndex is used to specify the starting index in the tokens array for the user, 
