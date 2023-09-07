@@ -357,6 +357,8 @@ iframe {
 .introductionHold p{
   font-size: clamp(24px, 5vw, 34px);
   max-width: 550px;
+  font-size: clamp(27px, 6vw, 37px);
+  max-width: 600px;
 }
 .introductionHold small{
   box-sizing: content-box;
@@ -818,7 +820,8 @@ section.cta .container {
   gap: 2rem;
 }
 .introductionHold p{
-  line-height: 1 !important;
+  line-height: 1;
+  line-height: unset !important;
   background-color: rgba(0,0,0,0.5);
   border-radius: 2vw;
 }
