@@ -1174,6 +1174,9 @@ section.er404 {
   padding: 1.2vw 3vw;
   box-sizing: border-box;
 }
+.usecase h3{
+  margin-bottom: 1vw;
+}
 .usecaseCont {
   margin-top:60px;
 }
@@ -1221,7 +1224,7 @@ section.er404 {
   margin:2vw auto;
   width: 100%;
   max-width: 900px;
-  font-size: clamp(15px, 2vw, 16px) !important;
+  font-size: clamp(14px, 1vw, 15px) !important;
   color: #FFF;
   text-align: justify;
 }
@@ -1397,7 +1400,7 @@ section.er404 {
 .heading_right {
   color: #FFF;
   line-height: 30px;
-  font-size: clamp(14px, 2vw, 15px);
+  font-size: clamp(14px, 1vw, 14px);
   padding-top: 5px;
   box-sizing: border-box;
 }
