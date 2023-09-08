@@ -2005,6 +2005,15 @@ footer .container li a:hover {
 }
 .badgeLeft {
   margin-top:-5vw;
+  /* delete everything below to top:-10vw; for original flow */
+  margin-top: unset;
+  position: relative;
+}
+.badgeLeft a.footermaskot{
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -10vw;
 }
 /*--------------------------------------------------------*/
 /*	11. MODALS */
