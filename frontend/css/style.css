@@ -44,6 +44,7 @@ html {
   scrollbar-width: thin;
   scrollbar-color: #188dd6 #040115;
   scroll-behavior: smooth;
+  background-color: #070114;
 }
 
 img {
