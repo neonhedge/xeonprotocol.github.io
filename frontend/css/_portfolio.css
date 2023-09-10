@@ -1686,6 +1686,11 @@ hr.line {
 		font-size: 1rem;
 	}
 }
+
+.rewClaimed {
+	align-items: flex-start;
+  	row-gap: 1rem;
+}
   /*=======================
   		LIQUIDITY MINING 
 =============================*/
