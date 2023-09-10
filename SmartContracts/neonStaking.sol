@@ -60,7 +60,10 @@ contract StakingContract is Ownable {
 
     function stake(uint256 _amount) external stakingWindow {
         require(_amount > 0, "Staked amount must be greater than zero.");
-        require(stakers[msg.sender].amount == 0, "You can only stake once at a time.");
+        //require(stakers[msg.sender].amount == 0, "You can only stake once at a time.");
+        
+        //check users allowances on native token
+        require(stakingToken.allowance(msg.sender, address(this)) >= _amount, "Insufficient allowance");
 
         stakingToken.transferFrom(msg.sender, address(this), _amount);
 
