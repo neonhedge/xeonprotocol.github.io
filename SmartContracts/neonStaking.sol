@@ -205,38 +205,38 @@ contract StakingContract is Ownable {
         emit RewardClaimed(msg.sender, collateralRewardShare, 3);
     }
 
-    function getRewardsDue() external view returns (uint256) {
-        Staker storage staker = stakers[msg.sender];
+    function getRewardsDue(address stakerAddress) external view returns (uint256) {
+        Staker storage staker = stakers[stakerAddress];
 
         if (staker.amount == 0) {
             return 0;
         }
 
-        uint256 ethChange = ethRewardBasis - lastRewardBasis[msg.sender];
+        uint256 ethChange = ethRewardBasis - lastRewardBasis[stakerAddress];
         uint256 stakerRewardShare = ethChange.mul(staker.amount).div(getTotalStaked());
         return stakerRewardShare;
     }
 
-    function getLiquidityRewardsDue() external view returns (uint256) {
-        Staker storage staker = stakers[msg.sender];
+    function getLiquidityRewardsDue(address stakerAddress) external view returns (uint256) {
+        Staker storage staker = stakers[stakerAddress];
 
         if (staker.assignedForLiquidity == 0) {
             return 0;
         }
 
-        uint256 ethChange = ethLiquidityRewardBasis - lastLiquidityRewardBasis[msg.sender];
+        uint256 ethChange = ethLiquidityRewardBasis - lastLiquidityRewardBasis[stakerAddress];
         uint256 liquidityRewardShare = ethChange.mul(staker.assignedForLiquidity).div(totalAssignedForLiquidity);
         return liquidityRewardShare;
     }
 
-    function getCollateralRewardsDue() external view returns (uint256) {
-        Staker storage staker = stakers[msg.sender];
+    function getCollateralRewardsDue(address stakerAddress) external view returns (uint256) {
+        Staker storage staker = stakers[stakerAddress];
 
         if (staker.assignedForCollateral == 0) {
             return 0;
         }
 
-        uint256 ethChange = ethCollateralRewardBasis - lastCollateralRewardBasis[msg.sender];
+        uint256 ethChange = ethCollateralRewardBasis - lastCollateralRewardBasis[stakerAddress];
         uint256 collateralRewardShare = ethChange.mul(staker.assignedForCollateral).div(totalAssignedForCollateral);
         return collateralRewardShare;
     }
