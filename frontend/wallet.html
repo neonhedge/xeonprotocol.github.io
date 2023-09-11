@@ -143,7 +143,7 @@
 											<div class="volume-bar blue"></div>
 											<div class="volume-bar green"></div>
 										</div>
-										<div id="walletBalance" class="volume-count green-value">5,000,000</div>
+										<div id="walletBalance" class="volume-count value-green">5,000,000</div>
 									</div>
 								</div>
 							
@@ -863,7 +863,7 @@
 										<span id="rewardAmount" class="green-amount">17 ETH</span> (<span id="rewardValue" class="green-value">$30,000</span>)
 									</div>
 								</div>
-								<button class="claim-button" disabled=""><span>Claim</span></button>
+								<button class="claim-button"><span>Claim</span></button>
 							</div>
 							<hr class="line">
 							<div class="grid grid-cols-2 stakeBlock">
@@ -873,7 +873,7 @@
 										<span id="rewardAmount" class="green-amount">2 ETH</span> (<span id="rewardValue" class="green-value">$3,000</span>)
 									</div>
 								</div>
-								<button class="claim-button" disabled=""><span>Claim</span></button>
+								<button class="claim-button"><span>Claim</span></button>
 							</div>
 							<hr class="line">
 							<div class="grid grid-cols-2 stakeBlock">
@@ -883,17 +883,17 @@
 										<span id="rewardAmount" class="green-amount">1 ETH</span> (<span id="rewardValue" class="green-value">$2,000</span>)
 									</div>
 								</div>
-								<button class="claim-button" disabled=""><span>Claim</span></button>
+								<button class="claim-button"><span>Claim</span></button>
 							</div>
 							<hr class="line">
 							<div class="grid grid-cols-2 stakeBlock">
 								<div class="flex flex-col">
 									<div class="grid-sect-subtitle">Hedge Mining Commission</div>
 									<div class="grid-sect-subtitle-value">
-										<span id="rewardAmount" class="green-amount">1 ETH</span> (<span id="rewardValue" class="green-value">$2,000</span>)
+										<span id="rewardAmount" class="green-amount"><span id="rewardValue" class="green-value">* auto claim</span>
 									</div>
 								</div>
-								<button class="claim-button" disabled=""><span>Claim</span></button>
+								<button class="claim-button" disabled="true"><span>Claim</span></button>
 							</div>
 						</div>
 						<div class="rewClaimed flex flex-col gap-5">
@@ -909,22 +909,25 @@
 									<span id="rewardAmount" class="green-amount">2 ETH</span> (<span id="rewardValue" class="green-value">$3,000</span>)
 								</div>
 							</div>
+							<hr class="line">
 							<div class="flex flex-col gap-1">
 								<div class="grid-sect-subtitle">from Native Lending Collateral</div>
 								<div class="grid-sect-subtitle-value">
 									<span id="rewardAmount" class="green-amount">1 ETH</span> (<span id="rewardValue" class="green-value">$1,000</span>)
 								</div>
 							</div>
+							<hr class="line">
 							<div class="flex flex-col gap-1">
 								<div class="grid-sect-subtitle">from Native Hedge Liquidity</div>
 								<div class="grid-sect-subtitle-value">
 									<span id="rewardAmount" class="green-amount">3 ETH</span> (<span id="rewardValue" class="green-value">$6,000</span>)
 								</div>
 							</div>
+							<hr class="line">
 							<div class="flex flex-col gap-1">
 								<div class="grid-sect-subtitle">from Mining Hedges</div>
 								<div class="grid-sect-subtitle-value">
-									<span id="rewardAmount" class="green-amount">2 ETH</span> (<span id="rewardValue" class="green-value">$3,000</span>)
+									<span id="rewardValue" class="green-value">generate total commission earned.. <div class="hedge-i-cat"><button class="hedgeTxBtn">fetch</button></div></span>
 								</div>
 							</div>
 						</div>

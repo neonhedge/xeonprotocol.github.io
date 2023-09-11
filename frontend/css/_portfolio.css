@@ -372,7 +372,7 @@ body{
 	justify-content: right !important;
   }
   
-  .green-value {
+  .value-green {
 	color:#33856b;
 	padding-inline-end: 1vw;
   }
@@ -1518,6 +1518,16 @@ hr.line {
 	border: 1px solid #3399ff;
 	background: linear-gradient(220deg, #39f, #110f47 80%);
 }
+button:disabled {
+	opacity: 0.6; 
+	background-color: #110f47;
+	cursor: not-allowed; 
+}
+button:disabled:hover {
+	background-color: #0a092f;
+}
+  
+  
 /* ===================
 	STAKING WIDGET
 =====================*/
