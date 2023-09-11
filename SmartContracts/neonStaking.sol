@@ -32,6 +32,9 @@ contract StakingContract is Ownable {
     mapping(address => uint256) public lastRewardBasis;
     mapping(address => uint256) public lastLiquidityRewardBasis;
     mapping(address => uint256) public lastCollateralRewardBasis;
+    mapping(address => uint256) public stakerRewardsClaimed;
+    mapping(address => uint256) public stakerLiquidityClaimed;
+    mapping(address => uint256) public stakerCollateralClaimed;
 
     event Staked(address indexed staker, uint256 amount);
     event Unstaked(address indexed staker, uint256 amount);
@@ -169,6 +172,7 @@ contract StakingContract is Ownable {
 
         staker.lastClaimedDay = rewardDistributionDay;
         lastRewardBasis[msg.sender] = ethRewardBasis;
+        stakerRewardsClaimed[msg.sender] = stakerRewardShare;
 
         payable(msg.sender).transfer(stakerRewardShare);
 
@@ -184,6 +188,7 @@ contract StakingContract is Ownable {
 
         staker.lastClaimedDay = block.timestamp;
         lastLiquidityRewardBasis[msg.sender] = ethLiquidityRewardBasis;
+        stakerLiquidityClaimed[msg.sender] = liquidityRewardShare;
 
         payable(msg.sender).transfer(liquidityRewardShare);
 
@@ -199,11 +204,13 @@ contract StakingContract is Ownable {
 
         staker.lastClaimedDay = block.timestamp;
         lastCollateralRewardBasis[msg.sender] = ethCollateralRewardBasis;
+        stakerCollateralClaimed[msg.sender] = collateralRewardShare;
 
         payable(msg.sender).transfer(collateralRewardShare);
 
         emit RewardClaimed(msg.sender, collateralRewardShare, 3);
     }
+    /* make a rewards claimed tracking for each staker */
 
     function getRewardsDue(address stakerAddress) external view returns (uint256) {
         Staker storage staker = stakers[stakerAddress];
