@@ -518,25 +518,33 @@
                         <div class="stakeGrids flex flex-col gap-4">
                             <div class="stakeDataRow flex items-center justify-between gap-2">
                                 <div class="grid-sect-title">Staked Supply</div>
-                                <div class="grid-sect-title" style="color:#33856b !important;">0 ($0)</div>
+                                <div class="grid-sect-title" style="color:#33856b !important;">
+                                    <span id="stakedAmount" class="amount">0</span> (<span id="stakedValue" class="value">$0</span>)
+                                </div>
                             </div>
     
                             <hr class="line">
                             <div class="stakeDataRow flex items-center justify-between gap-2">
                                 <div class="grid-sect-title">Circulating Supply</div>
-                                <div class="grid-sect-title" style="color:#33856b !important;">0 ($0)</div>
+                                <div class="grid-sect-title" style="color:#33856b !important;">
+                                    <span id="circAmount" class="amount">0</span> (<span id="circValue" class="value">$0</span>)
+                                </div>
                             </div>
                             
                             <hr class="line">
                             <div class="stakeDataRow flex items-center justify-between gap-2">
                                 <div class="grid-sect-title">Staking Cycles</div>
-                                <div class="grid-sect-title" style="color:#33856b !important;">30 Days</div>
+                                <div class="grid-sect-title" style="color:#33856b !important;">
+                                    <span id="stakeCycle" class="amount">0</span>
+                                </div>
                             </div>
 
                             <hr class="line">
                             <div class="stakeDataRow flex items-center justify-between gap-2">
                                 <div class="grid-sect-title">Total Stakers</div>
-                                <div class="grid-sect-title" style="color:#33856b !important;">2</div>
+                                <div class="grid-sect-title" style="color:#33856b !important;">
+                                    <span id="stakersCount" class="amount">0</span>
+                                </div>
                             </div>
                         </div><!-- stakeGrids -->
                     </div><!-- staking-summary-grid -->
