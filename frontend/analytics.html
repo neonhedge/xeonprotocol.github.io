@@ -516,34 +516,34 @@
                 <div class="trafficStats">
                     <div class="staking-summary-grid grid grid-cols-2 gap-5">
                         <div class="stakeGrids flex flex-col gap-4">
-                            <div class="stakeDataRow flex items-center justify-between gap-2">
+                            <div class="stakeDataRow flex justify-between gap-2">
                                 <div class="grid-sect-title">Staked Supply</div>
                                 <div class="grid-sect-title" style="color:#33856b !important;">
-                                    <span id="stakedAmount" class="amount">0</span> (<span id="stakedValue" class="value">$0</span>)
+                                    <span id="stakedAmount" class="green-amount">80,000,000</span> (<span id="stakedValue" class="green-value">$700,000</span>)
                                 </div>
                             </div>
     
                             <hr class="line">
-                            <div class="stakeDataRow flex items-center justify-between gap-2">
+                            <div class="stakeDataRow flex justify-between gap-2">
                                 <div class="grid-sect-title">Circulating Supply</div>
                                 <div class="grid-sect-title" style="color:#33856b !important;">
-                                    <span id="circAmount" class="amount">0</span> (<span id="circValue" class="value">$0</span>)
+                                    <span id="circAmount" class="green-amount">300,000,000</span> (<span id="circValue" class="green-value">$3,000,000</span>)
                                 </div>
                             </div>
                             
                             <hr class="line">
-                            <div class="stakeDataRow flex items-center justify-between gap-2">
+                            <div class="stakeDataRow flex justify-between gap-2">
                                 <div class="grid-sect-title">Staking Cycles</div>
                                 <div class="grid-sect-title" style="color:#33856b !important;">
-                                    <span id="stakeCycle" class="amount">0</span>
+                                    <span id="stakeCycle" class="green-amount">30 Days</span>
                                 </div>
                             </div>
 
                             <hr class="line">
-                            <div class="stakeDataRow flex items-center justify-between gap-2">
+                            <div class="stakeDataRow flex justify-between gap-2">
                                 <div class="grid-sect-title">Total Stakers</div>
                                 <div class="grid-sect-title" style="color:#33856b !important;">
-                                    <span id="stakersCount" class="amount">0</span>
+                                    <span id="stakersCount" class="green-amount">800</span>
                                 </div>
                             </div>
                         </div><!-- stakeGrids -->
@@ -561,8 +561,8 @@
                     <!-- <div class="icon"><i class="fas fa-coins"></i></div> -->
                     <span class="sectionLabel aplAssignments">Stake Assignment Pools</span>
                 </div>
-                <div class="assignments-grid grid grid-cols-2 gap-5">
-                    <div class="stakeGrids flex flex-col gap-4">
+                <div class="assignments-grid">
+                    <div class="assignGrids staking-summary-grid grid grid-cols-2 gap-5">
                         <!--
                         <div class="stakeDataRow flex items-center justify-between gap-2">
                             <div class="grid-sect-title">Total Staked NEON</div>
@@ -570,29 +570,37 @@
                         </div>
 
                         <hr class="line">
-                    -->
+                        -->
                         <div class="stakeDataRow flex items-center justify-between gap-2">
                             <div class="grid-sect-title">Assigned Stakes</div>
-                            <div class="grid-sect-title" style="color:#33856b !important;">0 ($0)</div>
+                            <div class="grid-sect-title" style="color:#33856b !important;">
+                                <span id="circAmount" class="green-amount">10,000,000</span> (<span id="circValue" class="green-value">$300,000</span>)
+                            </div>
                         </div>
                         
                         <hr class="line">
                         <div class="stakeDataRow flex items-center justify-between gap-2">
                             <div class="grid-sect-title">Unassigned Stakes</div>
-                            <div class="grid-sect-title" style="color:#33856b !important;">0 ($0)</div>
+                            <div class="grid-sect-title" style="color:#33856b !important;">
+                                <span id="circAmount" class="green-amount">290,000,000</span> (<span id="circValue" class="green-value">$2,700,000</span>)
+                            </div>
                         </div>
 
                         <hr class="line">
                         <div class="stakeDataRow flex items-center justify-between gap-2">
                             <div class="grid-sect-title">Staking Earnings</div>
-                            <div class="grid-sect-title" style="color:#33856b !important;">$0</div>
+                            <div class="grid-sect-title" style="color:#33856b !important;">
+                                <span id="circValue" class="green-value">$400,000</span>
+                            </div>
                         </div>
                     </div><!-- stakeGrids -->
                     <div class="assignmentPools flex flex-col gap-5">
                         <div class="grid grid-cols-2 place-flexstart">
                             <div class="flex flex-col">
                                 <div class="grid-sect-subtitle">Normal Staking</div>
-                                <div class="grid-sect-subtitle-value">0 ($0)</div>
+                                <div class="grid-sect-subtitle-value">
+                                    <span id="stakedAmount" class="amount">8,000,000</span> (<span id="stakedValue" class="value">$70,000</span>)
+                                </div>
                             </div>
                             <button class="claim-button" disabled=""><span>Review Earnings</span></button>
                         </div>
@@ -600,7 +608,9 @@
                         <div class="grid grid-cols-2 place-flexstart">
                             <div class="flex flex-col">
                                 <div class="grid-sect-subtitle">Protocol Hedge Liquidity</div>
-                                <div class="grid-sect-subtitle-value">0 ($0)</div>
+                                <div class="grid-sect-subtitle-value">
+                                    <span id="stakedAmount" class="amount">1,000,000</span> (<span id="stakedValue" class="value">$30,000</span>)
+                                </div>
                             </div>
                             <button class="claim-button" disabled=""><span>Review Earnings</span></button>
                         </div>
@@ -608,7 +618,9 @@
                         <div class="grid grid-cols-2 place-flexstart">
                             <div class="flex flex-col">
                                 <div class="grid-sect-subtitle">Protocol Loan Collateral</div>
-                                <div class="grid-sect-subtitle-value">0 ($0)</div>
+                                <div class="grid-sect-subtitle-value">
+                                    <span id="stakedAmount" class="amount">2,500,000</span> (<span id="stakedValue" class="value">$40,000</span>)
+                                </div>
                             </div>
                             <button class="claim-button" disabled=""><span>Review Earnings</span></button>
                         </div>
