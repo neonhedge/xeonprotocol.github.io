@@ -18,6 +18,9 @@ contract StakingContract is Ownable {
     uint256 public totalAssignedForMining;
     uint256 public totalAssignedForLiquidity;
     uint256 public totalAssignedForCollateral;
+    uint256 public rewardsClaimed;
+    uint256 public rewardsClaimedLiquidity;
+    uint256 public rewardsClaimedCollateral;
 
     struct Staker {
         uint256 amount;
@@ -173,6 +176,7 @@ contract StakingContract is Ownable {
         staker.lastClaimedDay = rewardDistributionDay;
         lastRewardBasis[msg.sender] = ethRewardBasis;
         stakerRewardsClaimed[msg.sender] = stakerRewardShare;
+        rewardsClaimed = rewardsClaimed.add(stakerRewardShare);
 
         payable(msg.sender).transfer(stakerRewardShare);
 
@@ -189,6 +193,7 @@ contract StakingContract is Ownable {
         staker.lastClaimedDay = block.timestamp;
         lastLiquidityRewardBasis[msg.sender] = ethLiquidityRewardBasis;
         stakerLiquidityClaimed[msg.sender] = liquidityRewardShare;
+        rewardsClaimedLiquidity = rewardsClaimedLiquidity.add(liquidityRewardShare);
 
         payable(msg.sender).transfer(liquidityRewardShare);
 
@@ -205,6 +210,7 @@ contract StakingContract is Ownable {
         staker.lastClaimedDay = block.timestamp;
         lastCollateralRewardBasis[msg.sender] = ethCollateralRewardBasis;
         stakerCollateralClaimed[msg.sender] = collateralRewardShare;
+        rewardsClaimedCollateral = rewardsClaimedCollateral.add(collateralRewardShare);
 
         payable(msg.sender).transfer(collateralRewardShare);
 
