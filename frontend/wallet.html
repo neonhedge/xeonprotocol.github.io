@@ -106,7 +106,7 @@
             <div class="netWorthHold">
 				<div class="section-title list-header" style="padding: 30px 20px 0;">
 					<img src="./imgs/playful.webp" alt="Neon">
-					<h2>Assets UM</h2>
+					<h2>User Assets</h2>
 				</div>
 				<div class="nw-rectangle">
 					<!-- Add your cool neon background image here -->
@@ -151,10 +151,10 @@
 								<span class="dot dot_idle"></span>airdrop
 								<a href="#jump-to-section" class="walletStateLink"><i class="fa fa-link" aria-hidden="true"></i></a>
 								<div class="volume-widget">
-									<div class="volume-icon">
-									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20px" height="20px">
-										<path d="M8.277 16.055h2.808v-9.649h-2.808v9.649zm3.731 0h2.808v-6.822h-2.808v6.822zm-7.462 0h2.808v-3.487h-2.808v3.487zm16.357-17.11v17.11c0 1.19-.966 2.155-2.155 2.155h-17.11c-1.19 0-2.155-.965-2.155-2.155v-17.11c0-1.19.965-2.155 2.155-2.155h17.11c1.189 0 2.155.965 2.155 2.155zm-2.154 0h-17.11v17.11h17.11v-17.11z"/>
-									</svg>
+									<div class="volume-bars rain">
+										<div class="volume-bar red"></div>
+										<div class="volume-bar blue"></div>
+										<div class="volume-bar green"></div>
 									</div>
 									<div class="volume-count value-green">0</div>
 								</div>
@@ -830,6 +830,10 @@
 						<h2>Rewards Panel</h2>
 					</div>
 
+					<div class="rewardsInformer">
+						<a href=""><i class="fa fa-leaf" aria-hidden="true"></i></a> Neon Protocol generates Real Yield from farming, and brings it back to investors for Revenue Sharing. Learn more about our Real Yield income streams <a href="" class="neon-real-yield-link">here..</a> 
+					</div>
+
 					<div class="earnMoreWidget-rewards">
 						<div class="staking-widget-rewards">
 							<div class="icon"><i class="fas fa-coins"></i></div>
@@ -850,7 +854,7 @@
 
 					<div class="rewards-grid grid grid-cols-2 gap-5">
 						<div class="flex flex-col gap-4">
-							<div class="flex items-center justify-between gap-2">
+							<div class="sumRewards flex items-center justify-between gap-2">
 								<div class="grid-sect-title">Claimable Rewards</div>
 								<div class="grid-sect-title" style="color:#0b9455 !important;">
 									<span id="totalRewardsDueAmnt" class="amount">10 ETH</span> (<span id="totalRewardsDueValue" class="green-value">$20,000</span>)
@@ -897,7 +901,7 @@
 							</div>
 						</div>
 						<div class="rewClaimed flex flex-col gap-5">
-							<div class="flex items-center justify-between gap-2">
+							<div class="sumRewards flex items-center justify-between gap-2">
 								<div class="grid-sect-title">Rewards Claimed</div>
 								<div class="grid-sect-title" style="color:#0b9455 !important;">
 									<span id="totalRewardsClaimedAmnt" class="amount">1 ETH</span> (<span id="totalRewardsClaimedValue" class="green-value">$1,000</span>)
@@ -942,6 +946,10 @@
 						<h2>Staking Panel</h2>
 					</div>
 
+					<div class="rewardsInformer">
+						<a href=""><i class="fa fa-leaf" aria-hidden="true"></i></a> Stake NEON tokens to be eligible for rewards sharing. The staking window opens 3 days only each month-end, during which users can stake or unstake NEON. Revenue is deposited to staking contract for claiming.
+					</div>
+
 					<div class="myStakes staking-grid grid grid-cols-2 gap-5">
 						<div class="flex flex-col gap-4">
 							
@@ -957,7 +965,7 @@
 							<hr class="line">
 							<div class="grid grid-cols-2 stakeGrids">
 								<div class="stakeDataRow flex flex-col">
-									<div class="grid-sect-subtitle splitView stakedTitle"><span>Supply Staked: </span><span>0 ($0)</span></div>
+									<div class="grid-sect-subtitle splitView stakedTitle"><span>Staked Supply: </span><span>0 ($0)</span></div>
 									<div class="grid-sect-subtitle splitView"><span>Circulating Supply: </span><span>0 ($0)</span></div>
 								</div>
 								<div class="graph" style="--bluePercentage: 40;">
@@ -994,32 +1002,35 @@
 					</div>
 					<div class="section-title staking-assignments-title">
 						<!-- <div class="icon"><i class="fas fa-coins"></i></div> -->
-						<span class="sectionLabel aplAssignments">Manage Stake Assignments</span>
+						<span class="sectionLabel aplAssignments">Stake Assignment Pools</span>
+					</div>
+					<div class="rewardsInformer">
+						<a href=""><i class="fa fa-leaf" aria-hidden="true"></i></a> After staking tokens, you can choose which farming pool or income method to assign your tokens to. (1) Simply stake NEON without assigning, to qualify for general revenue sharing. (2) Stake and assign to Native Hedging & Lending Liquidity Pools. (3) The protocol will now use your tokens to provide native equity swaps or options liquidity. (4) Profits are brought back to pool assigners for sharing.
 					</div>
 					<div class="assignments-grid grid grid-cols-2 gap-5">
 						<div class="stakeGrids flex flex-col gap-4">
 							<div class="stakeDataRow flex items-center justify-between gap-2">
-								<div class="grid-sect-title">Staked Balance</div>
+								<div class="grid-sect-title">Staked Tokens</div>
 								<div class="grid-sect-title" style="color:#0b9455 !important;">0 ($0)</div>
 							</div>
 
 							<hr class="line">
 							<div class="stakeDataRow flex items-center justify-between gap-2">
-								<div class="grid-sect-title">Assigned Stake</div>
+								<div class="grid-sect-title">Assigned Tokens</div>
 								<div class="grid-sect-title" style="color:#0b9455 !important;">0 ($0)</div>
 							</div>
 							
 							<hr class="line">
 							<div class="stakeDataRow flex items-center justify-between gap-2">
-								<div class="grid-sect-title">Unassigned Stake</div>
+								<div class="grid-sect-title">Unassigned Tokens</div>
 								<div class="grid-sect-title" style="color:#0b9455 !important;">0 ($0)</div>
 							</div>
 
 						</div>
-						<div class="flex flex-col gap-5">
+						<div class="flex flex-col gap-5">							
 							<div class="grid grid-cols-2 place-flexstart">
 								<div class="flex flex-col">
-									<div class="grid-sect-subtitle">Normal Staking</div>
+									<div class="grid-sect-subtitle">Protocol Hedge Liquidity</div>
 									<div class="grid-sect-subtitle-value">0 ($0)</div>
 								</div>
 								<button class="claim-button" disabled=""><span>Manage</span></button>
@@ -1027,7 +1038,7 @@
 							<hr class="line">
 							<div class="grid grid-cols-2 place-flexstart">
 								<div class="flex flex-col">
-									<div class="grid-sect-subtitle">Equity Swap Liquidity</div>
+									<div class="grid-sect-subtitle">Protocol Lending Collateral</div>
 									<div class="grid-sect-subtitle-value">0 ($0)</div>
 								</div>
 								<button class="claim-button" disabled=""><span>Manage</span></button>
@@ -1035,7 +1046,7 @@
 							<hr class="line">
 							<div class="grid grid-cols-2 place-flexstart">
 								<div class="flex flex-col">
-									<div class="grid-sect-subtitle">Protocol Collateral</div>
+									<div class="grid-sect-subtitle">Mining Rights</div>
 									<div class="grid-sect-subtitle-value">0 ($0)</div>
 								</div>
 								<button class="claim-button" disabled=""><span>Manage</span></button>

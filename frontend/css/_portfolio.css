@@ -105,7 +105,7 @@ body{
 	display: inline-block;
 	width: 120px;
 	padding-right: 5px;
-	font-size: clamp(13px, 1vw, 14px);
+	font-size: clamp(13px, 1vw, 15px);
 	font-family: 'modeseven','bitwise', sans-serif, "Helvetica Neue", Helvetica, Arial !important;
   }
   
@@ -137,7 +137,7 @@ body{
 	display: inline-block;
 	width: 50%;
 	text-align: left;
-	font-size: clamp(13px, 1vw, 14px);
+	font-size: clamp(13px, 1vw, 15px);
 	font-family: 'modeseven','bitwise', sans-serif, "Helvetica Neue", Helvetica, Arial !important;
 
 	color: #33856b;
@@ -190,13 +190,14 @@ body{
   .nwPrimary-ttitle, .userWallet{
 	font-family: 'modeseven','bitwise', sans-serif, "Helvetica Neue", Helvetica, Arial !important;
 	font-size: clamp(15px, 1vw, 15px) !important;
+	font-weight:100;
 	/* text-shadow: 0 0 5px #ffd10c, 0 0 1px #fff, 0 0 12px #ffd10c, 0 0 12px #ffd10c, 0 0 1px #fff, 1px 0.5px 0.5px #000, -1px -0.5px 0.5px #000; */
 	color: #fff6d4;
 	white-space: nowrap;
   }
 
   .userWallet{
-	font-size: 16px !important;
+	font-size: 17px !important;
   }
   
   .walletStates {
@@ -211,8 +212,9 @@ body{
 
   .walletStatesDiv {
 	width: 100%;
-	font-size: clamp(13px, 1vw, 14px);
+	font-size: clamp(13px, 1vw, 15px);
 	font-family: 'modeseven', 'bitwise', sans-serif, "Helvetica Neue", Helvetica, Arial !important;
+	font-weight:100;
 	margin-bottom: 10px;
 	text-transform: capitalize;
 
@@ -296,6 +298,12 @@ body{
 	align-items: center;
 	height: 20px;
   }
+
+  .volume-bars.rain {
+	display: flex;
+	align-items: center;
+	height: 20px;
+  }
   
   .volume-bars.horizontal .volume-bar {
 	width: 4px;
@@ -309,6 +317,11 @@ body{
 	border-radius: 2px;
   }
   
+  .volume-bars.rain .volume-bar {
+	width: 4px;
+	margin-right: 1.5px;
+	border-radius: 2px;
+  }
   .vertical .volume-bar:nth-child(1) {
 	background-color: #ff4d4d;
 	height: 4px;
@@ -362,6 +375,31 @@ body{
   
   .horizontal .volume-bar:nth-child(5) {
 	background-color: #ff66ff;
+	height: 4px;
+  }
+
+  .rain .volume-bar:nth-child(1) {
+	background-color: #33cc33;
+	height: 5px;
+  }
+  
+  .rain .volume-bar:nth-child(2) {
+	background-color: #ff66ff;
+	height: 5px;
+  }
+  
+  .rain .volume-bar:nth-child(3) {
+	background-color: #3399ff;
+	height: 5px;
+  }
+  
+  .rain .volume-bar:nth-child(4) {
+	background-color: #ff9900;
+	height: 4px;
+  }
+  
+  .rain .volume-bar:nth-child(5) {
+	background-color: #ff4d4d;
 	height: 4px;
   }
   
@@ -1193,7 +1231,6 @@ button#transactSubmit{
 .list-toggle button {
 	border: none;
 	color: #c4c1c1;
-	padding: 1vw;
 	box-sizing: border-box;
 	text-align: left;
 	text-decoration: none;
@@ -1410,6 +1447,10 @@ button#transactSubmit{
 	gap:1vw;
 	position: relative;
 	top: 0;
+}
+
+.sumRewards {
+	margin-bottom: 1vw;
 }
 
 .rewards-grid, .staking-grid, .assignments-grid {
