@@ -86,5 +86,58 @@ function updateSectionValues_Hedges(
     document.getElementById("lossesETH").textContent = formatString(totalLossTWETH);
 }
 
+function updateSectionValues_StakingRewards(
+    totalRewardsDueWETH,
+    totalRewardsDueUSDT,
+    totalRewardsClaimedWETH,
+    totalRewardsClaimedUSDT,
+    userRewardsDueEth,
+    userRewardsDueUSDT,
+    userLiqRewardsDueEth,
+    userLiqRewardsDueUSDT,
+    userColRewardsDueEth,
+    userColRewardsDueUSDT
+) {
+    const formatValue = (value) => {
+        return `$${value.toFixed(2)}`;
+    };
+
+    const formatString = (number) => {
+        return number.toLocaleString();
+    };
+
+    const formatStringDecimal = (number) => {
+        const options = {
+            style: 'decimal',
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+        };
+        return number.toLocaleString('en-US', options);
+    };
+
+    // Update rewards due panel
+    document.getElementById("totalRewardsDueAmnt").textContent = totalRewardsDueWETH;
+    document.getElementById("rewardsDueAmnt").textContent = userRewardsDueEth;
+    document.getElementById("rewardsDueAmntLiq").textContent = userLiqRewardsDueEth;
+    document.getElementById("rewardsDueAmntLend").textContent = userColRewardsDueEth;
+    
+
+	document.getElementById("totalRewardsDueValue").textContent = formatString(totalRewardsDueUSDT);
+    document.getElementById("rewardsDueValue").textContent = formatString(userRewardsDueUSDT);
+    document.getElementById("rewardsDueValueLend").textContent = formatString(userLiqRewardsDueUSDT);
+    document.getElementById("rewardsDueValueLiq").textContent = formatString(userColRewardsDueUSDT);
+
+    // Update rewards claimed panel
+    document.getElementById("totalRewardsClaimedAmnt").textContent = totalRewardsClaimedWETH;
+    document.getElementById("rewardsClaimedAmnt").textContent = userRewardsClaimedEth;
+    document.getElementById("rewardsClaimedAmntLiq").textContent = userLiqRewardsClaimedEth;
+    document.getElementById("rewardsClaimedAmntLend").textContent = userColRewardsClaimedEth;
+
+    document.getElementById("totalRewardsClaimedValue").textContent = formatString(totalRewardsClaimedUSDT);
+    document.getElementById("rewardsClaimedValue").textContent = formatString(userRewardsClaimedUSDT);
+    document.getElementById("rewardsClaimedValueLend").textContent = formatString(userLiqRewardsClaimedUSDT);
+    document.getElementById("rewardsClaimedValueLiq").textContent = formatString(userColRewardsClaimedUSDT);
+}
+
 // Export the fetch functions
-export { updateSectionValues_Networth, updateSectionValues_Hedges };
+export { updateSectionValues_Networth, updateSectionValues_Hedges, updateSectionValues_StakingRewards };
