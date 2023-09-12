@@ -976,10 +976,11 @@ button#transactSubmit{
   }
   
   .section-title {
-	color: #fff;
-	display: flex;
-	flex-wrap: wrap;
-  }
+    color: #fff;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
   
   .section-title img{
 	display: inline-flex;
@@ -1488,19 +1489,19 @@ hr.line {
 }
 
 .grid-sect-title{
-	font-size: clamp(20px, 1vw, 24px);
+	font-size: clamp(18px, 1vw, 22px);
 	color:#FFF;
 	line-height: 1;
 }
 
 .grid-sect-subtitle{
-	font-size: clamp(15px, 1vw, 16px);
+	font-size: clamp(16px, 1vw, 19px);
 	color:rgb(139, 149, 158);
 	line-height: 1;
 }
 
 .grid-sect-subtitle-value{
-	font-size: clamp(18px, 1vw, 20px);
+	font-size: clamp(16px, 1vw, 19px);
 	color:#FFF;
 }
 
@@ -1526,11 +1527,22 @@ button:disabled {
 button:disabled:hover {
 	background-color: #0a092f;
 }
-  
+
+.amount {
+    color: #fff;
+    margin-right: 5px;
+}
+
+.green-value {
+	color: #33856b;
+}
   
 /* ===================
 	STAKING WIDGET
 =====================*/
+.myStakes {
+	margin-block: 2vw;
+}
 .staking-widget {
 	background: linear-gradient(60deg, #131145 0%, #1b1b49 100%);
 	color: #fff;
@@ -1701,6 +1713,7 @@ button:disabled:hover {
 	align-items: flex-start;
   	row-gap: 1rem;
 }
+
   /*=======================
   		LIQUIDITY MINING 
 =============================*/
@@ -1859,18 +1872,19 @@ button:disabled:hover {
   /*=================
   Common NEON Dash
   ===================*/
-  .sectionLabel{
-	position:relative;
-	display:inline-flex;
-	flex-basis:90%;
-	font-size: clamp(15px, 2vw, 18px);
-	text-transform:uppercase;
-	text-align:left;
-	padding:5px 9.5%;
-	box-sizing:border-box;
-	border-bottom: 0.5px solid #555;
-	margin-bottom:3%;
-}
+  .sectionLabel {
+    position: relative;
+    display: inline-flex;
+    flex-basis: 90%;
+    font-size: clamp(15px, 2vw, 18px);
+    text-transform: uppercase;
+    text-align: left;
+    padding: 5px 9.5%;
+    box-sizing: border-box;
+    margin-block: 3%;
+  
+    border-bottom: 1px solid var(--neon-border-color);
+  }
 
 
 /* neon styles */
