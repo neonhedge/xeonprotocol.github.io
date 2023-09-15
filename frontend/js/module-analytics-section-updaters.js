@@ -207,17 +207,32 @@ function updateSectionValues_Staking(
     return `$${value.toFixed(2)}`;
   };
 
-  // Update assigned stakes
+  // Update staked versus circulating totals
+  document.getElementById("stakedAmount").textContent = formatAmount(totalStaked);
+  document.getElementById("stakedValue").textContent = formatValue(totalStakedUSDT);
+  document.getElementById("circAmount").textContent = formatAmount(circulatingSupply);
+  document.getElementById("circValue").textContent = formatValue(circulatingSupplyUSDT);
+  document.getElementById("stakersCount").textContent = formatAmount(totalStakers);
+
+  // Update assigned totals
   document.getElementById("assignedStakesAmnt").textContent = formatAmount(totalAssigned);
   document.getElementById("assignedStakesValue").textContent = formatValue(totalAssignedUSDT);
 
-  // Update assigned stakes
+  // Update unassigned totals
   document.getElementById("unAssignedStakesAmnt").textContent = formatAmount(totalUnassigned);
   document.getElementById("unAssignedStakesValue").textContent = formatValue(totalUnassignedUSDT);
 
-  // Update hedge revenue
-  document.getElementById("hedgeRevenueAmnt").textContent = formatAmount(hedgeRevenueEth);
-  document.getElementById("hedgeRevenueValue").textContent = formatValue(hedgeRevenueUsd);
+  // Update assignment rewards
+  document.getElementById("assignmentRewardsAmnt").textContent = formatAmount(totalAssignmentsRewardsEth);
+  document.getElementById("assignmentRewardsValue").textContent = formatAmount(totalAssignmentRewardsUSDT);
+
+  // Update assignment pools
+  document.getElementById("assignedLiquidityAmnt").textContent = formatValue(AssignedRewardsLiq);
+  document.getElementById("assignedLiquidityValue").textContent = formatValue(AssignedRewardsLiqUSDT);
+  document.getElementById("assignedCollateralAmnt").textContent = formatValue(AssignedRewardsCol);
+  document.getElementById("assignedCollateralValue").textContent = formatValue(AssignedRewardsColUSDT);
+  document.getElementById("assignedMiningAmnt").textContent = formatValue(AssignedRewardsMin);
+  document.getElementById("assignedMiningValue").textContent = formatValue(AssignedRewardsMinUSDT);
 
 }
 
@@ -248,4 +263,4 @@ function updateSectionValues_Tokenomics(symbol, decimals, contractAddress, buyTa
 }
 
 // Export the fetch functions
-export { updateSectionValues_Traffic, updateSectionValues_hedges, updateSectionValues_Earnings, updateSectionValues_Tokenomics };
+export { updateSectionValues_Traffic, updateSectionValues_hedges, updateSectionValues_Earnings, updateSectionValues_Staking, updateSectionValues_Tokenomics };
