@@ -230,6 +230,10 @@ async function fetchSection_StakingPanel(){
 	const claimedRewards = await stakingInstance.methods.rewardsClaimed().call();
 	const claimedRewardsLiqu = await stakingInstance.methods.rewardsClaimedLiquidity().call();
 	const claimedRewardsColl = await stakingInstance.methods.rewardsClaimedCollateral().call();
+	// Assigned to staking pools
+	const claimedRewards = await stakingInstance.methods.rewardsClaimed().call();
+	const claimedRewardsLiqu = await stakingInstance.methods.rewardsClaimedLiquidity().call();
+	const claimedRewardsColl = await stakingInstance.methods.rewardsClaimedCollateral().call();
 	
 	// Fetch ETH to USD conversion rate
 	const ethUsdPrice = await getCurrentEthUsdcPriceFromUniswapV2();
@@ -242,7 +246,7 @@ async function fetchSection_StakingPanel(){
 	const stakedBalance = new BigNumber(stakedBalanceRaw).div(10 ** CONSTANTS.decimals);
 	const depositedBalance = new BigNumber(deposited).div(10 ** CONSTANTS.decimals);
 	const withdrawnBalance = new BigNumber(withdrawn).div(10 ** CONSTANTS.decimals);
-	const totalHoldingsRaw = walletBalance + stakedBalance + (depositedBalance - withdrawnBalance);
+	const totalHoldings = walletBalance + stakedBalance + (depositedBalance - withdrawnBalance);
 
 	const totalStaked = new BigNumber(totalStakedRaw).div(10 ** CONSTANTS.decimals);
 	const circulatingSupply = new BigNumber(circulatingSupplyRaw).div(10 ** CONSTANTS.decimals);
@@ -262,7 +266,7 @@ async function fetchSection_StakingPanel(){
 	const stakedBalanceUSDT = stakedBalance * getTokenUSDValue;
 	const depositedBalanceUSDT = depositedBalance * getTokenUSDValue;
 	const withdrawnBalanceUSDT = withdrawnBalance * getTokenUSDValue;
-	const totalHoldingsUSDT = totalHoldingsRaw * getTokenUSDValue;
+	const totalHoldingsUSDT = totalHoldings * getTokenUSDValue;
 
 	const totalStakedUSDT = totalStaked * getTokenUSDValue;
 	const circulatingSupplyUSDT = circulatingSupply * getTokenUSDValue;
@@ -282,7 +286,7 @@ async function fetchSection_StakingPanel(){
 		stakedBalance,
 		depositedBalance,
 		withdrawnBalance,
-		totalHoldingsRaw,
+		totalHoldings,
 		totalStaked,
 		circulatingSupply,
 		distributedRewardsEth,
