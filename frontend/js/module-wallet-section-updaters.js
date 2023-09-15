@@ -86,7 +86,7 @@ function updateSectionValues_Hedges(
     document.getElementById("lossesETH").textContent = formatString(totalLossTWETH);
 }
 
-function updateSectionValues_StakingRewards(
+function updateSectionValues_Rewards(
     totalRewardsDueWETH,
     totalRewardsDueUSDT,
     totalRewardsClaimedWETH,
@@ -96,7 +96,13 @@ function updateSectionValues_StakingRewards(
     userLiqRewardsDueEth,
     userLiqRewardsDueUSDT,
     userColRewardsDueEth,
-    userColRewardsDueUSDT
+    userColRewardsDueUSDT,
+    userRewardsClaimedEth,
+    userRewardsClaimedUSDT,
+    userLiqRewardsClaimedEth,
+    userLiqRewardsClaimedUSDT,
+    userColRewardsClaimedEth,
+    userColRewardsClaimedUSDT
 ) {
     const formatValue = (value) => {
         return `$${value.toFixed(2)}`;
@@ -121,7 +127,6 @@ function updateSectionValues_StakingRewards(
     document.getElementById("rewardsDueAmntLiq").textContent = userLiqRewardsDueEth;
     document.getElementById("rewardsDueAmntLend").textContent = userColRewardsDueEth;
     
-
 	document.getElementById("totalRewardsDueValue").textContent = formatString(totalRewardsDueUSDT);
     document.getElementById("rewardsDueValue").textContent = formatString(userRewardsDueUSDT);
     document.getElementById("rewardsDueValueLend").textContent = formatString(userLiqRewardsDueUSDT);
@@ -139,5 +144,79 @@ function updateSectionValues_StakingRewards(
     document.getElementById("rewardsClaimedValueLiq").textContent = formatString(userColRewardsClaimedUSDT);
 }
 
+function updateSectionValues_Staking(
+    walletBalance,
+    stakedBalance,
+    depositedBalance,
+    withdrawnBalance,
+    totalHoldings,
+    totalStaked,
+    circulatingSupply,
+    distributedRewardsEth,
+    distributedRewardsLiquEth,
+    distributedRewardsCollEth,
+    distributedRewardsTotalEth,
+    claimedRewardsEth,
+    claimedRewardsLiquEth,
+    claimedRewardsCollEth,
+    claimedRewardsTotalEth,
+    walletBalanceUSDT,
+    stakedBalanceUSDT,
+    depositedBalanceUSDT,
+    withdrawnBalanceUSDT,
+    totalHoldingsUSDT,
+    totalStakedUSDT,
+    circulatingSupplyUSDT,
+    distributedRewardsUSDT,
+    distributedRewardsLiqUSDT,
+    distributedRewardsColUSDT,
+    distributedRewardsTotalUSDT,
+    claimedRewardsUSDT,
+    claimedRewardsLiqUSDT,
+    claimedRewardsColUSDT,
+    claimedRewardsTotalUSDT
+) {
+    const formatValue = (value) => {
+        return `$${value.toFixed(2)}`;
+    };
+
+    const formatString = (number) => {
+        return number.toLocaleString();
+    };
+
+    const formatStringDecimal = (number) => {
+        const options = {
+            style: 'decimal',
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+        };
+        return number.toLocaleString('en-US', options);
+    };
+
+    // Update staking panel
+    document.getElementById("stakedBalanceAmnt").textContent = formatString(stakedBalance);
+    document.getElementById("stakedBalanceValue").textContent = formatString(stakedBalanceUSDT);
+    document.getElementById("totalBalanceAmnt").textContent = formatString(totalHoldings);
+    document.getElementById("totalBalanceValue").textContent = formatString(totalHoldingsUSDT);
+    document.getElementById("stakedSupplyAmnt").textContent = formatString(totalStaked);
+	document.getElementById("stakedSupplyValue").textContent = formatString(totalStakedUSDT);
+    document.getElementById("circSupplyAmnt").textContent = formatString(circulatingSupply);
+    document.getElementById("circSupplyValue").textContent = formatString(circulatingSupplyUSDT);
+    document.getElementById("divDistributedAmnt").textContent = formatString(distributedRewardsTotalEth);
+    document.getElementById("divDistributedValue").textContent = formatString(distributedRewardsTotalUSDT);
+    document.getElementById("divClaimedAmnt").textContent = formatString(claimedRewardsTotalEth);
+    document.getElementById("divClaimedValue").textContent = formatString(claimedRewardsTotalUSDT);
+
+    document.getElementById("tokensAvailableWallet").textContent = formatString(walletBalance);
+    document.getElementById("tokensStakedWallet").textContent = formatString(stakedBalance);
+    
+    document.getElementById("mystakedTokensAmnt").textContent = formatString(stakedBalance);
+    document.getElementById("myStakedTokensValue").textContent = formatString(stakedBalanceUSDT);
+    document.getElementById("myAssignedAmnt").textContent = formatString(stakedBalance);
+    document.getElementById("myAssignedValue").textContent = formatString(stakedBalanceUSDT);
+    document.getElementById("myUnassignedAmnt").textContent = formatString(stakedBalance);
+    document.getElementById("myUnassignedValue").textContent = formatString(stakedBalanceUSDT);
+    
+}
 // Export the fetch functions
-export { updateSectionValues_Networth, updateSectionValues_Hedges, updateSectionValues_StakingRewards };
+export { updateSectionValues_Networth, updateSectionValues_Hedges, updateSectionValues_Rewards };
