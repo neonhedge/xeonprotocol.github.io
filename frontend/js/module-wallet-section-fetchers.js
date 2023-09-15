@@ -227,13 +227,12 @@ async function fetchSection_StakingPanel(){
 	const distributedRewardsLiqu = await stakingInstance.methods.ethLiquidityRewardBasis().call();
 	const distributedRewardsColl = await stakingInstance.methods.ethCollateralRewardBasis().call();
 	// Claimed ETH rewards to staking contract
-	const claimedRewards = await stakingInstance.methods.rewardsClaimed().call();
-	const claimedRewardsLiqu = await stakingInstance.methods.rewardsClaimedLiquidity().call();
-	const claimedRewardsColl = await stakingInstance.methods.rewardsClaimedCollateral().call();
-	// Assigned to staking pools
-	const claimedRewards = await stakingInstance.methods.rewardsClaimed().call();
-	const claimedRewardsLiqu = await stakingInstance.methods.rewardsClaimedLiquidity().call();
-	const claimedRewardsColl = await stakingInstance.methods.rewardsClaimedCollateral().call();
+	const claimedRewards = await stakingInstance.methods.rewardsClaimed().call(userAddress);
+	const claimedRewardsLiqu = await stakingInstance.methods.rewardsClaimedLiquidity(userAddress).call();
+	const claimedRewardsColl = await stakingInstance.methods.rewardsClaimedCollateral(userAddress).call();
+	// My pool assignments
+	const assignmentsRaw = await stakingInstance.methods.getAssignedAndUnassignedAmounts(userAddress).call();
+	const [assignedMiningRaw, assignedLiquidityRaw, assignedCollateralRaw, unassignedRaw] = assignmentsRaw;
 	
 	// Fetch ETH to USD conversion rate
 	const ethUsdPrice = await getCurrentEthUsdcPriceFromUniswapV2();
@@ -241,7 +240,7 @@ async function fetchSection_StakingPanel(){
 	// Step 1: Convert amounts
 	const wethDecimals = 18; const usdtDecimals = 6; const usdcDecimals = 6;
 	
-	// Step 2: Convert ETH values
+	// Step 2: Convert normal values
 	const walletBalance = new BigNumber(walletBalanceRaw).div(10 ** CONSTANTS.decimals);
 	const stakedBalance = new BigNumber(stakedBalanceRaw).div(10 ** CONSTANTS.decimals);
 	const depositedBalance = new BigNumber(deposited).div(10 ** CONSTANTS.decimals);
@@ -260,6 +259,12 @@ async function fetchSection_StakingPanel(){
 	const claimedRewardsLiquEth = new BigNumber(claimedRewardsLiqu).div(10 ** wethDecimals);
 	const claimedRewardsCollEth = new BigNumber(claimedRewardsColl).div(10 ** wethDecimals);
 	const claimedRewardsTotalEth = distributedRewardsEth + distributedRewardsLiquEth + distributedRewardsCollEth;
+
+	const assignedMining = new BigNumber(assignedMiningRaw).div(10 ** CONSTANTS.decimals);
+	const assignedLiquidity = new BigNumber(assignedLiquidityRaw).div(10 ** CONSTANTS.decimals);
+	const assignedCollateral = new BigNumber(assignedCollateralRaw).div(10 ** CONSTANTS.decimals);
+	const unassigned = new BigNumber(unassignedRaw).div(10 ** CONSTANTS.decimals);
+	const totalAssigned = assignedMining + assignedLiquidity + assignedCollateral;
 
 	// Step 3: Convert usdt values
 	const walletBalanceUSDT = walletBalance * getTokenUSDValue;
@@ -281,6 +286,12 @@ async function fetchSection_StakingPanel(){
 	const claimedRewardsColUSDT = claimedRewardsCollEth * ethUsdPrice;	
 	const claimedRewardsTotalUSDT = claimedRewardsTotalEth * ethUsdPrice;
 
+	const assignedMiningUSDT = assignedMining * tokenUsdPrice;
+	const assignedLiquidityUSDT = assignedLiquidity * tokenUsdPrice;
+	const assignedCollateralUSDT = assignedCollateral * tokenUsdPrice;
+	const unassignedUSDT = unassigned * tokenUsdPrice;
+	const totalAssignedUSDT = assignedMiningUSDT + assignedLiquidityUSDT + assignedCollateralUSDT;
+
 	updateSectionValues_Staking(
 		walletBalance,
 		stakedBalance,
@@ -297,6 +308,11 @@ async function fetchSection_StakingPanel(){
 		claimedRewardsLiquEth,
 		claimedRewardsCollEth,
 		claimedRewardsTotalEth,
+		assignedMining,
+		assignedLiquidity,
+		assignedCollateral,
+		unassigned,
+		totalAssigned,
 		walletBalanceUSDT,
 		stakedBalanceUSDT,
 		depositedBalanceUSDT,
@@ -311,7 +327,12 @@ async function fetchSection_StakingPanel(){
 		claimedRewardsUSDT,
 		claimedRewardsLiqUSDT,
 		claimedRewardsColUSDT,
-		claimedRewardsTotalUSDT
+		claimedRewardsTotalUSDT,
+		assignedMiningUSDT,
+		assignedLiquidityUSDT,
+		assignedCollateralUSDT,
+		unassignedUSDT,
+		totalAssignedUSDT
 	);
 
 }

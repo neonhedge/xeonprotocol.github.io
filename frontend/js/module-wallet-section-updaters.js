@@ -160,6 +160,11 @@ function updateSectionValues_Staking(
     claimedRewardsLiquEth,
     claimedRewardsCollEth,
     claimedRewardsTotalEth,
+    assignedMining,
+    assignedLiquidity,
+    assignedCollateral,
+    unassigned,
+    totalAssigned,
     walletBalanceUSDT,
     stakedBalanceUSDT,
     depositedBalanceUSDT,
@@ -174,7 +179,12 @@ function updateSectionValues_Staking(
     claimedRewardsUSDT,
     claimedRewardsLiqUSDT,
     claimedRewardsColUSDT,
-    claimedRewardsTotalUSDT
+    claimedRewardsTotalUSDT,
+    assignedMiningUSDT,
+    assignedLiquidityUSDT,
+    assignedCollateralUSDT,
+    unassignedUSDT,
+    totalAssignedUSDT
 ) {
     const formatValue = (value) => {
         return `$${value.toFixed(2)}`;
@@ -210,13 +220,21 @@ function updateSectionValues_Staking(
     document.getElementById("tokensAvailableWallet").textContent = formatString(walletBalance);
     document.getElementById("tokensStakedWallet").textContent = formatString(stakedBalance);
     
+    // Update assignments panel
     document.getElementById("mystakedTokensAmnt").textContent = formatString(stakedBalance);
     document.getElementById("myStakedTokensValue").textContent = formatString(stakedBalanceUSDT);
-    document.getElementById("myAssignedAmnt").textContent = formatString(stakedBalance);
-    document.getElementById("myAssignedValue").textContent = formatString(stakedBalanceUSDT);
-    document.getElementById("myUnassignedAmnt").textContent = formatString(stakedBalance);
-    document.getElementById("myUnassignedValue").textContent = formatString(stakedBalanceUSDT);
+    document.getElementById("myAssignedAmnt").textContent = formatString(totalAssigned);
+    document.getElementById("myAssignedValue").textContent = formatString(totalAssignedUSDT);
+    document.getElementById("myUnassignedAmnt").textContent = formatString(unassigned);
+    document.getElementById("myUnassignedValue").textContent = formatString(unassignedUSDT);
+
+    document.getElementById("assignedToLiquidityAmnt").textContent = formatString(assignedLiquidity);
+    document.getElementById("assignedToLiquidityAmnt").textContent = formatString(assignedLiquidityUSDT);
+    document.getElementById("assignedToCollateralAmnt").textContent = formatString(assignedCollateral);
+    document.getElementById("assignedToCollateralValue").textContent = formatString(assignedCollateralUSDT);
+    document.getElementById("assignedToMiningAmnt").textContent = formatString(assignedMining);
+    document.getElementById("assignedToMiningValue").textContent = formatString(assignedMiningUSDT);
     
 }
 // Export the fetch functions
-export { updateSectionValues_Networth, updateSectionValues_Hedges, updateSectionValues_Rewards };
+export { updateSectionValues_Networth, updateSectionValues_Hedges, updateSectionValues_Rewards, updateSectionValues_Staking };

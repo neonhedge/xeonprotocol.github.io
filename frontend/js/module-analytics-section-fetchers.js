@@ -1,5 +1,5 @@
 import { CONSTANTS, getCurrentEthUsdcPriceFromUniswapV2, getTokenETHValue, tokenUsdPrice } from './constants.js';
-import { updateSectionValues_Traffic, updateSectionValues_hedges, updateSectionValues_Earnings, updateSectionValues_Tokenomics } from './module-analytics-section-updaters.js';
+import { updateSectionValues_Traffic, updateSectionValues_hedges, updateSectionValues_Earnings, updateSectionValues_Staking, updateSectionValues_Tokenomics } from './module-analytics-section-updaters.js';
 import { updateChartValues_Cash, updateChartValues_PIE, updateChartValues_hedges, updateChartValues_Revenue, updateChartValues_Dividents, updateChartValues_Claims, updateChartValues_Staking, updateChartValues_Tokenomics } from './module-analytics-chart-updaters.js';
 
 async function setCurrent_TrafficSection() {
