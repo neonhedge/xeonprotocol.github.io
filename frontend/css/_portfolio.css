@@ -58,7 +58,7 @@ body{
 	width:50%;
 	max-width: calc(50% - 20px); /* adjust the width here */
 	margin: 20px 10px;
-	padding: 20px 0px 10px;
+	padding: 10px;
 	box-sizing: border-box;
 
 	background: linear-gradient(40deg, #191336 0%, #141247 100%);
@@ -83,22 +83,25 @@ body{
   }
   
   .nw-right {
+	flex-basis: 60%;
 	height: auto;
 	padding: 5px;
 	box-sizing: border-box;
-	background-color: rgba(0,0,0,0.4);
+	background-color: rgba(0,0,0,0.3);
 	border-radius: 10px;
+	border: 0.5px dotted #3399ff;
   }
   
   .nw-text {
 	display: flex;
-	justify-content: end;
+	justify-content: center;
 	align-items: center;
 	margin-bottom: 11px;
   }
 
   .nwtextFirst {
-	margin-bottom: 10px;
+	margin: 0;
+	justify-content: center;
   }
   
   .nw-text-title {
@@ -107,19 +110,39 @@ body{
 	padding-right: 5px;
 	font-size: clamp(13px, 1vw, 15px);
 	font-family: 'modeseven','bitwise', sans-serif, "Helvetica Neue", Helvetica, Arial !important;
+	text-transform: uppercase;	
+	border-bottom: 0.5px dotted #3399ff;
   }
   
   .nwPrimary-ttitle {
+	width: auto !important;
 	text-transform: uppercase;
 	color:#fff6d4;
+	/* font-size: clamp(18px, 1vw, 20px) !important; */
+	font-size: clamp(14px, 1vw, 16px) !important; 
+	font-weight: 100;
+	border: unset !important;
+	padding: 0.5vw 1vw !important;
   }
 
-  .nw-text-title img {
+  .nwPrimary-ttitle img {
 	position: relative;
-	width: 10px;
-	margin-inline: 5px;
-	justify-content: center;
-	align-items: center;
+	width: 2rem;
+	margin-right: 5px;
+	vertical-align: middle;
+  }
+
+  #netWorthUSD {
+	font-size: clamp(18px, 1vw, 20px) !important;
+	width: auto !important;
+	border-radius: 15px;
+	background-color: #172164;
+	background-color: rgba(0,0,0,0.35);
+	padding: 0.5vw 1vw !important;
+	margin-bottom:1vw;
+	border: 0.5px solid #3399ff !important;
+	/* box-shadow: 0 0 2px #188dd6, 0 0 2px #188dd6, 0 0 2px #188dd6, 0 0 2px #38eeff, 0 0 2px #38eeff, 2px 2px 0.5px #38eeff !important; */
+	/* box-shadow: 0 0 .05rem #38eeff, inset 0 0 .05rem #38eeff, 0 0 0.352rem #188dd6, inset 0 0 0.25rem #188dd6, 0 0 0.16rem #188dd6, inset 0 0 0.16rem #188dd6; */
   }
 
   .fa-info-circle{
@@ -129,19 +152,21 @@ body{
 	align-items: center;
 	color:#948f8f;
 	color:#fff6d4;
-	color:#AAA;
+	color:#08e7fe;
 	font-size: 10px;
   }
 
   .nw-text-value {
 	display: inline-block;
-	width: 50%;
+	width: 120px;
 	text-align: left;
 	font-size: clamp(13px, 1vw, 15px);
 	font-family: 'modeseven','bitwise', sans-serif, "Helvetica Neue", Helvetica, Arial !important;
 
 	color: #33856b;
-	border-left: 1px dotted #354050;
+	color:#08e7fe;
+	/* border: 0.5px dotted #3399ff; */
+	border-bottom: 0.5px dotted #3399ff;
 	padding-inline: 10px 5px;
   }
   
@@ -166,14 +191,14 @@ body{
   }
   
   .user-card .icon{
-	max-width: 55px;
-	max-height:55px;
-	color:#3399ff;
+	display: block;
 	color:#fff6d4;
-	font-size: 50px;
+	text-shadow: 0 0 2px #188dd6, 0 0 3px #188dd6, 0 0 5px #188dd6, 0 0 5px #38eeff, 0 0 3px #38eeff, 2px 2px 0.5px #38eeff !important;
+	color: #10102c;
+	font-size: 65px;
 
 	position: relative;
-	top: -50px;
+	margin-top:-50px;
   }
 
   .userWallet {
@@ -189,8 +214,6 @@ body{
 
   .nwPrimary-ttitle, .userWallet{
 	font-family: 'modeseven','bitwise', sans-serif, "Helvetica Neue", Helvetica, Arial !important;
-	font-size: clamp(15px, 1vw, 15px) !important;
-	font-weight:100;
 	/* text-shadow: 0 0 5px #ffd10c, 0 0 1px #fff, 0 0 12px #ffd10c, 0 0 12px #ffd10c, 0 0 1px #fff, 1px 0.5px 0.5px #000, -1px -0.5px 0.5px #000; */
 	color: #fff6d4;
 	white-space: nowrap;
@@ -220,7 +243,7 @@ body{
 
 	display: flex;
 	flex-wrap: wrap;
-	justify-content: center; /* right was best view */
+	justify-content: space-around;
   }
   
   .walletStatesDiv .dot {
@@ -412,6 +435,7 @@ body{
   
   .value-green {
 	color:#33856b;
+	color:#0b9455;
 	padding-inline-end: 1vw;
   }
 
@@ -1032,7 +1056,8 @@ button#transactSubmit{
 	display: inline-flex;
 	flex-grow: 1;
 	align-items: center;
-	font-size: 21px;
+	font-size: clamp(18px, 2vw, 21px);
+	font-weight: 400;
   }
 
   .data-cards {
@@ -1152,6 +1177,7 @@ button#transactSubmit{
   
   .card-title {
 	font-size: clamp(12px, 1vw, 18px);
+	font-weight: 100;
 	margin-bottom: 10px;
 	white-space: nowrap;
 	align-items: center;
@@ -1339,8 +1365,8 @@ button#transactSubmit{
 .hedge-value {
 	flex-grow: 1;
     color: #33856b;
-	color: #089353 !important;
-    font-weight: bold;
+	color:#0b9455 !important;
+    font-weight: 400;
 }
 
 .hedge-tamount {

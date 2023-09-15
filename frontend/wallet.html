@@ -108,63 +108,110 @@
 					<img src="./imgs/playful.webp" alt="Neon">
 					<h2>User Assets</h2>
 				</div>
+				<div class="walletTransact">
+					<form>
+						<div class="form-group">
+							<!-- Rounded switch -->
+							<label class="switch" title="default mode: Deposit, click to switch to Withdraw">
+								<input type="checkbox">
+								<span class="slider round"></span>
+								<span class="mode">Cashier: Deposit Mode</span>
+							</label>
+							<div class="input-group">
+							<input type="text" class="erc20-address-input" id="erc20-address" name="erc20-address" placeholder="Paste address...">
+							<span class="or">OR</span>
+							<select id="erc20-select" name="erc20-select">
+								<option value="">Select token...</option>
+								<option value="erc20-1">ERC20-1</option>
+								<option value="erc20-2">ERC20-2</option>
+								<option value="erc20-3">ERC20-3</option>
+							</select>
+							</div>
+						</div>
+						<div class="form-group">
+							<input type="number" class="transact-amount" placeholder="amount">
+							<div id="balancesSection" class="hidden">
+								<div id="expandClose" class="expand-button">
+									<i class="fa fa-expand" aria-hidden="true"></i>
+								</div>
+								<div class="balgrid">
+								<strong>Deposited:</strong> <span id="depositedBalance">0</span>
+								</div>
+								<div class="balgrid">
+								<strong>Withdrawn:</strong> <span id="withdrawnBalance">0</span>
+								</div>
+								<div class="balgrid">
+								<strong>Locked:</strong> <span id="lockedInUseBalance">0</span>
+								</div>
+								<div class="balgrid">
+								<strong>Withdrawable:</strong> <span id="withdrawableBalance">0</span>
+								</div>
+							</div>
+						</div>
+						<button type="submit" id="transactSubmit">Submit</button>
+					</form>
+				</div>
+
 				<div class="nw-rectangle">
 					<!-- Add your cool neon background image here -->
-					<div class="userWalletCont">
-						<div class="user-card">
-							<div class="icon"><i class="fa-solid fa-user-astronaut"></i></div>
-						</div>
-						<div id="walletAddress" class="userWallet">0X3fe...h986</div>
-						<!-- userWallet alt location -->				
-					</div>
 					<div class="userFundsCont">
-						<div class="nw-left">
-							<div class="walletStates">
-								<!-- userWallet alt location -->	
-								<div class="walletStatesDiv">
-								<span class="dot dot_idle"></span>staked
-								<a href="#jump-to-section" class="walletStateLink"><i class="fa fa-link" aria-hidden="true"></i></a>
-								<div class="volume-widget">
-									<div class="volume-bars vertical">
-									<div class="volume-bar red"></div>
-									<div class="volume-bar blue"></div>
-									<div class="volume-bar green"></div>
-									</div>
-									<div id="stakedBalance" class="volume-count value-green">27,000,000</div>
-								</div>
-								</div>
-								
-								<div class="walletStatesDiv">
-									<span class="dot dot_idle"></span>wallet 
+						<div class="userWalletCont">
+							<div class="user-card">
+								<div class="icon"><i class="fa-solid fa-user-astronaut"></i></div>
+							</div>
+							<div id="walletAddress" class="userWallet">0X3fe...h986</div>
+							<!-- userWallet alt location -->	
+							<div class="nw-left">
+								<div class="walletStates">
+									<!-- userWallet alt location -->	
+									<div class="walletStatesDiv">
+									<span class="dot dot_idle"></span>staked
 									<a href="#jump-to-section" class="walletStateLink"><i class="fa fa-link" aria-hidden="true"></i></a>
 									<div class="volume-widget">
-										<div class="volume-bars horizontal">
+										<div class="volume-bars vertical">
+										<div class="volume-bar red"></div>
+										<div class="volume-bar blue"></div>
+										<div class="volume-bar green"></div>
+										</div>
+										<div id="stakedBalance" class="volume-count value-green">27,000,000</div>
+									</div>
+									</div>
+									
+									<div class="walletStatesDiv">
+										<span class="dot dot_idle"></span>wallet 
+										<a href="#jump-to-section" class="walletStateLink"><i class="fa fa-link" aria-hidden="true"></i></a>
+										<div class="volume-widget">
+											<div class="volume-bars horizontal">
+												<div class="volume-bar red"></div>
+												<div class="volume-bar blue"></div>
+												<div class="volume-bar green"></div>
+											</div>
+											<div id="walletBalance" class="volume-count value-green">5,000,000</div>
+										</div>
+									</div>
+								
+									<div class="walletStatesDiv">
+									<span class="dot dot_idle"></span>airdrop
+									<a href="#jump-to-section" class="walletStateLink"><i class="fa fa-link" aria-hidden="true"></i></a>
+									<div class="volume-widget">
+										<div class="volume-bars rain">
 											<div class="volume-bar red"></div>
 											<div class="volume-bar blue"></div>
 											<div class="volume-bar green"></div>
 										</div>
-										<div id="walletBalance" class="volume-count value-green">5,000,000</div>
+										<div class="volume-count value-green">0</div>
+									</div>
 									</div>
 								</div>
-							
-								<div class="walletStatesDiv">
-								<span class="dot dot_idle"></span>airdrop
-								<a href="#jump-to-section" class="walletStateLink"><i class="fa fa-link" aria-hidden="true"></i></a>
-								<div class="volume-widget">
-									<div class="volume-bars rain">
-										<div class="volume-bar red"></div>
-										<div class="volume-bar blue"></div>
-										<div class="volume-bar green"></div>
-									</div>
-									<div class="volume-count value-green">0</div>
-								</div>
-								</div>
-							</div>
-						</div>						  
+							</div>			
+						</div>
+
 						<div class="nw-right">
 							<div class="nw-text nwtextFirst">
-								<span class="nw-text-title nwPrimary-ttitle"><img src="imgs/moon5.webp" title="net worth of all assets">Net Worth</span>
-								<span id="netWorthUSD" class="nw-text-value">$10,000.00</span>
+								<div class="nw-text-title nwPrimary-ttitle"><img src="imgs/moon5.webp" title="net worth of all assets">Net Worth</div>
+							</div>
+							<div class="nw-text nwtextFirst">
+								<div id="netWorthUSD" class="nw-text-value nwPrimary-ttitle">$10,000.00</div>
 							</div>
 							<div class="nw-text">
 								<span class="nw-text-title"><i class="fa fa-info-circle" aria-hidden="true"  title="net value of user tokens currently deposited into protocol: in base"></i>Deposits</span>
@@ -179,66 +226,17 @@
 								<span id="netCommissionUSD" class="nw-text-value">$1,800.00</span>
 							</div>
 							<div class="nw-text">
-								<span class="nw-text-title"><i class="fa fa-info-circle" aria-hidden="true"  title="value of NEON tokens under wallet address"></i>Tokens</span>
+								<span class="nw-text-title"><i class="fa fa-info-circle" aria-hidden="true"  title="value of NEON tokens under wallet address"></i>NEONs</span>
 								<span id="tokensCount" class="nw-text-value">$707.01</span>
 							</div>
 						</div>
 					</div>
+				</div>
 
-					
-				  </div>
-
-				  <div class="walletTransact">
-					<form>
-					  <div class="form-group">
-						<!-- Rounded switch -->
-						<label class="switch" title="default mode: Deposit, click to switch to Withdraw">
-							<input type="checkbox">
-							<span class="slider round"></span>
-							<span class="mode">Cashier: Deposit Mode</span>
-						</label>
-						<div class="input-group">
-						  <input type="text" class="erc20-address-input" id="erc20-address" name="erc20-address" placeholder="Paste address...">
-						  <span class="or">OR</span>
-						  <select id="erc20-select" name="erc20-select">
-							<option value="">Select token...</option>
-							<option value="erc20-1">ERC20-1</option>
-							<option value="erc20-2">ERC20-2</option>
-							<option value="erc20-3">ERC20-3</option>
-						  </select>
-						</div>
-					  </div>
-					  <div class="form-group">
-						<input type="number" class="transact-amount" placeholder="amount">
-						<div id="balancesSection" class="hidden">
-							<div id="expandClose" class="expand-button">
-								<i class="fa fa-expand" aria-hidden="true"></i>
-							  </div>
-							<div class="balgrid">
-							  <strong>Deposited:</strong> <span id="depositedBalance">0</span>
-							</div>
-							<div class="balgrid">
-							  <strong>Withdrawn:</strong> <span id="withdrawnBalance">0</span>
-							</div>
-							<div class="balgrid">
-							  <strong>Locked:</strong> <span id="lockedInUseBalance">0</span>
-							</div>
-							<div class="balgrid">
-							  <strong>Withdrawable:</strong> <span id="withdrawableBalance">0</span>
-							</div>
-						</div>
-					  </div>
-					  <button type="submit" id="transactSubmit">Submit</button>
-					</form>
-
-					
-				  </div>
-				  
-				  
-				  <div class="list-section">
+				<div class="list-section">
 					<div class="section-title list-header">
 						<img src="./imgs/playful.webp" alt="Neon">
-					  <h2>Token Balances</h2>
+					  	<h2>Token Balances</h2>
 					</div>
 					<li class="trade-item t-i-lead">
 						<div class="token-icon"></div>
@@ -831,7 +829,7 @@
 					</div>
 
 					<div class="rewardsInformer">
-						<a href=""><i class="fa fa-leaf" aria-hidden="true"></i></a> Neon Protocol generates Real Yield from farming, and brings it back to investors for Revenue Sharing. Learn more about our Real Yield income streams <a href="" class="neon-real-yield-link">here..</a> 
+						<a href=""><i class="fa fa-leaf" aria-hidden="true"></i></a> Neon Protocol generates REAL YIELD from protocol ERC20 withdrawal fees, Hedge and Loan settlement fees, farming assigned token pools, and DEX trading fees. In future, providing retail ERC20 data feeds, providing  ERC20 native hedging & lending pools to projects. Neon Protocol brings back a portion of generated revenue to investors for Revenue Sharing. Learn more about our REAL YIELD income streams <a href="" class="neon-real-yield-link">here..</a> 
 					</div>
 
 					<div class="earnMoreWidget-rewards">
@@ -955,8 +953,8 @@
 							
 							<div class="grid grid-cols-2 stakeGrids">
 								<div class="stakeDataRow flex flex-col">
-									<div class="grid-sect-subtitle splitView stakedTitle"><span>my Staked Balance: </span><span>0 ($0)</span></div>
-									<div class="grid-sect-subtitle splitView"><span>my Total Holdings: </span><span>0 ($0)</span></div>
+									<div class="grid-sect-subtitle splitView stakedTitle"><span class="splitView-title">my Staked Balance: </span><span id="stakedBalanceAmnt">0</span><span id="stakedBalanceValue"> ($0)</span></div>
+									<div class="grid-sect-subtitle splitView"><span class="splitView-title">my Total Holdings: </span><span id="totalBalanceAmnt">0</span><span id="totalBalanceValue"> ($0)</span></div>
 								</div>
 								<div class="graph" style="--bluePercentage: 5;">
 									<p>5%</p>
@@ -965,8 +963,8 @@
 							<hr class="line">
 							<div class="grid grid-cols-2 stakeGrids">
 								<div class="stakeDataRow flex flex-col">
-									<div class="grid-sect-subtitle splitView stakedTitle"><span>Staked Supply: </span><span>0 ($0)</span></div>
-									<div class="grid-sect-subtitle splitView"><span>Circulating Supply: </span><span>0 ($0)</span></div>
+									<div class="grid-sect-subtitle splitView stakedTitle"><span class="splitView-title">Staked Supply: </span><span id="stakedSupplyAmnt">0</span><span id="stakedSupplyValue"> ($0)</span></div>
+									<div class="grid-sect-subtitle splitView"><span class="splitView-title">Circulating Supply: </span><span id="circSupplyAmnt">0</span><span id="circSupplyValue"> ($0)</span></div>
 								</div>
 								<div class="graph" style="--bluePercentage: 40;">
 									<p>40%</p>
@@ -975,8 +973,8 @@
 							<hr class="line">
 							<div class="grid grid-cols-2 stakeGrids">
 								<div class="stakeDataRow flex flex-col">
-									<div class="grid-sect-subtitle splitView stakedTitle"><span>Dividents Distributed: </span><span>0 ($0)</span></div>
-									<div class="grid-sect-subtitle splitView"><span>Dividents Claimed: </span><span>0 ($0)</span></div>
+									<div class="grid-sect-subtitle splitView stakedTitle"><span class="splitView-title">Dividents Distributed: </span><span id="divDistributedAmnt">0</span><span id="divDistributedValue"> ($0)</span></div>
+									<div class="grid-sect-subtitle splitView"><span class="splitView-title">Dividents Claimed: </span><span id="divClaimedAmnt">0</span><span id="divClaimedValue"> ($0)</span></div>
 								</div>
 								<div class="graph" style="--bluePercentage: 85;">
 									<p>85%</p>
@@ -987,16 +985,16 @@
 							<div class="flex flex-col gap-1">
 								<div class="flex flex-col">
 									<div class="grid-sect-subtitle">NEON available</div>
-									<div class="grid-sect-subtitle-value">0</div>
+									<div class="grid-sect-subtitle-value"><span id="tokensAvailableWallet">0</span></div>
 								</div>
-								<button class="claim-button" disabled=""><span>Stake NEON</span></button>
+								<button class="claim-button"><span>Stake NEON</span></button>
 							</div>
 							<div class="flex flex-col gap-1">
 								<div class="flex flex-col">
 									<div class="grid-sect-subtitle">NEON staked</div>
-									<div class="grid-sect-subtitle-value">0</div>
+									<div class="grid-sect-subtitle-value"><span id="tokensStakedWallet">0</span></div>
 								</div>
-								<button class="claim-button" disabled=""><span>unStake NEON</span></button>
+								<button class="claim-button"><span>unStake NEON</span></button>
 							</div>
 						</div>
 					</div>
@@ -1011,19 +1009,19 @@
 						<div class="stakeGrids flex flex-col gap-4">
 							<div class="stakeDataRow flex items-center justify-between gap-2">
 								<div class="grid-sect-title">Staked Tokens</div>
-								<div class="grid-sect-title" style="color:#0b9455 !important;">0 ($0)</div>
+								<div class="grid-sect-title" style="color:#0b9455 !important;"><span id="mystakedTokensAmnt">0</span><span id="myStakedTokensValue"> ($0)</span></div>
 							</div>
 
 							<hr class="line">
 							<div class="stakeDataRow flex items-center justify-between gap-2">
 								<div class="grid-sect-title">Assigned Tokens</div>
-								<div class="grid-sect-title" style="color:#0b9455 !important;">0 ($0)</div>
+								<div class="grid-sect-title" style="color:#0b9455 !important;"><span id="myAssignedAmnt">0</span><span id="myAssignedValue"> ($0)</span></div>
 							</div>
 							
 							<hr class="line">
 							<div class="stakeDataRow flex items-center justify-between gap-2">
 								<div class="grid-sect-title">Unassigned Tokens</div>
-								<div class="grid-sect-title" style="color:#0b9455 !important;">0 ($0)</div>
+								<div class="grid-sect-title" style="color:#0b9455 !important;"><span id="myUnassignedAmnt">0</span><span id="myUnassignedValue"> ($0)</span></div>
 							</div>
 
 						</div>
@@ -1031,7 +1029,7 @@
 							<div class="grid grid-cols-2 place-flexstart">
 								<div class="flex flex-col">
 									<div class="grid-sect-subtitle">Protocol Hedge Liquidity</div>
-									<div class="grid-sect-subtitle-value">0 ($0)</div>
+									<div class="grid-sect-subtitle-value"><span id="assignedToLiquidityAmnt">0</span><span id="assignedToLiquidityValue"> ($0)</span></div>
 								</div>
 								<button class="claim-button" disabled=""><span>Manage</span></button>
 							</div>
@@ -1039,7 +1037,7 @@
 							<div class="grid grid-cols-2 place-flexstart">
 								<div class="flex flex-col">
 									<div class="grid-sect-subtitle">Protocol Lending Collateral</div>
-									<div class="grid-sect-subtitle-value">0 ($0)</div>
+									<div class="grid-sect-subtitle-value"><span id="assignedToCollateralAmnt">0</span><span id="assignedToCollateralValue"> ($0)</span></div>
 								</div>
 								<button class="claim-button" disabled=""><span>Manage</span></button>
 							</div>
@@ -1047,7 +1045,7 @@
 							<div class="grid grid-cols-2 place-flexstart">
 								<div class="flex flex-col">
 									<div class="grid-sect-subtitle">Mining Rights</div>
-									<div class="grid-sect-subtitle-value">0 ($0)</div>
+									<div class="grid-sect-subtitle-value"><span id="assignedToMiningAmnt">0</span><span id="assignedToMiningValue"> ($0)</span></div>
 								</div>
 								<button class="claim-button" disabled=""><span>Manage</span></button>
 							</div>
@@ -1153,9 +1151,9 @@
 					<p data-aos="fade-down" data-aos-delay="100">Bundled Asset Equity Swaps.</p>
 					<p data-aos="fade-down" data-aos-delay="100">Directional Equity Swaps.</p>
 					<p data-aos="fade-down" data-aos-delay="100">Leveraged Hedging.</p>
-					<p data-aos="fade-down" data-aos-delay="100">Projects & Institutions: </p>
-					<p data-aos="fade-down" data-aos-delay="100">- Stake Assigning & Farming.</p>
-					<p data-aos="fade-down" data-aos-delay="100">- Raw & AI Curated ERC20 Data Feeds.</p>
+					<p data-aos="fade-down" data-aos-delay="100">Projects & Institutional support for: </p>
+					<p data-aos="fade-down" data-aos-delay="100">- ERC20 Native Farming Pools.</p>
+					<p data-aos="fade-down" data-aos-delay="100">- ERC20 Price Feeds & AI Curated Data Feeds.</p>
 				</div>
 				<!-- space vortex -->
 				<div class="space-vortex vortex-sm" data-aos="zoom-out-down" data-aos-delay="400">

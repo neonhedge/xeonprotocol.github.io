@@ -574,7 +574,7 @@
                         <div class="stakeDataRow flex items-center justify-between gap-2">
                             <div class="grid-sect-title">Assigned Stakes</div>
                             <div class="grid-sect-title" style="color:#33856b !important;">
-                                <span id="circAmount" class="green-amount">10,000,000</span> (<span id="circValue" class="green-value">$300,000</span>)
+                                <span id="assignedStakesAmnt" class="green-amount">10,000,000</span> (<span id="assignedStakesValue" class="green-value">$300,000</span>)
                             </div>
                         </div>
                         
@@ -582,7 +582,7 @@
                         <div class="stakeDataRow flex items-center justify-between gap-2">
                             <div class="grid-sect-title">Unassigned Stakes</div>
                             <div class="grid-sect-title" style="color:#33856b !important;">
-                                <span id="circAmount" class="green-amount">290,000,000</span> (<span id="circValue" class="green-value">$2,700,000</span>)
+                                <span id="unAssignedStakesAmnt" class="green-amount">290,000,000</span> (<span id="unAssignedStakesValue" class="green-value">$2,700,000</span>)
                             </div>
                         </div>
 
@@ -590,26 +590,16 @@
                         <div class="stakeDataRow flex items-center justify-between gap-2">
                             <div class="grid-sect-title">Assignment Pools Earnings</div>
                             <div class="grid-sect-title" style="color:#33856b !important;">
-                                <span id="circValue" class="green-value">$400,000</span>
+                                <span id="assignmentRewardsAmnt" class="green-value">24 ETH</span> (<span id="assignmentRewardsValue" class="green-value">$400,000</span>)
                             </div>
                         </div>
                     </div><!-- stakeGrids -->
                     <div class="assignmentPools flex flex-col gap-5">
                         <div class="grid grid-cols-2 place-flexstart">
                             <div class="flex flex-col">
-                                <div class="grid-sect-subtitle">Normal Staking</div>
-                                <div class="grid-sect-subtitle-value">
-                                    <span id="stakedAmount" class="amount">8,000,000</span> (<span id="stakedValue" class="value">$70,000</span>)
-                                </div>
-                            </div>
-                            <button class="claim-button" disabled=""><span>Review Earnings</span></button>
-                        </div>
-                        <hr class="line">
-                        <div class="grid grid-cols-2 place-flexstart">
-                            <div class="flex flex-col">
                                 <div class="grid-sect-subtitle">Protocol Hedge Liquidity</div>
                                 <div class="grid-sect-subtitle-value">
-                                    <span id="stakedAmount" class="amount">1,000,000</span> (<span id="stakedValue" class="value">$30,000</span>)
+                                    <span id="assignedLiquidityAmnt" class="amount">1,000,000</span> (<span id="assignedLiquidityValue" class="value">$30,000</span>)
                                 </div>
                             </div>
                             <button class="claim-button" disabled=""><span>Review Earnings</span></button>
@@ -619,11 +609,22 @@
                             <div class="flex flex-col">
                                 <div class="grid-sect-subtitle">Protocol Loan Collateral</div>
                                 <div class="grid-sect-subtitle-value">
-                                    <span id="stakedAmount" class="amount">2,500,000</span> (<span id="stakedValue" class="value">$40,000</span>)
+                                    <span id="assignedCollateralAmnt" class="amount">2,500,000</span> (<span id="assignedCollateralValue" class="value">$40,000</span>)
                                 </div>
                             </div>
                             <button class="claim-button" disabled=""><span>Review Earnings</span></button>
                         </div>
+                        <hr class="line">
+                        <div class="grid grid-cols-2 place-flexstart">
+                            <div class="flex flex-col">
+                                <div class="grid-sect-subtitle">Mining Rights</div>
+                                <div class="grid-sect-subtitle-value">
+                                    <span id="assignedMiningAmnt" class="amount">8,000,000</span> (<span id="assignedMiningValue" class="value">$70,000</span>)
+                                </div>
+                            </div>
+                            <button class="claim-button" disabled=""><span>Review Earnings</span></button>
+                        </div>
+                        
                     </div> <!-- assignmentPools -->
                 </div>            
                 <!-- End of page sections -->

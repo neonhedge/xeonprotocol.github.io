@@ -236,6 +236,7 @@ async function fetchSection_StakingPanel(){
 	
 	// Fetch ETH to USD conversion rate
 	const ethUsdPrice = await getCurrentEthUsdcPriceFromUniswapV2();
+	const tokenUsdPrice = await getTokenUSDValue();
 
 	// Step 1: Convert amounts
 	const wethDecimals = 18; const usdtDecimals = 6; const usdcDecimals = 6;
