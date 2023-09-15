@@ -1,5 +1,5 @@
-import { CONSTANTS, getCurrentEthUsdcPriceFromUniswapV2, getTokenETHValue } from './constants.js';
-import { updateSectionValues_Networth, updateSectionValues_Hedges, updateSectionValues_StakingRewards } from './module-wallet-section-updaters.js';
+import { CONSTANTS, getCurrentEthUsdcPriceFromUniswapV2, getTokenETHValue, getTokenUSDValue } from './constants.js';
+import { updateSectionValues_Networth, updateSectionValues_Hedges, updateSectionValues_Rewards, updateSectionValues_Staking } from './module-wallet-section-updaters.js';
 import { getCurrentBalancesValue, calculateStakedTokensValueETH, calculateRewardsDue, calculateCommissionDueETH } from './module-wallet-networth-dependencies.js';
 import { userTokenList, cashierErc20List } from './module-wallet-tokenlist-dependencies.js';
 
@@ -10,7 +10,7 @@ async function fetchSection_Networth(){
         const accounts = await web3.eth.requestAccounts();
         const userAddress = accounts[0];
         
-        const walletBalanceRaw = await web3.eth.getBalance(userAddress);
+        const walletBalanceRaw = await neonInstance.methods.balanceOf(userAddress).call();
         const stakedBalanceRaw = await stakingInstance.methods.getStakedBalance(userAddress).call();
 
         const transactedTokensArrayList = await hedgingInstance.methods.getUserTokenList(userAddress).call();
@@ -140,9 +140,9 @@ async function fetchSection_HedgePanel(){
 
 }
 
-// 4. Fetch Section Values - STAKING PANEL
+// 4. Fetch Section Values - REWARDS PANEL
 //----------------------------------------------------
-async function fetchSection_StakingPanel(){
+async function fetchSection_RewardsPanel(){
 	
 	const accounts = await web3.eth.requestAccounts();
 	const userAddress = accounts[0];
@@ -187,7 +187,7 @@ async function fetchSection_StakingPanel(){
 	const userColRewardsClaimedUSDT = userColRewardsClaimedEth * ethUsdPrice;
 	const totalRewardsClaimedUSDT = userRewardsClaimedUSDT + userLiqRewardsClaimedUSDT + userColRewardsClaimedUSDT;
 
-	updateSectionValues_StakingRewards(
+	updateSectionValues_Rewards(
 		totalRewardsDueWETH,
 		totalRewardsDueUSDT,
 		totalRewardsClaimedWETH,
@@ -197,10 +197,120 @@ async function fetchSection_StakingPanel(){
 		userLiqRewardsDueEth,
 		userLiqRewardsDueUSDT,
 		userColRewardsDueEth,
-		userColRewardsDueUSDT
+		userColRewardsDueUSDT,
+		userRewardsClaimedEth,
+		userRewardsClaimedUSDT,
+		userLiqRewardsClaimedEth,
+		userLiqRewardsClaimedUSDT,
+		userColRewardsClaimedEth,
+		userColRewardsClaimedUSDT
+	);
+
+}
+
+// 5. Fetch Section Values - STAKING PANEL
+//----------------------------------------------------
+async function fetchSection_StakingPanel(){
+	
+	const accounts = await web3.eth.requestAccounts();
+	const userAddress = accounts[0];
+	
+	const walletBalanceRaw = await neonInstance.methods.balanceOf(userAddress).call();
+	const stakedBalanceRaw = await stakingInstance.methods.getStakedBalance(userAddress).call();
+	const depositedBalanceRaw = await hedgingInstance.methods.getuserTokenBalances(CONSTANTS.neonAddress, userAddress).call();
+	const [deposited, withdrawn] = depositedBalanceRaw;
+	// Staked versus Supply
+	const totalStakedRaw = await stakingInstance.methods.getTotalStaked().call();
+	const circulatingSupplyRaw = await tokenInst.circulatingSupply(); 
+	// Distrubuted ETH rewards to staking contract
+	const distributedRewards = await stakingInstance.methods.ethRewardBasis().call();
+	const distributedRewardsLiqu = await stakingInstance.methods.ethLiquidityRewardBasis().call();
+	const distributedRewardsColl = await stakingInstance.methods.ethCollateralRewardBasis().call();
+	// Claimed ETH rewards to staking contract
+	const claimedRewards = await stakingInstance.methods.rewardsClaimed().call();
+	const claimedRewardsLiqu = await stakingInstance.methods.rewardsClaimedLiquidity().call();
+	const claimedRewardsColl = await stakingInstance.methods.rewardsClaimedCollateral().call();
+	
+	// Fetch ETH to USD conversion rate
+	const ethUsdPrice = await getCurrentEthUsdcPriceFromUniswapV2();
+
+	// Step 1: Convert amounts
+	const wethDecimals = 18; const usdtDecimals = 6; const usdcDecimals = 6;
+	
+	// Step 2: Convert ETH values
+	const walletBalance = new BigNumber(walletBalanceRaw).div(10 ** CONSTANTS.decimals);
+	const stakedBalance = new BigNumber(stakedBalanceRaw).div(10 ** CONSTANTS.decimals);
+	const depositedBalance = new BigNumber(deposited).div(10 ** CONSTANTS.decimals);
+	const withdrawnBalance = new BigNumber(withdrawn).div(10 ** CONSTANTS.decimals);
+	const totalHoldingsRaw = walletBalance + stakedBalance + (depositedBalance - withdrawnBalance);
+
+	const totalStaked = new BigNumber(totalStakedRaw).div(10 ** CONSTANTS.decimals);
+	const circulatingSupply = new BigNumber(circulatingSupplyRaw).div(10 ** CONSTANTS.decimals);
+
+	const distributedRewardsEth = new BigNumber(distributedRewards).div(10 ** wethDecimals);
+	const distributedRewardsLiquEth = new BigNumber(distributedRewardsLiqu).div(10 ** wethDecimals);
+	const distributedRewardsCollEth = new BigNumber(distributedRewardsColl).div(10 ** wethDecimals);
+	const distributedRewardsTotalEth = distributedRewardsEth + distributedRewardsLiquEth + distributedRewardsCollEth;
+	
+	const claimedRewardsEth = new BigNumber(claimedRewards).div(10 ** wethDecimals);
+	const claimedRewardsLiquEth = new BigNumber(claimedRewardsLiqu).div(10 ** wethDecimals);
+	const claimedRewardsCollEth = new BigNumber(claimedRewardsColl).div(10 ** wethDecimals);
+	const claimedRewardsTotalEth = distributedRewardsEth + distributedRewardsLiquEth + distributedRewardsCollEth;
+
+	// Step 3: Convert usdt values
+	const walletBalanceUSDT = walletBalance * getTokenUSDValue;
+	const stakedBalanceUSDT = stakedBalance * getTokenUSDValue;
+	const depositedBalanceUSDT = depositedBalance * getTokenUSDValue;
+	const withdrawnBalanceUSDT = withdrawnBalance * getTokenUSDValue;
+	const totalHoldingsUSDT = totalHoldingsRaw * getTokenUSDValue;
+
+	const totalStakedUSDT = totalStaked * getTokenUSDValue;
+	const circulatingSupplyUSDT = circulatingSupply * getTokenUSDValue;
+
+	const distributedRewardsUSDT = distributedRewardsEth * ethUsdPrice;
+	const distributedRewardsLiqUSDT = distributedRewardsLiquEth * ethUsdPrice;	
+	const distributedRewardsColUSDT = distributedRewardsCollEth * ethUsdPrice;	
+	const distributedRewardsTotalUSDT = distributedRewardsTotalEth * ethUsdPrice;
+
+	const claimedRewardsUSDT = claimedRewardsEth * ethUsdPrice;
+	const claimedRewardsLiqUSDT = claimedRewardsLiquEth * ethUsdPrice;	
+	const claimedRewardsColUSDT = claimedRewardsCollEth * ethUsdPrice;	
+	const claimedRewardsTotalUSDT = claimedRewardsTotalEth * ethUsdPrice;
+
+	updateSectionValues_Staking(
+		walletBalance,
+		stakedBalance,
+		depositedBalance,
+		withdrawnBalance,
+		totalHoldingsRaw,
+		totalStaked,
+		circulatingSupply,
+		distributedRewardsEth,
+		distributedRewardsLiquEth,
+		distributedRewardsCollEth,
+		distributedRewardsTotalEth,
+		claimedRewardsEth,
+		claimedRewardsLiquEth,
+		claimedRewardsCollEth,
+		claimedRewardsTotalEth,
+		walletBalanceUSDT,
+		stakedBalanceUSDT,
+		depositedBalanceUSDT,
+		withdrawnBalanceUSDT,
+		totalHoldingsUSDT,
+		totalStakedUSDT,
+		circulatingSupplyUSDT,
+		distributedRewardsUSDT,
+		distributedRewardsLiqUSDT,
+		distributedRewardsColUSDT,
+		distributedRewardsTotalUSDT,
+		claimedRewardsUSDT,
+		claimedRewardsLiqUSDT,
+		claimedRewardsColUSDT,
+		claimedRewardsTotalUSDT
 	);
 
 }
 
 // Export the fetch functions
-export { fetchSection_Networth, fetchSection_BalanceList, fetchSection_HedgePanel, fetchSection_StakingPanel };
+export { fetchSection_Networth, fetchSection_BalanceList, fetchSection_HedgePanel, fetchSection_RewardsPanel, fetchSection_StakingPanel };
