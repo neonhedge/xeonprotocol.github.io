@@ -1,15 +1,14 @@
-import { CONSTANTS, getCurrentEthUsdcPriceFromUniswapV2 } from './constants.js';
-import { updateSectionValues_Hedge, updateSectionValues_Progress, updateSectionValues_Gains } from './module-hedge-section-updaters.js';
+import { CONSTANTS } from './constants.js';
+import { updateSectionValues_HedgeCard, updateSectionValues_Progress, updateSectionValues_Gains } from './module-hedge-section-updaters.js';
 
 // 1. Fetch Section Values - Hedge
 //-----------------------------------------
-async function fetchSection_Hedge(hedgeID){
+async function fetchSection_HedgeCard(hedgeID){
     try {
         const accounts = await web3.eth.requestAccounts();
         const userAddress = accounts[0];
-        
+        // get hedge data
         const hedgeDataRaw = await hedgingInstance.methods.getHedgeDetails(hedgeID).call();
-        // Split the returned data into individual variables
         const {
             topupConsent, // bool
             zapTaker, // bool
@@ -32,7 +31,7 @@ async function fetchSection_Hedge(hedgeID){
             topupRequests, // uint256[]
         } = hedgeDataRaw;        
         
-        //Standard ERC20 ABI
+        //standard ERC20 ABI
         const erc20ABI = [
             {
               constant: true,
@@ -48,40 +47,25 @@ async function fetchSection_Hedge(hedgeID){
               outputs: [{ name: '', type: 'string' }],
               type: 'function',
             },
-          ];
-          
-
+        ];
+    
         // ERC20 Instance 
         const tokenContract = new web3.eth.Contract(erc20ABI, token);
         // Token Name
         const tokenName = await tokenContract.methods.name().call();
         const tokenDecimal = await tokenContract.methods.decimals().call();
+        const tokenSymbol = await tokenContract.methods.symbol().call();
         // Hedge Value
         const hedgeValueRaw = await hedgingInstance.methods.getUnderlyingValue(token, amount).call();
         const underlyingValue = hedgeValueRaw[0];
         const pairedCurrency = hedgeValueRaw[1];
         // Fetch Symbol of paired currency
-        const pairedSymbol = await tokenContract.methods.symbol().call();
-
-        /* Pass Hedge Type Check to Update Function
-        // Define a mapping object for hedgeType values
-        const hedgeTypeMapping = {
-            0: { text: 'Call Option', color: '#089353' }, // CALL
-            1: { text: 'Put Option', color: '#d6188a' },  // PUT
-            2: { text: 'Equity Swap', color: '#7e22ce' }, // SWAP
-        };
-        // Get the .hedgetype div element by its class name
-        const hedgeTypeDiv = document.querySelector('.hedgetype');        
-        // Get the hedgeType value
-        const hedgeTypeValue = hedgeTypeMapping[hedgeType] || { text: 'Unknown', color: '#000000' };
-        // Update the text content and background color of the div
-        hedgeTypeDiv.textContent = hedgeTypeValue.text;
-        hedgeTypeDiv.style.backgroundColor = hedgeTypeValue.color;
-*/      
+        const pairedContract = new web3.eth.Contract(erc20ABI, paired);
+        const pairedSymbol = await pairedContract.methods.symbol().call();  
         // Token Amount
         const tokenAmount = new BigNumber(amount).div(10 ** tokenDecimal);
-
-        // Gains & Losses, +ve or -ve result       
+        // Gains & Losses
+        // +ve or -ve integers passed to update function       
         let takerGains;
         let writerGains;
         switch (hedgeType) {
@@ -142,25 +126,38 @@ async function fetchSection_Hedge(hedgeID){
 
         updateSectionValues_HedgeCard(
             tokenName,
+            tokenSymbol,
             tokenAmount,
             hedgeType,
             token,
             pairedCurrency,
             pairedSymbol,
+            //values
+            endvalue,
             underlyingValue,
             startvalue,
             createValue,
             cost,
+            //parties
             owner,
             taker,
             userAddress,
             takerGains,
             writerGains,
+            //date
             dt_createdFormatted,
             dt_startedFormatted,
             dt_expiryFormatted,
             dt_settledFormatted,
-            timetoExpiry
+            timetoExpiry,
+            //status
+            status,
+            //consent
+            topupConsent, // bool
+            zapTaker, // bool
+            zapWriter, // bool
+            //requests
+            topupRequests, // uint256[]
         );
     } catch (error) {
         console.error("Error fetching Hedge Panel section data:", error);
