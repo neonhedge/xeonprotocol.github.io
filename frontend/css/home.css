@@ -35,6 +35,11 @@ body {
 	justify-content: center;
 	background: radial-gradient(#18142d, #040115 80%) !important;
 }
+
+header {
+  padding-block: 1.2rem;
+}
+
 main{
   overflow:hidden;
 }

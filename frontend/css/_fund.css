@@ -17,6 +17,12 @@ body {
 	background-repeat: no-repeat !important;
 }
 
+header {
+	/* old menu style restore point */
+	padding-block: unset !important;
+	border-bottom: 0.5px dotted #3399ff !important;
+}
+
 main {
   background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.8)), url('../imgs/tgbconcept.png');
   background-repeat: repeat, repeat;
@@ -241,6 +247,7 @@ hr.line {
   display: flex;
   justify-content: space-between;
   flex-basis: 750px;
+  flex-basis: 850px; /* without AI side panel */
 }
 
 @media (max-width: 55em) {
@@ -257,7 +264,7 @@ hr.line {
 .hedgeGrid {
   position: relative;
   margin: 0px auto;
-  border-bottom: 0.5px dotted #a1a1a1;
+  border-bottom: 1px dotted #000;
   text-align: center;
   display: flex;
   justify-content: center;

@@ -767,6 +767,9 @@ nav#navbar ul li ul.submenu li a {
   }
   nav#navbar ul li a {
     color: rgba(255, 255, 255, 0.9);
+    /* old menu font size restore - delete below & restore padding block on <header/> */
+    font-size: 16px;
+    font-weight: 100;
   }
   nav#navbar ul li.has-submenu > a {
     color: rgba(255, 255, 255, 0.9);

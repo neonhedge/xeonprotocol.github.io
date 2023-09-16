@@ -35,6 +35,9 @@
 	font-size: clamp(13px, 1vw, 15px);
 	font-weight: 400;
 	letter-spacing:0.5px;
+
+	/* old menu restore point - delete below */
+	font-weight: 100;
 }
 .wallet_connect:hover{
 	font-weight:500px;
