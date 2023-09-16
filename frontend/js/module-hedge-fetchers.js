@@ -61,7 +61,7 @@ async function fetchSection_Hedge(hedgeID){
         const underlyingValue = hedgeValueRaw[0];
         const pairedCurrency = hedgeValueRaw[1];
         // Fetch Symbol of paired currency
-        const tokenSymbol = await tokenContract.methods.symbol().call();
+        const pairedSymbol = await tokenContract.methods.symbol().call();
 
         /* Pass Hedge Type Check to Update Function
         // Define a mapping object for hedgeType values
@@ -80,7 +80,7 @@ async function fetchSection_Hedge(hedgeID){
 */      
         // Token Amount
         const tokenAmount = new BigNumber(amount).div(10 ** tokenDecimal);
-        const hedgeValue = new BigNumber(createValue).div(10 ** tokenDecimal);
+
         // Gains & Losses, +ve or -ve result       
         let takerGains;
         let writerGains;
@@ -140,17 +140,27 @@ async function fetchSection_Hedge(hedgeID){
             timetoExpiry = Math.floor(timetoExpiry / 3600); // 1 hour = 3600 seconds
         }
 
-
-        updateSectionValues_Networth(
+        updateSectionValues_HedgeCard(
+            tokenName,
+            tokenAmount,
+            hedgeType,
+            token,
+            pairedCurrency,
+            pairedSymbol,
+            underlyingValue,
+            startvalue,
+            createValue,
+            cost,
+            owner,
+            taker,
             userAddress,
-            walletBalance,
-            stakedBalance,
-            totalDepositsUSD,
-            totalRewardsDueUSD,
-            totalCommissionDueETH,
-            totalCommissionDueUSD,
-            transactedTokensCount,
-            netWorthUSD
+            takerGains,
+            writerGains,
+            dt_createdFormatted,
+            dt_startedFormatted,
+            dt_expiryFormatted,
+            dt_settledFormatted,
+            timetoExpiry
         );
     } catch (error) {
         console.error("Error fetching Hedge Panel section data:", error);
