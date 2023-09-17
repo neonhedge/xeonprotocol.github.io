@@ -96,8 +96,8 @@ contract HEDGEFUND {
         uint status; //0 - none, 1 - created, 2 - taken, 3 - settled
         uint256 amount;
         uint256 createValue;
-        uint256 startvalue;
-        uint256 endvalue;
+        uint256 startValue;
+        uint256 endValue;
         uint256 cost;
         uint256 dt_created;
         uint256 dt_started;
@@ -218,7 +218,7 @@ contract HEDGEFUND {
     event onWithdraw(address indexed token, uint256 indexed amount, address indexed wallet);
     event hedgeCreated(address indexed token, uint256 indexed optionId, uint256 amount, HedgeType hedgeType, uint256 cost);
     event hedgePurchased(address indexed token, uint256 indexed optionId, uint256 amount, HedgeType hedgeType, address buyer);
-    event hedgeSettled(address indexed token, uint256 indexed optionId, uint256 amount, uint256 indexed payOff, uint256 endvalue);
+    event hedgeSettled(address indexed token, uint256 indexed optionId, uint256 amount, uint256 indexed payOff, uint256 endValue);
     event minedHedge(uint256 optionId, address indexed miner, address indexed token, address indexed paired, uint256 tokenFee, uint256 baseFee);
     event bookmarkToggle(address indexed user, uint256 hedgeId, bool bookmarked);
     event topupHedge(address indexed party, uint256 indexed hedgeId, uint256 topupAmount, bool consent);
@@ -362,6 +362,7 @@ contract HEDGEFUND {
     // Hedges are bought in base or paired currency of underlying token
     // For Call and Put Options cost is premium, lockedinuse here but paid out on settlement
     // For Equity Swaps cost is equal to underlying value as 100% collateral is required. There is no premium
+    // Strike value is not set here, maturity calculations left to the settlement function
     function buyHedge(uint256 _optionId) public nonReentrant {
         require(!locked, "Function is locked");
         locked = true;
@@ -371,16 +372,15 @@ contract HEDGEFUND {
         require(_optionId < optionID && msg.sender != hedge.owner, "Invalid option ID | Owner cant buy");
        
         // Calculate, check and update start value based on the hedge type
-        (hedge.startvalue, ) = getUnderlyingValue(hedge.token, hedge.amount);
+        (hedge.startValue, ) = getUnderlyingValue(hedge.token, hedge.amount);
         if (hedge.hedgeType == HedgeType.SWAP) {
-            hedge.startvalue += hedge.cost;
+            hedge.startValue += hedge.cost;
         }
-        require(hedge.startvalue > 0, "Math error whilst getting price");
+        require(hedge.startValue > 0, "Math error whilst getting price");
         stk.lockedinuse = stk.lockedinuse.add(hedge.cost);
         hedge.dt_started = block.timestamp;
         hedge.taker = msg.sender;
         hedge.status = 2;
-
         // Store updated structs
         userBalanceMap[hedge.paired][msg.sender] = stk;
         hedgeMap[_optionId] = hedge;
@@ -399,17 +399,17 @@ contract HEDGEFUND {
             baseERC20s[address(this)].push(hedge.paired);
         }
         // Protocol Revenue Trackers
-        hedgesTakenVolume[hedge.paired].add(hedge.startvalue);
+        hedgesTakenVolume[hedge.paired].add(hedge.startValue);
         hedgesCostVolume[hedge.paired].add(hedge.cost);
         if (hedge.hedgeType == HedgeType.SWAP) {
-            swapsVolume[hedge.paired].add(hedge.startvalue);
+            swapsVolume[hedge.paired].add(hedge.startValue);
         } else if(hedge.hedgeType == HedgeType.CALL) {
-            optionsVolume[hedge.paired].add(hedge.startvalue);
+            optionsVolume[hedge.paired].add(hedge.startValue);
         }
         // Wallet hedge volume analytics in main bases only
-        if(hedge.paired == wethAddress){wethEquivUserCosts[msg.sender] += hedge.startvalue;}
-        if(hedge.paired == usdtAddress){usdtEquivUserCosts[msg.sender] += hedge.startvalue;}
-        if(hedge.paired == usdcAddress){usdcEquivUserCosts[msg.sender] += hedge.startvalue;}
+        if(hedge.paired == wethAddress){wethEquivUserCosts[msg.sender] += hedge.startValue;}
+        if(hedge.paired == usdtAddress){usdtEquivUserCosts[msg.sender] += hedge.startValue;}
+        if(hedge.paired == usdcAddress){usdcEquivUserCosts[msg.sender] += hedge.startValue;}
 
         // Emit the hedgePurchased event
         emit hedgePurchased(hedge.token, _optionId, hedge.amount, hedge.hedgeType, msg.sender);
@@ -528,7 +528,7 @@ contract HEDGEFUND {
         require(option.zapWriter || option.zapTaker || block.timestamp >= option.dt_expiry, "Hedge cannot be settled yet");
 
         // Initialize local variables
-        hedgeInfo.startValue = option.startvalue;
+        hedgeInfo.startValue = option.startValue;
         (hedgeInfo.underlyingValue, ) = getUnderlyingValue(option.token, option.amount);
 
         // Get storage ready for user balances of the owner, taker, and contract
@@ -594,7 +594,7 @@ contract HEDGEFUND {
                 logPL(option.cost.sub(hedgeInfo.baseFee), option.paired, option.owner, option.taker, 0);
             }
         } else if (option.hedgeType == HedgeType.PUT) {
-            hedgeInfo.isBelowStrikeValue = hedgeInfo.underlyingValue < hedgeInfo.startValue.add(option.cost);
+            hedgeInfo.isBelowStrikeValue = hedgeInfo.underlyingValue < hedgeInfo.startValue.less(option.cost);
             if (hedgeInfo.isBelowStrikeValue) {
                 // Taker profit in base = strike value - underlying - cost
                 hedgeInfo.payOff = hedgeInfo.startValue.sub(hedgeInfo.underlyingValue).sub(option.cost);
@@ -685,7 +685,7 @@ contract HEDGEFUND {
         logAnalyticsFees(option.token, hedgeInfo.tokenFee, hedgeInfo.baseFee, hedgeInfo.tokensDue, option.cost, hedgeInfo.underlyingValue);
         // Update hedge
         option.status = 3;
-        option.endvalue = hedgeInfo.underlyingValue;
+        option.endValue = hedgeInfo.underlyingValue;
         option.dt_settled = block.timestamp;
         // catch new erc20 address so that wallet can log all underlying token balances credited to it
         // base addresses already caught on deposit by wallet
