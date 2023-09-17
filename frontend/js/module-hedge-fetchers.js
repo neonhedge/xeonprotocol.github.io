@@ -1,5 +1,6 @@
 import { CONSTANTS } from './constants.js';
 import { updateSectionValues_HedgeCard, updateSectionValues_Progress, updateSectionValues_Gains } from './module-hedge-section-updaters.js';
+import { updateChartValues_Hedge } from './module-hedge-chart-updaters.js';
 
 // 1. Fetch Section Values - Hedge
 //-----------------------------------------
