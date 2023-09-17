@@ -79,214 +79,160 @@ function updateSectionValues_HedgeCard(
         document.getElementById("strikeValue").textContent = `${formatValue(strikeValue)} ${pairedSymbol}`;
         document.getElementById("hedgeCost").textContent = `${formatValue(cost)} ${pairedSymbol}`;
 
+        // Step 5: Update times
+        document.getElementById("dateCreate").textContent = dt_createdFormatted;
+        document.getElementById("dateStart").textContent = dt_startedFormatted;
+        document.getElementById("dateExpiry").textContent = dt_expiryFormatted;
 
-        var first = userAddress.substring(0, 5);//get first chars
-        var last = userAddress.slice(userAddress.length - 3);//get last chars
-        var privatize = first+'..'+last;
-    
-        // Update wallet address
-        document.getElementById("walletAddress").textContent = privatize;
-        document.getElementById("stakedBalance").textContent = formatString(stakedBalance);
-        document.getElementById("walletBalance").textContent = formatString(walletBalance);
-        document.getElementById("netWorthUSD").textContent = formatStringDecimal(netWorthUSD);
-        document.getElementById("netDepositsUSD").textContent = formatStringDecimal(totalDepositsUSD);
-        document.getElementById("netRewardsUSD").textContent = formatStringDecimal(totalRewardsDueUSD);
-        document.getElementById("netCommissionUSD").textContent = formatStringDecimal(totalCommissionDueUSD);
-        document.getElementById("tokensCount").textContent = formatValue(transactedTokensCount);
+    } catch (error) {
+        console.error("Error Updating Net Worth section data:", error);
+    }
+}
+function updateSectionValues_Progress(
+    pairedCurrency,
+    pairedSymbol,
+    //values
+    endValue,
+    strikeValue,
+    underlyingValue,
+    startValue,
+    createValue,
+    cost,
+    //date
+    dt_createdFormatted,
+    dt_startedFormatted,
+    dt_expiryFormatted,
+    dt_settledFormatted,
+    timetoExpiry,
+    lifespan,
+    //status
+    status
+)   {
+    try {
+        // Step 1: Update progress : hours left
+        document.getElementById("timetoExpiry").textContent = `${timetoExpiry} hrs`;
+        
+        // Step 2: compare lifespan to timetoExpiry and set the width of a div with ID progressBar, if timetoExpiry is 10% of lifespan then width is 10% of 100%        
+        const progressBar = document.getElementById('progressBar');
+        
+        if (lifespan >= 0 && timetoExpiry < lifespan) {
+          const percentage = (timetoExpiry / lifespan) * 100;
+          const percentWidth = 100 - percentage;
+          progressBar.style.width = `${percentWidth}%`;
+        } else {
+          progressBar.style.width = '0%';
+        }
     } catch (error) {
         console.error("Error Updating Net Worth section data:", error);
     }
 }
 
-// Update Section Values - Networth
-function updateSectionValues_Hedges(
-	userHedgesCreated,
-	userHedgesTaken,
-	totalWriteTWETH,
-	totalTakeTWETH,
-	userOptionsHistoryCount,
-	userSwapsHistoryCount,
-	totalProfitTWETH,
-	totalLossTWETH
-	) {
-    
-    const formatValue = (value) => {
-      return `$${value.toFixed(2)}`;
-    };
+function updateSectionValues_Gains(
+    tokenName,
+    tokenSymbol,
+    tokenAmount,
+    hedgeType,
+    token,
+    pairedCurrency,
+    pairedSymbol,
+    //values
+    endValue,
+    strikeValue,
+    underlyingValue,
+    startValue,
+    createValue,
+    cost,
+    //parties
+    owner,
+    taker,
+    userAddress,
+    takerGains,
+    writerGains,
+    //date
+    timetoExpiry,
+    //status
+    status,
+    //consent
+    zapTaker, // bool
+    zapWriter // bool
+) {
 
-	const formatString = (number) => {
-		return number.toLocaleString();
-	};
+  try {
+        const formatValue = (value) => {
+            return `$${value.toFixed(2)}`;
+        };
 
-	const formatStringDecimal = (number) => {
-		const options = {
-			style: 'decimal',
-			minimumFractionDigits: 2,
-			maximumFractionDigits: 2,
-		};
-		return number.toLocaleString('en-US', options);
-	};
+        const formatString = (number) => {
+            return number.toLocaleString();
+        };
+
+        const formatStringDecimal = (number) => {
+            const options = {
+                style: 'decimal',
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+            };
+            return number.toLocaleString('en-US', options);
+        };
+
+        // Check writer gains
+        const writerGainsDiv = document.getElementById("writerGains");
+        if (writerGains < 0) {
+            writerGainsDiv.style.backgroundColor = "rgba(255, 0, 0, 0.5)";
+        } else if (writerGains > 0) {
+            writerGainsDiv.style.backgroundColor = "rgba(0, 255, 0, 0.5)";
+        }
+
+        // Check taker gains
+        const takerGainsDiv = document.getElementById("takerGains");
+        if (takerGains < 0) {
+            takerGainsDiv.style.backgroundColor = "rgba(255, 0, 0, 0.5)";
+        } else if (takerGains > 0) {
+            takerGainsDiv.style.backgroundColor = "rgba(0, 255, 0, 0.5)";
+        }
+
+        // Display writer gains and taker gains with symbols
+        const writerGainsBaseDiv = document.getElementById("writerGainsBase");
+        writerGainsBaseDiv.innerText = `${writerGains >= 0 ? '+' : '-'}${Math.abs(writerGains).toFixed(2)} ${pairedSymbol}`;
+        
+        const takerGainsBaseDiv = document.getElementById("takerGainsBase");
+        takerGainsBaseDiv.innerText = `${takerGains >= 0 ? '+' : '-'}${Math.abs(takerGains).toFixed(2)} ${pairedSymbol}`;
+
+        // Truncate addresses
+        const truncateAddress = (address) => {
+            const first = address.substring(0, 5);
+            const last = address.slice(address.length - 3);
+            return `${first}..${last}`;
+        };
+
+        // Display privatised taker and owner addresses
+        const hedgeTakerDiv = document.getElementById("hedgeTaker");
+        hedgeTakerDiv.innerText = truncateAddress(taker);
+
+        const hedgeOwnerDiv = document.getElementById("hedgeOwner");
+        hedgeOwnerDiv.innerText = truncateAddress(owner);
+
+        // Show buttons based on status and userAddress
+        const takeHedgeButton = document.getElementById("takeHedge");
+        const deleteHedgeButton = document.getElementById("deleteHedge");
+        const zapHedgeButton = document.getElementById("zapHedge");
+        const settledAlreadyButton = document.getElementById("settledAlready");
+
+        if (status === 1) {
+            if (userAddress !== owner) {
+            takeHedgeButton.style.display = "block";
+            deleteHedgeButton.style.display = "block";
+            }
+        } else if (status === 2) {
+            zapHedgeButton.style.display = "block";
+        } else if (status === 3) {
+            settledAlreadyButton.style.display = "block";
+        }
   
-    // Update panel
-    document.getElementById("hedgesCreatedCount").textContent = userHedgesCreated;
-    document.getElementById("hedgesTakenCount").textContent = userHedgesTaken;
-	document.getElementById("writeVolume").textContent = formatString(totalWriteTWETH);
-    document.getElementById("takeVolume").textContent = formatString(totalTakeTWETH);
-    document.getElementById("optionsCount").textContent = userOptionsHistoryCount;
-    document.getElementById("swapsCount").textContent = userSwapsHistoryCount;
-    document.getElementById("profitsETH").textContent = formatString(totalProfitTWETH);
-    document.getElementById("lossesETH").textContent = formatString(totalLossTWETH);
+    } catch (error) {
+      console.error("Error Updating Net Worth section data:", error);
+    }
 }
 
-function updateSectionValues_Rewards(
-    totalRewardsDueWETH,
-    totalRewardsDueUSDT,
-    totalRewardsClaimedWETH,
-    totalRewardsClaimedUSDT,
-    userRewardsDueEth,
-    userRewardsDueUSDT,
-    userLiqRewardsDueEth,
-    userLiqRewardsDueUSDT,
-    userColRewardsDueEth,
-    userColRewardsDueUSDT,
-    userRewardsClaimedEth,
-    userRewardsClaimedUSDT,
-    userLiqRewardsClaimedEth,
-    userLiqRewardsClaimedUSDT,
-    userColRewardsClaimedEth,
-    userColRewardsClaimedUSDT
-) {
-    const formatValue = (value) => {
-        return `$${value.toFixed(2)}`;
-    };
-
-    const formatString = (number) => {
-        return number.toLocaleString();
-    };
-
-    const formatStringDecimal = (number) => {
-        const options = {
-            style: 'decimal',
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-        };
-        return number.toLocaleString('en-US', options);
-    };
-
-    // Update rewards due panel
-    document.getElementById("totalRewardsDueAmnt").textContent = totalRewardsDueWETH;
-    document.getElementById("rewardsDueAmnt").textContent = userRewardsDueEth;
-    document.getElementById("rewardsDueAmntLiq").textContent = userLiqRewardsDueEth;
-    document.getElementById("rewardsDueAmntLend").textContent = userColRewardsDueEth;
-    
-	document.getElementById("totalRewardsDueValue").textContent = formatString(totalRewardsDueUSDT);
-    document.getElementById("rewardsDueValue").textContent = formatString(userRewardsDueUSDT);
-    document.getElementById("rewardsDueValueLend").textContent = formatString(userLiqRewardsDueUSDT);
-    document.getElementById("rewardsDueValueLiq").textContent = formatString(userColRewardsDueUSDT);
-
-    // Update rewards claimed panel
-    document.getElementById("totalRewardsClaimedAmnt").textContent = totalRewardsClaimedWETH;
-    document.getElementById("rewardsClaimedAmnt").textContent = userRewardsClaimedEth;
-    document.getElementById("rewardsClaimedAmntLiq").textContent = userLiqRewardsClaimedEth;
-    document.getElementById("rewardsClaimedAmntLend").textContent = userColRewardsClaimedEth;
-
-    document.getElementById("totalRewardsClaimedValue").textContent = formatString(totalRewardsClaimedUSDT);
-    document.getElementById("rewardsClaimedValue").textContent = formatString(userRewardsClaimedUSDT);
-    document.getElementById("rewardsClaimedValueLend").textContent = formatString(userLiqRewardsClaimedUSDT);
-    document.getElementById("rewardsClaimedValueLiq").textContent = formatString(userColRewardsClaimedUSDT);
-}
-
-function updateSectionValues_Staking(
-    walletBalance,
-    stakedBalance,
-    depositedBalance,
-    withdrawnBalance,
-    totalHoldings,
-    totalStaked,
-    circulatingSupply,
-    distributedRewardsEth,
-    distributedRewardsLiquEth,
-    distributedRewardsCollEth,
-    distributedRewardsTotalEth,
-    claimedRewardsEth,
-    claimedRewardsLiquEth,
-    claimedRewardsCollEth,
-    claimedRewardsTotalEth,
-    assignedMining,
-    assignedLiquidity,
-    assignedCollateral,
-    unassigned,
-    totalAssigned,
-    walletBalanceUSDT,
-    stakedBalanceUSDT,
-    depositedBalanceUSDT,
-    withdrawnBalanceUSDT,
-    totalHoldingsUSDT,
-    totalStakedUSDT,
-    circulatingSupplyUSDT,
-    distributedRewardsUSDT,
-    distributedRewardsLiqUSDT,
-    distributedRewardsColUSDT,
-    distributedRewardsTotalUSDT,
-    claimedRewardsUSDT,
-    claimedRewardsLiqUSDT,
-    claimedRewardsColUSDT,
-    claimedRewardsTotalUSDT,
-    assignedMiningUSDT,
-    assignedLiquidityUSDT,
-    assignedCollateralUSDT,
-    unassignedUSDT,
-    totalAssignedUSDT
-) {
-    const formatValue = (value) => {
-        return `$${value.toFixed(2)}`;
-    };
-
-    const formatString = (number) => {
-        return number.toLocaleString();
-    };
-
-    const formatStringDecimal = (number) => {
-        const options = {
-            style: 'decimal',
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-        };
-        return number.toLocaleString('en-US', options);
-    };
-
-    // Update staking panel
-    document.getElementById("stakedBalanceAmnt").textContent = formatString(stakedBalance);
-    document.getElementById("stakedBalanceValue").textContent = formatString(stakedBalanceUSDT);
-    document.getElementById("totalBalanceAmnt").textContent = formatString(totalHoldings);
-    document.getElementById("totalBalanceValue").textContent = formatString(totalHoldingsUSDT);
-    document.getElementById("stakedSupplyAmnt").textContent = formatString(totalStaked);
-	document.getElementById("stakedSupplyValue").textContent = formatString(totalStakedUSDT);
-    document.getElementById("circSupplyAmnt").textContent = formatString(circulatingSupply);
-    document.getElementById("circSupplyValue").textContent = formatString(circulatingSupplyUSDT);
-    document.getElementById("divDistributedAmnt").textContent = formatString(distributedRewardsTotalEth);
-    document.getElementById("divDistributedValue").textContent = formatString(distributedRewardsTotalUSDT);
-    document.getElementById("divClaimedAmnt").textContent = formatString(claimedRewardsTotalEth);
-    document.getElementById("divClaimedValue").textContent = formatString(claimedRewardsTotalUSDT);
-
-    document.getElementById("tokensAvailableWallet").textContent = formatString(walletBalance);
-    document.getElementById("tokensStakedWallet").textContent = formatString(stakedBalance);
-    
-    // Update assignments panel
-    document.getElementById("mystakedTokensAmnt").textContent = formatString(stakedBalance);
-    document.getElementById("myStakedTokensValue").textContent = formatString(stakedBalanceUSDT);
-    document.getElementById("myAssignedAmnt").textContent = formatString(totalAssigned);
-    document.getElementById("myAssignedValue").textContent = formatString(totalAssignedUSDT);
-    document.getElementById("myUnassignedAmnt").textContent = formatString(unassigned);
-    document.getElementById("myUnassignedValue").textContent = formatString(unassignedUSDT);
-
-    document.getElementById("assignedToLiquidityAmnt").textContent = formatString(assignedLiquidity);
-    document.getElementById("assignedToLiquidityAmnt").textContent = formatString(assignedLiquidityUSDT);
-    document.getElementById("assignedToCollateralAmnt").textContent = formatString(assignedCollateral);
-    document.getElementById("assignedToCollateralValue").textContent = formatString(assignedCollateralUSDT);
-    document.getElementById("assignedToMiningAmnt").textContent = formatString(assignedMining);
-    document.getElementById("assignedToMiningValue").textContent = formatString(assignedMiningUSDT);
-    
-}
 // Export the fetch functions
-export { updateSectionValues_Networth, updateSectionValues_Hedges, updateSectionValues_Rewards, updateSectionValues_Staking };
+export { updateSectionValues_HedgeCard, updateSectionValues_Progress, updateSectionValues_Gains };
