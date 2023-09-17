@@ -120,6 +120,7 @@ async function fetchSection_HedgeCard(hedgeID){
         // Progress or time to expiry
         // get current timestamp in seconds
         const dt_today = Math.floor(Date.now() / 1000); 
+        const lifespan = Math.floor((dt_expiry - dt_created) / 3600);
         let timetoExpiry = 0;
         if (dt_started > 0 && dt_today < dt_expiry) {
             timetoExpiry = dt_expiry - dt_today;
@@ -180,6 +181,7 @@ async function fetchSection_HedgeCard(hedgeID){
             dt_expiryFormatted,
             dt_settledFormatted,
             timetoExpiry,
+            lifespan,
             //status
             status
         );
@@ -212,11 +214,8 @@ async function fetchSection_HedgeCard(hedgeID){
             //status
             status,
             //consent
-            topupConsent, // bool
             zapTaker, // bool
-            zapWriter, // bool
-            //requests
-            topupRequests, // uint256[]
+            zapWriter // bool
         );
 
         // Update Charts and Graphics
