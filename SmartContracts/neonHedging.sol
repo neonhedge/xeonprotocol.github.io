@@ -421,9 +421,9 @@ contract HEDGEFUND {
     // Action is request (false) or accept (true)
     // Request amount can be incremented if not accepted yet
     function topupHedge(uint _optionId, uint256 amount, bool action) public nonReentrant {
-        require(!hedge.topupConsent, "request accepted already");
         hedgingOption storage hedge = hedgeMap[_optionId];
         require(msg.sender == hedge.owner || msg.sender == hedge.taker, "Invalid party to request");
+        require(topupMap[topupRequestID].state == 0, "Request already accepted");
 
         bool requestAccept; 
         if(!action) {
@@ -453,9 +453,6 @@ contract HEDGEFUND {
             //update hedge cost
             hedge.cost += amount;
             topupMap[topupRequestID].amountTaker += amount;
-        }
-        if(requestAccept) {
-            hedge.topupConsent = true;
         }
         emit topupHedge(_optionId, amount, msg.sender, requestAccept);
     }
