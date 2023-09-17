@@ -8,9 +8,10 @@ function updateSectionValues_HedgeCard(
     pairedCurrency,
     pairedSymbol,
     //values
-    endvalue,
+    endValue,
+    strikeValue,
     underlyingValue,
-    startvalue,
+    startValue,
     createValue,
     cost,
     //parties
@@ -71,12 +72,12 @@ function updateSectionValues_HedgeCard(
         document.getElementById("tokenAmount").textContent = tokenAmount;
 
         // Step 3: Update underlying / current value
-        document.getElementById("underlyingValue").textContent = `${underlyingValue} ETH`;
+        document.getElementById("underlyingValue").textContent = `${underlyingValue} ${pairedSymbol}`;
 
-        // Step 4: Update asset bubbles & type of asset basket
-        // use chart updater function, like in networth, wc accepts values to display all; bubbles, price chart, etc
-        // this way its easy to create a default load & separate an actual data update
-
+        // Step 4: Update hedge values
+        document.getElementById("startValue").textContent = `${formatValue(startValue)} ${pairedSymbol}`;
+        document.getElementById("strikeValue").textContent = `${formatValue(strikeValue)} ${pairedSymbol}`;
+        document.getElementById("hedgeCost").textContent = `${formatValue(cost)} ${pairedSymbol}`;
 
 
         var first = userAddress.substring(0, 5);//get first chars

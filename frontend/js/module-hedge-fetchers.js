@@ -20,8 +20,8 @@ async function fetchSection_HedgeCard(hedgeID){
             status, // uint256
             amount, // uint256
             createValue, // uint256
-            startvalue, // uint256
-            endvalue, // uint256
+            startValue, // uint256
+            endValue, // uint256
             cost, // uint256
             dt_created, // uint256
             dt_started, // uint256
@@ -65,35 +65,38 @@ async function fetchSection_HedgeCard(hedgeID){
         // Token Amount
         const tokenAmount = new BigNumber(amount).div(10 ** tokenDecimal);
         // Gains & Losses
-        // +ve or -ve integers passed to update function       
+        // +ve or -ve integers passed to update function.. logic below is sound       
         let takerGains;
         let writerGains;
+        let strikeValue;
         switch (hedgeType) {
         case 0: // CALL - cost max loss if price goes down
-            if(underlyingValue > startvalue + cost) {
-                takerGains = underlyingValue - startvalue + cost;
-                writerGains = startvalue + cost - underlyingValue;
+            strikeValue = startValue + cost;
+            if(underlyingValue > startValue + cost) {
+                takerGains = underlyingValue - startValue + cost;
+                writerGains = startValue + cost - underlyingValue;
             }else{
                 takerGains =- cost;
                 writerGains = cost;
             }
             break;
         case 1: // PUT - cost max loss if price goes up
-            if(underlyingValue > startvalue + cost) {
+            strikeValue = startValue - cost;
+            if(underlyingValue > startValue - cost) {
                 takerGains =- cost;
                 writerGains = cost;
             }else{
-                takerGains = startvalue - underlyingValue - cost;
-                writerGains = cost + underlyingValue - startvalue;
+                takerGains = startValue - underlyingValue - cost;
+                writerGains = cost + underlyingValue - startValue;
             }
             break;
         case 2: // SWAP - no cost paid in equity swaps
-            if(underlyingValue > startvalue + cost) {
-                takerGains = underlyingValue - startvalue;
-                writerGains = startvalue - underlyingValue;
+            if(underlyingValue > startValue + cost) {
+                takerGains = underlyingValue - startValue;
+                writerGains = startValue - underlyingValue;
             }else{
-                takerGains = startvalue - underlyingValue;
-                writerGains = underlyingValue - startvalue;
+                takerGains = startValue - underlyingValue;
+                writerGains = underlyingValue - startValue;
             }
             break;
         default:
@@ -124,6 +127,7 @@ async function fetchSection_HedgeCard(hedgeID){
             timetoExpiry = Math.floor(timetoExpiry / 3600); // 1 hour = 3600 seconds
         }
 
+        // USE 3 UPDATERS: HEDGE, PROGRESS, GAINS
         updateSectionValues_HedgeCard(
             tokenName,
             tokenSymbol,
@@ -133,9 +137,10 @@ async function fetchSection_HedgeCard(hedgeID){
             pairedCurrency,
             pairedSymbol,
             //values
-            endvalue,
+            endValue,
+            strikeValue,
             underlyingValue,
-            startvalue,
+            startValue,
             createValue,
             cost,
             //parties
@@ -158,6 +163,68 @@ async function fetchSection_HedgeCard(hedgeID){
             zapWriter, // bool
             //requests
             topupRequests, // uint256[]
+        );
+        updateSectionValues_Progress(
+            pairedCurrency,
+            pairedSymbol,
+            //values
+            endValue,
+            strikeValue,
+            underlyingValue,
+            startValue,
+            createValue,
+            cost,
+            //date
+            dt_createdFormatted,
+            dt_startedFormatted,
+            dt_expiryFormatted,
+            dt_settledFormatted,
+            timetoExpiry,
+            //status
+            status
+        );
+        // Gains, Buy & Requests. All variables needed to compile breakdown paragraph/ explainer for each party 
+        //..(you wrote a swap of 1M TSUKA (TSU....) this means...
+        // status to determine buttons to show
+        updateSectionValues_Gains(
+            tokenName,
+            tokenSymbol,
+            tokenAmount,
+            hedgeType,
+            token,
+            pairedCurrency,
+            pairedSymbol,
+            //values
+            endValue,
+            strikeValue,
+            underlyingValue,
+            startValue,
+            createValue,
+            cost,
+            //parties
+            owner,
+            taker,
+            userAddress,
+            takerGains,
+            writerGains,
+            //date
+            timetoExpiry,
+            //status
+            status,
+            //consent
+            topupConsent, // bool
+            zapTaker, // bool
+            zapWriter, // bool
+            //requests
+            topupRequests, // uint256[]
+        );
+
+        // Update Charts and Graphics
+        // Step 4: Update asset bubbles & type of asset basket
+        // use chart updater function, like in networth, wc accepts values to display all; bubbles, price chart, etc
+        // this way its easy to create a default load & separate an actual data update
+        updateChartValues_Hedge(
+            
         );
     } catch (error) {
         console.error("Error fetching Hedge Panel section data:", error);
