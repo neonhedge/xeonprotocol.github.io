@@ -260,5 +260,8 @@ function updateChartValues_Assets() {
     // Call the function to initialize the circles
     initCircles();
 }
+
+// Export the fetch functions
+export { updateChartValues_Hedge, updateChartValues_Assets };
   
   
