@@ -138,122 +138,118 @@ function updateChartValues_Hedge(prices, targetPrice) {
       ctx.fillText(`Now: ${prices[prices.length - 1]}`, chartWidth - 60, currentPriceY - 5);
     }
 
-    // Initial draw with sample data
+    // Draw Price Chart with data provided
     drawChart();
 }
 
 
-  
-  
   /*===================================================*/
-  document.addEventListener('DOMContentLoaded', function () {
+
   
-    // Global arrays for token names and amounts
-    const tokenNames = ["ZKS", "ZRO", "GMX", "ARB", "VELA"];
-    const tokenAmount = [1000000, 2000000, 3000000, 4000000, 5000000];
-  
-    // Function to generate a random color
-    function getRandomColor() {
-        // Generate random RGB components in the range 0-127 (dark colors)
-        const r = Math.floor(Math.random() * 128);
-        const g = Math.floor(Math.random() * 128);
-        const b = Math.floor(Math.random() * 128);
-  
-        // Convert RGB components to a hexadecimal color string
-        const color = `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+function updateChartValues_Assets() {
+        // Global arrays for token names and amounts
+        const tokenNames = ["ZKS", "ZRO", "GMX", "ARB", "VELA"];
+        const tokenAmount = [1000000, 2000000, 3000000, 4000000, 5000000];
+    
+        // Function to generate a random color
+        function getRandomColor() {
+            // Generate random RGB components in the range 0-127 (dark colors)
+            const r = Math.floor(Math.random() * 128);
+            const g = Math.floor(Math.random() * 128);
+            const b = Math.floor(Math.random() * 128);
         
-        return color;
-    }
-  
-    // Function to create random circles with token names and amounts
-    function createRandomCircles(container) {
-      // Matter.js engine and world
-      const engine = Matter.Engine.create();
-      const world = engine.world;
-  
-      // Configure gravity and bounds
-      world.gravity.y = 0.8;
-      const width = container.clientWidth;
-      const height = container.clientHeight;
-  
-      // Create boundaries to keep circles within the container
-      Matter.World.add(world, [
-        Matter.Bodies.rectangle(width / 2, height, width, 1, { isStatic: true, render: { fillStyle: '#3399ff' }  }),
-        Matter.Bodies.rectangle(width / 2, 0, width, 0, { isStatic: true }),
-        Matter.Bodies.rectangle(0, height / 2, 1, height, { isStatic: true, render: { fillStyle: '#3399ff' }  }),
-        Matter.Bodies.rectangle(width, height / 2, 1, height, { isStatic: true, render: { fillStyle: '#3399ff' }  })
-      ]);
-  
-      // Create the circles
-      for (let i = 0; i < 5; i++) {
-        // Random index for tokenNames and tokenAmount arrays
-        const randomIndex = i;
-  
-        // Get the corresponding token name and amount
-        const name = tokenNames[randomIndex];
-        const amount = tokenAmount[randomIndex];
-  
-        // Calculate circle size based on token amount
-        const amountRatio = (amount - Math.min(...tokenAmount)) / (Math.max(...tokenAmount) - Math.min(...tokenAmount));
-        const circleRadius = 30 + (30 * amountRatio);
-  
-        // Randomize the position within the container
-        const x = Math.random() * (width - circleRadius * 2) + circleRadius;
-        const y = Math.random() * (height - circleRadius * 2) + circleRadius;
-  
-        // Create the circle element
-        const circle = document.createElement("div");
-        circle.classList.add("assetCircle");
-        circle.textContent = `${name}\n${amount}`;
-        circle.style.width = `${circleRadius * 2}px`;
-        circle.style.height = `${circleRadius * 2}px`;
-        circle.style.borderRadius = `${circleRadius}px`;
-  
-        // Add class "text" to circles with text
-  
-        // Assign a random color to the circle
-        const randomColor = getRandomColor();
-        circle.style.backgroundColor = randomColor;
-  
-        // Add the circle to the container
-        container.appendChild(circle);
-  
-        // Create a Matter.js circle
-        const matterCircle = Matter.Bodies.circle(x, y, circleRadius, {
-          restitution: 0.5,
-          friction: 0.1
-        });
-  
-        // Add the Matter.js circle to the world
-        Matter.World.add(world, matterCircle);
-  
-        // Update the positions of both circles after each physics update
-        Matter.Events.on(engine, "afterUpdate", () => {
-          const circlePos = matterCircle.position;
-          const translateX = circlePos.x - circleRadius;
-          const translateY = circlePos.y - circleRadius;
-  
-          circle.style.transform = `translate(${translateX}px, ${translateY}px)`;
-  
-          // Remove opacity when the physics simulation settles down. works in collab with CSS currently it displays text by default
-          if (engine.timing.timestamp >= 2000) {
-            circle.style.opacity = 1;
-          }
-        });
-      }
-  
-      // Run the Matter.js engine
-      Matter.Engine.run(engine);
-      Matter.Render.run(Matter.Render.create({
-        element: container,
-        engine: engine,
-        options: {
-          wireframes: false,
-          background: "rgba(0, 0, 0, 0)",
-          showVelocity: true
+            // Convert RGB components to a hexadecimal color string
+            const color = `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+        
+            return color;
         }
-      }));
-    }
+    
+        // Function to create random circles with token names and amounts
+        function createRandomCircles(container) {
+            // Matter.js engine and world
+            const engine = Matter.Engine.create();
+            const world = engine.world;
+        
+            // Configure gravity and bounds
+            world.gravity.y = 0.8;
+            const width = container.clientWidth;
+            const height = container.clientHeight;
+        
+            // Create boundaries to keep circles within the container
+            Matter.World.add(world, [
+                Matter.Bodies.rectangle(width / 2, height, width, 1, { isStatic: true, render: { fillStyle: '#3399ff' } }),
+                Matter.Bodies.rectangle(width / 2, 0, width, 0, { isStatic: true }),
+                Matter.Bodies.rectangle(0, height / 2, 1, height, { isStatic: true, render: { fillStyle: '#3399ff' } }),
+                Matter.Bodies.rectangle(width, height / 2, 1, height, { isStatic: true, render: { fillStyle: '#3399ff' } })
+            ]);
+    
+            // Create the circles
+            for (let i = 0; i < 5; i++) {
+                // Random index for tokenNames and tokenAmount arrays
+                const randomIndex = i;
+        
+                // Get the corresponding token name and amount
+                const name = tokenNames[randomIndex];
+                const amount = tokenAmount[randomIndex];
+        
+                // Calculate circle size based on token amount
+                const amountRatio = (amount - Math.min(...tokenAmount)) / (Math.max(...tokenAmount) - Math.min(...tokenAmount));
+                const circleRadius = 30 + (30 * amountRatio);
+        
+                // Randomize the position within the container
+                const x = Math.random() * (width - circleRadius * 2) + circleRadius;
+                const y = Math.random() * (height - circleRadius * 2) + circleRadius;
+        
+                // Create the circle element
+                const circle = document.createElement("div");
+                circle.classList.add("assetCircle");
+                circle.textContent = `${name}\n${amount}`;
+                circle.style.width = `${circleRadius * 2}px`;
+                circle.style.height = `${circleRadius * 2}px`;
+                circle.style.borderRadius = `${circleRadius}px`;
+        
+                // Assign a random color to the circle
+                const randomColor = getRandomColor();
+                circle.style.backgroundColor = randomColor;
+        
+                // Add the circle to the container
+                container.appendChild(circle);
+        
+                // Create a Matter.js circle
+                const matterCircle = Matter.Bodies.circle(x, y, circleRadius, {
+                restitution: 0.5,
+                friction: 0.1
+                });
+        
+                // Add the Matter.js circle to the world
+                Matter.World.add(world, matterCircle);
+        
+                // Update the positions of both circles after each physics update
+                Matter.Events.on(engine, "afterUpdate", () => {
+                const circlePos = matterCircle.position;
+                const translateX = circlePos.x - circleRadius;
+                const translateY = circlePos.y - circleRadius;
+        
+                circle.style.transform = `translate(${translateX}px, ${translateY}px)`;
+        
+                // Remove opacity when the physics simulation settles down. works in collab with CSS currently it displays text by default
+                if (engine.timing.timestamp >= 2000) {
+                    circle.style.opacity = 1;
+                }
+                });
+            }
+            // Run the Matter.js engine
+            Matter.Engine.run(engine);
+            Matter.Render.run(Matter.Render.create({
+                element: container,
+                engine: engine,
+                options: {
+                    wireframes: false,
+                    background: "rgba(0, 0, 0, 0)",
+                    showVelocity: true
+                }
+            }));
+        }
   
     // Function to initialize the circles
     function initCircles() {
@@ -263,6 +259,6 @@ function updateChartValues_Hedge(prices, targetPrice) {
   
     // Call the function to initialize the circles
     initCircles();
+}
   
-  });
   
