@@ -146,10 +146,7 @@ function updateChartValues_Hedge(prices, targetPrice) {
   /*===================================================*/
 
   
-function updateChartValues_Assets() {
-        // Global arrays for token names and amounts
-        const tokenNames = ["ZKS", "ZRO", "GMX", "ARB", "VELA"];
-        const tokenAmount = [1000000, 2000000, 3000000, 4000000, 5000000];
+function updateChartValues_Assets(tokenNames, tokenAmount) {
     
         // Function to generate a random color
         function getRandomColor() {

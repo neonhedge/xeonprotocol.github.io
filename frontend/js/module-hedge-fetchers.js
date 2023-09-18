@@ -1,6 +1,6 @@
 import { CONSTANTS } from './constants.js';
 import { updateSectionValues_HedgeCard, updateSectionValues_Progress, updateSectionValues_Gains } from './module-hedge-section-updaters.js';
-import { updateChartValues_Hedge } from './module-hedge-chart-updaters.js';
+import { updateChartValues_Hedge, updateChartValues_Assets } from './module-hedge-chart-updaters.js';
 
 // 1. Fetch Section Values - Hedge
 //-----------------------------------------
@@ -228,6 +228,11 @@ async function fetchSection_HedgeCard(hedgeID){
         const initialPrices = [100, 110, 150, 80, 130];
         const initialTargetPrice = 120;
         updateChartValues_Hedge(initialPrices, initialTargetPrice);
+
+        // Global arrays for token names and amounts
+        const tokenNamesArray = ["ZKS", "ZRO", "GMX", "ARB", "VELA"];
+        const tokenAmountArray = [1000000, 2000000, 3000000, 4000000, 5000000];
+        updateChartValues_Assets(tokenNamesArray, tokenAmountArray);
 
         // Fetch Hedge Requests from mappings and populate requests list
 
