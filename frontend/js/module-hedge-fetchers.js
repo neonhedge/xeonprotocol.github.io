@@ -223,9 +223,11 @@ async function fetchSection_HedgeCard(hedgeID){
         // Step 4: Update asset bubbles & type of asset basket
         // use chart updater function, like in networth, wc accepts values to display all; bubbles, price chart, etc
         // this way its easy to create a default load & separate an actual data update
-        updateChartValues_Hedge(
-            
-        );
+        
+        // Example usage:
+        const initialPrices = [100, 110, 150, 80, 130];
+        const initialTargetPrice = 120;
+        updateChartValues_Hedge(initialPrices, initialTargetPrice);
 
         // Fetch Hedge Requests from mappings and populate requests list
 

@@ -1,8 +1,4 @@
-document.addEventListener('DOMContentLoaded', function () {
-  
-    let prices = [100, 110, 150, 80, 130]; // Default prices
-    let targetPrice = 120; // Default target price
-  
+function updateChartValues_Hedge(prices, targetPrice) {
     // Canvas setup
     const canvas = document.getElementById('priceChangeChart');
     const ctx = canvas.getContext('2d');
@@ -36,6 +32,45 @@ document.addEventListener('DOMContentLoaded', function () {
         priceRange: adjustedMaxPrice - adjustedMinPrice,
       };
     }
+  
+    // Handle mousemove event to show/hide price change tag
+    canvas.addEventListener('mousemove', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const mouseX = e.clientX - rect.left;
+      const mouseY = e.clientY - rect.top;
+  
+      const step = chartWidth / (prices.length - 1);
+      const chartDimensions = calculateChartDimensions();
+  
+      for (let i = 0; i < prices.length; i++) {
+        const x = i * step;
+        const y = chartHeight - ((prices[i] - chartDimensions.minPrice) / chartDimensions.priceRange) * chartHeight;
+  
+        if (mouseX > x - 2 && mouseX < x + 2 && mouseY > y - 2 && mouseY < y + 2) {
+          const tag = document.getElementById('priceChangeTag');
+          tag.textContent = `Price: ${prices[i]}`;
+          tag.style.top = `${y}px`;
+          tag.style.left = `${x + 5}px`;
+          tag.classList.add('show');
+        }
+      }
+      // Hide tag if not hovered over a price point
+      const tag = document.getElementById('priceChangeTag');
+      tag.classList.remove('show');
+    });
+  
+    // Function to update the chart with new prices
+    function updateChart(newPrices) {
+      prices = newPrices;
+      drawChart();
+    }
+  
+    // Example of dynamically updating the chart with new prices (replace with your own logic)
+    document.getElementById('refreshButton').addEventListener('click', () => {
+      // Replace the newPrices array with your desired prices
+      const newPrices = [110, 100, 90, 90, 130, 150];
+      updateChart(newPrices);
+    });
   
     // Draw chart
     function drawChart() {
@@ -102,51 +137,13 @@ document.addEventListener('DOMContentLoaded', function () {
       ctx.fillText(`Target: ${targetPrice}`, chartWidth - 60, targetY - 5);
       ctx.fillText(`Now: ${prices[prices.length - 1]}`, chartWidth - 60, currentPriceY - 5);
     }
-  
+
     // Initial draw with sample data
     drawChart();
+}
+
+
   
-    // Handle mousemove event to show/hide price change tag
-    canvas.addEventListener('mousemove', (e) => {
-      const rect = canvas.getBoundingClientRect();
-      const mouseX = e.clientX - rect.left;
-      const mouseY = e.clientY - rect.top;
-  
-      const step = chartWidth / (prices.length - 1);
-      const chartDimensions = calculateChartDimensions();
-  
-      for (let i = 0; i < prices.length; i++) {
-        const x = i * step;
-        const y = chartHeight - ((prices[i] - chartDimensions.minPrice) / chartDimensions.priceRange) * chartHeight;
-  
-        if (mouseX > x - 2 && mouseX < x + 2 && mouseY > y - 2 && mouseY < y + 2) {
-          const tag = document.getElementById('priceChangeTag');
-          tag.textContent = `Price: ${prices[i]}`;
-          tag.style.top = `${y}px`;
-          tag.style.left = `${x + 5}px`;
-          tag.classList.add('show');
-        }
-      }
-  
-      // Hide tag if not hovered over a price point
-      const tag = document.getElementById('priceChangeTag');
-      tag.classList.remove('show');
-    });
-  
-    // Function to update the chart with new prices
-    function updateChart(newPrices) {
-      prices = newPrices;
-      drawChart();
-    }
-  
-    // Example of dynamically updating the chart with new prices (replace with your own logic)
-    document.getElementById('refreshButton').addEventListener('click', () => {
-      // Replace the newPrices array with your desired prices
-      const newPrices = [110, 100, 90, 90, 130, 150];
-      updateChart(newPrices);
-    });
-  
-  });
   
   /*===================================================*/
   document.addEventListener('DOMContentLoaded', function () {
