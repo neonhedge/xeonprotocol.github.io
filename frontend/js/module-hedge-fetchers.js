@@ -224,9 +224,9 @@ async function fetchSection_HedgeCard(hedgeID){
         // use chart updater function, like in networth, wc accepts values to display all; bubbles, price chart, etc
         // this way its easy to create a default load & separate an actual data update
         
-        // Example usage:
-        const initialPrices = [100, 110, 150, 80, 130];
-        const initialTargetPrice = 120;
+        // First item is startValue, last item is underlying/current value
+        const initialPrices = [startValue, 110, 150, 80, underlyingValue];
+        const initialTargetPrice = strikeValue;
         updateChartValues_Hedge(initialPrices, initialTargetPrice);
 
         // Global arrays for token names and amounts
