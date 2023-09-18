@@ -1,14 +1,15 @@
 /*=========================================================================
-    IMPORT MODULES
+    Import modules
 ==========================================================================*/
 
 import { initWeb3 } from './dapp-web3-utils.js';
-import { fetchSection_Networth, fetchSection_BalanceList, fetchSection_HedgePanel } from './module-wallet-section-fetchers.js';
+import { fetchSection_Networth, fetchSection_BalanceList, fetchSection_HedgePanel, fetchSection_RewardsPanel, fetchSection_StakingPanel } from './module-wallet-section-fetchers.js';
 import { loadHedgesModule } from './module-wallet-section-hedgesList.js';
 
 /*=========================================================================
     INITIALIZE WEB3
 ==========================================================================*/
+
 initWeb3();
 
 $(document).ready(async function () {
@@ -24,7 +25,7 @@ $(document).ready(async function () {
         };
         // Load sections automatically & periodically
         const callPageTries = async () => {
-            const asyncFunctions = [fetchSection_Networth, fetchSection_BalanceList, fetchSection_HedgePanel];
+            const asyncFunctions = [fetchSection_Networth, fetchSection_BalanceList, fetchSection_HedgePanel, fetchSection_RewardsPanel, fetchSection_StakingPanel];
             for (const func of asyncFunctions) {
                 await func();
             }
