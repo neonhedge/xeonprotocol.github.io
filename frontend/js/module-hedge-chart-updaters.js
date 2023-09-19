@@ -6,9 +6,6 @@ function updateChartValues_Hedge(prices, targetPrice) {
     // Chart dimensions
     const chartWidth = 250;
     const chartHeight = 250;
-    let maxPrice = Math.max(...prices); // Default maximum price
-    let minPrice = Math.min(...prices); // Default minimum price
-  
     canvas.width = chartWidth;
     canvas.height = chartHeight;
   
@@ -17,20 +14,25 @@ function updateChartValues_Hedge(prices, targetPrice) {
     const textColor = '#ffffff';
     const areaColor = '#222870'; // dark blue. ALT #2a3082
   
-    // Function to calculate chart dimensions based on prices dataset
-    function calculateChartDimensions() {
-      maxPrice = Math.max(...prices);
-      minPrice = Math.min(...prices);
-      const priceRange = maxPrice - minPrice;
-      const padding = priceRange * 0.1; // Add 10% padding to the price range
-      const adjustedMaxPrice = maxPrice + padding;
-      const adjustedMinPrice = minPrice - padding;
-  
-      return {
-        maxPrice: adjustedMaxPrice,
-        minPrice: adjustedMinPrice,
-        priceRange: adjustedMaxPrice - adjustedMinPrice,
-      };
+    // Calculate chart dimensions based on prices dataset
+    function calculateChartDimensions() {    
+        //add targetprice to array so it shows on chart even if price doesnt go there
+        //pop it from array afterwards so we dont plot it with the other prices
+        prices.push(targetPrice);
+        let maxPrice = Math.max(...prices); // Default maximum price
+        let minPrice = Math.min(...prices); // Default minimum price
+        prices.pop();
+        //proceed
+        const priceRange = maxPrice - minPrice;
+        const padding = priceRange * 0.1; // Add 10% padding to the price range
+        const adjustedMaxPrice = maxPrice + padding;
+        const adjustedMinPrice = minPrice - padding;
+    
+        return {
+          maxPrice: adjustedMaxPrice,
+          minPrice: adjustedMinPrice,
+          priceRange: adjustedMaxPrice - adjustedMinPrice,
+        };
     }
   
     // Handle mousemove event to show/hide price change tag
@@ -65,9 +67,8 @@ function updateChartValues_Hedge(prices, targetPrice) {
       drawChart();
     }
   
-    // Example of dynamically updating the chart with new prices (replace with your own logic)
+    // Temporary: dynamically updating the chart with new prices
     document.getElementById('refreshButton').addEventListener('click', () => {
-      // Replace the newPrices array with your desired prices
       const newPrices = [110, 100, 90, 90, 130, 150];
       updateChart(newPrices);
     });
@@ -146,10 +147,7 @@ function updateChartValues_Hedge(prices, targetPrice) {
   /*===================================================*/
 
   
-function updateChartValues_Assets() {
-    // Global arrays for token names and amounts
-    const tokenNames = ["ZKS", "ZRO", "GMX", "ARB", "VELA"];
-    const tokenAmount = [1000000, 2000000, 3000000, 4000000, 5000000];
+function updateChartValues_Assets(tokenNames, tokenAmounts) {
 
     // Function to generate a random color
     function getRandomColor() {
@@ -157,10 +155,8 @@ function updateChartValues_Assets() {
         const r = Math.floor(Math.random() * 128);
         const g = Math.floor(Math.random() * 128);
         const b = Math.floor(Math.random() * 128);
-    
         // Convert RGB components to a hexadecimal color string
         const color = `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
-    
         return color;
     }
 
@@ -185,15 +181,15 @@ function updateChartValues_Assets() {
 
         // Create the circles
         for (let i = 0; i < 5; i++) {
-            // Random index for tokenNames and tokenAmount arrays
+            // Random index for tokenNames and tokenAmounts arrays
             const randomIndex = i;
     
             // Get the corresponding token name and amount
             const name = tokenNames[randomIndex];
-            const amount = tokenAmount[randomIndex];
+            const amount = tokenAmounts[randomIndex];
     
             // Calculate circle size based on token amount
-            const amountRatio = (amount - Math.min(...tokenAmount)) / (Math.max(...tokenAmount) - Math.min(...tokenAmount));
+            const amountRatio = (amount - Math.min(...tokenAmounts)) / (Math.max(...tokenAmounts) - Math.min(...tokenAmounts));
             const circleRadius = 30 + (30 * amountRatio);
     
             // Randomize the position within the container

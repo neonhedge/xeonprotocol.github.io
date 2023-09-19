@@ -224,17 +224,17 @@ async function fetchSection_HedgeCard(hedgeID){
         // use chart updater function, like in networth, wc accepts values to display all; bubbles, price chart, etc
         // this way its easy to create a default load & separate an actual data update
         
-        // First item is startValue, last item is underlying/current value
+        // Hedge Price Levels - First item is startValue, last item is underlying/current value
         const initialPrices = [startValue, 110, 150, 80, underlyingValue];
         const initialTargetPrice = strikeValue;
         updateChartValues_Hedge(initialPrices, initialTargetPrice);
 
-        // Global arrays for token names and amounts
+        // Hedge Underlying ERC20 Assets - Global arrays for token names and amounts
         const tokenNamesArray = ["ZKS", "ZRO", "GMX", "ARB", "VELA"];
         const tokenAmountArray = [1000000, 2000000, 3000000, 4000000, 5000000];
         updateChartValues_Assets(tokenNamesArray, tokenAmountArray);
 
-        // Fetch Hedge Requests from mappings and populate requests list
+        // Hedge Requests - pull topup requests from mappings and populate list
 
     } catch (error) {
         console.error("Error fetching Hedge Panel section data:", error);
