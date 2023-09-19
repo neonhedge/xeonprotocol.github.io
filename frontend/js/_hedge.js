@@ -52,7 +52,7 @@ $(document).ready(async function () {
 //==============================================
 document.addEventListener('DOMContentLoaded', function () {
   
-  let prices = [100, 110, 150, 80, 130]; // Default prices
+  let prices = [100, 80, 130]; // Default prices
   let targetPrice = 120; // Default target price
 
   // Canvas setup
@@ -62,8 +62,6 @@ document.addEventListener('DOMContentLoaded', function () {
   // Chart dimensions
   const chartWidth = 250;
   const chartHeight = 250;
-  let maxPrice = Math.max(...prices); // Default maximum price
-  let minPrice = Math.min(...prices); // Default minimum price
 
   canvas.width = chartWidth;
   canvas.height = chartHeight;
@@ -75,8 +73,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // Function to calculate chart dimensions based on prices dataset
   function calculateChartDimensions() {
-    maxPrice = Math.max(...prices);
-    minPrice = Math.min(...prices);
+    
+    //add targetprice to array so it shows on chart even if price doesnt go there
+    //pop it from array afterwards so we dont plot it with the other prices
+    prices.push(targetPrice);
+    let maxPrice = Math.max(...prices); // Default maximum price
+    let minPrice = Math.min(...prices); // Default minimum price
+    prices.pop();
+    //proceed
     const priceRange = maxPrice - minPrice;
     const padding = priceRange * 0.1; // Add 10% padding to the price range
     const adjustedMaxPrice = maxPrice + padding;
