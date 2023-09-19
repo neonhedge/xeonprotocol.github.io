@@ -205,9 +205,11 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 // =================================================================================
+
 document.addEventListener('DOMContentLoaded', function () {
 
   // Global arrays for token names and amounts
+  // For Alpha and Beta V1, single assets, display underlying quantity & cost quantity
   const tokenNames = ["ZKS", "ZRO", "GMX", "ARB", "VELA"];
   const tokenAmount = [1000000, 2000000, 3000000, 4000000, 5000000];
 

@@ -179,9 +179,9 @@ function updateChartValues_Assets(tokenNames, tokenAmounts) {
             Matter.Bodies.rectangle(width, height / 2, 1, height, { isStatic: true, render: { fillStyle: '#3399ff' } })
         ]);
 
-        // Create the circles
-        for (let i = 0; i < 5; i++) {
-            // Random index for tokenNames and tokenAmounts arrays
+        // Create the circles, use tokenlength as max counter
+        for (let i = 0; i < tokenAmount.length; i++) {
+            // Random index for tokenNames and tokenAmount arrays
             const randomIndex = i;
     
             // Get the corresponding token name and amount
