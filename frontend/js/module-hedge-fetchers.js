@@ -236,12 +236,68 @@ async function fetchSection_HedgeCard(hedgeID){
         updateChartValues_Assets(tokenNamesArray, tokenAmountArray);
 
         // Hedge Requests - pull topup requests from mappings and populate list
+        // Put in separate module after hedgeCard
+        await fetchSection_HedgeRequests(topupRequests, owner, taker);
 
     } catch (error) {
         console.error("Error fetching Hedge Panel section data:", error);
     }
 }
 
+
+    // TODO: fetch topup requests
+    //topupRequests is an array if intergers that point to mapping locations in solidity
+    // storage is as follows;
+    //struct topupData { uint256 amountWriter;  uint256 amountTaker; uint256 requestTime, uint256 acceptTime,  uint state; }
+    // where state is, 0 - requested, 1 accepted, 2 rejected
+    // mapping topup requests 
+    //mapping(uint => topupData) public topupMap;
+    // fetch the individual mappings using IDs in array topupRequests
+    // if state == 0 and owner == userAddress and amountTaker > 0, then it's a taker request
+    // if state == 0 and owner == userAddress and amountWriter > 0, then it's a writer request
+    // if state == 0 and taker == userAddress and amountWriter > 0, then its writer request
+    // if state == 0 and taker == userAddress and amountTaker > 0, then its taker request
+    // i want to display this HTML to a list, this HTML is for a request open (i.e state == 0); <span><i class="fa fa-superpowers"></i> Topup Request Pending <button class="requestButton actonRequest">Accept</button></span>
+    // this HTML is for a request accepted (i.e state == 1); <span><i class="fa fa-handshake-o"></i> Topup Accepted 20/05/2023</span>
+    // if state == 1 then create a request rejected list entry and timestamp simialr to the type for accepted
+    //the ID of the HTML ul element to append to is "requestList".
+
+
+async function fetchSection_HedgeRequests(topupRequests, owner, taker) {
+    const accounts = await web3.eth.requestAccounts();
+    const userAddress = accounts[0];
+
+    const requestList = document.getElementById("requestList");
+    // Iterate the array IDs and retrieve the request status then append to requestList
+    topupRequests.forEach(async (requestId) => {
+        const topupData = await hedgingInstance.methods.topupMap(requestId).call();
+
+        if (topupData.state == 0) {
+            if (owner == userAddress && topupData.amountTaker > 0) {
+                requestList.innerHTML += `<span><i class="fa fa-superpowers"></i> Topup Request Pending <button class="requestButton actonRequest">Accept</button></span>`;
+            }
+
+            if (owner == userAddress && topupData.amountWriter > 0) {
+                requestList.innerHTML += `<span><i class="fa fa-superpowers"></i> Topup Request Pending <button class="requestButton actonRequest">Accept</button></span>`;
+            }
+
+            if (taker == userAddress && topupData.amountWriter > 0) {
+                requestList.innerHTML += `<span><i class="fa fa-superpowers"></i> Topup Request Pending <button class="requestButton actonRequest">Accept</button></span>`;
+            }
+
+            if (taker == userAddress && topupData.amountTaker > 0) {
+                requestList.innerHTML += `<span><i class="fa fa-superpowers"></i> Topup Request Pending <button class="requestButton actonRequest">Accept</button></span>`;
+            }
+        } else if (topupData.state == 1) {
+            requestList.innerHTML += `<span><i class="fa fa-handshake-o"></i> Topup Accepted 20/05/2023</span>`;
+        }
+        
+        // Create a request rejected list entry and timestamp
+        if (topupData.state == 2) {
+            requestList.innerHTML += `<span><i class="fa fa-times-circle"></i> Topup Rejected 20/05/2023</span>`;
+        }
+    });
+}
 
 // Export the fetch functions
 export { fetchSection_HedgeCard };
