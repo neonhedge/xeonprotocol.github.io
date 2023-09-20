@@ -116,6 +116,9 @@ contract HEDGEFUND {
     struct topupData {
         uint256 amountWriter;
         uint256 amountTaker;
+        uint256 requestTime;
+        uint256 acceptTime;
+        uint256 rejectTime;
         uint state; // 0 - requested, 1 accepted, 2 rejected
     }
 

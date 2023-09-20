@@ -245,10 +245,10 @@ async function fetchSection_HedgeCard(hedgeID){
 }
 
 
-    // TODO: fetch topup requests
+    // Fetch topup requests
     //topupRequests is an array if intergers that point to mapping locations in solidity
     // storage is as follows;
-    //struct topupData { uint256 amountWriter;  uint256 amountTaker; uint256 requestTime, uint256 acceptTime,  uint state; }
+    //struct topupData { uint256 amountWriter;  uint256 amountTaker; uint256 requestTime, uint256 acceptTime, uint256 rejectTime, uint state; }
     // where state is, 0 - requested, 1 accepted, 2 rejected
     // mapping topup requests 
     //mapping(uint => topupData) public topupMap;
@@ -270,7 +270,7 @@ async function fetchSection_HedgeRequests(topupRequests, owner, taker) {
     const requestList = document.getElementById("requestList");
     // Iterate the array IDs and retrieve the request status then append to requestList
     topupRequests.forEach(async (requestId) => {
-        const topupData = await hedgingInstance.methods.topupMap(requestId).call();
+        const topupData = await topupMap.methods.topupMap(requestId).call();
 
         if (topupData.state == 0) {
             if (owner == userAddress && topupData.amountTaker > 0) {
@@ -289,14 +289,21 @@ async function fetchSection_HedgeRequests(topupRequests, owner, taker) {
                 requestList.innerHTML += `<span><i class="fa fa-superpowers"></i> Topup Request Pending <button class="requestButton actonRequest">Accept</button></span>`;
             }
         } else if (topupData.state == 1) {
-            requestList.innerHTML += `<span><i class="fa fa-handshake-o"></i> Topup Accepted 20/05/2023</span>`;
-        }
-        
-        // Create a request rejected list entry and timestamp
-        if (topupData.state == 2) {
-            requestList.innerHTML += `<span><i class="fa fa-times-circle"></i> Topup Rejected 20/05/2023</span>`;
+            const acceptTime = formatDate(topupData.acceptTime);
+            requestList.innerHTML += `<span><i class="fa fa-handshake-o"></i> Topup Accepted ${acceptTime}</span>`;
+        } else if (topupData.state == 2) {
+            const rejectTime = formatDate(topupData.rejectTime);
+            requestList.innerHTML += `<span><i class="fa fa-times-circle"></i> Topup Rejected ${rejectTime}</span>`;
         }
     });
+}
+
+function formatDate(timestamp) {
+    const date = new Date(timestamp * 1000);
+    const day = date.getDate();
+    const month = date.getMonth() + 1;
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
 }
 
 // Export the fetch functions
