@@ -270,7 +270,7 @@ async function fetchSection_HedgeRequests(topupRequests, owner, taker) {
     const requestList = document.getElementById("requestList");
     // Iterate the array IDs and retrieve the request status then append to requestList
     topupRequests.forEach(async (requestId) => {
-        const topupData = await topupMap.methods.topupMap(requestId).call();
+        const topupData = await hedgingInstance.methods.topupMap(requestId).call();
 
         if (topupData.state == 0) {
             if (owner == userAddress && topupData.amountTaker > 0) {
