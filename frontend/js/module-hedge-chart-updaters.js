@@ -75,68 +75,72 @@ function updateChartValues_Hedge(prices, targetPrice) {
   
     // Draw chart
     function drawChart() {
-      const chartDimensions = calculateChartDimensions();
-      const step = chartWidth / (prices.length - 1);
-  
-      // Clear canvas
-      ctx.clearRect(0, 0, chartWidth, chartHeight);
-  
-      // Draw area below the charted points
-      ctx.fillStyle = areaColor;
-      ctx.beginPath();
-      ctx.moveTo(0, chartHeight);
-      for (let i = 0; i < prices.length; i++) {
-        const x = i * step;
-        const y = chartHeight - ((prices[i] - chartDimensions.minPrice) / chartDimensions.priceRange) * chartHeight;
-        ctx.lineTo(x, y);
-      }
-      ctx.lineTo(chartWidth, chartHeight);
-      ctx.closePath();
-      ctx.fill();
-  
-      // Draw target price level line (constant line)
-      const targetY = chartHeight - ((targetPrice - chartDimensions.minPrice) / chartDimensions.priceRange) * chartHeight;
-      ctx.strokeStyle = '#25d366'; // Green
-      ctx.beginPath();
-      ctx.moveTo(0, targetY);
-      ctx.lineTo(chartWidth, targetY);
-      ctx.stroke();
-  
-      // Draw start price level line
-      const startPrice = prices[0];
-      const startPriceY = chartHeight - ((startPrice - chartDimensions.minPrice) / chartDimensions.priceRange) * chartHeight;
-      ctx.strokeStyle = '#d6188a'; // Red
-      ctx.beginPath();
-      ctx.moveTo(0, startPriceY);
-      ctx.lineTo(chartWidth, startPriceY);
-      ctx.stroke();
-  
-      // Draw current price level line
-      const currentPrice = prices[prices.length - 1];
-      const currentPriceY = chartHeight - ((currentPrice - chartDimensions.minPrice) / chartDimensions.priceRange) * chartHeight;
-      ctx.strokeStyle = '#0dcaf1'; // Blue
-      ctx.beginPath();
-      ctx.moveTo(0, currentPriceY);
-      ctx.lineTo(chartWidth, currentPriceY);
-      ctx.stroke();
-  
-      // Draw price tags
-      ctx.fillStyle = textColor;
-      ctx.font = '11px Arial';
-      for (let i = 0; i < prices.length; i++) {
-        const x = i * step;
-        const y = chartHeight - ((prices[i] - chartDimensions.minPrice) / chartDimensions.priceRange) * chartHeight;
+        const chartDimensions = calculateChartDimensions();
+        const step = chartWidth / (prices.length - 1);
+    
+        // Clear canvas
+        ctx.clearRect(0, 0, chartWidth, chartHeight);
+
+        // Disable image smoothing for crisp text rendering
+        ctx.imageSmoothingEnabled = false;
+    
+        // Draw area below the charted points
+        ctx.fillStyle = areaColor;
         ctx.beginPath();
-        ctx.arc(x, y, 2, 0, Math.PI * 2);
+        ctx.moveTo(0, chartHeight);
+        for (let i = 0; i < prices.length; i++) {
+            const x = i * step;
+            const y = chartHeight - ((prices[i] - chartDimensions.minPrice) / chartDimensions.priceRange) * chartHeight;
+            ctx.lineTo(x, y);
+        }
+        ctx.lineTo(chartWidth, chartHeight);
+        ctx.closePath();
         ctx.fill();
-        ctx.fillText(prices[i].toString(), x + 5, y - 10); // Display price values at all times
-      }
-  
-      // Draw labels for horizontal lines
-      ctx.fillStyle = '#fff'; // White
-      ctx.fillText(`Start: ${prices[0]}`, chartWidth - 60, startPriceY - 5);
-      ctx.fillText(`Target: ${targetPrice}`, chartWidth - 60, targetY - 5);
-      ctx.fillText(`Now: ${prices[prices.length - 1]}`, chartWidth - 60, currentPriceY - 5);
+    
+        // Draw target price level line (constant line)
+        const targetY = chartHeight - ((targetPrice - chartDimensions.minPrice) / chartDimensions.priceRange) * chartHeight;
+        ctx.strokeStyle = '#25d366'; // Green
+        ctx.beginPath();
+        ctx.moveTo(0, targetY);
+        ctx.lineTo(chartWidth, targetY);
+        ctx.stroke();
+    
+        // Draw start price level line
+        const startPrice = prices[0];
+        const startPriceY = chartHeight - ((startPrice - chartDimensions.minPrice) / chartDimensions.priceRange) * chartHeight;
+        ctx.strokeStyle = '#d6188a'; // Red
+        ctx.beginPath();
+        ctx.moveTo(0, startPriceY);
+        ctx.lineTo(chartWidth, startPriceY);
+        ctx.stroke();
+    
+        // Draw current price level line
+        const currentPrice = prices[prices.length - 1];
+        const currentPriceY = chartHeight - ((currentPrice - chartDimensions.minPrice) / chartDimensions.priceRange) * chartHeight;
+        ctx.strokeStyle = '#0dcaf1'; // Blue
+        ctx.beginPath();
+        ctx.moveTo(0, currentPriceY);
+        ctx.lineTo(chartWidth, currentPriceY);
+        ctx.stroke();
+    
+        // Draw price tags
+        ctx.fillStyle = textColor;
+        ctx.font = '100 10px sans-serif';
+        for (let i = 0; i < prices.length; i++) {
+            const x = i * step;
+            const y = chartHeight - ((prices[i] - chartDimensions.minPrice) / chartDimensions.priceRange) * chartHeight;
+            ctx.beginPath();
+            ctx.arc(x, y, 2, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillText(prices[i].toString(), x + 5, y - 10); // Display price values at all times
+        }
+    
+        // Draw labels for horizontal lines
+        ctx.fillStyle = '#fff'; // White
+        ctx.fillText(`Start: ${prices[0]}`, chartWidth - 60, startPriceY - 5);
+        ctx.fillText(`Target: ${targetPrice}`, chartWidth - 60, targetY - 5);
+        ctx.fillText(`Now: ${prices[prices.length - 1]}`, chartWidth - 60, currentPriceY - 5);
+        
     }
 
     // Draw Price Chart with data provided
@@ -147,6 +151,8 @@ function updateChartValues_Hedge(prices, targetPrice) {
   /*===================================================*/
 
   
+  // TODO: the circles generated below have a redish/brownish border how do i remove it
+
 function updateChartValues_Assets(tokenNames, tokenAmounts) {
 
     // Function to generate a random color
@@ -179,6 +185,9 @@ function updateChartValues_Assets(tokenNames, tokenAmounts) {
             Matter.Bodies.rectangle(width, height / 2, 1, height, { isStatic: true, render: { fillStyle: '#3399ff' } })
         ]);
 
+        // Empty the container
+        container.innerHTML = "";
+
         // Create the circles, use tokenlength as max counter
         for (let i = 0; i < tokenAmounts.length; i++) {
             // Random index for tokenNames and tokenAmount arrays
@@ -199,22 +208,22 @@ function updateChartValues_Assets(tokenNames, tokenAmounts) {
             // Create the circle element
             const circle = document.createElement("div");
             circle.classList.add("assetCircle");
-            circle.textContent = `${name}\n${amount}`;
             circle.style.width = `${circleRadius * 2}px`;
             circle.style.height = `${circleRadius * 2}px`;
             circle.style.borderRadius = `${circleRadius}px`;
-    
             // Assign a random color to the circle
-            const randomColor = getRandomColor();
-            circle.style.backgroundColor = randomColor;
-    
+            const uniqueColor = getRandomColor();
+            circle.style.backgroundColor = uniqueColor;
+            circle.style.border = `1px solid ${uniqueColor}`;
+            // Add text
+            circle.textContent = `${name}\n${amount}`;
             // Add the circle to the container
             container.appendChild(circle);
     
             // Create a Matter.js circle
             const matterCircle = Matter.Bodies.circle(x, y, circleRadius, {
-            restitution: 0.5,
-            friction: 0.1
+                restitution: 0.5,
+                friction: 0.1
             });
     
             // Add the Matter.js circle to the world
@@ -242,7 +251,9 @@ function updateChartValues_Assets(tokenNames, tokenAmounts) {
             options: {
                 wireframes: false,
                 background: "rgba(0, 0, 0, 0)",
-                showVelocity: true
+                showVelocity: true,
+                width: "100%", // Set the width to "100%"
+                height: "100%" // Set the height to "100%"
             }
         }));
     }
