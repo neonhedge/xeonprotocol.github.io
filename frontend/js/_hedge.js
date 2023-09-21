@@ -14,13 +14,28 @@ initWeb3();
 $(document).ready(async function () {
     const accounts = await web3.eth.requestAccounts();
     const userAddress = accounts[0];
-
     const unlockState = await unlockedWallet();
+    
     if (unlockState === true) {
         const setatmIntervalAsync = (fn, ms) => {
-            fn().then(() => {
-                setTimeout(() => setatmIntervalAsync(fn, ms), ms);
-            });
+          let countdown = ms / 1000;
+          const refreshCounter = document.getElementById('refreshCounter');
+        
+          const updateCountdown = () => {
+            countdown--;
+            refreshCounter.innerText = countdown;
+          };
+          //Update the countdown in real time
+          fn().then(() => {
+            updateCountdown();
+            const intervalId = setInterval(() => {
+              updateCountdown();
+              if (countdown === 0) {
+                clearInterval(intervalId);
+                setatmIntervalAsync(fn, ms);
+              }
+            }, 1000);
+          });
         };
 
         // Load sections automatically & periodically
@@ -53,21 +68,20 @@ $(document).ready(async function () {
 
                 // Get the page-title section
                 const pageTitleSection = document.getElementById('page-title');
-                // Clear the contents of the page-title section
-                  pageTitleSection.innerHTML = '';
+                pageTitleSection.innerHTML = '';
                 // Create the rewardsInformer div with the specified text and icon
-                  const rewardsInformerDiv = document.createElement('div');
-                  rewardsInformerDiv.classList.add('rewardsInformer');
+                const rewardsInformerDiv = document.createElement('div');
+                rewardsInformerDiv.classList.add('rewardsInformer');
                 // Create the icon element
-                  const icon = document.createElement('i');
-                  icon.classList.add('fa', 'fa-exclamation-triangle');
-                  icon.setAttribute('aria-hidden', 'true');
+                const icon = document.createElement('i');
+                icon.classList.add('fa', 'fa-exclamation-triangle');
+                icon.setAttribute('aria-hidden', 'true');
                 // Create the text element
-                  const text = document.createTextNode(' Hedge ID not found in URL, sample data displayed instead as default');
+                const text = document.createTextNode(' Hedge ID not found in URL, sample data displayed instead as default');
                 // Append the icon and text elements to the rewardsInformer div
-                  rewardsInformerDiv.appendChild(icon);
-                  rewardsInformerDiv.appendChild(text);
-                
+                rewardsInformerDiv.appendChild(icon);
+                rewardsInformerDiv.appendChild(text);
+
                 if (pageTitleSection) {
                     // Append the rewardsInformer div to the page-title section
                     pageTitleSection.appendChild(rewardsInformerDiv);
@@ -242,7 +256,7 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   // Example of dynamically updating the chart with new prices (replace with your own logic)
-  document.getElementById('refreshButton').addEventListener('click', () => {
+  document.getElementById('refreshCounter').addEventListener('click', () => {
     // Replace the newPrices array with your desired prices
     const newPrices = [110, 100, 90, 90, 130, 150];
     updateChart(newPrices);
