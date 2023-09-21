@@ -244,6 +244,31 @@ async function fetchSection_HedgeCard(hedgeID){
     }
 }
 
+// 2. Fetch Section Values - HedgeCard Default Load
+async function fetchSection_HedgeCardDefault(){
+    try {
+        // Hedge Price Levels - First item is startValue, last item is underlying/current value
+        const startValue = 0;
+        const underlyingValue = 100;
+        const initialPrices = [startValue, 50, underlyingValue];
+        const initialTargetPrice = 80;
+        updateChartValues_Hedge(initialPrices, initialTargetPrice);
+
+        // Hedge Underlying ERC20 Assets - Global arrays for token names and amounts
+        // For Alpha and Beta V1, single assets, display underlying quantity & cost quantity in basket
+        const tokenNamesArray = ["ZKS", "ZRO", "GMX", "ARB", "VELA"];
+        const tokenAmountArray = [1000000, 2000000, 3000000, 4000000, 5000000];
+        updateChartValues_Assets(tokenNamesArray, tokenAmountArray);
+
+        // Hedge Requests - pull topup requests from mappings and populate list
+        // Put in separate module after hedgeCard
+        await fetchSection_HedgeRequests(topupRequests, owner, taker);
+
+    } catch (error) {
+        console.error("Error fetching Hedge Panel section data:", error);
+    }
+}
+
 
     // Fetch topup requests
     //topupRequests is an array if intergers that point to mapping locations in solidity
@@ -307,4 +332,4 @@ function formatDate(timestamp) {
 }
 
 // Export the fetch functions
-export { fetchSection_HedgeCard };
+export { fetchSection_HedgeCard, fetchSection_HedgeCardDefault };

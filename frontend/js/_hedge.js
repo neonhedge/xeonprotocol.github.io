@@ -3,7 +3,7 @@
 ==========================================================================*/
 
 import { initWeb3 } from './dapp-web3-utils.js';
-import { fetchSection_Hedge, fetchSection_Progress, fetchSection_Gains } from './module-hedge-fetchers.js';
+import { fetchSection_HedgeCard, fetchSection_HedgeCardDefault, fetchSection_Progress, fetchSection_Gains } from './module-hedge-fetchers.js';
 
 /*=========================================================================
     INITIALIZE WEB3
@@ -22,6 +22,9 @@ $(document).ready(async function () {
             });
         };
         // Load sections automatically & periodically
+        // TODO: CHECK IF THE webpage URL has ?id=...
+        // if it does then load the below: fetchSection_Hedge, fetchSection_Progress, fetchSection_Gains
+        // if it doesnt have then 
         const callPageTries = async () => {
             const asyncFunctions = [fetchSection_Hedge, fetchSection_Progress, fetchSection_Gains];
             for (const func of asyncFunctions) {
