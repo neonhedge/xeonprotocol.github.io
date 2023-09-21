@@ -31,6 +31,25 @@ main {
   /*** remove background:none on .sectionCenter{ to enable cool blue BG */
 }
 
+#page-title {
+  margin-top:-50px;
+}
+
+.rewardsInformer {
+	width:92%;
+	margin:2vw auto;
+	margin-top: 0;
+	padding: 20px;
+	font-size: clamp(14px, 1vw, 16px);
+	cursor:help;
+	transition: background-color 0.3s;
+	color: #08e7fe;
+	border: 1px solid rgba(51, 153, 255, 0.5);
+	border-radius: 8px;
+	background-color: rgba(29, 163, 216, 0.2);
+	background-color: rgba(29, 129, 216, 0.2);
+}
+
 /*==================================
     SAMPLE CARD FROM BETA
   =================================*/

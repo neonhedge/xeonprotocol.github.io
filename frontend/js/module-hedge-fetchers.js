@@ -64,9 +64,11 @@ async function fetchSection_HedgeCard(hedgeID){
         const pairedContract = new web3.eth.Contract(erc20ABI, paired);
         const pairedSymbol = await pairedContract.methods.symbol().call();  
         const pairedDeciaml = await pairedContract.methods.decimals().call();
-        // Token Amount
+        // Amounts Conversion
         const tokenAmount = new BigNumber(amount).div(10 ** tokenDecimal);
         const underlyingValue = new BigNumber(underlyingValueRaw).div(10 ** pairedDeciaml);
+        createValue = new BigNumber(createValue).div(10 ** pairedDeciaml);
+        startValue = new BigNumber(startValue).div(10 ** pairedDeciaml);
         // Gains & Losses
         // +ve or -ve integers passed to update function.. logic below is sound       
         let takerGains;
@@ -227,7 +229,7 @@ async function fetchSection_HedgeCard(hedgeID){
         // this way its easy to create a default load & separate an actual data update
         
         // Hedge Price Levels - First item is startValue, last item is underlying/current value
-        const initialPrices = [startValue, 110, 150, 80, underlyingValue];
+        const initialPrices = [0, createValue, startValue, underlyingValue];
         const initialTargetPrice = strikeValue;
         updateChartValues_Hedge(initialPrices, initialTargetPrice);
 
@@ -252,8 +254,9 @@ async function fetchSection_HedgeCardDefault(){
     try {
         // Hedge Price Levels - First item is startValue, last item is underlying/current value
         const startValue = 0;
+        const createValue = 50;
         const underlyingValue = 100;
-        const initialPrices = [startValue, 50, underlyingValue];
+        const initialPrices = [startValue, createValue, underlyingValue];
         const initialTargetPrice = 80;
         updateChartValues_Hedge(initialPrices, initialTargetPrice);
 
@@ -262,10 +265,6 @@ async function fetchSection_HedgeCardDefault(){
         const tokenNamesArray = ["ZKS", "ZRO", "GMX", "ARB", "VELA"];
         const tokenAmountArray = [1000000, 2000000, 3000000, 4000000, 5000000];
         updateChartValues_Assets(tokenNamesArray, tokenAmountArray);
-
-        // Hedge Requests - pull topup requests from mappings and populate list
-        // Put in separate module after hedgeCard
-        await fetchSection_HedgeRequests(topupRequests, owner, taker);
 
     } catch (error) {
         console.error("Error fetching Hedge Panel section data:", error);

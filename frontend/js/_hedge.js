@@ -50,6 +50,28 @@ $(document).ready(async function () {
                 await callPageTries();
             } else {
                 await fetchSection_HedgeCardDefault();
+
+                // Get the page-title section
+                const pageTitleSection = document.getElementById('page-title');
+                // Clear the contents of the page-title section
+                  pageTitleSection.innerHTML = '';
+                // Create the rewardsInformer div with the specified text and icon
+                  const rewardsInformerDiv = document.createElement('div');
+                  rewardsInformerDiv.classList.add('rewardsInformer');
+                // Create the icon element
+                  const icon = document.createElement('i');
+                  icon.classList.add('fa', 'fa-exclamation-triangle');
+                  icon.setAttribute('aria-hidden', 'true');
+                // Create the text element
+                  const text = document.createTextNode(' Hedge ID not found in URL, sample data displayed instead as default');
+                // Append the icon and text elements to the rewardsInformer div
+                  rewardsInformerDiv.appendChild(icon);
+                  rewardsInformerDiv.appendChild(text);
+                
+                if (pageTitleSection) {
+                    // Append the rewardsInformer div to the page-title section
+                    pageTitleSection.appendChild(rewardsInformerDiv);
+                }
             }
         };
 

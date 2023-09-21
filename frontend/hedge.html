@@ -39,9 +39,27 @@
 	<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
 	<script type="module" src="js/_hedge.js"></script>
 	<script type="module" src="js/web3-walletstatus-module.js"></script>
+	
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.17.1/matter.min.js"></script> <!-- ASSET BASKET-->
-
 	<script type="application/javascript" src="js/sweetalert/sweetalert.min.js"></script>
+	<script>
+		/* Remove .html from URL, in production
+		// Get the current path
+		const currentPath = window.location.pathname;
+		if (currentPath.endsWith('.html')) {
+			// Remove '.html' from the path
+			const newPath = currentPath.slice(0, -5);
+	
+			// Build the new URL by appending the query string if it exists
+			const query = window.location.search;
+			const newUrl = newPath + (query || '');
+	
+			// Replace the current URL without '.html' in the address bar
+			window.history.replaceState({}, document.title, newUrl);
+		}
+		*/
+	</script>
+	
 </head>
 
 <body>
@@ -100,6 +118,7 @@
 	<main id="main">	
 		<!-- page title section -->
 		<section class="page-title"></section>
+		<div id="page-title"></div>
 		<!-- main section: project cards -->
 		<section class="sectionCenter">
 			<!--  ai assistant -->
