@@ -2,8 +2,9 @@
     Import modules
 ==========================================================================*/
 
+import { unlockedWallet, reqConnect } from './web3-walletstatus-module.js';
 import { initWeb3 } from './dapp-web3-utils.js';
-import { fetchSection_HedgeCard, fetchSection_HedgeCardDefault, fetchSection_Progress, fetchSection_Gains } from './module-hedge-fetchers.js';
+import { fetchSection_HedgeCard, fetchSection_HedgeCardDefault } from './module-hedge-fetchers.js';
 
 /*=========================================================================
     INITIALIZE WEB3
@@ -24,7 +25,7 @@ $(document).ready(async function () {
 
         // Load sections automatically & periodically
         const callPageTries = async () => {
-            const asyncFunctions = [fetchSection_HedgeCard, fetchSection_Progress, fetchSection_Gains];
+            const asyncFunctions = [fetchSection_HedgeCard];
             
             // Check if the webpage URL has '?id='
             const urlParams = new URLSearchParams(window.location.search);

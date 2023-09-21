@@ -180,7 +180,7 @@ function updateChartValues_Assets(tokenNames, tokenAmounts) {
         ]);
 
         // Create the circles, use tokenlength as max counter
-        for (let i = 0; i < tokenAmount.length; i++) {
+        for (let i = 0; i < tokenAmounts.length; i++) {
             // Random index for tokenNames and tokenAmount arrays
             const randomIndex = i;
     
