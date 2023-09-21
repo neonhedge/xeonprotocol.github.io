@@ -58,13 +58,15 @@ async function fetchSection_HedgeCard(hedgeID){
         const tokenSymbol = await tokenContract.methods.symbol().call();
         // Hedge Value
         const hedgeValueRaw = await hedgingInstance.methods.getUnderlyingValue(token, amount).call();
-        const underlyingValue = hedgeValueRaw[0];
+        const underlyingValueRaw = hedgeValueRaw[0];
         const pairedCurrency = hedgeValueRaw[1];
         // Fetch Symbol of paired currency
         const pairedContract = new web3.eth.Contract(erc20ABI, paired);
         const pairedSymbol = await pairedContract.methods.symbol().call();  
+        const pairedDeciaml = await pairedContract.methods.decimals().call();
         // Token Amount
         const tokenAmount = new BigNumber(amount).div(10 ** tokenDecimal);
+        const underlyingValue = new BigNumber(underlyingValueRaw).div(10 ** pairedDeciaml);
         // Gains & Losses
         // +ve or -ve integers passed to update function.. logic below is sound       
         let takerGains;
@@ -231,8 +233,9 @@ async function fetchSection_HedgeCard(hedgeID){
 
         // Hedge Underlying ERC20 Assets - Global arrays for token names and amounts
         // For Alpha and Beta V1, single assets, display underlying quantity & cost quantity in basket
-        const tokenNamesArray = ["ZKS", "ZRO", "GMX", "ARB", "VELA"];
-        const tokenAmountArray = [1000000, 2000000, 3000000, 4000000, 5000000];
+        const costAmount = cost / (tokenAmount / underlyingValue);
+        const tokenNamesArray = [tokenSymbol, pairedSymbol];
+        const tokenAmountArray = [tokenAmount, costAmount];
         updateChartValues_Assets(tokenNamesArray, tokenAmountArray);
 
         // Hedge Requests - pull topup requests from mappings and populate list

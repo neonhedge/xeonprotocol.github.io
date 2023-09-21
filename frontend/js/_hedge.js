@@ -12,7 +12,7 @@ initWeb3();
 
 $(document).ready(async function () {
     const accounts = await web3.eth.requestAccounts();
-	  const userAddress = accounts[0];
+    const userAddress = accounts[0];
 
     const unlockState = await unlockedWallet();
     if (unlockState === true) {
@@ -21,19 +21,39 @@ $(document).ready(async function () {
                 setTimeout(() => setatmIntervalAsync(fn, ms), ms);
             });
         };
+
         // Load sections automatically & periodically
-        // TODO: CHECK IF THE webpage URL has ?id=...
-        // if it does then load the below: fetchSection_Hedge, fetchSection_Progress, fetchSection_Gains
-        // if it doesnt have then 
         const callPageTries = async () => {
-            const asyncFunctions = [fetchSection_Hedge, fetchSection_Progress, fetchSection_Gains];
-            for (const func of asyncFunctions) {
-                await func();
+            const asyncFunctions = [fetchSection_HedgeCard, fetchSection_Progress, fetchSection_Gains];
+            
+            // Check if the webpage URL has '?id='
+            const urlParams = new URLSearchParams(window.location.search);
+            const idParam = urlParams.get('id');
+
+            if (idParam) {
+                for (const func of asyncFunctions) {
+                    await func();
+                }
+            } else {
+                await fetchSection_HedgeCardDefault();
+            }
+        };
+
+        // Check the URL before starting the periodic interval
+        const checkURL = async () => {
+            // Check if the webpage URL has '?id='
+            const urlParams = new URLSearchParams(window.location.search);
+            const idParam = urlParams.get('id');
+
+            if (idParam) {
+                await callPageTries();
+            } else {
+                await fetchSection_HedgeCardDefault();
             }
         };
 
         setatmIntervalAsync(async () => {
-            await callPageTries();
+            await checkURL();
         }, 30000);
     } else {
         reqConnect();
