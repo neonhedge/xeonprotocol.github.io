@@ -32,22 +32,24 @@ main {
 }
 
 #page-title {
-  margin-top:-50px;
+  margin-top:-70px;
 }
 
 .rewardsInformer {
-	width:92%;
-	margin:2vw auto;
+	width:50%;
+  margin:1vw auto;
 	margin-top: 0;
 	padding: 20px;
-	font-size: clamp(14px, 1vw, 16px);
+	font-size: clamp(14px, 1vw, 14.5px);
 	cursor:help;
 	transition: background-color 0.3s;
 	color: #08e7fe;
 	border: 1px solid rgba(51, 153, 255, 0.5);
 	border-radius: 8px;
+  /*
 	background-color: rgba(29, 163, 216, 0.2);
 	background-color: rgba(29, 129, 216, 0.2);
+  */
 }
 
 /*==================================
@@ -304,9 +306,8 @@ hr.line {
   font-size: clamp(14px, 1vw, 16px);
   padding: 1vw;
   box-sizing: border-box;
-  background: radial-gradient(#000327e5 0%, #1d1f56 100%) !important;
-  background-color: rgba(0, 0, 0, 0);
-  background-image: radial-gradient(#18142d, #1d1f56 100%) !important;
+  background: linear-gradient(60deg, #131145 0%, #1b1b49 100%) !important;
+  background-image: radial-gradient(#131145, #1b1b49 100%) !important;
   color: #EEE;
 }
 
@@ -326,7 +327,7 @@ hr.line {
 .tokenName {
   display: inline-block;
   font-weight: 600;
-  font-size: clamp(16px, 2vw, 20px);
+  font-size: clamp(16px, 2vw, 19px);
   text-align: left;
 }
 
@@ -629,6 +630,10 @@ hr.line {
   font-size: 14px;
 }
 
+.timetoexpiry {
+  color: #FFF !important;
+}
+
 .mbcard_detail {
   width: 100%;
   height: 30px;
@@ -788,7 +793,6 @@ font-size: clamp(12.2px, 1vw, 13.5px);
 }
 
 #refreshButton {
-  margin:2px auto;
   border-radius: 5px;
   border: 1px solid #3399ff;
   border: none;
@@ -796,6 +800,12 @@ font-size: clamp(12.2px, 1vw, 13.5px);
   color: #08e7fe;
   display: flex;
   justify-content: space-between;
+}
+
+#refreshCounter {
+  margin-left: 1vw;
+  color: #02f0fe;
+  font-size: 13px;
 }
 
 .inprogress i {
@@ -844,6 +854,10 @@ font-size: clamp(12.2px, 1vw, 13.5px);
   border-radius:5px;
   font-size: 12px;
   color: #000000;
+}
+
+#priceChangeChart {
+  font-smooth: none;
 }
 
 
