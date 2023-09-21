@@ -1,37 +1,25 @@
-export function loadHedgesModule(userAddress) {
-	const CONFIG = {
-		wallet: "0x61418293d8649Cc9066cb103028710253184CE77",
-		network: "0x5", // Goerli: 0x5, BSC: 0x56
-		etherScan: "https://goerli.etherscan.io", //https://goerli.etherscan.io //https://ETHERscan.com/
-		decimals: 18,
-		tokenAddress: "0x967677a31A149Ebd5E605b2a7C85E850bb0dd00F",
-		tokenBalance: 0,
-		popuptimer: 20,
-		contractABI: [],
-		disconnected: 0,
-	};
+/*=========================================================================
+    Import modules
+==========================================================================*/
+import { CONSTANTS } from './constants.js';
 
-	// Initialize B
-	try {
-		if (typeof window.ethereum == 'undefined') {
-			swal({
-				title: "Hold on!",
-				type: "error",
-				confirmButtonColor: "#F27474",
-				text: "Metamask is missing, so is the full experience now..."
-			});
-		} else if (typeof window.ethereum !== 'undefined') {
-			window.web3 = new Web3(window.ethereum);
-			var tokenAddress = CONFIG.tokenAddress;
-			var erc20Abi = CONFIG.contractABI;
-			window.tokenInst = new window.web3.eth.Contract(erc20Abi, tokenAddress);
-		} else {
-			console.warn("No web3 detected. Fallback to local node.");
-			App.web3 = new Web3(new Web3.providers.HttpProvider("http://127.0.0.1:7545"));
-		}
-	} catch (error) {}
+/*=========================================================================
+    run functions
+==========================================================================*/
+async function unlockedWallet() {
+	const accounts = await window.web3.eth.getAccounts();
+	if (accounts.length > 0) {
+		$('.wallets').css('display', 'none');
+		$('.walletpur').css('display', 'inline-block');
+		return true;
+	} else if (accounts.length === 0 || CONSTANTS.disconnected === 1) {
+		$('.wallets').css('display', 'none');
+		$('.wallet_connect').css('display', 'inline-block');
+		return false;
+	}
+}
 
-	// Event listeners for window load
+// Event listeners for window load
 	window.addEventListener("load", () => {
 		const ethereum = window.ethereum;
 
@@ -56,13 +44,13 @@ export function loadHedgesModule(userAddress) {
 		const correctChain = await chainCheck();
 		if (correctChain) {
 			currentBlock();
-			blockTimer = setInterval(currentBlock, 40000);
+			setInterval(currentBlock, 40000);
 
 			if (!(await unlockedWallet())) {
 				reqConnect();
 			} else {
 				walletCheckProceed();
-				checks = setInterval(walletCheckProceed, 40000);
+				setInterval(walletCheckProceed, 40000);
 			}
 		} else {
 			if (switchNetwork()) {
@@ -73,13 +61,14 @@ export function loadHedgesModule(userAddress) {
 		}
 	}
 
-	async function handleAccountChange(accounts) {
+	async function handleAccountChange(wallets) {
 		console.log("Account changed:", accounts);
-		CONFIG.wallet = accounts.length ? accounts[0] : null;
-		if (accounts.length === 0) {
+    	let wallet = wallets[0];
+		wallet = wallets.length ? wallets[0] : null;
+		if (wallets.length === 0) {
 			console.log("Please connect to MetaMask.");
-		} else if (accounts[0] !== window.currentAccount) {
-			window.currentAccount = accounts[0];
+		} else if (wallets[0] !== window.currentAccount) {
+			window.currentAccount = wallets[0];
 			initializeConnection();
 		}
 	}
@@ -87,7 +76,7 @@ export function loadHedgesModule(userAddress) {
 	async function handleNetworkChange(networkId) {
 		console.log("Network changed:", networkId);
 		window.chainID = networkId;
-		if (networkId !== CONFIG.network) {
+		if (networkId !== CONSTANTS.network) {
 			console.log("Reading other chain:", networkId);
 			$(".wallets").css("display", "none");
 			$(".network_switch").css("display", "inline-block");
@@ -98,27 +87,13 @@ export function loadHedgesModule(userAddress) {
 	}
 
 	// Other functions follow...
-
-	async function unlockedWallet() {
-		const accounts = await window.web3.eth.getAccounts();
-		if (accounts.length > 0) {
-		CONFIG.wallet = accounts[0];
-		$('.wallets').css('display', 'none');
-		$('.walletpur').css('display', 'inline-block');
-		return true;
-		} else if (accounts.length === 0 || CONFIG.disconnected === 1) {
-		$('.wallets').css('display', 'none');
-		$('.wallet_connect').css('display', 'inline-block');
-		return false;
-		}
-	}
 	
 	async function balanceOf(account) {
 		try {
-		const result = await tokenInst.methods.balanceOf(account).call();
-		const decimals = CONFIG.decimals;
+		const result = await neonInstance.methods.balanceOf(account).call();
+		const decimals = CONSTANTS.decimals;
 		const balance = (result / Math.pow(10, decimals)).toFixed(2);
-		CONFIG.tokenBalance = balance;
+		CONSTANTS.tokenBalance = balance;
 	
 		if (result) {
 			const first = account.substring(0, 5);
@@ -154,7 +129,7 @@ export function loadHedgesModule(userAddress) {
 	async function currentBlock() {
 		try {
 		const block = await window.web3.eth.getBlockNumber();
-		document.getElementById('blocknumber').innerHTML = `<a href="${CONFIG.etherScan}/block/${block}" target="_blank">${block}</a>`;
+		document.getElementById('blocknumber').innerHTML = `<a href="${CONSTANTS.etherScan}/block/${block}" target="_blank">${block}</a>`;
 		} catch (error) {
 		console.log(error);
 		swal({
@@ -170,13 +145,13 @@ export function loadHedgesModule(userAddress) {
 	
 	async function chainCheck() {
 		const chainID = await ethereum.request({ method: 'eth_chainId' });
-		if (chainID === CONFIG.network) {
-		console.log(`${chainID} == ${CONFIG.network}`);
+		if (chainID === CONSTANTS.network) {
+		console.log(`${chainID} == ${CONSTANTS.network}`);
 		$('.wallets').css('display', 'none');
 		$('.waiting_init').css('display', 'inline-block');
 		return true;
-		} else if (chainID !== CONFIG.network) {
-		console.log(`wrong chain: ${chainID} vs ${CONFIG.network}`);
+		} else if (chainID !== CONSTANTS.network) {
+		console.log(`wrong chain: ${chainID} vs ${CONSTANTS.network}`);
 		$('.wallets').css('display', 'none');
 		$('.network_switch').css('display', 'inline-block');
 		return false;
@@ -204,7 +179,7 @@ export function loadHedgesModule(userAddress) {
 						symbol: 'ETH',
 						decimals: 18,
 					},
-					blockExplorerUrls: [CONFIG.etherScan],
+					blockExplorerUrls: [CONSTANTS.etherScan],
 					rpcUrls: ['https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161'],
 					},
 				],
@@ -260,8 +235,8 @@ export function loadHedgesModule(userAddress) {
 	
 		const accountsPermission = permissions.find(permission => permission.parentCapability === 'eth_accounts');
 		if (accountsPermission) {
-			CONFIG.disconnected = 0;
-			console.log(`eth_accounts permission successfully requested! set: ${CONFIG.disconnected}`);
+			CONSTANTS.disconnected = 0;
+			console.log(`eth_accounts permission successfully requested! set: ${CONSTANTS.disconnected}`);
 			initializeConnection();
 			return true;
 		}
@@ -296,16 +271,16 @@ export function loadHedgesModule(userAddress) {
 	
 	async function walletCheckProceed() {
 		try {
-		CONFIG.decimals = await tokenInst.methods.decimals().call();
+			CONSTANTS.decimals = await neonInstance.methods.decimals().call();
 		} catch (error) {
-		console.log(error);
+			console.log(error);
 		}
 	
 		try {
-		const account = CONFIG.wallet;
-		balanceOf(CONFIG.wallet);
+			const account = await window.web3.eth.getAccounts();
+			balanceOf(account);
 		} catch (error) {
-		console.log('Metamask Locked');
+			console.log('Metamask Locked');
 		}
 	}
 	
@@ -314,7 +289,7 @@ export function loadHedgesModule(userAddress) {
 	// Function to show popup and initiate countdown animation
 	async function popupSuccess(type, currency, Txhash, title, amountEth, amountTokens, wallet, nonTxAction) {
 		// Reset pop-up timer and styling
-		CONFIG.popuptimer = 20;
+		CONSTANTS.popuptimer = 20;
 		$("#popupNotify, #pNt").removeAttr("style");
 		$('#pNt').css({ 'width': '100% !important' });
 		$('#pNotifyX').click();
@@ -332,20 +307,20 @@ export function loadHedgesModule(userAddress) {
 		}
 	
 		// Set transaction hash link and display pop-up
-		$('#popupTxhash').empty().append('<a href="' + CONFIG.etherScan + '/tx/' + Txhash + '" target="_blank">View Transaction on ETHERscan..</a>');
+		$('#popupTxhash').empty().append('<a href="' + CONSTANTS.etherScan + '/tx/' + Txhash + '" target="_blank">View Transaction on ETHERscan..</a>');
 		$('#popupNotify').css('display', 'flex');
 	
 		// Initiate countdown animation
-		CONFIG.resumeclock = CONFIG.popuptimer * 1000;
-		$('#pNt').animate({ width: "0px" }, CONFIG.resumeclock, "swing", function () {
+		CONSTANTS.resumeclock = CONSTANTS.popuptimer * 1000;
+		$('#pNt').animate({ width: "0px" }, CONSTANTS.resumeclock, "swing", function () {
 		$('#pNotifyX').click();
 		});
 	}
 	
 	// Function to decrement the pop-up timer
 	function decrementSeconds() {
-		if (CONFIG.popuptimer > 0) {
-		CONFIG.popuptimer -= 1;
+		if (CONSTANTS.popuptimer > 0) {
+		CONSTANTS.popuptimer -= 1;
 		}
 	}
 	
@@ -363,13 +338,13 @@ export function loadHedgesModule(userAddress) {
 		if (typeof window.pauseCount === 'undefined') {
 			$('#pNt').stop(true);
 			const x = $('#pNt').width();
-			CONFIG.popuptimer = (x / 280) * 10;
+			CONSTANTS.popuptimer = (x / 280) * 10;
 		}
 		});
 	
 		popup.on("mouseleave", function (event) {
-		const resumeclock = CONFIG.popuptimer * 1000;
-		if (CONFIG.popuptimer > 0) {
+		const resumeclock = CONSTANTS.popuptimer * 1000;
+		if (CONSTANTS.popuptimer > 0) {
 			$('#pNt').animate({ width: "0px" }, resumeclock, "swing", function () {
 			$('#pNotifyX').click();
 			});
@@ -405,7 +380,7 @@ export function loadHedgesModule(userAddress) {
 	// HELPERS
 	//Tokens unrounded
 	function fromWeiToFixed2_unrounded(amount) {//doesnt round up figures
-		var amount = amount / Math.pow(10, CONFIG.decimals);
+		var amount = amount / Math.pow(10, CONSTANTS.decimals);
 		var fixed = 2;
 		var re = new RegExp('^-?\\d+(?:\.\\d{0,' + (fixed || -1) + '})?');
 		return amount.toString().match(re)[0];
@@ -452,4 +427,6 @@ export function loadHedgesModule(userAddress) {
 		var ethFriendly = parsed_eth.toFixed(5);
 		return ethFriendly;
 	}
-}
+
+
+	export { unlockedWallet, reqConnect };
