@@ -43,7 +43,7 @@
     <script>
         //which tab is highlighted
         $(document).ready(function(){
-			$('#callOptions').css({'background' : '#d6188a'});//left panel
+			$('#erc20Options').css({'background' : 'rgba(214, 24, 138,0.2)','border' : '1px solid rgb(214, 24, 138)'});//left panel
 			$('#discoverTab').css({'border' : '1px solid #d6188a'});//try #87CEFA
 			//set global
 			window.nav = 1;
@@ -55,9 +55,9 @@
 			MyGlobals.lastItemIndex = 0;
 			loadOptions(startIndex, readLimit);
        });
-       $(document).on('click', '#callOptions', function(e){
+       $(document).on('click', '#erc20Options', function(e){
             $('.asideNavsinside').removeAttr('style'); //reset styles
-            $(this).css({'border' : '1px solid #d6188a', 'background' : '#d6188a'});//set style
+            $(this).css({'border' : '1px solid rgb(214, 24, 138)', 'background' : 'rgba(214, 24, 138,0.2)'});//set style
             //set global
 			window.nav = 1;
 			window.filters = 1;
@@ -69,7 +69,7 @@
         });
         $(document).on('click', '#equitySwaps', function(e){
             $('.asideNavsinside').removeAttr('style'); //reset styles
-            $(this).css({'border' : '1px solid #d6188a', 'background' : '#d6188a'});//set style
+            $(this).css({'border' : '1px solid rgb(214, 24, 138)', 'background' : 'rgba(214, 24, 138,0.2)'});//set style
             //set global
 			window.nav = 2;
 			window.filters = 1;
@@ -79,9 +79,9 @@
 			MyGlobals.lastItemIndex = 0;
 			loadOptions(startIndex, readLimit);
         });
-        $(document).on('click', '#walletloans', function(e){
+        $(document).on('click', '#erc20Loans', function(e){
             $('.asideNavsinside').removeAttr('style'); //reset styles
-            $(this).css({'border' : '1px solid #d6188a', 'background' : '#d6188a'});//set style
+            $(this).css({'border' : '1px solid rgb(214, 24, 138)', 'background' : 'rgba(214, 24, 138,0.2)'});//set style
             //set global
 			window.nav = 3;
 			window.filters = 1;
@@ -201,17 +201,17 @@
 		<!-- main section: project cards -->
 		<section class="sectionCenter">
             <aside id="leftpaner">
-                <div class="clubSinnage">
-                    <h4 title="P2P options market place">> OTC Timeline</h4>
+                <div class="clubSinnage neon-blue">
+                    <h4 title="P2P options market place">> OTC Markets</h4>
                 </div>
                 <div class="asideNavs">
-                    <div class="asideNavsinside" id="callOptions" title="create - buy - discover and track OTC ERC20 Call Options">Options</div>
+                    <div class="asideNavsinside" id="erc20Options" title="create - buy - discover and track OTC ERC20 Options">Options</div>
                 </div>
                 <div class="asideNavs">
-                    <div class="asideNavsinside" id="equitySwaps" title="create - buy - discover and track OTC ERC20 Equity Swaps">Swaps</div>
+                    <div class="asideNavsinside" id="equitySwaps" title="create - buy - discover and track OTC ERC20 Equity Swaps">Equity Swaps</div>
                 </div>
                 <div class="asideNavs">
-                    <div class="asideNavsinside" id="clubloans" title="create or discover OTC loan requests, collateralized by ERC20 tokens">Loans</div>
+                    <div class="asideNavsinside" id="erc20Loans" title="create or discover OTC loans collateralized by ERC20 tokens">ERC20 Loans</div>
                 </div>
                 <div class="asideNavs">
                     <div class="asideNavsinside" id="socialstream">Social</div>
@@ -231,8 +231,8 @@
                 <!-- navigate timelines -->
                 <div class="feedsfilterDockHold">					  
                     <div  class="streamtype" id="discoverTab"><div class="eventAct" ><a href="#">Discover</a></div></div>
-                    <div  class="streamtype" id="mypositionsTabs"><div class="eventAct" ><a href="#">MyPositions</a></div></div>
-                    <div  class="streamtype" id="bookmarksTab"><div class="eventAct"><a href="#">Bookmarks</a></div></div>
+                    <div  class="streamtype" id="mypositionsTabs"><div class="eventAct" ><a href="#">myPositions</a></div></div>
+                    <div  class="streamtype" id="bookmarksTab"><div class="eventAct"><a href="#">myBookmarks</a></div></div>
                     <button id="create_button" class="neon-button">
 						<span class="neon-button-icon">+</span>
 					</button>
@@ -288,7 +288,7 @@
 						</div>
 						<div class="valueHold">
 							<div class="assetsMarketValue flux highlightOption"><div class="valueTitle">VALUE</div>12 ETH</div>
-							<div class="assetsType flux highlightOption"><div class="typeTitle">HEDGE TYPE</div>Put Option</div>
+							<div class="assetsType flux highlightOption">Put Option</div>
 						</div>
 
 						<div class="optionMark"><span>Strk:</span><span class="oMfigure">`+strikevalue+` `+pairSymbol+`</span></div>
@@ -588,7 +588,7 @@
 	
 	
 	<!-- scrool to top button -->
-	<button id="goTop" title="Scrool to top">
+	<button id="goTop" title="Scroll to top">
 		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 450"><path d="M168.5 164.2l148 146.8c4.7 4.7 4.7 12.3 0 17l-19.8 19.8c-4.7 4.7-12.3 4.7-17 0L160 229.3 40.3 347.8c-4.7 4.7-12.3 4.7-17 0L3.5 328c-4.7-4.7-4.7-12.3 0-17l148-146.8c4.7-4.7 12.3-4.7 17 0z"></path></svg>
 	</button>
 

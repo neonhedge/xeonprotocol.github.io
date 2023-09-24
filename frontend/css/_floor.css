@@ -5,8 +5,8 @@
   }
 
   :root {  
-	/* set neon color */
-	--neon-text-color: rgb(255, 153, 0);
+	/* USED WITH EXO FONT --- Set neon color */
+	--neon-text-color: #188dd6;
 	--neon-border-color: #08f;
   }
 /*========================================*/
@@ -28,11 +28,9 @@ body{
 	box-sizing:border-box;
 
 	font-family: monospace, sans-serif, "Helvetica Neue", Helvetica, "Liberation Sans"!important;
-	font-size: clamp(14px, 2vw, 17px) !important;
+	font-size: clamp(15px, 2vw, 17px) !important;
 	font-weight:100;
 	text-align:left;
-	color:#DDD;	
-	/* background-image: linear-gradient(to right, #2d2d2d, #151515, #2d2d2d); */
 }
 .clubSinnage h4{
 	font-family: 'Neon',monospace, sans-serif, Tahoma, Geneva;
@@ -43,8 +41,6 @@ body{
 	padding:10px;
 	margin:0px;
 	box-sizing:border-box;
-	color: #fff;
-	text-shadow: 2px 2px 1px rgba(0,0,0,0.5), 0 0 6px #fff, 0 0 6px #38eeff, 0 0 30px #38eeff;
 }
 aside {
 	position:fixed;
@@ -65,7 +61,7 @@ aside {
 }
 .asideNavsinside{
 	position: relative;
-	margin: 0px auto;
+	margin: 10px auto;
 	width: 100%;
 	line-height: 28px !important;
 	box-sizing: border-box;
@@ -78,9 +74,11 @@ aside {
 	font-weight: 400 !important;
 	text-align: center;
 	color: #F4F4F4;
-	background-color: linear-gradient(90deg, #202A44 0%, #313548 100%);
+	/*
 	border: 1px solid #110f47;
 	background: linear-gradient(280deg, #144d8d, #110f47 100%);
+	*/
+	border:0.5px solid #3399ff;
 }
 #footerSideNavs{
 	text-align: center;
@@ -205,7 +203,7 @@ aside {
 .sitesearchhold{
 	flex-basis: 100%;
 	height: auto;
-	margin-top:10px;
+	margin-top:30px;
 }
 #swap_searcher {
     position: relative;
@@ -227,7 +225,7 @@ aside {
     text-align: center;
     line-height: 1;
     color: rgb(117, 117, 117);
-    background-color: #313548;
+    background-color: #242737;
     -webkit-transition: all .2s ease-in-out;
     -moz-transition: all .2s ease-in-out;
     transition: all .2s ease-in-out;
@@ -439,6 +437,11 @@ fieldset input{
 	background-color: rgba(15, 8, 46, 0.9);
 	border-radius: 5px;
   }
+  .assetsValue {
+	display: flex;
+	justify-content: space-around;
+	align-items: center;
+  }
   
   .assetsValue,
   .assetsType,
@@ -467,12 +470,31 @@ fieldset input{
  	width: 100%;
   }
   .assetsMarketValue {
+	width: unset;
 	text-shadow: 0 0 1.5vw #38409b;
 	background-color: unset; /* disable to shade the value area */
+	color: rgb(8, 231, 254);
   }
   
   .assetsTypeValue {
 	border-radius: 5px;
+	color: unset;
+  }
+
+  .assetsMarketValue, .valueTitle {
+	font-size: 18px;
+  }
+
+  .valueTitle {
+	background: url('../imgs/moon4.webp') no-repeat right;
+	background-size: contain;
+	width: 100px;
+	height: 30px;
+
+	display: flex;
+	justify-content: left;
+	align-items: center;
+	font-size: unset;
   }
   
   .assetsType {
@@ -534,7 +556,7 @@ fieldset input{
   .oMfigure {
 	flex-grow: 1;
 	text-align: left !important;
-	font-size: clamp(13.5px, 2vw, 14px) !important;
+	font-size: clamp(15px, 2vw, 17px) !important;
 	font-weight: 500 !important;
 	color: #fff !important;
 }
@@ -664,8 +686,9 @@ fieldset input{
     display: inline-flex;
     padding: 2px;
     box-sizing: border-box;
-    background-color: #252525 ;
+    background-color: unset;
 	margin-left: 2vw;
+	font-size: 14px;
 }
 .social_links img{
     width:18px;
