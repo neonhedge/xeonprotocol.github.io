@@ -360,13 +360,14 @@ fieldset input{
 ======================================*/
 .tl_hedgeGrid{
     position: relative;
+	width:100%;
     margin:0px auto;
     border-bottom: 0.5px dotted #a1a1a1;
 	border-bottom: 1.5px solid rgba(15, 8, 46, 0.5);
     text-align: center;
 
     display: flex;
-    justify-content: center;    
+    justify-content: start;    
     padding-bottom: 10px;
     box-sizing: border-box;
 }
@@ -458,7 +459,7 @@ fieldset input{
   .assetsMarketValue,
   .assetsTypeValue,
   .compositionValue {
-	padding:4px;
+	padding:2px;
 	font-size: clamp(15px, 1vw, 16px);
 	background-color: #0f082e;
 	color: #188dd6;
@@ -481,6 +482,8 @@ fieldset input{
 	background-color: #089353;
 	border-radius: 5px;
 
+	display: flex;
+	flex-direction: column;
 	align-items: center;
   	justify-content: center;
   }
@@ -658,10 +661,10 @@ fieldset input{
 }
 .social_links {
     display: inline-flex;
-    flex-basis: 40%;
     padding: 2px;
     box-sizing: border-box;
     background-color: #252525 ;
+	margin-left: 2vw;
 }
 .social_links img{
     width:18px;
