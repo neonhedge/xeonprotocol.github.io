@@ -104,7 +104,8 @@ aside {
 }
 /* club timeline projects tabs */
 .feedsfilterDockHold{
-	position: relative;
+	position: sticky;
+	top:190px; /* match aside */
 	margin:0px auto;
 	width: 500px;
 	height:75px;
@@ -126,15 +127,13 @@ aside {
 	height: 42px;
 	border-radius: 10px;
 	overflow: hidden;
-	color: #CCC;
+	color: #08e7fe;
 	font-family: monospace, sans-serif, "Helvetica Neue", Helvetica, Arial !important;
 	font-size: clamp(13px, 1vw, 15px) !important;
 	letter-spacing: 0;
 	font-weight: 400 !important;
 	border: 0.5px solid #363636;
-	background: #272b38;
-	background: linear-gradient(0deg, #202A44 0%, #1f2943 50%);
-	
+	border: 0.5px solid #3399ff;
 	
 }
 .streamtype .eventAct {
@@ -147,7 +146,7 @@ aside {
     height: 100%;
     padding: 0% 1% 0% 1%;
 	box-sizing: border-box;
-	color: #CCCCCC;
+	color: #08e7fe;
 	text-decoration: none;
 }
 /* create button */
@@ -159,7 +158,7 @@ aside {
 	padding: 0.5rem;
 	box-sizing: border-box;
 	background-color: transparent;
-	border: 0.5px solid #FFF;
+	border: 0.5px solid #08e7fe;
 	outline: none;
 	overflow: hidden;
 	cursor: pointer;
@@ -183,15 +182,15 @@ aside {
 	}    
 }
 .neon-button:hover {
-	border: 1px solid #d6188a;
+	border: 1px solid #08e7fe;
 }
 .neon-button-icon {
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    color: #BBB;
-    text-shadow: 0 0 1.5vw #38409b;
+    color: #08e7fe;
+    text-shadow: 0 0 1.5vw #08e7fe;
     z-index: 1;
 } 
 .neon-button:hover .neon-button-icon {
@@ -340,51 +339,54 @@ fieldset input{
 	width:100%;
 }
 /* timeline of hedges */
-.hedgesTimeline{
-	position:relative;
-	top:0;
+.hedgesTimeline {
+	position: relative;
+	top: 0;
 	padding-top: 2.5vw;
 	box-sizing: border-box;
-	display: inline-block;/* for us to center as child elements of v-align & t-align above */
+	display: flex;
 	vertical-align: middle;
-	text-align:center;
-	width:100%;
+	justify-content: space-between;
+	flex-wrap: wrap;
+	row-gap: 2vw;
+	flex-direction: column;
+	align-items: center;
 }
 /*=====================================
     HEDGE OPTIONS CARDS excl loans
 ======================================*/
-.hedgeGrid{
+.tl_hedgeGrid{
     position: relative;
-    width:70%;
     margin:0px auto;
     border-bottom: 0.5px dotted #a1a1a1;
     text-align: center;
-    vertical-align: middle;
+
+    display: flex;
+    justify-content: center;    
+    padding-bottom: 10px;
+    box-sizing: border-box;
 }
-.hedgeCard{
+.tl_hedgeCard {
+	display: flex;
+	flex-direction: column;
 	position: relative;
 	width: calc(100% - 1em);
-	max-width:450px;
-	height:auto;
-	display: inline-block;
+	max-width: 450px;
 	vertical-align: middle;
-	border:1px solid #333;
-	border:0.5px solid #626262;
-	border-radius:5px;
-	line-height:1.5;
-	font-size: clamp(14px, 2vw, 17px);
-	padding:1.5vw;
-	box-sizing:border-box;
-	background-color: #252525;
-	background-size: 80px;
-	background-position: top right;
-	background-repeat: no-repeat;
-	color:#EEE;
-}
-.tokenLogoLeft {
+	border: 0.5px solid #202A44;
+	border-radius: 5px;
+	line-height: 1.5;
+	font-family: 'modeseven', 'bitwise', sans-serif, "Helvetica Neue", Helvetica, Arial;
+	font-size: clamp(14px, 1vw, 16px);
+	padding: 1vw;
+	box-sizing: border-box;
+	background: linear-gradient(60deg, #131145 0%, #1b1b49 100%) !important;
+	background-image: radial-gradient(#131145, #1b1b49 100%) !important;
+	color: #EEE;
+  }
+.projectLogo {
     position: relative;
-    margin-inline: 2vw;
-    top:0;
+    margin-inline: 1.5vw;
     width: 50px;
     height: 50px;
     background-position: center;
@@ -393,82 +395,138 @@ fieldset input{
     border-radius: 50%;
     display: inline-block;
 }
-.tokenName{
-    top:-7px;
-    position: relative;
-    width: auto;
+.projectName{
     display: inline-block;
-    font-weight: 600;
-    font-family: 'modeseven','bitwise', sans-serif, "Helvetica Neue", Helvetica, Arial !important;
-    font-size: clamp(17px, 2vw, 20px);
-    text-align:left;
+	font-weight: 600;
+	font-size: clamp(16px, 2vw, 19px);
+	text-align: left;
 }
-.bagsize{
-    width:100%;
-    line-height:20px;
-    font-size: 13px;
-    color:#188dd6;
-    text-align: center;
+.tl_bagsize {
+	width: 100%;
+	line-height: 20px;
+	font-size: 14px;
+	color: #188dd6;
+	color:#FFF;
+	text-align: left;
 }
-.valueHold{
-    margin:15px 0;
+  
+.additionalTokens {
+	font-size: 12px;
+	color: #188dd6;
+	margin-left: 5px;
 }
-.flux {
-    display: inline-block;
-    font-family: 'modeseven','bitwise', sans-serif, "Helvetica Neue", Helvetica, Arial !important;
+  
+  .tokenLink {
+	color: #188dd6;
+	text-decoration: none;
+	vertical-align: middle;
+  }
+  
+  .tokenLink i {
+	font-size: 13px;
+  }
+  
+  /* Option styles */
+  .valueHold {
+	display: flex;
+	justify-content: space-evenly;
+	margin: 15px 0;
+	border-bottom: 2px dashed #0f082e;
+  }
+  
+  .assetsValue,
+  .assetsType,
+  .optionComposition {
+	flex-basis: 50%;
+	text-align: center;
+  }
+  
+  .valueTitle,
+  .typeTitle,
+  .compositionTitle {
+	color: #fff;
+	font-size: clamp(14px, 1vw, 15px);
+	text-align:center;
+  }
+  
+  .assetsMarketValue,
+  .assetsTypeValue,
+  .compositionValue {
+	padding:4px;
+	flex-basis: 50%;
+	font-size: clamp(15px, 1vw, 16px);
+	background-color: #0f082e;
+	color: #188dd6;
+  }
+  .assetsMarketValue {
+	text-shadow: 0 0 1.5vw #38409b;
+	background-color: unset; /* disable to shade the value area */
+  }
+  
+  .assetsTypeValue {
+	border-radius: 5px;
+  }
+  
+  .assetsType {
+	border: 2px solid #089353; 
+	text-shadow: none;
+	vertical-align: middle;
+
+	max-width: 120px;
+	background-color: #089353;
+	border-radius: 5px;
+  }
+  
+  /* Option mark styles */
+  .optionMarkContainer {
+	text-align: center;
+	margin-top: 15px;
+	display: flex;
+	flex-wrap: wrap;
+  }
+  
+  .optionMark {
+	position: relative;
+	width:200px;
+	height: auto;
+	flex-basis: 30%;
+	display: flex;
+	
+	padding: 4px 2px;
+	box-sizing: border-box;
+	text-align: center;
+	font-size: clamp(13px, 1vw, 14px);
+	font-weight: 100;
+	line-height: 1;
+	text-transform: capitalize;
+	background-color: rgba(0, 0, 0, 0.1);
+	border-radius: 1vw;
+	border: 0.5px solid #08f;
+
+	margin: unset;
+	margin-block: 5px;
+  }
+  
+  .optionMark span {
+	display: flex; /* Use flexbox */
+	align-items: center; /* Align text vertically center */
+	width: unset;
+	letter-spacing: unset;
+	text-align: left;
+	padding-inline: 8px;
+	font-family: "Nunito Sans", monospace, sans-serif !important;
+	font-size: clamp(13px, 1vw, 13.5px);
+	color: rgb(139, 149, 158);
+  }
+  
+  .oMfigure {
+	flex-grow: 1;
+	text-align: left !important;
+	font-size: clamp(13.5px, 2vw, 14px) !important;
+	font-weight: 500 !important;
+	color: #fff !important;
 }
-.optionMarketValue{
-    font-family: 'modeseven','bitwise', sans-serif, "Helvetica Neue", Helvetica, Arial !important;
-    /* color:#0c9556; */
-    color: #188dd6;
-    text-shadow: 0 0 1.5vw #38409b;
-}
-.optionMarketValue, .optionType{
-    position: relative;
-    height:auto;
-    font-size: clamp(16px, 2vw, 18px);
-    padding-inline: 10px;
-}
-.optionType {
-    display: inline-block;
-    font-family: 'modeseven','bitwise', sans-serif, "Helvetica Neue", Helvetica, Arial !important;
-    color: #FFF;
-    text-shadow: 0 0 1.5vw #FFF;
-    background-color: #089353;
-    border-radius: 1.8rem;
-    border-radius: 7px;
-    line-height:1.5;
-}
-.optionMark{
-    position: relative;
-    height:auto;
-    width:85%;
-    margin:3px auto;
-    display:block;
-    background-color: #1d1d1d;
-    border-radius:1vw;
-    padding:2px;
-    box-sizing: border-box;
-    text-align: center;
-    font-family: 'modeseven','bitwise', sans-serif, "Helvetica Neue", Helvetica, Arial !important;
-    text-transform: uppercase;
-    font-size: clamp(13.5px, 2vw, 15.5px);
-    line-height: 1.3;
-    line-height: 1;
-}
-.highlightOption{
-    padding-top:2px;
-}
-.optionMark span{
-    display: inline-block;
-    width:40%;
-    text-align: right;
-    padding-inline: 8px;
-	letter-spacing:0.5px;
-}
-.oMfigure{
-    text-align: left !important;
-}
+
 .optionSummary{
     margin-top: 15px;
     width:100%;

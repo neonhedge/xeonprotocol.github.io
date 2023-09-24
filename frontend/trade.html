@@ -259,7 +259,7 @@
 								<div class="valueTitle">VALUE</div>
 								<div class="assetsMarketValue flux highlightOption">10 ETH</div>
 							</div>
-							<div class="assetsType" style="max-width: 140px;">
+							<div class="assetsType">
 								<div class="typeTitle">HEDGE</div>
 								<div class="assetsTypeValue flux highlightOption">Call Option</div>
 							</div>
@@ -268,11 +268,13 @@
 						<div class="optionMark"><span>Cost:</span><span class="oMfigure">`+cost+` `+pairSymbol+`</span></div>
 						<div class="optionMark"><span>Time:</span><span class="oMfigure">`+timeToExpiry+`</span></div>
 						<div class="optionSummary">
-							`+activity_btn+`
-							`+action_btn+`
+							<div class="option_S_tab _bullbear">
+								<span class="status-dot inprogress"><svg stroke="currentColor" fill="#188dd6" stroke-width="0" viewBox="0 0 16 16" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><circle cx="8" cy="8" r="8"></circle></svg><span style="white-space: nowrap;">Vacant</span></span>
+							</div>
+							<div id='"+optionId+"buyButton' class='option_S_tab actionButton buyButton'>Buy Option</div>
 							<div class="option_S_tab _bookmarkjump">
 								<a class="view_project" href="hedge.html?id=`+optionId+`" target="_blank" alt="View" title="full details">view</a>
-								`+bookmark_btn+`
+								<div class='raise_S_tab _bookmarkjump' onclick='"+bookmark+"'><img src='imgs/bookmark_.png' width='18px'/></div>
 							</div>
 						</div>
 					</div>
@@ -285,53 +287,47 @@
 							</div>
 						</div>
 						<div class="valueHold">
-							<div class="assetsValue">
-								<div class="valueTitle">VALUE</div>
-								<div class="assetsMarketValue flux highlightOption">10 ETH</div>
-							</div>
-							<div class="assetsType" style="max-width: 140px;">
-								<div class="typeTitle">HEDGE</div>
-								<div class="assetsTypeValue flux highlightOption">Call Option</div>
-							</div>
-						</div>
-						<div class="valueHold">
-							<div class="assetsMarketValue flux highlightOption">12 ETH</div>
-							<div class="assetsType flux highlightOption">Put Option</div>
+							<div class="assetsMarketValue flux highlightOption"><div class="valueTitle">VALUE</div>12 ETH</div>
+							<div class="assetsType flux highlightOption"><div class="typeTitle">HEDGE TYPE</div>Put Option</div>
 						</div>
 
 						<div class="optionMark"><span>Strk:</span><span class="oMfigure">`+strikevalue+` `+pairSymbol+`</span></div>
 						<div class="optionMark"><span>Cost:</span><span class="oMfigure">`+cost+` `+pairSymbol+`</span></div>
 						<div class="optionMark"><span>Time:</span><span class="oMfigure">`+timeToExpiry+`</span></div>
 						<div class="optionSummary">
-							`+activity_btn+`
-							`+action_btn+`
+							<div class="option_S_tab _bullbear">
+								<span class="status-dot inprogress"><svg stroke="currentColor" fill="#188dd6" stroke-width="0" viewBox="0 0 16 16" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><circle cx="8" cy="8" r="8"></circle></svg><span style="white-space: nowrap;">Vacant</span></span>
+							</div>
+							<div id='"+optionId+"buyButton' class='option_S_tab actionButton buyButton'>Buy Option</div>
 							<div class="option_S_tab _bookmarkjump">
 								<a class="view_project" href="hedge.html?id=`+optionId+`" target="_blank" alt="View" title="full details">view</a>
-								`+bookmark_btn+`
+								<div class='raise_S_tab _bookmarkjump' onclick='"+bookmark+"'><img src='imgs/bookmark_.png' width='18px'/></div>
 							</div>
 						</div>
 					</div>
 					<div class="hedgeCard statemark_ill_wish">				
-						<div class="hedgeGrid">
-							<div class="tokenLogoLeft" style="background-image:url('imgs/monkeytrain.png')"></div>
-							<div class="tokenName">
+						<div class="tl_hedgeGrid">
+							<div class="projectLogo" style="background-image:url('./imgs/cosmictravel.webp')"></div>
+							<div class="projectName">
 								<div>`+name+`<a class="social_links" href="https://etherscan.io/address/'`+pairAddress+`" target="_blank" alt="SC" title="Go to Etherscan">`+truncatedTokenAdd+`</a></div>
-								<div class="bagsize">`+amount+` `+symbol+`</div>
+								<div class="tl_bagsize">`+amount+` `+symbol+`</div>
 							</div>
 						</div>
 						<div class="valueHold">
-							<div class="optionMarketValue flux highlightOption">`+marketvalue+` `+pairSymbol+`</div>
-							<div class="optionType flux highlightOption">`+hedgeType+`</div>
+							<div class="optionMarketValue flux highlightOption">0.54 ETH</div>
+							<div class="optionType flux highlightOption">PUT OPTION</div>
 						</div>
 						<div class="optionMark"><span>Strk:</span><span class="oMfigure">`+strikevalue+` `+pairSymbol+`</span></div>
 						<div class="optionMark"><span>Cost:</span><span class="oMfigure">`+cost+` `+pairSymbol+`</span></div>
 						<div class="optionMark"><span>Time:</span><span class="oMfigure">`+timeToExpiry+`</span></div>
 						<div class="optionSummary">
-							`+activity_btn+`
-							`+action_btn+`
+							<div class="option_S_tab _bullbear">
+								<span class="status-dot inprogress"><svg stroke="currentColor" fill="#188dd6" stroke-width="0" viewBox="0 0 16 16" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><circle cx="8" cy="8" r="8"></circle></svg><span style="white-space: nowrap;">Vacant</span></span>
+							</div>
+							<div id='"+optionId+"buyButton' class='option_S_tab actionButton buyButton'>Buy Option</div>
 							<div class="option_S_tab _bookmarkjump">
 								<a class="view_project" href="hedge.html?id=`+optionId+`" target="_blank" alt="View" title="full details">view</a>
-								`+bookmark_btn+`
+								<div class='raise_S_tab _bookmarkjump' onclick='"+bookmark+"'><img src='imgs/bookmark_.png' width='18px'/></div>
 							</div>
 						</div>
 					</div>
