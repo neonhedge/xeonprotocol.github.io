@@ -368,7 +368,7 @@ fieldset input{
 
     display: flex;
     justify-content: start;    
-    padding-bottom: 10px;
+    padding-bottom: 4px;
     box-sizing: border-box;
 }
 .tl_hedgeCard {
@@ -503,7 +503,7 @@ fieldset input{
 	flex-basis: 30%;
 	display: flex;
 	
-	padding: 4px 2px;
+	padding: 2px;
 	box-sizing: border-box;
 	text-align: center;
 	font-size: clamp(13px, 1vw, 14px);
@@ -522,6 +522,7 @@ fieldset input{
 	display: flex; /* Use flexbox */
 	align-items: center; /* Align text vertically center */
 	width: unset;
+	min-width: 50px;
 	letter-spacing: unset;
 	text-align: left;
 	padding-inline: 8px;
