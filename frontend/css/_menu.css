@@ -14,8 +14,6 @@
 	position:relative;
 	height:auto;
 	width: 100%;
-	max-width:220px;
-	min-width:200px;
 	border-radius: 8px;
 	box-sizing:border-box;
 	cursor: pointer;

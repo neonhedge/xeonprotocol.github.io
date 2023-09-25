@@ -50,22 +50,23 @@ body{
 */
 	background-color: rgba(29, 129, 216, 0.15);
 }
-
+section.sectionCenter {
+	position: relative;
+	display: grid;
+    grid-template-columns: auto 1fr; 
+    min-height: 100vh;
+}
 .clubSinnage{
 	position:relative;
 	padding:10px;
 	margin:0px;
 	box-sizing:border-box;
-
-	font-family: monospace, sans-serif, "Helvetica Neue", Helvetica, "Liberation Sans"!important;
-	font-size: clamp(15px, 2vw, 17px) !important;
-	font-weight:100;
 	text-align:left;
 }
 .clubSinnage h4{
 	font-family: 'Neon',monospace, sans-serif, Tahoma, Geneva;
 	font-size: clamp(18px, 3vw, 28px) !important;
-	font-weight:600;
+	font-weight:400;
 	letter-spacing:normal;
 	text-transform: uppercase;
 	padding:10px;
@@ -73,21 +74,18 @@ body{
 	box-sizing:border-box;
 }
 aside {
-	position:fixed;
-	width:auto;
-	height: 100%;
-	top: 0;
-	left: 0;
-	overflow: hidden;
+	position: sticky;
+	top:100px; /* match aside container */
+
 	transition: 1s;
 	align-items: center;
-	padding-top:150px;
 	box-sizing: border-box;
+	padding: 30px 20px 20px; 
 }
 .asideNavs {
 	position: relative;
 	margin: 5px auto;
-	width: 70%;
+	width: 80%;
 }
 .asideNavsinside{
 	position: relative;
@@ -119,11 +117,9 @@ aside {
 .timelineHold{
 	position: relative;
 	min-height: 500px; /* get clear of CTA section below it */
-	margin-left: 307px;/* side section width */
-	/* padding: 30px 20px 20px; */
-	padding-bottom: 2vw;
+	padding: 30px 20px 20px; 
 	box-sizing:border-box;
-	transition: 500ms linear; 
+	transition: 1s; 
 	
 	color:#FFF;
 	align-items:center;
@@ -140,7 +136,7 @@ aside {
 	z-index:2;
 	text-align:center;
 	/* background-color: #363636; */
-	padding-top: 15px;
+	padding: 15px 2px 5px;
 	border-radius: 10px;
 
 	display: flex;
@@ -181,7 +177,7 @@ aside {
 	text-decoration: none;
 	font-weight:400;
 	letter-spacing: 0.5px;
-	transition: all 0.2s ease-in-out;
+	transition: all 0.3s ease-in-out;
 }
 .streamtype a:hover {
 	color: #08e7fe;
