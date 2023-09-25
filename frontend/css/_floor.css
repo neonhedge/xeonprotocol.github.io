@@ -75,7 +75,7 @@ section.sectionCenter {
 }
 aside {
 	position: sticky;
-	top:100px; /* match aside container */
+	top:70px; /* match aside container */
 
 	transition: 1s;
 	align-items: center;
