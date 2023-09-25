@@ -1,33 +1,75 @@
-MyGlobals = {"wallet":"0x61418293d8649Cc9066cb103028710253184CE77"};
-MyGlobals.clubaddress = '0x569Da12383141d95162dd3C9c83A4Eb7a22A9174';
-MyGlobals.Mode = 0;
-MyGlobals.outputArray = [];
-MyGlobals.startIndex;
-MyGlobals.lastItemIndex;
-MyGlobals.profitBg = 'imgs/repayment2.webp';
-MyGlobals.lossBg = 'imgs/repayment2.webp';
+const MyGlobals = {
+	wallet	: '',
+	Mode : 0,
+	outputArray : [],
+	startIndex : 0,
+	lastItemIndex : 0,
+	profitBg : 'imgs/repayment2.webp',
+	lossBg : 'imgs/repayment2.webp'
+};
 
-MyGlobals.clubABI = [ { "inputs": [ { "internalType": "address payable", "name": "_tokenAdd", "type": "address" } ], "stateMutability": "nonpayable", "type": "constructor" }, { "anonymous": false, "inputs": [ { "indexed": true, "internalType": "address", "name": "project", "type": "address" }, { "indexed": true, "internalType": "address", "name": "funder", "type": "address" }, { "indexed": false, "internalType": "uint256", "name": "funded", "type": "uint256" }, { "indexed": false, "internalType": "uint256", "name": "owed", "type": "uint256" } ], "name": "LiquidityFunded", "type": "event" }, { "anonymous": false, "inputs": [ { "indexed": true, "internalType": "address", "name": "previousOwner", "type": "address" }, { "indexed": true, "internalType": "address", "name": "newOwner", "type": "address" } ], "name": "OwnershipTransferred", "type": "event" }, { "anonymous": false, "inputs": [ { "indexed": true, "internalType": "address", "name": "project", "type": "address" }, { "indexed": true, "internalType": "address", "name": "receiver", "type": "address" }, { "indexed": false, "internalType": "uint256", "name": "amount", "type": "uint256" }, { "indexed": false, "internalType": "uint256", "name": "balance", "type": "uint256" } ], "name": "RepaidWithLove", "type": "event" }, { "anonymous": false, "inputs": [ { "indexed": true, "internalType": "address", "name": "project", "type": "address" }, { "indexed": false, "internalType": "uint256", "name": "funded", "type": "uint256" }, { "indexed": false, "internalType": "uint256", "name": "due", "type": "uint256" } ], "name": "projectFunded", "type": "event" }, { "anonymous": false, "inputs": [ { "indexed": true, "internalType": "address", "name": "project", "type": "address" }, { "indexed": false, "internalType": "uint256", "name": "loaned", "type": "uint256" }, { "indexed": false, "internalType": "uint256", "name": "due", "type": "uint256" } ], "name": "projectLoaned", "type": "event" }, { "anonymous": false, "inputs": [ { "indexed": true, "internalType": "address", "name": "project", "type": "address" }, { "indexed": false, "internalType": "uint256", "name": "amount", "type": "uint256" }, { "indexed": true, "internalType": "address", "name": "repayer", "type": "address" }, { "indexed": true, "internalType": "uint256", "name": "what", "type": "uint256" } ], "name": "projectRepaid", "type": "event" }, { "inputs": [], "name": "_fundingRate", "outputs": [ { "internalType": "uint256", "name": "", "type": "uint256" } ], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "_managerWallet", "outputs": [ { "internalType": "address", "name": "", "type": "address" } ], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "_memebankVaultFXD", "outputs": [ { "internalType": "address", "name": "", "type": "address" } ], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "_memebankVaultLP", "outputs": [ { "internalType": "address", "name": "", "type": "address" } ], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "_minHoldings", "outputs": [ { "internalType": "uint256", "name": "", "type": "uint256" } ], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "_minimumFunding", "outputs": [ { "internalType": "uint256", "name": "", "type": "uint256" } ], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "_totalCurrentAccount", "outputs": [ { "internalType": "uint256", "name": "", "type": "uint256" } ], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "_totalDividentsAvailable", "outputs": [ { "internalType": "uint256", "name": "", "type": "uint256" } ], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "_totalFundingFromVault", "outputs": [ { "internalType": "uint256", "name": "", "type": "uint256" } ], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "_totalFundingPaidout", "outputs": [ { "internalType": "uint256", "name": "", "type": "uint256" } ], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "_totalFundingPaidoutWallets", "outputs": [ { "internalType": "uint256", "name": "", "type": "uint256" } ], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "_totalFundingRepaid", "outputs": [ { "internalType": "uint256", "name": "", "type": "uint256" } ], "stateMutability": "view", "type": "function" }, { "inputs": [ { "internalType": "uint256", "name": "", "type": "uint256" } ], "name": "_totalFundingRepaidTerm", "outputs": [ { "internalType": "uint256", "name": "", "type": "uint256" } ], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "_totalFundingRepaidWallets", "outputs": [ { "internalType": "uint256", "name": "", "type": "uint256" } ], "stateMutability": "view", "type": "function" }, { "inputs": [ { "internalType": "uint256", "name": "", "type": "uint256" } ], "name": "_totalFundingTerm", "outputs": [ { "internalType": "uint256", "name": "", "type": "uint256" } ], "stateMutability": "view", "type": "function" }, { "inputs": [ { "internalType": "uint256", "name": "", "type": "uint256" } ], "name": "_totalLoanRepaidTerm", "outputs": [ { "internalType": "uint256", "name": "", "type": "uint256" } ], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "_totalLoansPaidout", "outputs": [ { "internalType": "uint256", "name": "", "type": "uint256" } ], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "_totalLoansRepaid", "outputs": [ { "internalType": "uint256", "name": "", "type": "uint256" } ], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "_totalLoansRepaidWallets", "outputs": [ { "internalType": "uint256", "name": "", "type": "uint256" } ], "stateMutability": "view", "type": "function" }, { "inputs": [ { "internalType": "uint256", "name": "", "type": "uint256" } ], "name": "_totalLoansTerm", "outputs": [ { "internalType": "uint256", "name": "", "type": "uint256" } ], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "_totalProceedsWithdrawn", "outputs": [ { "internalType": "uint256", "name": "", "type": "uint256" } ], "stateMutability": "view", "type": "function" }, { "inputs": [ { "internalType": "address", "name": "_address", "type": "address" } ], "name": "bookmarkProject", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [], "name": "depositFundingCapital", "outputs": [], "stateMutability": "payable", "type": "function" }, { "inputs": [ { "internalType": "address", "name": "_project", "type": "address" }, { "internalType": "uint256", "name": "amountFunded", "type": "uint256" } ], "name": "fundProjectX", "outputs": [], "stateMutability": "payable", "type": "function" }, { "inputs": [], "name": "getAllFundingRequests", "outputs": [ { "internalType": "address[]", "name": "", "type": "address[]" } ], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "getAllLoanRequests", "outputs": [ { "internalType": "address[]", "name": "", "type": "address[]" } ], "stateMutability": "view", "type": "function" }, { "inputs": [ { "internalType": "address", "name": "project", "type": "address" } ], "name": "getBankFundingProfile", "outputs": [ { "internalType": "uint256", "name": "_due", "type": "uint256" }, { "internalType": "uint256", "name": "_repaid", "type": "uint256" }, { "internalType": "uint256", "name": "_time", "type": "uint256" } ], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "getClubFundedProjects", "outputs": [ { "internalType": "address[]", "name": "", "type": "address[]" } ], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "getClubLoanedProjects", "outputs": [ { "internalType": "address[]", "name": "", "type": "address[]" } ], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "getCrowdFundedProjects", "outputs": [ { "internalType": "address[]", "name": "", "type": "address[]" } ], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "getCrowdLoanedProjects", "outputs": [ { "internalType": "address[]", "name": "", "type": "address[]" } ], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "getFundedProjects", "outputs": [ { "internalType": "address[]", "name": "", "type": "address[]" } ], "stateMutability": "view", "type": "function" }, { "inputs": [ { "internalType": "uint256", "name": "timestampStart", "type": "uint256" }, { "internalType": "uint256", "name": "timestampTo", "type": "uint256" } ], "name": "getFundingForTerm", "outputs": [ { "internalType": "uint256", "name": "sum", "type": "uint256" } ], "stateMutability": "view", "type": "function" }, { "inputs": [ { "internalType": "address", "name": "project", "type": "address" } ], "name": "getLaunchAddrs", "outputs": [ { "internalType": "address", "name": "pair", "type": "address" }, { "internalType": "address", "name": "router", "type": "address" }, { "internalType": "address", "name": "factory", "type": "address" } ], "stateMutability": "view", "type": "function" }, { "inputs": [ { "internalType": "address", "name": "project", "type": "address" } ], "name": "getLaunchAmnts", "outputs": [ { "internalType": "uint256", "name": "amount", "type": "uint256" }, { "internalType": "uint256", "name": "due", "type": "uint256" }, { "internalType": "uint256", "name": "repaid", "type": "uint256" }, { "internalType": "uint256", "name": "fundingTime", "type": "uint256" }, { "internalType": "uint256", "name": "managerstamped", "type": "uint256" }, { "internalType": "uint256", "name": "amount", "type": "uint256" } ], "stateMutability": "view", "type": "function" }, { "inputs": [ { "internalType": "uint256", "name": "requestID", "type": "uint256" } ], "name": "getLoanAmnts", "outputs": [ { "internalType": "uint256", "name": "startedTime", "type": "uint256" }, { "internalType": "uint256", "name": "amount", "type": "uint256" }, { "internalType": "uint256", "name": "_due", "type": "uint256" }, { "internalType": "uint256", "name": "_repaid", "type": "uint256" }, { "internalType": "uint256", "name": "collateral", "type": "uint256" }, { "internalType": "address", "name": "collateralAddy", "type": "address" }, { "internalType": "address", "name": "receiverWallet", "type": "address" } ], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "getLoanedProjects", "outputs": [ { "internalType": "address[]", "name": "", "type": "address[]" } ], "stateMutability": "view", "type": "function" }, { "inputs": [ { "internalType": "address", "name": "_wallet", "type": "address" } ], "name": "getMyFundedProjects", "outputs": [ { "internalType": "address[]", "name": "", "type": "address[]" } ], "stateMutability": "view", "type": "function" }, { "inputs": [ { "internalType": "address", "name": "_wallet", "type": "address" } ], "name": "getMyLoansProjects", "outputs": [ { "internalType": "address[]", "name": "", "type": "address[]" } ], "stateMutability": "view", "type": "function" }, { "inputs": [ { "internalType": "uint256", "name": "loanID", "type": "uint256" } ], "name": "getProfileAddy", "outputs": [ { "internalType": "address", "name": "projectAddr", "type": "address" } ], "stateMutability": "view", "type": "function" }, { "inputs": [ { "internalType": "address", "name": "project", "type": "address" } ], "name": "getProfileILL", "outputs": [ { "internalType": "string", "name": "name", "type": "string" }, { "internalType": "string", "name": "website", "type": "string" }, { "internalType": "string", "name": "telegram", "type": "string" }, { "internalType": "string", "name": "url", "type": "string" }, { "internalType": "address", "name": "owner", "type": "address" }, { "internalType": "uint256", "name": "funder", "type": "uint256" }, { "internalType": "uint256", "name": "hedgeStatus", "type": "uint256" } ], "stateMutability": "view", "type": "function" }, { "inputs": [ { "internalType": "uint256", "name": "loanID", "type": "uint256" } ], "name": "getProfileOPL", "outputs": [ { "internalType": "string", "name": "name", "type": "string" }, { "internalType": "string", "name": "website", "type": "string" }, { "internalType": "string", "name": "telegram", "type": "string" }, { "internalType": "string", "name": "url", "type": "string" }, { "internalType": "address", "name": "owner", "type": "address" }, { "internalType": "uint256", "name": "hedgeStatus", "type": "uint256" }, { "internalType": "uint256", "name": "managerstamped", "type": "uint256" } ], "stateMutability": "view", "type": "function" }, { "inputs": [ { "internalType": "address", "name": "_project", "type": "address" } ], "name": "getProjectsLoanHistory", "outputs": [ { "internalType": "uint256[]", "name": "", "type": "uint256[]" } ], "stateMutability": "view", "type": "function" }, { "inputs": [ { "internalType": "uint256", "name": "timestampStart", "type": "uint256" }, { "internalType": "uint256", "name": "timestampTo", "type": "uint256" } ], "name": "getRepaidForTerm", "outputs": [ { "internalType": "uint256", "name": "sum", "type": "uint256" } ], "stateMutability": "view", "type": "function" }, { "inputs": [ { "internalType": "address", "name": "project", "type": "address" } ], "name": "getWalletFundingProfile", "outputs": [ { "internalType": "uint256", "name": "_due", "type": "uint256" }, { "internalType": "uint256", "name": "_repaid", "type": "uint256" }, { "internalType": "uint256", "name": "_time", "type": "uint256" } ], "stateMutability": "view", "type": "function" }, { "inputs": [ { "internalType": "uint256", "name": "requestID", "type": "uint256" } ], "name": "getWalletLoanProfile", "outputs": [ { "internalType": "uint256", "name": "_due", "type": "uint256" }, { "internalType": "uint256", "name": "_repaid", "type": "uint256" }, { "internalType": "uint256", "name": "_time", "type": "uint256" } ], "stateMutability": "view", "type": "function" }, { "inputs": [ { "internalType": "address", "name": "_address", "type": "address" } ], "name": "getbookmarkOnProject", "outputs": [ { "internalType": "bool", "name": "marking", "type": "bool" } ], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "globalLoanCount", "outputs": [ { "internalType": "uint256", "name": "", "type": "uint256" } ], "stateMutability": "view", "type": "function" }, { "inputs": [ { "internalType": "address", "name": "_project", "type": "address" }, { "internalType": "uint256", "name": "requestID", "type": "uint256" } ], "name": "loanProjectX", "outputs": [], "stateMutability": "payable", "type": "function" }, { "inputs": [ { "internalType": "address", "name": "owner", "type": "address" }, { "internalType": "address", "name": "_projectAddr", "type": "address" }, { "internalType": "address", "name": "_liquidityAddr", "type": "address" } ], "name": "mapPermissions", "outputs": [ { "internalType": "bool", "name": "pass", "type": "bool" } ], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "owner", "outputs": [ { "internalType": "address", "name": "", "type": "address" } ], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "renounceOwnership", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [ { "internalType": "uint256", "name": "_amount", "type": "uint256" } ], "name": "repayFundingCapital", "outputs": [], "stateMutability": "payable", "type": "function" }, { "inputs": [ { "internalType": "address", "name": "_project", "type": "address" } ], "name": "repayProjectFunding", "outputs": [], "stateMutability": "payable", "type": "function" }, { "inputs": [ { "internalType": "address", "name": "_project", "type": "address" }, { "internalType": "uint256", "name": "request", "type": "uint256" } ], "name": "repayProjectLoan", "outputs": [], "stateMutability": "payable", "type": "function" }, { "inputs": [ { "internalType": "address", "name": "project", "type": "address" }, { "internalType": "address", "name": "router", "type": "address" }, { "internalType": "address", "name": "factory", "type": "address" }, { "internalType": "uint256", "name": "fundingtype", "type": "uint256" }, { "internalType": "uint256", "name": "amountETH", "type": "uint256" }, { "internalType": "uint256", "name": "tokens", "type": "uint256" }, { "internalType": "string", "name": "name", "type": "string" }, { "internalType": "string", "name": "website", "type": "string" }, { "internalType": "string", "name": "telegram", "type": "string" }, { "internalType": "string", "name": "icon_128px_url", "type": "string" } ], "name": "requestFunding", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [ { "internalType": "address", "name": "project", "type": "address" }, { "internalType": "address", "name": "receiver", "type": "address" }, { "internalType": "address", "name": "LPaddress", "type": "address" }, { "internalType": "uint256", "name": "fundingtype", "type": "uint256" }, { "internalType": "uint256", "name": "amountETH", "type": "uint256" }, { "internalType": "string", "name": "name", "type": "string" }, { "internalType": "string", "name": "website", "type": "string" }, { "internalType": "string", "name": "telegram", "type": "string" }, { "internalType": "string", "name": "icon_128px_url", "type": "string" } ], "name": "requestLoan", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [], "name": "sendDividents", "outputs": [], "stateMutability": "payable", "type": "function" }, { "inputs": [ { "internalType": "address payable", "name": "_vaultFixedTerm", "type": "address" } ], "name": "setFixedTermVault", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [ { "internalType": "uint256", "name": "_rate", "type": "uint256" } ], "name": "setLiquidityFundRate", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [ { "internalType": "address payable", "name": "_vaultLiquidity", "type": "address" } ], "name": "setLiquidityVault", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [ { "internalType": "uint256", "name": "_ethWEI", "type": "uint256" } ], "name": "setMinFunding", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [ { "internalType": "uint256", "name": "_minTokens", "type": "uint256" } ], "name": "setMinHoldings", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [ { "internalType": "address", "name": "_wallet", "type": "address" } ], "name": "setmanager", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [ { "internalType": "address", "name": "project", "type": "address" }, { "internalType": "bool", "name": "stamp", "type": "bool" }, { "internalType": "bool", "name": "poach", "type": "bool" } ], "name": "stampFundingRequest", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [ { "internalType": "address", "name": "project", "type": "address" }, { "internalType": "uint256", "name": "request", "type": "uint256" }, { "internalType": "bool", "name": "stamp", "type": "bool" }, { "internalType": "bool", "name": "poach", "type": "bool" } ], "name": "stampLoanRequest", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [], "name": "tokenAddress", "outputs": [ { "internalType": "address payable", "name": "", "type": "address" } ], "stateMutability": "view", "type": "function" }, { "inputs": [ { "internalType": "address", "name": "newOwner", "type": "address" } ], "name": "transferOwnership", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [ { "internalType": "address", "name": "_project", "type": "address" }, { "internalType": "uint256", "name": "_amount", "type": "uint256" } ], "name": "withdrawProceeds", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "stateMutability": "payable", "type": "receive" } ];
+/*=========================================================================
+    Import modules
+==========================================================================*/
+
+import { initWeb3 } from './dapp-web3-utils.js';
+import { assignDataToElements, setCurrent_HedgeSection, setCurrent_EarningsSection, setCurrent_StakedSection, setCurrent_TokenomicsSection } from './module-floor-card-fetchers.js';
+import { updateChartValues_Cash, updateChartValues_PIE, updateChartValues_hedges, updateChartValues_Revenue, updateChartValues_Dividents, updateChartValues_Claims, updateChartValues_Staking, updateChartValues_Tokenomics } from './module-analytics-chart-updaters.js';
+import { CONSTANTS } from './constants.js';
+
+/*=========================================================================
+    INITIALIZE WEB3
+==========================================================================*/
+
+initWeb3();
+
+/*========================================================================
+    ON PAGE LOAD  
+==========================================================================*/
+
+$(document).ready(async function () {
+
+    const unlockState = await unlockedWallet();
+    if (unlockState === true) {
+
+		const accounts = await web3.eth.requestAccounts();
+		MyGlobals.wallet = accounts[0];
+
+        const setatmIntervalAsync = (fn, ms) => {
+            fn().then(() => {
+                setTimeout(() => setatmIntervalAsync(fn, ms), ms);
+            });
+        };
+        // Load sections automatically & periodically
+        const callPageTries = async () => {
+            const asyncFunctions = [setCurrent_TrafficSection, setCurrent_HedgeSection, setCurrent_EarningsSection, setCurrent_StakedSection, setCurrent_TokenomicsSection];
+            for (const func of asyncFunctions) {
+                await func();
+            }
+        };
+        setatmIntervalAsync(async () => {
+            await callPageTries();
+        }, 30000);
+
+        // Load more sections manually not automatically & periodically
+        // Create an IntersectionObserver to load sections when in view
+    } else {
+        reqConnect();
+    }
+});
 
 
-//Initialize B
-try{
-	if (typeof window.ethereum == 'undefined') {
-		swal({title: "Hold on!",type: "error",confirmButtonColor: "#F27474",text: "metamask missing, so is the full experience now..."});
-	}else if (typeof window.ethereum !== 'undefined') {
-		//Metamask on BROWSER, NOW SET WEB3 PROVIDER
-		window.web3 = new Web3(window.ethereum);
-		//SET INSTANCE
-		const tokenAddress = MyGlobals.clubaddress;		
-		const erc20Abi = MyGlobals.clubABI;
-		window.clubInst = new window.web3.eth.Contract(erc20Abi, tokenAddress);
-		
-	} else {
-		console.warn("No web3 detected. Falling back to http://127.0.0.1:8545. You should remove this fallback when you deploy live");
-		// fallback - use your fallback strategy (local node / hosted node + in-dapp id mgmt / fail)
-		App.web3 = new Web3( new Web3.providers.HttpProvider("http://127.0.0.1:7545"));
-	}
-}catch(error) {}
+/*=========================================================================
+    HELPER FUNCTIONS
+==========================================================================*/
+
+// FunctionS to set initial CHART values
+function setInitial_StakingChart() {
+    const totalStaked = 100000000;
+    const totalSupply = 300000000;
+
+    updateChartValues_Staking(totalStaked, totalSupply);
+}
 
 //Hedge cards data refresh
 $(document).ready(async function(){
@@ -162,12 +204,12 @@ async function loadOptions(){
 		  }
 		  startIndex = lastItemIndex - 1 - countLimit;
 		} else { // Start from the latest item in the array, our solidity reads incrementally so subtract countLimit -1 point to pick correct starting point for reads
-			let myHedgesLength = await clubInst.methods.getUserHedgesLength(MyLibrary.wallet).call();
+			let myHedgesLength = await clubInst.methods.getUserHedgesLength(userAddress).call();
 		  	startIndex = myHedgesLength - 1 - countLimit;
 		}
 	  
 		let arrayType = true;
-		let optionsArray = await clubInst.methods.getmyHedgesFromXY(startIndex, countLimit, arrayType).call({ from: MyLibrary.wallet });
+		let optionsArray = await clubInst.methods.getmyHedgesFromXY(startIndex, countLimit, arrayType).call({ from: MyGlobals.wallet });
 	  
 		if (optionsArray.length > 0) {
 		  $('#hedgesTimeline').empty();
@@ -188,7 +230,7 @@ async function loadOptions(){
 
 	//BOOKMARKED HEDGES
 	if(window.nav === 1 && window.filters === 3){//get my bookmarks
-		let optionsArray = await clubInst.methods.getmyBookmarks(MyLibrary.wallet).call();
+		let optionsArray = await clubInst.methods.getmyBookmarks(MyGlobals.wallet).call();
 		if(optionsArray.length > 0){
 			$('#hedgesTimeline').empty();
 			// Update outputArray directly
@@ -278,12 +320,12 @@ async function loadOptions(){
 		  }
 		  startIndex = lastItemIndex - 1 - countLimit;
 		} else { // Start from the latest item in the array, our solidity reads incrementally so subtract countLimit -1 point to pick correct starting point for reads
-			let mySwapsLength = await clubInst.methods.getUserSwapsLength(MyLibrary.wallet).call();
+			let mySwapsLength = await clubInst.methods.getUserSwapsLength(MyGlobals.wallet).call();
 		  	startIndex = mySwapsLength - 1 - countLimit;
 		}
 	  
 		let arrayType = false;
-		let optionsArray = await clubInst.methods.getmySwapsFromXY(startIndex, countLimit, arrayType).call({ from: MyLibrary.wallet });
+		let optionsArray = await clubInst.methods.getmySwapsFromXY(startIndex, countLimit, arrayType).call({ from: MyGlobals.wallet });
 	  
 		if (optionsArray.length > 0) {
 		  $('#hedgesTimeline').empty();
@@ -303,7 +345,7 @@ async function loadOptions(){
 	}
 	//BOOKMARKED EQUITY SWAPS
 	if(window.nav === 2 && window.filters === 3){//get my bookmarks
-		let optionsArray = await clubInst.methods.getmyBookmarks(MyLibrary.wallet).call();
+		let optionsArray = await clubInst.methods.getmyBookmarks(MyGlobals.wallet).call();
 		if(optionsArray.length > 0){
 			$('#hedgesTimeline').empty();
 			// Update outputArray directly
@@ -383,7 +425,7 @@ async function fetchOptionCard(optionId){
 			console.log('Hedge type is unknown');
 		}
 		//amount
-		let amount = parseFloat((result.amount / Math.pow(10, MyLibrary.decimals)).toFixed(2));
+		let amount = parseFloat((result.amount / Math.pow(10, MyGlobals.decimals)).toFixed(2));
 		//market value
 		const [marketvalue, pairedAddress] = await clubInst.methods.getUnderlyingValue(tokenAddress, result.amount).call();
 		let pairSymbol;
@@ -448,7 +490,7 @@ async function fetchOptionCard(optionId){
 		//bookmark check
 		var bookmark = 'addBookmark("'+optionId+'")';
 		var unbookmark = 'removeBookmark("'+optionId+'")';
-		var bookmarkState = await clubInst.methods.getBookmark(MyLibrary.wallet, optionId).call();
+		var bookmarkState = await clubInst.methods.getBookmark(MyGlobals.wallet, optionId).call();
 		if(!bookmarkState){
 			var bookmark_btn = "<div class='raise_S_tab _bookmarkjump' onclick='"+bookmark+"'><img src='imgs/bookmark_.png' width='18px'/></div>";
 		}
@@ -456,23 +498,29 @@ async function fetchOptionCard(optionId){
 			var bookmark_btn = "<div class='raise_S_tab _bookmarkjump' onclick='"+unbookmark+"'><img src='imgs/unbookmark_.png' width='18px'/></div>";
 		}
 		//display nav 1 - vacant option
-		if(window.nav == 1 && window.filters == 1){
+		if(window.nav == 1){
 			var projectCard = `
-			<div class="hedgeCard statemark_ill_wish">				
-				<div class="hedgeGrid">
-					<div class="projectLogoLeft" style="background-image:url('imgs/monkeytrain.png')"></div>
+			<div class="tl_hedgeCard statemark_ill_wish">				
+				<div class="tl_hedgeGrid">
+					<div class="projectLogo" style="background-image:url('imgs/monkeytrain.png')"></div>
 					<div class="projectName">
-						<div><a`+name+`<a class="social_links" href="https://etherscan.io/address/'`+pairAddress+`" target="_blank" alt="SC" title="Go to Etherscan">`+truncatedTokenAdd+`</a></div>
-						<div class="bagsize">`+amount+` `+symbol+`</div>
+						<div>`+name+`<a class="social_links" href="https://etherscan.io/address/'`+pairAddress+`" target="_blank" alt="SC" title="Go to Etherscan">`+truncatedTokenAdd+`</a></div>
+						<div class="tl_bagsize">`+amount+` `+symbol+`</div>
 					</div>
 				</div>
 				<div class="valueHold">
-					<div class="optionMarketValue flux highlightOption">`+marketvalue+` `+pairSymbol+`</div>
-					<div class="optionType flux highlightOption">`+hedgeType+`</div>
+					<div class="assetsValue">
+						<div class="valueTitle">VALUE</div>
+						<div class="assetsMarketValue flux highlightOption">`+marketvalue+` `+pairSymbol+`</div>
+					</div>
+					<div class="assetsType">
+						<div class="typeTitle">HEDGE</div>
+						<div class="assetsTypeValue flux highlightOption">`+hedgeType+`</div>
+					</div>
 				</div>
-				<div class="optionMark"><span>Strk:</span><span class="oMfigure">`+strikevalue+` `+pairSymbol+`</span></div>
-				<div class="optionMark"><span>Cost:</span><span class="oMfigure">`+cost+` `+pairSymbol+`</span></div>
-				<div class="optionMark"><span>Time:</span><span class="oMfigure">`+timeToExpiry+`</span></div>
+				<div class="optionMark"><span>Strike:</span><span class="oMfigure">`+strikevalue+` `+pairSymbol+`</span></div>
+				<div class="optionMark"><span>Premium:</span><span class="oMfigure">`+cost+` `+pairSymbol+`</span></div>
+				<div class="optionMark"><span>Expires:</span><span class="oMfigure">`+timeToExpiry+` `+timeToExpiry+`</span></div>
 				<div class="optionSummary">
 					`+activity_btn+`
 					`+action_btn+`
@@ -556,8 +604,8 @@ async function addBookmark(optionId) {
 	  const encodedData = clubInst.methods.bookmarkHedge(optionId).encodeABI();
 	  const estimateGas = await web3.eth.estimateGas({
 		data: encodedData,
-		from: MyLibrary.wallet,
-		to: MyGlobals.clubaddress
+		from: MyGlobals.wallet,
+		to: CONSTANTS.hedgingAddress
 	  });
   
 	  // Estimate gasPrice
@@ -565,7 +613,7 @@ async function addBookmark(optionId) {
   
 	  // Send transaction
 	  const receipt = await clubInst.methods.bookmarkHedge(optionId).send({
-		from: MyLibrary.wallet,
+		from: MyGlobals.wallet,
 		gasPrice: gasPrice,
 		gasLimit: estimateGas,
 	  });
@@ -665,7 +713,7 @@ async function fetchOptionStrip(optionId){
 			console.log('Hedge type is unknown');
 		}
 		//amount
-		let amount = parseFloat((result.amount / Math.pow(10, MyLibrary.decimals)).toFixed(2));
+		let amount = parseFloat((result.amount / Math.pow(10, MyGlobals.decimals)).toFixed(2));
 		//market value
 		const [marketvalue, pairedAddress] = await clubInst.methods.getUnderlyingValue(tokenAddress, result.amount).call();
 		let pairSymbol;
@@ -715,7 +763,7 @@ async function fetchOptionStrip(optionId){
 }
 
 function createForm(){
-	let trimUser = MyLibrary.wallet;
+	let trimUser = MyGlobals.wallet;
 	let truncatedUser = trimUser.substring(0, 6) + '...' + trimUser.slice(-3);
 	var privatize = `
 	<div class="shl_inputshold delegate_inputshold setBeneField">
@@ -764,7 +812,7 @@ function createForm(){
 
 	//proceed; get base balances
 	userBalances = setTimeout( function() {
-		clubInst.methods.getUserBases(MyLibrary.wallet).call().then((result) => {
+		clubInst.methods.getUserBases(MyGlobals.wallet).call().then((result) => {
 			const wethBalance = web3.utils.fromWei(result[0], 'ether'); // Convert wei to ether
 			// Get the decimal values for USDT and USDC tokens
 			const usdtDecimals = 6;
@@ -815,8 +863,8 @@ function isERC20TokenAddress(address) {
 }
 
 async function fetchUserTokenBalance(tokenAddress){
-	clubInst.methods.getWithdrawableBalance(tokenAddress, MyLibrary.wallet).call().then((result) => {
-		const tokenBal = parseFloat((result / Math.pow(10, MyLibrary.decimals)).toFixed(2));
+	clubInst.methods.getWithdrawableBalance(tokenAddress, MyGlobals.wallet).call().then((result) => {
+		const tokenBal = parseFloat((result / Math.pow(10, MyGlobals.decimals)).toFixed(2));
 		// Assign values to HTML elements
 		document.getElementById('tokenBal').innerText = `${tokenBal}`;
 	})
