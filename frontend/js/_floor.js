@@ -13,7 +13,7 @@ const MyGlobals = {
 ==========================================================================*/
 import { CONSTANTS } from './constants.js';
 import { initWeb3 } from './dapp-web3-utils.js';
-import { assignDataToElements, loadOptions, fetchOptionCard, fetchNameSymbol, prepareTimestamp, noOptionsSwal } from './module-floor-card-fetchers.js';
+import { refreshDataOnElements, loadOptions, fetchOptionCard, fetchNameSymbol, prepareTimestamp, noOptionsSwal } from './module-floor-card-fetchers.js';
 
 /*=========================================================================
     INITIALIZE WEB3
@@ -33,20 +33,20 @@ $(document).ready(async function () {
 		const accounts = await web3.eth.requestAccounts();
 		MyGlobals.wallet = accounts[0];
 
-        const setatmIntervalAsync = (fn, ms) => {
+        const setAsyncInterval = (fn, ms) => {
             fn().then(() => {
-                setTimeout(() => setatmIntervalAsync(fn, ms), ms);
+                setTimeout(() => setAsyncInterval(fn, ms), ms);
             });
         };
         // Load sections automatically & periodically
-        const callPageTries = async () => {
-            const asyncFunctions = [setCurrent_TrafficSection, setCurrent_HedgeSection, setCurrent_EarningsSection, setCurrent_StakedSection, setCurrent_TokenomicsSection];
+        const refreshDealCards = async () => {
+            const asyncFunctions = [ await refreshDataOnElements];
             for (const func of asyncFunctions) {
                 await func();
             }
         };
-        setatmIntervalAsync(async () => {
-            await callPageTries();
+        setAsyncInterval(async () => {
+            await refreshDealCards();
         }, 30000);
 
         // Load more sections manually not automatically & periodically
@@ -61,40 +61,10 @@ $(document).ready(async function () {
     HELPER FUNCTIONS
 ==========================================================================*/
 
-// FunctionS to set initial CHART values
-function setInitial_StakingChart() {
-    const totalStaked = 100000000;
-    const totalSupply = 300000000;
-
-    updateChartValues_Staking(totalStaked, totalSupply);
-}
-
-//Hedge cards data refresh
-$(document).ready(async function(){
-	const unlockState = await unlockedWallet();
-	if (unlockState === true){
-		if (outputArray.length > 0){
-			// Repeat, with async and promise so it doesn't overspill
-			async function updateDataInterval() {
-			  await assignDataToElements(); // Call the function to update data in HTML elements
-			  // Schedule the next update after 30 seconds
-			  setTimeout(async () => {
-			    await updateDataInterval();
-			  }, 30000);
-			}
-			// Call the function to start the initial update
-			updateDataInterval();
-		}
-	}else{
-		reqConnect();
-	}	
-});
-
-
 async function addBookmark(optionId) {
 	try {
 	  // Estimate gasLimit
-	  const encodedData = clubInst.methods.bookmarkHedge(optionId).encodeABI();
+	  const encodedData = hedgingInstance.methods.bookmarkHedge(optionId).encodeABI();
 	  const estimateGas = await web3.eth.estimateGas({
 		data: encodedData,
 		from: MyGlobals.wallet,
@@ -105,7 +75,7 @@ async function addBookmark(optionId) {
 	  const gasPrice = await web3.eth.getGasPrice();
   
 	  // Send transaction
-	  const receipt = await clubInst.methods.bookmarkHedge(optionId).send({
+	  const receipt = await hedgingInstance.methods.bookmarkHedge(optionId).send({
 		from: MyGlobals.wallet,
 		gasPrice: gasPrice,
 		gasLimit: estimateGas,
@@ -179,7 +149,7 @@ async function searchHedge(inputText){
 
 async function fetchOptionStrip(optionId){
     try{
-		let result = await clubInst.methods.getHedgeDetails(optionId).call();
+		let result = await hedgingInstance.methods.getHedgeDetails(optionId).call();
 		//name and symbol
 		let name; let symbol;
 		fetchNameSymbol(result.token).then(t=>{name=t.name,symbol=t.symbol}).catch(e=>console.error(e));
@@ -208,7 +178,7 @@ async function fetchOptionStrip(optionId){
 		//amount
 		let amount = parseFloat((result.amount / Math.pow(10, MyGlobals.decimals)).toFixed(2));
 		//market value
-		const [marketvalue, pairedAddress] = await clubInst.methods.getUnderlyingValue(tokenAddress, result.amount).call();
+		const [marketvalue, pairedAddress] = await hedgingInstance.methods.getUnderlyingValue(tokenAddress, result.amount).call();
 		let pairSymbol;
 		if (pairedAddress === '0xdac17f958d2ee523a2206206994597c13d831ec7') {
 			pairSymbol = 'USDT';
@@ -305,7 +275,7 @@ function createForm(){
 
 	//proceed; get base balances
 	userBalances = setTimeout( function() {
-		clubInst.methods.getUserBases(MyGlobals.wallet).call().then((result) => {
+		hedgingInstance.methods.getUserBases(MyGlobals.wallet).call().then((result) => {
 			const wethBalance = web3.utils.fromWei(result[0], 'ether'); // Convert wei to ether
 			// Get the decimal values for USDT and USDC tokens
 			const usdtDecimals = 6;
@@ -356,7 +326,7 @@ function isERC20TokenAddress(address) {
 }
 
 async function fetchUserTokenBalance(tokenAddress){
-	clubInst.methods.getWithdrawableBalance(tokenAddress, MyGlobals.wallet).call().then((result) => {
+	hedgingInstance.methods.getWithdrawableBalance(tokenAddress, MyGlobals.wallet).call().then((result) => {
 		const tokenBal = parseFloat((result / Math.pow(10, MyGlobals.decimals)).toFixed(2));
 		// Assign values to HTML elements
 		document.getElementById('tokenBal').innerText = `${tokenBal}`;

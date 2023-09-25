@@ -3,7 +3,7 @@ import { CONSTANTS } from './constants.js';
 async function refreshDataOnElements() {
 	// Fetch data for all items in outputArray concurrently
 	const promises = outputArray.map(async (optionId) => {
-		const result = await clubInst.methods.getHedgeDetails(optionId).call();
+		const result = await hedgingInstance.methods.getHedgeDetails(optionId).call();
 		// Convert timestamp to human-readable dates
 		const dt_created = new Date(result.dt_created * 1000).toLocaleString();
 		const dt_started = new Date(result.dt_started * 1000).toLocaleString();
@@ -29,7 +29,7 @@ async function refreshDataOnElements() {
 		// Values 
 		//..if option available then show market & current strike price
 		//..if option is taken then show start and market price
-		const [marketvalue, pairedAddress] = await clubInst.methods.getUnderlyingValue(tokenAddress, result.amount).call();
+		const [marketvalue, pairedAddress] = await hedgingInstance.methods.getUnderlyingValue(tokenAddress, result.amount).call();
 		const element = $(`#${optionId}buyButton`);
 		let profit = marketvalue - (result.startvalue + result.cost);
 		let borderColor = '';
@@ -76,12 +76,12 @@ async function loadOptions(){
 		  }
 		  startIndex = lastItemIndex - countLimit - 1;
 		} else { // Start from the latest item in the array, our solidity reads incrementally so subtract countLimit -1 point to pick correct starting point for reads
-		  let allHedgesLength = await clubInst.methods.getAllHedgesLength().call();
+		  let allHedgesLength = await hedgingInstance.methods.getAllHedgesLength().call();
 		  startIndex = allHedgesLength - countLimit - 1;
 		}
 	  
-		let optionsArray = await clubInst.methods.getAllHedges(startIndex, countLimit).call();
-		let takenArray = await clubInst.methods.getAllHedgesTaken(startIndex, 1000000000).call();
+		let optionsArray = await hedgingInstance.methods.getAllHedges(startIndex, countLimit).call();
+		let takenArray = await hedgingInstance.methods.getAllHedgesTaken(startIndex, 1000000000).call();
 	  
 		// Use filter() method to get vacant options
 		let vacantOptionsArray = optionsArray.filter(hedgeID => !takenArray.includes(hedgeID));
@@ -111,12 +111,12 @@ async function loadOptions(){
 		  }
 		  startIndex = lastItemIndex - 1 - countLimit;
 		} else { // Start from the latest item in the array, our solidity reads incrementally so subtract countLimit -1 point to pick correct starting point for reads
-			let myHedgesLength = await clubInst.methods.getUserHedgesLength(userAddress).call();
+			let myHedgesLength = await hedgingInstance.methods.getUserHedgesLength(userAddress).call();
 		  	startIndex = myHedgesLength - 1 - countLimit;
 		}
 	  
 		let arrayType = true;
-		let optionsArray = await clubInst.methods.getmyHedgesFromXY(startIndex, countLimit, arrayType).call({ from: MyGlobals.wallet });
+		let optionsArray = await hedgingInstance.methods.getmyHedgesFromXY(startIndex, countLimit, arrayType).call({ from: MyGlobals.wallet });
 	  
 		if (optionsArray.length > 0) {
 		  $('#hedgesTimeline').empty();
@@ -137,7 +137,7 @@ async function loadOptions(){
 
 	//BOOKMARKED HEDGES
 	if(window.nav === 1 && window.filters === 3){//get my bookmarks
-		let optionsArray = await clubInst.methods.getmyBookmarks(MyGlobals.wallet).call();
+		let optionsArray = await hedgingInstance.methods.getmyBookmarks(MyGlobals.wallet).call();
 		if(optionsArray.length > 0){
 			$('#hedgesTimeline').empty();
 			// Update outputArray directly
@@ -162,11 +162,11 @@ async function loadOptions(){
 			}
 			startIndex = lastItemIndex - 1 - countLimit;
 		} else { // Start from the latest item in the array, our solidity reads incrementally so subtract countLimit -1 point to pick correct starting point for reads
-			let allHedgesLength = await clubInst.methods.getHedgesForTokenCount(filterAddress).call();
+			let allHedgesLength = await hedgingInstance.methods.getHedgesForTokenCount(filterAddress).call();
 			startIndex = allHedgesLength - 1 - countLimit;
 		}
 			
-		let optionsArray = await clubInst.methods.getHedgesForToken(filterAddress, startIndex, countLimit).call();
+		let optionsArray = await hedgingInstance.methods.getHedgesForToken(filterAddress, startIndex, countLimit).call();
 
 		if (optionsArray.length > 0) {
 			$('#hedgesTimeline').empty();		
@@ -193,12 +193,12 @@ async function loadOptions(){
 		  }
 		  startIndex = lastItemIndex - countLimit - 1;
 		} else { // Start from the latest item in the array, our solidity reads incrementally so subtract countLimit -1 point to pick correct starting point for reads
-		  let allSwapsLength = await clubInst.methods.getAllSwapsLength().call();
+		  let allSwapsLength = await hedgingInstance.methods.getAllSwapsLength().call();
 		  startIndex = allSwapsLength - countLimit - 1;
 		}
 	  
-		let optionsArray = await clubInst.methods.getAllSwaps(startIndex, countLimit).call();
-		let takenArray = await clubInst.methods.getAllSwapsTaken(startIndex, 1000000000).call();
+		let optionsArray = await hedgingInstance.methods.getAllSwaps(startIndex, countLimit).call();
+		let takenArray = await hedgingInstance.methods.getAllSwapsTaken(startIndex, 1000000000).call();
 	  
 		// Use filter() method to get vacant swaps
 		let vacantOptionsArray = optionsArray.filter(hedgeID => !takenArray.includes(hedgeID));
@@ -227,12 +227,12 @@ async function loadOptions(){
 		  }
 		  startIndex = lastItemIndex - 1 - countLimit;
 		} else { // Start from the latest item in the array, our solidity reads incrementally so subtract countLimit -1 point to pick correct starting point for reads
-			let mySwapsLength = await clubInst.methods.getUserSwapsLength(MyGlobals.wallet).call();
+			let mySwapsLength = await hedgingInstance.methods.getUserSwapsLength(MyGlobals.wallet).call();
 		  	startIndex = mySwapsLength - 1 - countLimit;
 		}
 	  
 		let arrayType = false;
-		let optionsArray = await clubInst.methods.getmySwapsFromXY(startIndex, countLimit, arrayType).call({ from: MyGlobals.wallet });
+		let optionsArray = await hedgingInstance.methods.getmySwapsFromXY(startIndex, countLimit, arrayType).call({ from: MyGlobals.wallet });
 	  
 		if (optionsArray.length > 0) {
 		  $('#hedgesTimeline').empty();
@@ -252,7 +252,7 @@ async function loadOptions(){
 	}
 	//BOOKMARKED EQUITY SWAPS
 	if(window.nav === 2 && window.filters === 3){//get my bookmarks
-		let optionsArray = await clubInst.methods.getmyBookmarks(MyGlobals.wallet).call();
+		let optionsArray = await hedgingInstance.methods.getmyBookmarks(MyGlobals.wallet).call();
 		if(optionsArray.length > 0){
 			$('#hedgesTimeline').empty();
 			// Update outputArray directly
@@ -277,11 +277,11 @@ async function loadOptions(){
 			}
 			startIndex = lastItemIndex - 1 - countLimit;
 		} else { // Start from the latest item in the array, our solidity reads incrementally so subtract countLimit -1 point to pick correct starting point for reads
-			let allSwapsLength = await clubInst.methods.getSwapsForTokenCount(filterAddress).call();
+			let allSwapsLength = await hedgingInstance.methods.getSwapsForTokenCount(filterAddress).call();
 			startIndex = allSwapsLength - 1 - countLimit;
 		}
 			
-		let optionsArray = await clubInst.methods.getSwapsForToken(filterAddress2, startIndex, countLimit).call();
+		let optionsArray = await hedgingInstance.methods.getSwapsForToken(filterAddress2, startIndex, countLimit).call();
 
 		if (optionsArray.length > 0) {
 			$('#hedgesTimeline').empty();		
@@ -305,7 +305,7 @@ async function loadOptions(){
 
 async function fetchOptionCard(optionId){
     try{
-		let result = await clubInst.methods.getHedgeDetails(optionId).call();
+		let result = await hedgingInstance.methods.getHedgeDetails(optionId).call();
 		//name and symbol
 		let name,symbol;
 		fetchNameSymbol(result.token).then(t=>{name=t.name,symbol=t.symbol}).catch(e=>console.error(e));
@@ -334,7 +334,7 @@ async function fetchOptionCard(optionId){
 		//amount
 		let amount = parseFloat((result.amount / Math.pow(10, MyGlobals.decimals)).toFixed(2));
 		//market value
-		const [marketvalue, pairedAddress] = await clubInst.methods.getUnderlyingValue(tokenAddress, result.amount).call();
+		const [marketvalue, pairedAddress] = await hedgingInstance.methods.getUnderlyingValue(tokenAddress, result.amount).call();
 		let pairSymbol;
 		if (pairedAddress === '0xdac17f958d2ee523a2206206994597c13d831ec7') {
 			pairSymbol = 'USDT';
@@ -397,7 +397,7 @@ async function fetchOptionCard(optionId){
 		//bookmark check
 		var bookmark = 'addBookmark("'+optionId+'")';
 		var unbookmark = 'removeBookmark("'+optionId+'")';
-		var bookmarkState = await clubInst.methods.getBookmark(MyGlobals.wallet, optionId).call();
+		var bookmarkState = await hedgingInstance.methods.getBookmark(MyGlobals.wallet, optionId).call();
 		if(!bookmarkState){
 			var bookmark_btn = "<div class='raise_S_tab _bookmarkjump' onclick='"+bookmark+"'><img src='imgs/bookmark_.png' width='18px'/></div>";
 		}
