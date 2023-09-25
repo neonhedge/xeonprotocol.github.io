@@ -1,8 +1,8 @@
 /*=========================================================================
     Import modules
 ==========================================================================*/
-
 import { initWeb3 } from './dapp-web3-utils.js';
+import { unlockedWallet, reqConnect} from './web3-walletstatus-module.js';
 import { setCurrent_TrafficSection, setCurrent_HedgeSection, setCurrent_EarningsSection, setCurrent_StakedSection, setCurrent_TokenomicsSection } from './module-analytics-section-fetchers.js';
 import { updateChartValues_Cash, updateChartValues_PIE, updateChartValues_hedges, updateChartValues_Revenue, updateChartValues_Dividents, updateChartValues_Claims, updateChartValues_Staking, updateChartValues_Tokenomics } from './module-analytics-chart-updaters.js';
 

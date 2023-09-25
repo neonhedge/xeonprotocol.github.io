@@ -1,3 +1,17 @@
+/*=========================================================================
+    Import modules
+==========================================================================*/
+import { CONSTANTS } from './constants.js';
+import { initWeb3 } from './dapp-web3-utils.js';
+import { unlockedWallet, reqConnect} from './web3-walletstatus-module.js';
+import { refreshDataOnElements, loadOptions, fetchOptionCard, fetchNameSymbol, prepareTimestamp, noOptionsSwal } from './module-market-card-fetchers.js';
+
+/*=========================================================================
+    INITIALIZE WEB3 & LOCAL CONSTANTS
+==========================================================================*/
+
+initWeb3();
+
 const MyGlobals = {
 	wallet	: '',
 	Mode : 0,
@@ -7,19 +21,6 @@ const MyGlobals = {
 	profitBg : 'imgs/repayment2.webp',
 	lossBg : 'imgs/repayment2.webp'
 };
-
-/*=========================================================================
-    Import modules
-==========================================================================*/
-import { CONSTANTS } from './constants.js';
-import { initWeb3 } from './dapp-web3-utils.js';
-import { refreshDataOnElements, loadOptions, fetchOptionCard, fetchNameSymbol, prepareTimestamp, noOptionsSwal } from './module-floor-card-fetchers.js';
-
-/*=========================================================================
-    INITIALIZE WEB3
-==========================================================================*/
-
-initWeb3();
 
 /*========================================================================
     ON PAGE LOAD  
