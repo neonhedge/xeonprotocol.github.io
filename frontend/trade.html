@@ -226,9 +226,15 @@
                     </div>
                 </section>
             </aside>
-            <!-- timeline of projects funded|loans|repaying -->
+            <!-- HEDGE AND LOAN OTC DEAL CARDS TIMELINE, SOCIALFI UI -->
             <div class="timelineHold">
-                <!-- navigate timelines -->
+				<!--
+				<div class="rewardsInformer">**
+					SocialFi + OTC = <i class="fa fa-heart" aria-hidden="true"></i>
+					Friendly UI for OTC timeline. Write, buy, discover ERC20 hedges & loans here.
+				</div>
+				-->
+                <!-- navigate OTC markets -->
                 <div class="feedsfilterDockHold">					  
                     <div  class="streamtype" id="discoverTab"><div class="eventAct" ><a href="#">Discover</a></div></div>
                     <div  class="streamtype" id="mypositionsTabs"><div class="eventAct" ><a href="#">myPositions</a></div></div>
@@ -245,7 +251,7 @@
                     </div>
                 </div>
                 <div id="hedgesTimeline" class="hedgesTimeline">
-                    <!-- project cards in here -->
+                    <!-- OTC deal cards in here -->
 					<div class="tl_hedgeCard statemark_ill_wish">				
 						<div class="tl_hedgeGrid">
 							<div class="projectLogo" style="background-image:url('./imgs/cosmictravel.webp')"></div>
@@ -257,24 +263,22 @@
 						<div class="valueHold">
 							<div class="assetsValue">
 								<div class="valueTitle">VALUE</div>
-								<div class="assetsMarketValue flux highlightOption">10 ETH</div>
+								<div class="assetsMarketValue flux highlightOption">`+marketvalue+` `+pairSymbol+`</div>
 							</div>
 							<div class="assetsType">
 								<div class="typeTitle">HEDGE</div>
-								<div class="assetsTypeValue flux highlightOption">Call Option</div>
+								<div class="assetsTypeValue flux highlightOption">`+hedgeType+`</div>
 							</div>
 						</div>
-						<div class="optionMark"><span>Strk:</span><span class="oMfigure">`+strikevalue+` `+pairSymbol+`</span></div>
-						<div class="optionMark"><span>Cost:</span><span class="oMfigure">`+cost+` `+pairSymbol+`</span></div>
-						<div class="optionMark"><span>Time:</span><span class="oMfigure">`+timeToExpiry+` `+timeToExpiry+`</span></div>
+						<div class="optionMark"><span>Strike:</span><span class="oMfigure">`+strikevalue+` `+pairSymbol+`</span></div>
+						<div class="optionMark"><span>Premium:</span><span class="oMfigure">`+cost+` `+pairSymbol+`</span></div>
+						<div class="optionMark"><span>Expires:</span><span class="oMfigure">`+timeToExpiry+` `+timeToExpiry+`</span></div>
 						<div class="optionSummary">
-							<div class="option_S_tab _bullbear">
-								<span class="status-dot inprogress"><svg stroke="currentColor" fill="#188dd6" stroke-width="0" viewBox="0 0 16 16" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><circle cx="8" cy="8" r="8"></circle></svg><span style="white-space: nowrap;">Vacant</span></span>
-							</div>
-							<div id='"+optionId+"buyButton' class='option_S_tab actionButton buyButton'>Buy Option</div>
+							`+activity_btn+`
+							`+action_btn+`
 							<div class="option_S_tab _bookmarkjump">
 								<a class="view_project" href="hedge.html?id=`+optionId+`" target="_blank" alt="View" title="full details">view</a>
-								<div class='raise_S_tab _bookmarkjump' onclick='"+bookmark+"'><img src='imgs/bookmark_.png' width='18px'/></div>
+								`+bookmark_btn+`
 							</div>
 						</div>
 					</div>

@@ -21,6 +21,36 @@ body{
 	background-image: url(../imgs/zap.webp); /* fallback */
 	background-image: url(../imgs/zap.webp), linear-gradient(#130228, #130228); 
 }
+#page-title {
+	margin-top:-70px;
+}
+
+.rewardsInformer {
+	position: absolute;
+	left: 0;
+	right: 0;
+	width:40%;
+	margin-left: auto;
+	margin-right: auto;
+	top:-70px;
+	z-index: 10;
+
+	padding: 5px 20px;
+	font-size: clamp(13px, 1vw, 13.5px);
+	text-align: left;
+	cursor:help;
+	transition: background-color 0.3s;
+	color: #FFF;
+	color: #08e7fe;
+	border: 1px solid rgba(51, 153, 255, 0.15);
+	border-radius: 8px;
+/*
+	background-color: rgba(29, 163, 216, 0.2);
+	background-color: rgba(29, 129, 216, 0.2);
+*/
+	background-color: rgba(29, 129, 216, 0.15);
+}
+
 .clubSinnage{
 	position:relative;
 	padding:10px;
@@ -147,8 +177,14 @@ aside {
     padding: 0% 1% 0% 1%;
 	box-sizing: border-box;
 	color: #08e7fe;
+	color: #fff;
 	text-decoration: none;
 	font-weight:400;
+	letter-spacing: 0.5px;
+	transition: all 0.2s ease-in-out;
+}
+.streamtype a:hover {
+	color: #08e7fe;
 }
 /* create button */
 .neon-button {
@@ -525,7 +561,7 @@ fieldset input{
 	flex-basis: 30%;
 	display: flex;
 	
-	padding: 2px;
+	padding: 5px;
 	box-sizing: border-box;
 	text-align: center;
 	font-size: clamp(13px, 1vw, 14px);
