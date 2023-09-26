@@ -2,14 +2,19 @@
 @font-face {
 	font-family: neon;
 	src: url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/707108/neon.ttf);
-  }
+}
 
-  :root {  
+:root {  
 	/* USED WITH EXO FONT --- Set neon color */
 	--neon-text-color: #188dd6;
 	--neon-border-color: #08f;
-  }
+}
 /*========================================*/
+
+header {
+	padding-block: unset !important;
+	border-bottom: 0.5px dotted #3399ff !important;
+}
 
 body{
 	background-size:contain !important;
@@ -21,6 +26,7 @@ body{
 	background-image: url(../imgs/zap.webp); /* fallback */
 	background-image: url(../imgs/zap.webp), linear-gradient(#130228, #130228); 
 }
+
 #page-title {
 	margin-top:-70px;
 }
@@ -29,15 +35,15 @@ body{
 	position: absolute;
 	left: 0;
 	right: 0;
-	width:40%;
-	margin-left: auto;
-	margin-right: auto;
-	top:-70px;
+	/* width:40%; */
+	margin-left: 20px;
+	margin-right: 20px;
+	top:-50px;
 	z-index: 10;
 
 	padding: 5px 20px;
 	font-size: clamp(13px, 1vw, 13.5px);
-	text-align: left;
+	text-align: center;
 	cursor:help;
 	transition: background-color 0.3s;
 	color: #FFF;
@@ -49,11 +55,13 @@ body{
 	background-color: rgba(29, 129, 216, 0.2);
 */
 	background-color: rgba(29, 129, 216, 0.15);
+	display: none;
 }
 section.sectionCenter {
 	position: relative;
 	display: grid;
-    grid-template-columns: auto 1fr; 
+    /* grid-template-columns: auto 1fr 300px; /* 3 column grid with right side bar */ 
+	grid-template-columns: auto 1fr; /* 2 column grid */ 
     min-height: 100vh;
 }
 .clubSinnage{
@@ -72,6 +80,10 @@ section.sectionCenter {
 	padding:10px;
 	margin:0px;
 	box-sizing:border-box;
+}
+.left-paner-parent {
+	position: relative;
+	/* background-color: rgba(4, 1, 21, 0.5); */
 }
 aside {
 	position: sticky;
@@ -136,14 +148,14 @@ aside {
 	z-index:2;
 	text-align:center;
 	/* background-color: #363636; */
-	padding: 15px 2px 5px;
+	padding: 20px 0px;
 	border-radius: 10px;
 
 	display: flex;
 	flex-wrap: wrap;
 	align-items: center; /* Align items vertically */
 
-	background-color: #040115;
+	background-color: rgba(4, 1, 21, 1);
   }
   
 .streamtype {
@@ -160,6 +172,7 @@ aside {
 	font-weight: 400 !important;
 	border: 0.5px solid #363636;
 	border: 0.5px solid #3399ff;
+	background-color: #07041e;
 	
 }
 .streamtype .eventAct {
@@ -240,13 +253,13 @@ aside {
 #swap_searcher {
     position: relative;
     display: block;
-    width: 100%;
     height: 32px;
     margin: 0px auto;
-    padding: 0;
+    padding-inline: 5px;
 }
 .search-input {
-	width: 100%;
+	margin: 0px auto;
+	margin-inline: -10px;
 	height: 32px;
     border: 0;
     border-radius: 10px;
