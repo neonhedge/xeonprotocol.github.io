@@ -231,12 +231,6 @@ function createForm(){
 	let truncatedUser = trimUser.substring(0, 6) + '...' + trimUser.slice(-3);
 	var privatize = `
 	<div class="shl_inputshold delegate_inputshold setBeneField">
-		<label id="tokenLabel" class="labels"><img src="imgs/info.png" title="token address of the tokens you want to hedge">token Addr:</label>
-		<input id="tokenAddy" class="sweetInput shldi benown" aria-invalid="false" autocomplete="token to hedge ERC20">
-		<label id="amountLabel" class="labels"><img src="imgs/info.png" title="amount of the tokens you want to hedge P.S should be deposited first">token amount:</label>
-		<input id="tokenAmount" class="sweetInput shldi benown" aria-invalid="false" autocomplete="amount of tokens to hedge">
-		<label id="costLabel" class="labels"><img src="imgs/info.png" title="cost in paired currency or base">hedge cost:</label>
-		<input id="" class="sweetInput shldi benown" aria-invalid="false" autocomplete="cost in base to buy hedge">
 		<label id="typeLabel" class="labels"><img src="imgs/info.png" title="Call Option or Equity Swap (read docs)">hedge type:</label>
 		<select id="hedgeType" name="hedgeType">
 			<option value="option1">Call Option</option>
@@ -244,7 +238,14 @@ function createForm(){
 			<option value="option2">Equity Swap</option>
 			<option value="option3">Crypto Loan (coming)</option>
 		</select>
-
+		<label id="tokenLabel" class="labels"><img src="imgs/info.png" title="token address of the tokens you want to hedge">token Address:</label>
+		<input id="tokenAddy" class="sweetInput shldi benown" aria-invalid="false" autocomplete="ERC20 token to hedge">
+		<label id="amountLabel" class="labels"><img src="imgs/info.png" title="amount of the tokens you want to hedge P.S should deposit first, visit wallet page">token amount:</label>
+		<input id="tokenAmount" class="sweetInput shldi benown" aria-invalid="false" autocomplete="amount of tokens to hedge">
+		<label id="costLabel" class="labels"><img src="imgs/info.png" title="cost in paired currency on dex">premium:</label>
+		<input id="" class="sweetInput shldi benown" aria-invalid="false" autocomplete="cost in paired currency to buy hedge">
+		<label id="strikeLabel" class="labels"><img src="imgs/info.png" title="strike value in paired currency on dex">strike price:</label>
+		<input id="" class="sweetInput shldi benown" aria-invalid="false" autocomplete="strike value in paired currency at which hedge breaks even for the buyer">
 		<br>
 		<div class="walletBalancesTL">
 			<span class="walletbalanceSpan">`+truncatedUser+` <img src="imgs/info.png" title="withdrawable or free balances for connected wallet"></span></br>
@@ -255,12 +256,12 @@ function createForm(){
 		</div>
 	</div>`;
 	swal({
-			title: "Create New",
+			title: "Write a Hedge",
 			text: privatize,
 			type: "prompt",  //var alertTypes = ['error', 'warning', 'info', 'success', 'input', 'prompt'];
 			html: true,
 					dangerMode: true,
-					confirmButtonText: "Create",
+					confirmButtonText: "Write",
 					confirmButtonColor: "#171716", //cowboy brown
 					cancelButtonText: "Cancel",
 					closeOnConfirm: false,
