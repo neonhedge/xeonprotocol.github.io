@@ -99,6 +99,11 @@ aside {
 	margin: 5px auto;
 	width: 80%;
 }
+@media (min-width: 300px) {
+	.asideNavs {
+		min-width: 220px;
+	}
+}
 .asideNavsinside{
 	position: relative;
 	margin: 10px auto;
@@ -118,7 +123,7 @@ aside {
 	border: 1px solid #110f47;
 	background: linear-gradient(280deg, #144d8d, #110f47 100%);
 	*/
-	border:0.5px solid #3399ff;
+	border:1px solid #3399ff;
 }
 #footerSideNavs{
 	text-align: center;
@@ -142,7 +147,7 @@ aside {
 /* club timeline projects tabs */
 .feedsfilterDockHold{
 	position: sticky;
-	top:100px; /* match aside container */
+	top:64px; /* match aside container */
 	margin:0px auto;
 	width: 500px;
 	z-index:2;
@@ -171,7 +176,7 @@ aside {
 	letter-spacing: 0;
 	font-weight: 400 !important;
 	border: 0.5px solid #363636;
-	border: 0.5px solid #3399ff;
+	border: 1px solid #3399ff;
 	background-color: #07041e;
 	
 }
@@ -430,6 +435,7 @@ fieldset input{
 	box-sizing: border-box;
 	background: linear-gradient(60deg, #131145 0%, #1b1b49 100%) !important;
 	background-image: radial-gradient(#131145, #1b1b49 100%) !important;
+	background: radial-gradient(#131145, #1d1f56 80%) !important;
 	color: #EEE;
   }
 .projectLogo {

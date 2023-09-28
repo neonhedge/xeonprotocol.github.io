@@ -231,12 +231,12 @@ function createForm(){
 	let truncatedUser = trimUser.substring(0, 6) + '...' + trimUser.slice(-3);
 	var privatize = `
 	<div class="shl_inputshold delegate_inputshold setBeneField">
-		<label id="typeLabel" class="labels"><img src="imgs/info.png" title="Call Option or Equity Swap (read docs)">hedge type:</label>
+		<label id="typeLabel" class="labels"><img src="imgs/info.png" title="Options or Equity Swaps (read docs)">hedge type:</label>
 		<select id="hedgeType" name="hedgeType">
 			<option value="option1">Call Option</option>
-			<option value="option3">Put Option (coming)</option>
+			<option value="option3">Put Option</option>
 			<option value="option2">Equity Swap</option>
-			<option value="option3">Crypto Loan (coming)</option>
+			<option value="option3">Loan Request (coming)</option>
 		</select>
 		<label id="tokenLabel" class="labels"><img src="imgs/info.png" title="token address of the tokens you want to hedge">token Address:</label>
 		<input id="tokenAddy" class="sweetInput shldi benown" aria-invalid="false" autocomplete="ERC20 token to hedge">
@@ -256,7 +256,7 @@ function createForm(){
 		</div>
 	</div>`;
 	swal({
-			title: "Write a Hedge",
+			title: "Write: Option | Swap | Loan",
 			text: privatize,
 			type: "prompt",  //var alertTypes = ['error', 'warning', 'info', 'success', 'input', 'prompt'];
 			html: true,
