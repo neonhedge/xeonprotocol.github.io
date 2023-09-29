@@ -349,6 +349,7 @@ fieldset input{
 	width:50%;
 	border-radius:10px;
 	border: 0.5px solid #d6188a;
+	border: 0.5px solid #188dd6;
 	background-color: #3d3d3d;
 	color:#DDD;
 	text-align:center;
@@ -375,8 +376,15 @@ fieldset input{
 	margin:5px 0;
 	color:#188dd6;
 	font-family: 'modeseven','bitwise', sans-serif, "Helvetica Neue", Helvetica, Arial !important;
-	font-size: 14px;
+	font-size: 13.5px;
 	letter-spacing: 0;
+	text-transform: uppercase;
+}
+.walletBalancesTL p {
+	font-size: 13px !important;
+	padding:5px 10px !important;
+	width: 100%;
+	text-align: center !important;
 	text-transform: uppercase;
 }
 .walletbalanceSpan img{
