@@ -248,11 +248,12 @@ function createForm(){
 		<input id="" class="sweetInput shldi benown" aria-invalid="false" autocomplete="strike value in paired currency at which hedge breaks even for the buyer">
 		<br>
 		<div class="walletBalancesTL">
-			<span class="walletbalanceSpan">`+truncatedUser+` <img src="imgs/info.png" title="withdrawable or free balances for connected wallet"></span></br>
-			<div><span class="walBalTitle">TOKEN:</span><span id="tokenBal">120,000,000</span></div>
-			<div><span class="walBalTitle">WETH:</span><span id="wethBal">2.6</span></div>
-			<div><span class="walBalTitle">USDT:</span><span id="usdtBal">10,000</span></div>
-			<div><span class="walBalTitle">USDC:</span><span id="usdcBal">204,000</span></div>
+			<p>paste token address above & view your balances: </p>
+			<span class="walletbalanceSpan">`+truncatedUser+` <img src="imgs/info.png" title="protocol balances on connected wallet"></span></br>
+			<div><span class="walBalTitle">deposited:</span><span id="tokenBal">12,000,000</span></div>
+			<div><span class="walBalTitle">locked:</span><span id="wethBal">5,000,000</span></div>
+			<div><span class="walBalTitle">withdrawn:</span><span id="usdtBal">4,000,000</span></div>
+			<div><span class="walBalTitle">available:</span><span id="usdcBal">3,000,000</span></div>
 		</div>
 	</div>`;
 	swal({

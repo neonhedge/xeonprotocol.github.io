@@ -17,19 +17,22 @@ body.stop-scrolling {
   z-index: 10000;}
 
 .sweet-alert {
-  background-color: #f98fc6;
-  font-family: monospace, sans-serif, "Helvetica Neue", Helvetica, "Liberation Sans"!important;
+  position: fixed;
+  top: 50%;
+  left: 0;
+  right:0;
+  margin-left: auto;
+  margin-right: auto;
+
   width:100%;
-  max-width: 478px;
-  padding: 17px;
+  max-width: 450px;
+  padding: 1vw;
   box-sizing:border-box;
   border-radius: 5px;
+
+  background: linear-gradient(150deg, #d6188a, #040115 20%) !important;
+  font-family: monospace, sans-serif, "Helvetica Neue", Helvetica, "Liberation Sans"!important;
   text-align: center;
-  position: fixed;
-  left: 50%;
-  top: 50%;
-  margin-left: -256px;
-  margin-top: -200px;
   overflow: hidden;
   display: none;
   z-index: 99999; }
@@ -43,8 +46,8 @@ body.stop-scrolling {
 	  
 	 
   .sweet-alert h2 {
-    color: #fffde7;
-    font-size: 20px;
+    color: #ddd;
+    font-size: clamp(18px, 2vw, 20px);
     text-align: center;
     font-weight: 500;
     text-transform: none;
@@ -54,8 +57,8 @@ body.stop-scrolling {
     line-height: 30px;
     display: block; }
   .sweet-alert p {
-    color: #fffde7;
-    font-size: 16px;
+    color: #ddd;
+    font-size: 14.5px;
     text-align: center;
     font-weight: 300;
     position: relative;
@@ -68,7 +71,7 @@ body.stop-scrolling {
     border: none;
     position: relative; }
   .sweet-alert .sa-error-container {
-    background-color: #f98fc6;
+    background-color: #f1f1f1;
     margin-left: -17px;
     margin-right: -17px;
     overflow: hidden;
@@ -110,7 +113,7 @@ body.stop-scrolling {
       content: "";
       width: 20px;
       height: 6px;
-      background-color: #f98fc6;
+      background-color: #f06e57;
       border-radius: 3px;
       position: absolute;
       top: 50%;
@@ -127,38 +130,44 @@ body.stop-scrolling {
       opacity: 1;
       -webkit-transform: scale(1);
       transform: scale(1); }
-  .sweet-alert input {
-    width: 100%;
+  
+  .sweet-alert .sweetInput {
+    width: 50%;
     box-sizing: border-box;
-    border-radius: 3px;
-    border: 1px solid #d7d7d7;
-    height: 43px;
-    margin-top: 10px;
-    margin-bottom: 17px;
-    font-size: 18px;
+    border-radius: 15px;
+    border: 0.5px solid #188dd6;
+    height: 30px;
+    margin-top: 7px;
+    margin-bottom: 7px;
+    font-size: 15px;
+    color:#FFF;
+    background-color: #242737;
     box-shadow: inset 0px 1px 1px rgba(0, 0, 0, 0.06);
     padding: 0 12px;
-    display: none;
+    display: inline-block !important;
     -webkit-transition: all 0.3s;
-    transition: all 0.3s; }
-    .sweet-alert input:focus {
+    transition: all 0.3s; 
+  }
+    .sweet-alert .sweetInput:focus {
       outline: none;
       box-shadow: 0px 0px 3px #c4e6f5;
-      border: 1px solid #b4dbed; }
-      .sweet-alert input:focus::-moz-placeholder {
+      border: 1px solid #b4dbed; 
+      background-color: #3f4351;
+    }
+      .sweet-alert .sweetInput:focus::-moz-placeholder {
         transition: opacity 0.3s 0.03s ease;
         opacity: 0.5; }
-      .sweet-alert input:focus:-ms-input-placeholder {
+      .sweet-alert .sweetInput:focus:-ms-input-placeholder {
         transition: opacity 0.3s 0.03s ease;
         opacity: 0.5; }
-      .sweet-alert input:focus::-webkit-input-placeholder {
+      .sweet-alert .sweetInput:focus::-webkit-input-placeholder {
         transition: opacity 0.3s 0.03s ease;
         opacity: 0.5; }
-    .sweet-alert input::-moz-placeholder {
+    .sweet-alert .sweetInput::-moz-placeholder {
       color: #bdbdbd; }
-    .sweet-alert input:-ms-input-placeholder {
+    .sweet-alert .sweetInput:-ms-input-placeholder {
       color: #bdbdbd; }
-    .sweet-alert input::-webkit-input-placeholder {
+    .sweet-alert .sweetInput::-webkit-input-placeholder {
       color: #bdbdbd; }
   .sweet-alert.show-input input {
     display: none; }
@@ -175,16 +184,21 @@ body.stop-scrolling {
 	transform: translate(-50%, 0);
 	visibility: hidden; }
   .sweet-alert button {
-    background-color: #67efa1 !important;
+    background-color: #050c1c !important;
+    background: linear-gradient(220deg, #188dd6, #050c1c 90%);
     border:0.5px solid #a6a6a6;
-    color: #fffde7;
-    border: none;
+    color: #ddd;
+
+    border: 1px solid #3399ff;
+    background: linear-gradient(220deg, #39f, #110f47 80%);
+    color:#FFF;
+
     box-shadow: none;
-    font-size: 17px;
+    font-size: 16px;
     font-weight: 500;
     -webkit-border-radius: 4px;
     border-radius: 5px;
-    padding: 10px 32px;
+    padding: 10px 28px;
     margin: 13px 5px 0 5px;
     cursor: pointer; }
     .sweet-alert button:focus {
@@ -222,7 +236,7 @@ body.stop-scrolling {
 	height:40px;
     max-width: 60px;
     max-height: 60px;
-    border: 4px solid #D95353;
+    border: 4px solid #ca1882;
     -webkit-border-radius: 40px;
     border-radius: 50%;
     margin: 4% auto;
@@ -230,7 +244,7 @@ body.stop-scrolling {
     position: relative;
     box-sizing: content-box; }
     .sweet-alert .sa-icon.sa-error {
-      border-color: #D95353; }
+      border-color: #ca1882; }
       .sweet-alert .sa-icon.sa-error .sa-x-mark {
         position: relative;
         display: block; }
@@ -238,7 +252,7 @@ body.stop-scrolling {
         position: absolute;
         height: 5px;
         width: 40px;
-        background-color: #D95353;
+        background-color: #ca1882;
         display: block;
         top: 16.5px;
         border-radius: 2px; }
@@ -493,28 +507,28 @@ body.stop-scrolling {
   animation: slideFromBottom 0.3s; }
 
 .hideSweetAlert[data-animation=pop] {
-  -webkit-transition: all 0.50s ease;
-  transition: all 0.50s ease;
-  -webkit-animation: hideSweetAlert 0.2s;
-  animation: hideSweetAlert 0.2s; }
+  -webkit-transition: all 1.50s ease;
+  transition: all 1.50s ease;
+  -webkit-animation: hideSweetAlert 0.6s;
+  animation: hideSweetAlert 0.6s; }
 
 .hideSweetAlert[data-animation=none] {
-  -webkit-transition: all 0.50s ease;
-  transition: all 0.50s ease;
+  -webkit-transition: all 1.50s ease;
+  transition: all 1.50s ease;
   -webkit-animation: none;
   animation: none; }
 
 .hideSweetAlert[data-animation=slide-from-top] {
-  -webkit-transition: all 0.50s ease;
-  transition: all 0.50s ease;
-  -webkit-animation: slideToTop 0.4s;
-  animation: slideToTop 0.4s; }
+  -webkit-transition: all 1.50s ease;
+  transition: all 1.50s ease;
+  -webkit-animation: slideToTop 1.2s;
+  animation: slideToTop 1.2s; }
 
 .hideSweetAlert[data-animation=slide-from-bottom] {
-  -webkit-transition: all 0.50s ease;
-  transition: all 0.50s ease;
-  -webkit-animation: slideToBottom 0.3s;
-  animation: slideToBottom 0.3s; }
+  -webkit-transition: all 1.50s ease;
+  transition: all 1.50s ease;
+  -webkit-animation: slideToBottom 0.9s;
+  animation: slideToBottom 0.9s; }
 
 @-webkit-keyframes animateSuccessTip {
   0% {
