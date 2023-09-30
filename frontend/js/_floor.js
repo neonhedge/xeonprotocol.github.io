@@ -12,6 +12,10 @@ import { refreshDataOnElements, loadOptions, fetchOptionCard, fetchNameSymbol, p
 
 initWeb3();
 
+/*========================================================================
+    ON PAGE LOAD  
+==========================================================================*/
+//define globals
 const MyGlobals = {
 	wallet	: '',
 	Mode : 0,
@@ -22,9 +26,103 @@ const MyGlobals = {
 	lossBg : 'imgs/repayment2.webp'
 };
 
-/*========================================================================
-    ON PAGE LOAD  
-==========================================================================*/
+//which tab is highlighted
+$(document).ready(function(){
+	$('#erc20Options').css({'background' : 'rgba(214, 24, 138,0.2)','border' : '1px solid rgb(214, 24, 138)'});//left panel
+	$('#discoverTab').css({'border' : '1px solid #d6188a'});//try #87CEFA
+	//set global
+	window.nav = 1;
+	window.filters = 1;
+	window.readLimit = 30;
+	//check load continuation
+	MyGlobals.outputArray = [];
+	MyGlobals.startIndex = 0;
+	MyGlobals.lastItemIndex = 0;
+	loadOptions(startIndex, readLimit);
+});
+$(document).on('click', '#erc20Options', function(e){
+	$('.asideNavsinside').removeAttr('style'); //reset styles
+	$(this).css({'border' : '1px solid rgb(214, 24, 138)', 'background' : 'rgba(214, 24, 138,0.2)'});//set style
+	//set global
+	window.nav = 1;
+	window.filters = 1;
+	//check load continuation
+	MyGlobals.outputArray = [];
+	MyGlobals.startIndex = 0;
+	MyGlobals.lastItemIndex = 0;
+	loadOptions(startIndex, readLimit);
+});
+$(document).on('click', '#equitySwaps', function(e){
+	$('.asideNavsinside').removeAttr('style'); //reset styles
+	$(this).css({'border' : '1px solid rgb(214, 24, 138)', 'background' : 'rgba(214, 24, 138,0.2)'});//set style
+	//set global
+	window.nav = 2;
+	window.filters = 1;
+	//check load continuation
+	MyGlobals.outputArray = [];
+	MyGlobals.startIndex = 0;
+	MyGlobals.lastItemIndex = 0;
+	loadOptions(startIndex, readLimit);
+});
+$(document).on('click', '#erc20Loans', function(e){
+	$('.asideNavsinside').removeAttr('style'); //reset styles
+	$(this).css({'border' : '1px solid rgb(214, 24, 138)', 'background' : 'rgba(214, 24, 138,0.2)'});//set style
+	//set global
+	window.nav = 3;
+	window.filters = 1;
+	//check load continuation
+	MyGlobals.outputArray = [];
+	MyGlobals.startIndex = 0;
+	MyGlobals.lastItemIndex = 0;
+	loadOptions(startIndex, readLimit);
+});
+$(document).on('click', '#socialstream', function(e){
+	$('.asideNavsinside').removeAttr('style'); //reset styles
+	$(this).css({'border' : '1px solid #d6188a', 'background' : '#d6188a'});//set style
+	//set global
+		
+});
+//filters
+$(document).on('click', '#discoverTab', function(e){
+	$('.streamtype').removeAttr('style'); //reset styles
+	$(this).css({'border' : '1px solid #d6188a'});//set style
+	//set global
+	window.filters = 1;
+	//check load continuation
+	MyGlobals.outputArray = [];
+	MyGlobals.startIndex = 0;
+	MyGlobals.lastItemIndex = 0;
+	loadOptions(startIndex, readLimit);
+});
+$(document).on('click', '#mypositionsTabs', function(e){
+	$('.streamtype').removeAttr('style'); //reset styles
+	$(this).css({'border' : '1px solid #d6188a'});//set style
+	//set global
+	window.filters = 2;
+	//check load continuation
+	MyGlobals.outputArray = [];
+	MyGlobals.startIndex = 0;
+	MyGlobals.lastItemIndex = 0;
+	loadOptions(startIndex, readLimit);
+});
+$(document).on('click', '#bookmarksTab', function(e){
+	$('.streamtype').removeAttr('style'); //reset styles
+	$(this).css({'border' : '1px solid #d6188a'});//set style
+	//set global
+	window.filters = 3;
+	//check load continuation
+	MyGlobals.outputArray = [];
+	MyGlobals.startIndex = 0;
+	MyGlobals.lastItemIndex = 0;
+	loadOptions(startIndex, readLimit);
+});
+
+//notes:
+//looping script to update options card
+//script takes a global new array of optionIDs at any time then uses those IDs to update value, settlement state
+//option cards are fetched on nav or tab click or results subset tabs in sets of 30
+//each subset fetch stores the last array index to know where it left when fetching more results
+
 
 $(document).ready(async function () {
 
@@ -226,9 +324,19 @@ async function fetchOptionStrip(optionId){
 	}
 }
 
-function createForm(){
+async function createForm(){
 	let trimUser = MyGlobals.wallet;
-	let truncatedUser = trimUser.substring(0, 6) + '...' + trimUser.slice(-3);
+	let truncatedUser = '';
+	//check if address is valid and not empty
+	if(trimUser.length == 42){
+		truncatedUser = trimUser.substring(0, 6) + '...' + trimUser.slice(-3);
+
+		//fetch balances for user under token address
+		await getUserBalancesForToken(pastedAddress, userAddress);
+	}else{
+		truncatedUser = 'Connect Wallet';
+	}
+	
 	var privatize = `
 	<div class="shl_inputshold delegate_inputshold setBeneField">
 		<label id="typeLabel" class="labels"><img src="imgs/info.png" title="Options or Equity Swaps (read docs)">hedge type:</label>
@@ -278,6 +386,7 @@ function createForm(){
 
 	//proceed; get base balances
 	userBalances = setTimeout( function() {
+		alert('felt')
 		hedgingInstance.methods.getUserBases(MyGlobals.wallet).call().then((result) => {
 			const wethBalance = web3.utils.fromWei(result[0], 'ether'); // Convert wei to ether
 			// Get the decimal values for USDT and USDC tokens
