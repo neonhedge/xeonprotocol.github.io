@@ -1,7 +1,7 @@
 /*=========================================================================
     Import modules
 ==========================================================================*/
-
+import { isValidEthereumAddress, getUserBalancesForToken } from './constants.js';
 import { initWeb3 } from './dapp-web3-utils.js';
 import { fetchSection_Networth, fetchSection_BalanceList, fetchSection_HedgePanel, fetchSection_RewardsPanel, fetchSection_StakingPanel } from './module-wallet-section-fetchers.js';
 import { loadHedgesModule } from './module-wallet-section-hedgesList.js';
@@ -9,7 +9,6 @@ import { loadHedgesModule } from './module-wallet-section-hedgesList.js';
 /*=========================================================================
     INITIALIZE WEB3
 ==========================================================================*/
-
 initWeb3();
 
 $(document).ready(async function () {
@@ -95,15 +94,38 @@ export function setupToggleElements() {
         const pastedAddress = event.clipboardData.getData('text/plain');
         const accounts = await web3.eth.requestAccounts();
         const userAddress = accounts[0];
+        const mybalances = {};
         if (!isValidEthereumAddress(pastedAddress)) {
             alert('Please enter a valid Ethereum wallet address.');
             return;
         }
         try {
-            await getUserBalancesForToken(pastedAddress, userAddress);
+            mybalances = await getUserBalancesForToken(pastedAddress, userAddress);
+            // format output
+            const formatValue = (value) => {
+                return `$${value.toFixed(2)}`;
+            };    
+            const formatString = (number) => {
+                return number.toLocaleString();
+            };    
+            const formatStringDecimal = (number) => {
+                const options = {
+                    style: 'decimal',
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                };
+                return number.toLocaleString('en-US', options);
+            };
+            // Display balances in the HTML form
+            document.getElementById('depositedBalance').textContent = formatStringDecimal(mybalances.deposited);
+            document.getElementById('withdrawnBalance').textContent = formatStringDecimal(mybalances.withdrwan);
+            document.getElementById('lockedInUseBalance').textContent = formatStringDecimal(mybalances.lockedInUse);
+            document.getElementById('withdrawableBalance').textContent = formatStringDecimal(mybalances.withdrawableBalance);
+            
         } catch (error) {
             console.error("Error processing wallet address:", error);
         }
     });
+    
 }
   
