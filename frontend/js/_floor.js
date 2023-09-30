@@ -398,13 +398,13 @@ $(document).on('click', '#create_button', function(e){
 });
 
 // Attach event handler to document object for event delegation
-document.addEventListener('paste', function(event) {
+document.addEventListener('paste', async function(event) {
     if (event.target.id === 'tokenAddy') {
-        handlePaste(event);
+        await handlePaste(event);
     }
 });
 
-function handlePaste(event) {
+async function handlePaste(event) {
     event.preventDefault();
     // Get the pasted text from the clipboard
     var clipboardData = event.clipboardData || window.clipboardData;
@@ -414,7 +414,7 @@ function handlePaste(event) {
     if (isERC20TokenAddress(pastedText)) {
         // update the input field value with the pasted token address
         event.target.value = pastedText;
-		fetchUserTokenBalance(pastedText);
+		await fetchUserTokenBalance(pastedText);
     } else {
         console.log('Invalid ERC20 token address pasted:', pastedText);
     }
@@ -425,12 +425,29 @@ function isERC20TokenAddress(address) {
 }
 
 async function fetchUserTokenBalance(tokenAddress){
-	hedgingInstance.methods.getWithdrawableBalance(tokenAddress, MyGlobals.wallet).call().then((result) => {
-		const tokenBal = parseFloat((result / Math.pow(10, MyGlobals.decimals)).toFixed(2));
-		// Assign values to HTML elements
-		document.getElementById('tokenBal').innerText = `${tokenBal}`;
-	})
-	.catch((error) => {
-		console.error(error);
-	});
+	const accounts = await web3.eth.requestAccounts();
+    const userAddress = accounts[0];
+	//fetch balances for user under token address
+	const mybalances = await getUserBalancesForToken(tokenAddress, userAddress);
+	
+	// format output
+	const formatValue = (value) => {
+		return `$${value.toFixed(2)}`;
+	};    
+	const formatString = (number) => {
+		return number.toLocaleString();
+	};    
+	const formatStringDecimal = (number) => {
+		const options = {
+			style: 'decimal',
+			minimumFractionDigits: 2,
+			maximumFractionDigits: 2,
+		};
+		return number.toLocaleString('en-US', options);
+	};
+	// Display balances in the HTML form
+	document.getElementById('depositedBalance').textContent = formatStringDecimal(mybalances.deposited);
+	document.getElementById('withdrawnBalance').textContent = formatStringDecimal(mybalances.withdrwan);
+	document.getElementById('lockedInUseBalance').textContent = formatStringDecimal(mybalances.lockedInUse);
+	document.getElementById('withdrawableBalance').textContent = formatStringDecimal(mybalances.withdrawableBalance);
 }
