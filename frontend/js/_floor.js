@@ -1,7 +1,7 @@
 /*=========================================================================
     Import modules
 ==========================================================================*/
-import { CONSTANTS } from './constants.js';
+import { CONSTANTS, getUserBalancesForToken } from './constants.js';
 import { initWeb3 } from './dapp-web3-utils.js';
 import { unlockedWallet, reqConnect} from './web3-walletstatus-module.js';
 import { refreshDataOnElements, loadOptions, fetchOptionCard, fetchNameSymbol, prepareTimestamp, noOptionsSwal } from './module-market-card-fetchers.js';
@@ -327,12 +327,20 @@ async function fetchOptionStrip(optionId){
 async function createForm(){
 	let trimUser = MyGlobals.wallet;
 	let truncatedUser = '';
+		const depositedBalance = 0;
+		const withdrawnBalance = 0;
+		const lockedInUseBalance = 0;
+		const withdrawableBalance = 0;
 	//check if address is valid and not empty
 	if(trimUser.length == 42){
 		truncatedUser = trimUser.substring(0, 6) + '...' + trimUser.slice(-3);
-
 		//fetch balances for user under token address
-		await getUserBalancesForToken(pastedAddress, userAddress);
+		const mybalances = await getUserBalancesForToken(pastedAddress, userAddress);
+		// Access the balances
+		depositedBalance = mybalances.deposited;
+		withdrawnBalance = mybalances.withdrawn;
+		lockedInUseBalance = mybalances.lockedInUse;
+		withdrawableBalance = mybalances.withdrawableBalance;
 	}else{
 		truncatedUser = 'Connect Wallet';
 	}
@@ -358,10 +366,10 @@ async function createForm(){
 		<div class="walletBalancesTL">
 			<p>paste token address above & view your balances: </p>
 			<span class="walletbalanceSpan">`+truncatedUser+` <img src="imgs/info.png" title="protocol balances on connected wallet"></span></br>
-			<div><span class="walBalTitle">deposited:</span><span id="tokenBal">12,000,000</span></div>
-			<div><span class="walBalTitle">locked:</span><span id="wethBal">5,000,000</span></div>
-			<div><span class="walBalTitle">withdrawn:</span><span id="usdtBal">4,000,000</span></div>
-			<div><span class="walBalTitle">available:</span><span id="usdcBal">3,000,000</span></div>
+			<div><span class="walBalTitle">deposited:</span><span id="depositedBalance">`+depositedBalance+`</span></div>
+			<div><span class="walBalTitle">locked:</span><span id="lockedInUseBalance">`+lockedInUseBalance+`</span></div>
+			<div><span class="walBalTitle">withdrawn:</span><span id="withdrawnBalance">`+withdrawnBalance+`</span></div>
+			<div><span class="walBalTitle">available:</span><span id="withdrawableBalance">`+withdrawableBalance+`</span></div>
 		</div>
 	</div>`;
 	swal({
@@ -383,27 +391,6 @@ async function createForm(){
 		var address = $('#submitwallet').val();
 		setBeneficiaryWallet(address);
 	});
-
-	//proceed; get base balances
-	userBalances = setTimeout( function() {
-		alert('felt')
-		hedgingInstance.methods.getUserBases(MyGlobals.wallet).call().then((result) => {
-			const wethBalance = web3.utils.fromWei(result[0], 'ether'); // Convert wei to ether
-			// Get the decimal values for USDT and USDC tokens
-			const usdtDecimals = 6;
-			const usdcDecimals = 6;
-			// Convert USDT and USDC balances from wei to human-readable format using the decimal values
-			const usdtBalance = parseFloat((result[1] / Math.pow(10, usdtDecimals)).toFixed(2));
-			const usdcBalance = parseFloat((result[2] / Math.pow(10, usdcDecimals)).toFixed(2));
-			// Assign values to HTML elements
-			document.getElementById('wethBal').innerText = `${wethBalance.toFixed(2)}`;
-			document.getElementById('usdtBal').innerText = `${usdtBalance}`;
-			document.getElementById('usdcBal').innerText = `${usdcBalance}`;
-		})
-		.catch((error) => {
-			console.error(error);
-		});
-	}, 2000);
 }
 
 $(document).on('click', '#create_button', function(e){
