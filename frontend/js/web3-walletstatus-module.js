@@ -296,9 +296,9 @@ async function unlockedWallet() {
 	
 		// Set title and amount based on currency
 		$('#popupTitle').empty().append(title);
-		if (currency === 'GUNS') {
+		if (currency === 'NEON') {
 		$('#popupAmounts').empty().append(Number(amountTokens).toLocaleString() + ' ' + currency);
-		} else if (currency === 'BNB') {
+		} else if (currency === 'ETH') {
 		$('#popupAmounts').empty().append(amountEth + ' ' + currency);
 		} else {
 		if (nonTxAction.length > 2) {
@@ -307,7 +307,7 @@ async function unlockedWallet() {
 		}
 	
 		// Set transaction hash link and display pop-up
-		$('#popupTxhash').empty().append('<a href="' + CONSTANTS.etherScan + '/tx/' + Txhash + '" target="_blank">View Transaction on ETHERscan..</a>');
+		$('#popupTxhash').empty().append('<a href="' + CONSTANTS.etherScan + '/tx/' + Txhash + '" target="_blank">View Transaction on Etherscan..</a>');
 		$('#popupNotify').css('display', 'flex');
 	
 		// Initiate countdown animation
@@ -374,59 +374,6 @@ async function unlockedWallet() {
 	$(document).on('click', '#discon', function () {
 		// Handle disconnect logic here
 	});
-	
 
 
-	// HELPERS
-	//Tokens unrounded
-	function fromWeiToFixed2_unrounded(amount) {//doesnt round up figures
-		var amount = amount / Math.pow(10, CONSTANTS.decimals);
-		var fixed = 2;
-		var re = new RegExp('^-?\\d+(?:\.\\d{0,' + (fixed || -1) + '})?');
-		return amount.toString().match(re)[0];
-	}
-	//ETH unrounded
-	function toFixed8_unrounded(amount) {
-		//accepts decimals
-		var parsed_eth = parseFloat(amount);
-		var fixed = 8;//8 is good for all esp RBW
-		var re = new RegExp('^-?\\d+(?:\.\\d{0,' + (fixed || -1) + '})?');
-		return parsed_eth.toString().match(re)[0];
-	}
-	function fromWeiToFixed5_unrounded(amount) {//doesnt round up figures
-		//accepts wei only not decimals, also no need to string wei
-		var raw_eth = web3.utils.fromWei(amount, "ether");
-		var parsed_eth = parseFloat(raw_eth);
-		var fixed = 5;//6 is good for all esp RBW
-		var re = new RegExp('^-?\\d+(?:\.\\d{0,' + (fixed || -1) + '})?');
-		return parsed_eth.toString().match(re)[0];
-	}
-	function fromWeiToFixed8_unrounded(amount) {//doesnt round up figures
-		//accepts wei only not decimals, also no need to string wei
-		var raw_eth = web3.utils.fromWei(amount, "ether");
-		var parsed_eth = parseFloat(raw_eth);
-		var fixed = 8;
-		var re = new RegExp('^-?\\d+(?:\.\\d{0,' + (fixed || -1) + '})?');
-		return parsed_eth.toString().match(re)[0];
-	}
-	function fromWeiToFixed8(amount){
-		var raw_eth = web3.utils.fromWei(amount, "ether");
-		var parsed_eth = parseFloat(raw_eth);
-		var ethFriendly = parsed_eth.toFixed(8);
-		return ethFriendly;
-	}
-	function fromWeiToFixed12(amount){
-		var raw_eth = web3.utils.fromWei(amount, "ether");
-		var parsed_eth = parseFloat(raw_eth);
-		var ethFriendly = parsed_eth.toFixed(12);
-		return ethFriendly;
-	}
-	function fromWeiToFixed5(amount){
-		var raw_eth = web3.utils.fromWei(amount, "ether");
-		var parsed_eth = parseFloat(raw_eth);
-		var ethFriendly = parsed_eth.toFixed(5);
-		return ethFriendly;
-	}
-
-
-	export { unlockedWallet, reqConnect };
+	export { unlockedWallet, reqConnect, popupSuccess };

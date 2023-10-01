@@ -2,15 +2,16 @@ const CONSTANTS = {
   network: "0x5", // goerli 0x5 // bsc: 0x56
   etherScan: "https://goerli.etherscan.io", // https://goerli.etherscan.io // https://bscscan.com/
   decimals: 18,
-    neonAddress: '0x135Ca6fff3EcCd186d1bb4B518679e17115d0867',
+  neonAddress: '0x135Ca6fff3EcCd186d1bb4B518679e17115d0867',
   hedgingAddress: '0x135Ca6fff3EcCd186d1bb4B518679e17115d0867',
-    stakingAddress: '0x135Ca6fff3EcCd186d1bb4B518679e17115d0867',
+  stakingAddress: '0x135Ca6fff3EcCd186d1bb4B518679e17115d0867',
   wethAddress: '0xd0A1E359811322d97991E03f863a0C30C2cF029C',
   usdtAddress: "0x07865c6E87B9F70255377e024ace6630C1Eaa37F",
   usdcAddress: "0x07865c6E87B9F70255377e024ace6630C1Eaa37F",
   UniswapUSDCETH_LP: "0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc",
+  UNISWAP_FACTORY_ADDRESS: "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f",
   popuptimer: 20,
-    neonContractABI: [],
+  neonContractABI: [],
   hedgingContractABI: [],
   stakingContractABI: [],
 };
@@ -97,4 +98,56 @@ async function getUserBalancesForToken(tokenAddress, userAddress) {
   }
 }
 
+// HELPERS
+//Tokens unrounded
+function fromWeiToFixed2_unrounded(amount) {//doesnt round up figures
+  var amount = amount / Math.pow(10, CONSTANTS.decimals);
+  var fixed = 2;
+  var re = new RegExp('^-?\\d+(?:\.\\d{0,' + (fixed || -1) + '})?');
+  return amount.toString().match(re)[0];
+}
+//ETH unrounded
+function toFixed8_unrounded(amount) {
+  //accepts decimals
+  var parsed_eth = parseFloat(amount);
+  var fixed = 8;//8 is good for all esp RBW
+  var re = new RegExp('^-?\\d+(?:\.\\d{0,' + (fixed || -1) + '})?');
+  return parsed_eth.toString().match(re)[0];
+}
+function fromWeiToFixed5_unrounded(amount) {//doesnt round up figures
+  //accepts wei only not decimals, also no need to string wei
+  var raw_eth = web3.utils.fromWei(amount, "ether");
+  var parsed_eth = parseFloat(raw_eth);
+  var fixed = 5;//6 is good for all esp RBW
+  var re = new RegExp('^-?\\d+(?:\.\\d{0,' + (fixed || -1) + '})?');
+  return parsed_eth.toString().match(re)[0];
+}
+function fromWeiToFixed8_unrounded(amount) {//doesnt round up figures
+  //accepts wei only not decimals, also no need to string wei
+  var raw_eth = web3.utils.fromWei(amount, "ether");
+  var parsed_eth = parseFloat(raw_eth);
+  var fixed = 8;
+  var re = new RegExp('^-?\\d+(?:\.\\d{0,' + (fixed || -1) + '})?');
+  return parsed_eth.toString().match(re)[0];
+}
+function fromWeiToFixed8(amount){
+  var raw_eth = web3.utils.fromWei(amount, "ether");
+  var parsed_eth = parseFloat(raw_eth);
+  var ethFriendly = parsed_eth.toFixed(8);
+  return ethFriendly;
+}
+function fromWeiToFixed12(amount){
+  var raw_eth = web3.utils.fromWei(amount, "ether");
+  var parsed_eth = parseFloat(raw_eth);
+  var ethFriendly = parsed_eth.toFixed(12);
+  return ethFriendly;
+}
+function fromWeiToFixed5(amount){
+  var raw_eth = web3.utils.fromWei(amount, "ether");
+  var parsed_eth = parseFloat(raw_eth);
+  var ethFriendly = parsed_eth.toFixed(5);
+  return ethFriendly;
+}
+
 export { CONSTANTS, getCurrentEthUsdcPriceFromUniswapV2, isValidEthereumAddress, truncateAddress, convertToUSD, getTokenUSDValue, getTokenETHValue, getUserBalancesForToken };
+export { fromWeiToFixed12, fromWeiToFixed5, fromWeiToFixed8, fromWeiToFixed8_unrounded, fromWeiToFixed5_unrounded, fromWeiToFixed2_unrounded, toFixed8_unrounded };
