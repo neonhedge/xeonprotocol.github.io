@@ -16,7 +16,7 @@ initWeb3();
     ON PAGE LOAD  
 ==========================================================================*/
 //define globals
-const MyGlobals = {
+export const MyGlobals = {
 	wallet	: '',
 	Mode : 0,
 	outputArray : [],
@@ -38,7 +38,7 @@ $(document).ready(function(){
 	MyGlobals.outputArray = [];
 	MyGlobals.startIndex = 0;
 	MyGlobals.lastItemIndex = 0;
-	loadOptions(startIndex, readLimit);
+	loadOptions(MyGlobals.startIndex, window.readLimit);
 });
 $(document).on('click', '#erc20Options', function(e){
 	$('.asideNavsinside').removeAttr('style'); //reset styles
@@ -50,7 +50,7 @@ $(document).on('click', '#erc20Options', function(e){
 	MyGlobals.outputArray = [];
 	MyGlobals.startIndex = 0;
 	MyGlobals.lastItemIndex = 0;
-	loadOptions(startIndex, readLimit);
+	loadOptions(MyGlobals.startIndex, window.readLimit);
 });
 $(document).on('click', '#equitySwaps', function(e){
 	$('.asideNavsinside').removeAttr('style'); //reset styles
@@ -62,7 +62,7 @@ $(document).on('click', '#equitySwaps', function(e){
 	MyGlobals.outputArray = [];
 	MyGlobals.startIndex = 0;
 	MyGlobals.lastItemIndex = 0;
-	loadOptions(startIndex, readLimit);
+	loadOptions(MyGlobals.startIndex, window.readLimit);
 });
 $(document).on('click', '#erc20Loans', function(e){
 	$('.asideNavsinside').removeAttr('style'); //reset styles
@@ -74,7 +74,7 @@ $(document).on('click', '#erc20Loans', function(e){
 	MyGlobals.outputArray = [];
 	MyGlobals.startIndex = 0;
 	MyGlobals.lastItemIndex = 0;
-	loadOptions(startIndex, readLimit);
+	loadOptions(MyGlobals.startIndex, window.readLimit);
 });
 $(document).on('click', '#socialstream', function(e){
 	$('.asideNavsinside').removeAttr('style'); //reset styles
@@ -92,7 +92,7 @@ $(document).on('click', '#discoverTab', function(e){
 	MyGlobals.outputArray = [];
 	MyGlobals.startIndex = 0;
 	MyGlobals.lastItemIndex = 0;
-	loadOptions(startIndex, readLimit);
+	loadOptions(MyGlobals.startIndex, window.readLimit);
 });
 $(document).on('click', '#mypositionsTabs', function(e){
 	$('.streamtype').removeAttr('style'); //reset styles
@@ -103,7 +103,7 @@ $(document).on('click', '#mypositionsTabs', function(e){
 	MyGlobals.outputArray = [];
 	MyGlobals.startIndex = 0;
 	MyGlobals.lastItemIndex = 0;
-	loadOptions(startIndex, readLimit);
+	loadOptions(MyGlobals.startIndex, window.readLimit);
 });
 $(document).on('click', '#bookmarksTab', function(e){
 	$('.streamtype').removeAttr('style'); //reset styles
@@ -114,7 +114,7 @@ $(document).on('click', '#bookmarksTab', function(e){
 	MyGlobals.outputArray = [];
 	MyGlobals.startIndex = 0;
 	MyGlobals.lastItemIndex = 0;
-	loadOptions(startIndex, readLimit);
+	loadOptions(MyGlobals.startIndex, window.readLimit);
 });
 
 //notes:
@@ -429,7 +429,6 @@ async function fetchUserTokenBalance(tokenAddress){
     const userAddress = accounts[0];
 	//fetch balances for user under token address
 	const mybalances = await getUserBalancesForToken(tokenAddress, userAddress);
-	
 	// format output
 	const formatValue = (value) => {
 		return `$${value.toFixed(2)}`;
@@ -447,7 +446,7 @@ async function fetchUserTokenBalance(tokenAddress){
 	};
 	// Display balances in the HTML form
 	document.getElementById('depositedBalance').textContent = formatStringDecimal(mybalances.deposited);
-	document.getElementById('withdrawnBalance').textContent = formatStringDecimal(mybalances.withdrwan);
+	document.getElementById('withdrawnBalance').textContent = formatStringDecimal(mybalances.withdrawn);
 	document.getElementById('lockedInUseBalance').textContent = formatStringDecimal(mybalances.lockedInUse);
 	document.getElementById('withdrawableBalance').textContent = formatStringDecimal(mybalances.withdrawableBalance);
 }
