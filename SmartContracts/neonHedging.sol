@@ -97,6 +97,7 @@ contract HEDGEFUND {
         uint256 amount;
         uint256 createValue;
         uint256 startValue;
+        uint256 strikeValue;
         uint256 endValue;
         uint256 cost;
         uint256 dt_created;
@@ -303,7 +304,7 @@ contract HEDGEFUND {
     //cost is in base currency or pair token
     //swap collateral must  be equal, settle function relies on this implementation here
     //put options will have amax loss check to only accept a strike price 50% away max
-    function createHedge(bool tool, address token, uint256 amount, uint256 cost, uint256 deadline) public nonReentrant {
+    function createHedge(uint tool, address token, uint256 amount, uint256 cost, uint256 deadline) public nonReentrant {
         require(!locked, "Function is locked");
         locked = true;
         require(tool <= 2, amount > 0 && cost > 0 && deadline > block.timestamp, "Invalid option parameters");
