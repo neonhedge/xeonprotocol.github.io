@@ -1,9 +1,9 @@
 /*=========================================================================
     Import modules
 ==========================================================================*/
-import { CONSTANTS, getUserBalancesForToken } from './constants.js';
+import { CONSTANTS, getUserBalancesForToken, truncateAddress, fromWeiToFixed12, fromWeiToFixed5, fromWeiToFixed8, fromWeiToFixed8_unrounded, fromWeiToFixed5_unrounded, fromWeiToFixed2_unrounded, toFixed8_unrounded } from './constants.js';
 import { initWeb3 } from './dapp-web3-utils.js';
-import { unlockedWallet, reqConnect} from './web3-walletstatus-module.js';
+import { unlockedWallet, reqConnect, popupSuccess } from './web3-walletstatus-module.js';
 import { refreshDataOnElements, loadOptions, fetchOptionCard, fetchNameSymbol, prepareTimestamp, noOptionsSwal } from './module-market-card-fetchers.js';
 
 /*=========================================================================
@@ -334,7 +334,7 @@ async function createForm(){
 		const withdrawableBalance = 0;
 	//check if address is valid and not empty
 	if(trimUser.length == 42){
-		truncatedUser = trimUser.substring(0, 6) + '...' + trimUser.slice(-3);
+		truncatedUser = truncateAddress(trimUser);
 		//fetch balances for user under token address
 		const mybalances = await getUserBalancesForToken(pastedAddress, userAddress);
 		// Access the balances
@@ -454,6 +454,82 @@ async function fetchUserTokenBalance(tokenAddress){
 //==============================================================
 // Move to writes module
 //==============================================================
+async function getTokenInfo(tokenAddress) {
+	const erc20ABI = [
+	  {
+		constant: true,
+		inputs: [],
+		name: 'name',
+		outputs: [{ name: '', type: 'string' }],
+		type: 'function',
+	  },
+	  {
+		constant: true,
+		inputs: [],
+		name: 'decimals',
+		outputs: [{ name: '', type: 'uint8' }],
+		type: 'function',
+	  },
+	  {
+		constant: true,
+		inputs: [],
+		name: 'symbol',
+		outputs: [{ name: '', type: 'string' }],
+		type: 'function',
+	  },
+	];
+  
+	const tokenContract = new web3.eth.Contract(erc20ABI, tokenAddress);
+  
+	try {
+	  const tokenName = await tokenContract.methods.name().call();
+	  const tokenSymbol = await tokenContract.methods.symbol().call();
+	  const tokenDecimals = await tokenContract.methods.decimals().call();
+  
+	  return { name: tokenName, symbol: tokenSymbol, decimals: tokenDecimals };
+	} catch (error) {
+	  console.error('Error fetching token information:', error);
+	  return null;
+	}
+}
+
+// Get pair address - ALT just call getPairAddressZK from hedging contract
+async function getPairAddress(tokenAddress) {
+  const UNISWAP_FACTORY_ADDRESS = CONSTANTS.UNISWAP_FACTORY_ADDRESS; 
+  const wethAddress = CONSTANTS.wethAddress;
+  const usdtAddress = CONSTANTS.usdtAddress; 
+  const usdcAddress = CONSTANTS.usdcAddress;
+
+  const factory = new web3.eth.Contract([
+    {
+      constant: true,
+      inputs: [],
+      name: 'getPair',
+      outputs: [{ name: '', type: 'address' }],
+      type: 'function',
+    },
+  ], UNISWAP_FACTORY_ADDRESS);
+
+  try {
+    const wethPairAddress = await factory.methods.getPair(tokenAddress, wethAddress).call();
+    const usdtPairAddress = await factory.methods.getPair(tokenAddress, usdtAddress).call();
+    const usdcPairAddress = await factory.methods.getPair(tokenAddress, usdcAddress).call();
+
+    if (wethPairAddress !== '0x0000000000000000000000000000000000000000') {
+      return { pairAddress: wethPairAddress, pairedCurrency: wethAddress };
+    } else if (usdtPairAddress !== '0x0000000000000000000000000000000000000000') {
+      return { pairAddress: usdtPairAddress, pairedCurrency: usdtAddress };
+    } else if (usdcPairAddress !== '0x0000000000000000000000000000000000000000') {
+      return { pairAddress: usdcPairAddress, pairedCurrency: usdcAddress };
+    } else {
+      throw new Error("TokenValue: token is not paired with WETH, USDT, or USDC");
+    }
+  } catch (error) {
+    throw error;
+  }
+}
+
+// Submit call function to hedging contract to create hedge
 async function createHedgeSubmit() {
 	const accounts = await web3.eth.getAccounts();
 	if (accounts.length === 0) {
@@ -477,16 +553,27 @@ async function createHedgeSubmit() {
 		alert('Invalid amounts provided');
 		return;
 	}
-	if (!(hedgeType === 'option1' || hedgeType === 'option2' || hedgeType === 'option3')) {
+	if (!(hedgeType == 0 || hedgeType == 1 || hedgeType == 2)) {
 		alert('Invalid hedge type');
 		return;
 	}
-	// Convert ether values to Wei
-	const amountWei = web3.utils.toWei(tokenAmount.toString());
-	const costWei = web3.utils.toWei(cost.toString());
-	const strikePriceWei = web3.utils.toWei(strikePrice.toString());
+    
+	// get token info and pair infor, price and cost is in pair currency
+	const tokenInfo = await getTokenInfo(tokenAddress);
+	const tokenDecimals = tokenInfo.decimals;
 
-	//estimate gasLimit
+	const pairInfo = await getPairAddress(tokenAddress);
+	const pairAddress = pairInfo.pairAddress;
+
+	const pairInfo2 = await getTokenInfo(pairAddress.pairedCurrency);
+	const pairDecimals = pairInfo2.decimals;
+	
+	// use decimals to convert number up to 18 decimals
+	const amountWei = new BigNumber(tokenAmount.toString()).times(10 ** tokenDecimals);
+	const costWei = new BigNumber(cost.toString()).times(10 ** pairDecimals);
+	const strikePriceWei = new BigNumber(strikePrice.toString()).times(10 ** pairDecimals);
+
+	// estimate gasLimit
 	var encodedData = hedgingInstance.methods.createHedge(
 		hedgeType,
 		tokenAddy,
@@ -495,7 +582,7 @@ async function createHedgeSubmit() {
 		strikePriceWei,
 		deadline
 	).encodeABI();
-	//gas estimation error can occur on overpricing, even the local network test Txs can fail
+	// gas estimation error can occur on overpricing, even the local network test Txs can fail
 	var estimateGas = await web3.eth.estimateGas({
 		data: encodedData,
 		from: accounts[0],
@@ -503,8 +590,7 @@ async function createHedgeSubmit() {
 	});
 	// estimate the gasPrice
 	var gasPrice = await web3.eth.getGasPrice(); 
-
-	// Call createHedge function
+	// call createHedge function on Hedging contract
 	try {
 	  const deadline = Math.floor(Date.now() / 1000);
 
@@ -516,17 +602,15 @@ async function createHedgeSubmit() {
 		strikePriceWei,
 		deadline
 	  );
-  
 	  tx.send({ from: accounts[0], gasPrice: gasPrice, gasLimit: estimateGas })
 		.on('receipt', function (receipt) { // use .on to avoid blocking behavior - i.e. If Ethereum node experiences delays, our JavaScript code will be blocked while waiting for the transaction receipt 
 		  console.log('Transaction hash:', receipt.transactionHash);
-  
 		  if (receipt.status === true) {
 			alert('Transaction submitted successfully');
-			handleTransactionSuccess(); // Define this function as needed
+			handleTransactionSuccess(receipt.transactionHash); // Define this function as needed
 		  } else {
 			alert('Transaction failed');
-			handleTransactionFailure(); // Define this function as needed
+			handleTransactionFailure(receipt.status); // Define this function as needed
 		  }
 		})
 		.on('error', function (error) {
@@ -538,21 +622,21 @@ async function createHedgeSubmit() {
 	  console.error('Transaction error:', error);
 	  alert('Transaction failed');
 	}
-  }
+}
 
-  function handleTransactionSuccess(wallet, txHash) {
-	var first = wallet.substring(0, 10); // Get first chars
-	var last = wallet.slice(wallet.length - 5); // Get last chars
-	var nonTxAction = first + ".." + last;
-	var type = "success";
-	var outputCurrency = "";
-  
-	// Show success message and update UI
-	popupSuccess(type, outputCurrency, txHash, "Hedge Created", 0, 0, "", nonTxAction);
+function handleTransactionSuccess(transactionHash) {
+	// Display a success message based on the status
+	var message = "Transaction Submitted Successfully";
+	swal({
+	  title: "Failed.",
+	  type: "error",
+	  confirmButtonColor: "#F27474",
+	  text: message,
+	});
 	swal.close();
-  }
+}
   
-  function handleTransactionFailure(status) {
+function handleTransactionFailure(status) {
 	// Display a user-friendly message based on the status
 	var message = status ? "Transaction Failed" : "Transaction Reverted";
 	swal({
@@ -561,7 +645,34 @@ async function createHedgeSubmit() {
 	  confirmButtonColor: "#F27474",
 	  text: message,
 	});
-  }
+}
+
+// Listen for the hedgeCreated event
+hedgingInstance.events.hedgeCreated()
+	.on('data', function (event) {
+		console.log(event);
+		var token = truncateAddress(event.returnValues.token);
+		var optionId = event.returnValues.optionId;
+		var amount = event.returnValues.amount;
+		var hedgeType = event.returnValues.hedgeType;
+		var cost = event.returnValues.cost;
+		var tx_hash = event.transactionHash;
+
+		// You can add any additional actions you need to perform here
+		
+		var outputCurrency = '';//using nonTxBased message with empty currency
+		var type = 'success';//or error
+		var wallet = '';
+		var message = 'Hedge Created Successfully';
+		var nonTxAction = 'Token: ' + token + '<br>Hedge ID: ' + optionId + '<br>Amount: ' + amount + '<br>Hedge Type: ' + hedgeType + '<br>Premium: ' + cost;
+		popupSuccess(type,outputCurrency,tx_hash,message,0,0,wallet,nonTxAction);
+	})
+	.on('changed', function (event) {
+		// Remove event from local database
+		console.log(event);
+	})
+	.on('error', console.error);
+
   
 
 // END OF JAVASCRIPT
