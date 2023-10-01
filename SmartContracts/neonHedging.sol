@@ -225,8 +225,8 @@ contract HEDGEFUND {
     event hedgeSettled(address indexed token, uint256 indexed optionId, uint256 amount, uint256 indexed payOff, uint256 endValue);
     event minedHedge(uint256 optionId, address indexed miner, address indexed token, address indexed paired, uint256 tokenFee, uint256 baseFee);
     event bookmarkToggle(address indexed user, uint256 hedgeId, bool bookmarked);
-    event topupHedge(address indexed party, uint256 indexed hedgeId, uint256 topupAmount, bool consent);
-    event zapRequest(uint indexed hedgeId, address indexed party);
+    event topupRequested(address indexed party, uint256 indexed hedgeId, uint256 topupAmount, bool consent);
+    event zapRequested(uint indexed hedgeId, address indexed party);
 
     constructor() public {
         IUniswapV2Router02 router = IUniswapV2Router02(UNISWAP_ROUTER_ADDRESS);
@@ -307,7 +307,7 @@ contract HEDGEFUND {
     function createHedge(uint tool, address token, uint256 amount, uint256 cost, uint256 deadline) public nonReentrant {
         require(!locked, "Function is locked");
         locked = true;
-        require(tool <= 2, amount > 0 && cost > 0 && deadline > block.timestamp, "Invalid option parameters");
+        require(tool <= 2 && amount > 0 && cost > 0 && deadline > block.timestamp, "Invalid option parameters");
         uint256 withdrawable = getWithdrawableBalance(token, msg.sender);
         require(withdrawable > 0, "Insufficient free balance");
         require(token != address(0), "Token address cannot be zero");
@@ -466,7 +466,7 @@ contract HEDGEFUND {
             hedge.cost += amount;
             topupMap[topupRequestID].amountTaker += amount;
         }
-        emit topupHedge(_optionId, amount, msg.sender, requestAccept);
+        emit topupRequested(msg.sender, _optionId, amount, requestAccept);
     }
 
     function rejectTopupRequest(uint _optionId, uint _requestID) public {
@@ -493,7 +493,7 @@ contract HEDGEFUND {
         } else {
             hedge.zapTaker = true;
         }
-        emit zapRequest(_optionId, msg.sender);
+        emit zapRequested(_optionId, msg.sender);
     }
     
     //Settlement 
@@ -518,7 +518,6 @@ contract HEDGEFUND {
     //on revenue; revenue for providing native-collateral ARE transferred to staking contract
     
     struct HedgeInfo {
-        uint256 startValue;
         uint256 underlyingValue;
         uint256 payOff;
         uint256 priceNow;
@@ -540,7 +539,6 @@ contract HEDGEFUND {
         require(option.zapWriter || option.zapTaker || block.timestamp >= option.dt_expiry, "Hedge cannot be settled yet");
 
         // Initialize local variables
-        hedgeInfo.startValue = option.startValue;
         (hedgeInfo.underlyingValue, ) = getUnderlyingValue(option.token, option.amount);
 
         // Get storage ready for user balances of the owner, taker, and contract
@@ -557,10 +555,10 @@ contract HEDGEFUND {
         hedgeInfo.newAddressFlag = ttiU.deposited == 0;
 
         if (option.hedgeType == HedgeType.CALL) {
-            hedgeInfo.marketOverStart = hedgeInfo.underlyingValue > hedgeInfo.startValue.add(option.cost);
+            hedgeInfo.marketOverStart = hedgeInfo.underlyingValue > option.startValue.add(option.cost);
             if (hedgeInfo.marketOverStart) {
                 // Taker profit in base = underlying - cost - strike value
-                hedgeInfo.payOff = hedgeInfo.underlyingValue.sub(hedgeInfo.startValue.add(option.cost));
+                hedgeInfo.payOff = hedgeInfo.underlyingValue.sub(option.startValue.add(option.cost));
                 // DRAFT - for bundled underlying assets, take list of all tokens in basket & iterate payment code below until payOff is zero {
                 // ..
                 // ..
@@ -606,10 +604,10 @@ contract HEDGEFUND {
                 logPL(option.cost.sub(hedgeInfo.baseFee), option.paired, option.owner, option.taker, 0);
             }
         } else if (option.hedgeType == HedgeType.PUT) {
-            hedgeInfo.isBelowStrikeValue = hedgeInfo.underlyingValue < hedgeInfo.startValue.less(option.cost);
+            hedgeInfo.isBelowStrikeValue = hedgeInfo.underlyingValue < option.startValue.sub(option.cost);
             if (hedgeInfo.isBelowStrikeValue) {
                 // Taker profit in base = strike value - underlying - cost
-                hedgeInfo.payOff = hedgeInfo.startValue.sub(hedgeInfo.underlyingValue).sub(option.cost);
+                hedgeInfo.payOff = option.startValue.sub(hedgeInfo.underlyingValue).sub(option.cost);
                 // Convert to equivalent tokens lockedInUse by writer, factor fee
                 (hedgeInfo.priceNow, ) = getUnderlyingValue(option.token, 1);
                 hedgeInfo.tokensDue = hedgeInfo.payOff.div(hedgeInfo.priceNow);
@@ -649,8 +647,8 @@ contract HEDGEFUND {
                 logPL(option.cost.sub(hedgeInfo.baseFee), option.paired, option.owner, option.taker, 0);
             }
         } else if (option.hedgeType == HedgeType.SWAP) {
-            if (hedgeInfo.underlyingValue > hedgeInfo.startValue) {
-                hedgeInfo.payOff = hedgeInfo.underlyingValue.sub(hedgeInfo.startValue);
+            if (hedgeInfo.underlyingValue > option.startValue) {
+                hedgeInfo.payOff = hedgeInfo.underlyingValue.sub(option.startValue);
                 // Max loss config
                 if (hedgeInfo.payOff > option.cost) {
                     hedgeInfo.payOff = option.cost;
@@ -672,7 +670,7 @@ contract HEDGEFUND {
                 // Log wallet PL: 0 - owner won, 1 taker won
                 logPL(hedgeInfo.payOff - calculateFee(hedgeInfo.payOff), option.paired, option.owner, option.taker, 0);
             } else {                
-                hedgeInfo.payOff = hedgeInfo.startValue.sub(hedgeInfo.underlyingValue);
+                hedgeInfo.payOff = option.startValue.sub(hedgeInfo.underlyingValue);
                 // Max loss config
                 if (hedgeInfo.payOff > option.cost) {
                     hedgeInfo.payOff = option.cost;
@@ -848,7 +846,7 @@ contract HEDGEFUND {
       uint256 deposited = uto.deposited;
       uint256 withdrawn = uto.withdrawn;
       uint256 lockedinuse = uto.lockedinuse;
-      uint256 withdrawableBalance = getWithdrawableBalance(token, msg.sender);
+      uint256 withdrawableBalance = (uto.deposited).sub(uto.withdrawn).sub(uto.lockedinuse);
       uint256 withdrawableValue; address paired;
       if(token != wethAddress && token != usdtAddress && token != usdcAddress ){
         (withdrawableValue, paired) = getUnderlyingValue(token, withdrawableBalance);
@@ -862,23 +860,15 @@ contract HEDGEFUND {
     function getSubset(uint[] storage fullArray, uint startIndex, uint limit) internal view returns (uint[] memory) {
         uint length = fullArray.length;
         require(startIndex < length, "Invalid start index");
-        uint actualLimit = length - startIndex < limit ? length - startIndex : limit;
+        uint actualLimit = (length - startIndex < limit) ? length - startIndex : limit;
         uint[] memory subset = new uint[](actualLimit);
-        for (uint i = startIndex; i < startIndex + actualLimit; i++) {
-            subset[i - startIndex] = fullArray[i];
+        for (uint i = 0; i < actualLimit; i++) {
+            subset[i] = fullArray[startIndex + i];
         }
         return subset;
     }
-    /*user's erc20 history deposited and traded, targeted search
-    ~ user is the address of the user whose history is being searched in the userERC20s mapping. 
-    ~ startIndex is used to specify the starting index in the tokens array for the user, 
-    ~ and limit is used to determine the number of items to search. 
-    ~ The loop iterates from startIndex to startIndex + actualLimit (exclusive) 
-    ~ and populates the result array with the values from tokens starting from index startIndex to startIndex + actualLimit - 1. 
-    ~ The startIndex is used to calculate the correct index in the result array by subtracting it from the loop variable i. 
-    ~ Additionally, a check is added to ensure that startIndex is within the bounds of the tokens array using a require statement, 
-    ~ and actualLimit is calculated as the minimum of length - startIndex and limit to avoid exceeding the length of tokens.
-    */
+
+    // Function to retrieve a subset of tokens from a user's history. cant merge with above coz one is uint[] and other address []
     function getUserHistory(address user, uint startIndex, uint limit) public view returns (address[] memory) {
         address[] memory tokens = userERC20s[user];
         uint length = tokens.length;
@@ -891,322 +881,91 @@ contract HEDGEFUND {
         return result;
     }
 
-    /*All user hedge positions created + taken: targeted search
-    ~  user is the address of the user whose positions are being searched in the myoptionsHistory mapping. 
-    ~ startIndex is used to specify the starting index in the fullArray for the user, 
-    ~ and limit is used to determine the number of items to search. 
-    ~ The loop iterates from startIndex to startIndex + actualLimit (exclusive) 
-    ~ and populates the subset array with the values from fullArray starting from index startIndex to startIndex + actualLimit - 1. 
-    ~ The startIndex is used to calculate the correct index in the subset array by subtracting it from the loop variable i. 
-    ~ Additionally, a check is added to ensure that startIndex is within the bounds of the fullArray using a require statement, 
-    ~ and actualLimit is calculated as the minimum of length - startIndex and limit to avoid exceeding the length of fullArray.
-    */
-    function getUserOptionsSubset(address user, uint startIndex, uint limit) public view returns (uint[] memory) {
-        uint[] memory fullArray = myoptionsHistory[user];
-        uint length = fullArray.length;
-        require(startIndex < length, "Invalid start index");
-        uint actualLimit = length - startIndex < limit ? length - startIndex : limit;
-        uint[] memory subset = new uint[](actualLimit);
-        for (uint i = startIndex; i < startIndex + actualLimit; i++) {
-            subset[i - startIndex] = fullArray[i];
-        }
-        return subset;
+    // Helper function to retrieve a subset of options or swaps
+    function getSubsetOfOptionsOrSwaps(uint[] storage fullArray, uint startIndex, uint limit) internal view returns (uint[] memory) {
+        return getSubset(fullArray, startIndex, limit);
     }
 
-    function getUserSwapsSubset(address user, uint startIndex, uint limit) public view returns (uint[] memory) {
-        uint[] memory fullArray = myswapsHistory[user];
-        uint length = fullArray.length;
-        require(startIndex < length, "Invalid start index");
-        uint actualLimit = length - startIndex < limit ? length - startIndex : limit;
-        uint[] memory subset = new uint[](actualLimit);
-        for (uint i = startIndex; i < startIndex + actualLimit; i++) {
-            subset[i - startIndex] = fullArray[i];
-        }
-        return subset;
+    // Function to retrieve a subset of options or swaps created/taken by a user
+    function getUserOptionsCreated(address user, uint startIndex, uint limit) public view returns (uint[] memory) {
+        return getSubsetOfOptionsOrSwaps(myoptionsCreated[user], startIndex, limit);
     }
 
-    /*user hedges created: targeted search
-    ~ user is the address of the user whose hedges are being searched in the myoptionsCreated mapping. 
-    ~ startIndex is used to specify the starting index in the fullArray for the user, 
-    ~ and limit is used to determine the number of items to search. 
-    ~ The loop iterates from startIndex to startIndex + actualLimit (exclusive) 
-    ~ and populates the subset array with the values from fullArray starting from index startIndex to startIndex + actualLimit - 1. 
-    ~ The startIndex is used to calculate the correct index in the subset array by subtracting it from the loop variable i. 
-    ~ Additionally, a check is added to ensure that startIndex is within the bounds of the fullArray using a require statement, 
-    ~ and actualLimit is calculated as the minimum of length - startIndex and limit to avoid exceeding the length of fullArray.
-    */
-    function getUserOptionsCreated(address user, uint startIndex, uint limit) public view returns(uint[] memory){
-        uint[] memory fullArray = myoptionsCreated[user];
-        uint length = fullArray.length;
-        require(startIndex < length, "Invalid start index");
-        uint actualLimit = length - startIndex < limit ? length - startIndex : limit;
-        uint[] memory subset = new uint[](actualLimit);
-        for (uint i = startIndex; i < startIndex + actualLimit; i++) {
-            subset[i - startIndex] = fullArray[i];
-        }
-        return subset;
+    function getUserSwapsCreated(address user, uint startIndex, uint limit) public view returns (uint[] memory) {
+        return getSubsetOfOptionsOrSwaps(myswapsCreated[user], startIndex, limit);
     }
 
-    function getUserSwapsCreated(address user, uint startIndex, uint limit) public view returns(uint[] memory){
-        uint[] memory fullArray = myswapsCreated[user];
-        uint length = fullArray.length;
-        require(startIndex < length, "Invalid start index");
-        uint actualLimit = length - startIndex < limit ? length - startIndex : limit;
-        uint[] memory subset = new uint[](actualLimit);
-        for (uint i = startIndex; i < startIndex + actualLimit; i++) {
-            subset[i - startIndex] = fullArray[i];
-        }
-        return subset;
+    function getUserOptionsTaken(address user, uint startIndex, uint limit) public view returns (uint[] memory) {
+        return getSubsetOfOptionsOrSwaps(myoptionsTaken[user], startIndex, limit);
     }
 
-    /*user hedges taken: targeted search
-     ~ user is the address of the user whose hedges are being searched in the myoptionsTaken mapping. 
-     ~ startIndex is used to specify the starting index in the fullArray for the user, and limit is used to determine the number of items to search. 
-     ~ The loop iterates from startIndex to startIndex + actualLimit (exclusive) 
-     ~ and populates the subset array with the values from fullArray starting from index startIndex to startIndex + actualLimit - 1. 
-     ~ The startIndex is used to calculate the correct index in the subset array by subtracting it from the loop variable i. 
-     ~ Additionally, a check is added to ensure that startIndex is within the bounds of the fullArray using a require statement, 
-     ~ and actualLimit is calculated as the minimum of length - startIndex and limit to avoid exceeding the length of fullArray.
-     */
-    function getUserOptionsTaken(address user, uint startIndex, uint limit) public view returns(uint[] memory){
-        uint[] memory fullArray = myoptionsTaken[user];
-        uint length = fullArray.length;
-        require(startIndex < length, "Invalid start index");
-        uint actualLimit = length - startIndex < limit ? length - startIndex : limit;
-        uint[] memory subset = new uint[](actualLimit);
-        for (uint i = startIndex; i < startIndex + actualLimit; i++) {
-            subset[i - startIndex] = fullArray[i];
-        }
-        return subset;
+    function getUserSwapsTaken(address user, uint startIndex, uint limit) public view returns (uint[] memory) {
+        return getSubsetOfOptionsOrSwaps(myswapsTaken[user], startIndex, limit);
     }
 
-    function getUserSwapsTaken(address user, uint startIndex, uint limit) public view returns(uint[] memory){
-        uint[] memory fullArray = myswapsTaken[user];
-        uint length = fullArray.length;
-        require(startIndex < length, "Invalid start index");
-        uint actualLimit = length - startIndex < limit ? length - startIndex : limit;
-        uint[] memory subset = new uint[](actualLimit);
-        for (uint i = startIndex; i < startIndex + actualLimit; i++) {
-            subset[i - startIndex] = fullArray[i];
-        }
-        return subset;
+    // Helper function to retrieve a subset of options or swaps created/taken by all users
+    function getAllOptionsOrSwaps(uint[] storage fullArray, uint startIndex, uint limit) internal view returns (uint[] memory) {
+        return getSubsetOfOptionsOrSwaps(fullArray, startIndex, limit);
     }
 
-    /* all options created: targeted search
-    ~ startIndex is used to specify the starting index in the optionsCreated array, 
-    ~ and limit is used to determine the number of items to search. 
-    ~ The loop iterates from startIndex to startIndex + limit (exclusive) 
-    ~ and populates the result array with the values from optionsCreated array starting from index startIndex to startIndex + limit - 1. 
-    ~ The startIndex is used to calculate the correct index in the result array by subtracting it from the loop variable i. 
-    ~ Additionally, a check is added to ensure that startIndex is within the bounds of the optionsCreated array using a require statement.
-    */
+    // Function to retrieve a subset of all options or swaps created
     function getAllOptions(uint startIndex, uint limit) public view returns (uint[] memory) {
-        require(startIndex < optionsCreated.length, "Invalid start index");
-        uint endIndex = startIndex + limit;
-        if (endIndex > optionsCreated.length) {
-            endIndex = optionsCreated.length;
-        }
-        uint[] memory result = new uint[](endIndex - startIndex);
-        for (uint i = startIndex; i < endIndex; i++) {
-            result[i - startIndex] = optionsCreated[i];
-        }        
-        return result;
+        return getAllOptionsOrSwaps(optionsCreated, startIndex, limit);
     }
 
-    /* all swaps created: targeted search
-    ~ startIndex is used to specify the starting index in the equityswapsCreated array, 
-    ~ and limit is used to determine the number of items to search. 
-    ~ The loop iterates from startIndex to startIndex + limit (exclusive) 
-    ~ and populates the result array with the values from equityswapsCreated array starting from index startIndex to startIndex + limit - 1. 
-    ~ The startIndex is used to calculate the correct index in the result array by subtracting it from the loop variable i. 
-    ~ Additionally, a check is added to ensure that startIndex is within the bounds of the equityswapsCreated array using a require statement.
-    */
     function getAllSwaps(uint startIndex, uint limit) public view returns (uint[] memory) {
-        require(startIndex < equityswapsCreated.length, "Invalid start index");
-        uint endIndex = startIndex + limit;
-        if (endIndex > equityswapsCreated.length) {
-            endIndex = equityswapsCreated.length;
-        }
-        uint[] memory result = new uint[](endIndex - startIndex);
-        for (uint i = startIndex; i < endIndex; i++) {
-            result[i - startIndex] = equityswapsCreated[i];
-        }
-        return result;
+        return getAllOptionsOrSwaps(equityswapsCreated, startIndex, limit);
     }
 
-    /* all options taken: targeted search
-    ~ startIndex is used to specify the starting index in the hedgesTaken array, 
-    ~ and limit is used to determine the number of items to search. 
-    ~ The loop iterates from startIndex to startIndex + limit (exclusive) 
-    ~ and populates the result array with the values from hedgesTaken array starting from index startIndex to startIndex + limit - 1. 
-    ~ The startIndex is used to calculate the correct index in the result array by subtracting it from the loop variable i. 
-    ~ Additionally, a check is added to ensure that startIndex is within the bounds of the hedgesTaken array using a require statement.
-    */
+    // Function to retrieve a subset of options or swaps taken
     function getAllOptionsTaken(uint startIndex, uint limit) public view returns (uint[] memory) {
-        require(startIndex < hedgesTaken.length, "Invalid start index");
-        uint endIndex = startIndex + limit;
-        if (endIndex > hedgesTaken.length) {
-            endIndex = hedgesTaken.length;
-        }
-        uint[] memory result = new uint[](endIndex - startIndex);
-        for (uint i = startIndex; i < endIndex; i++) {
-            result[i - startIndex] = hedgesTaken[i];
-        }        
-        return result;
+        return getSubsetOfOptionsOrSwaps(hedgesTaken, startIndex, limit);
     }
 
-    /* all swaps taken: targeted search
-    ~ startIndex is used to specify the starting index in the equityswapsTaken array, 
-    ~ and limit is used to determine the number of items to search. 
-    ~ The loop iterates from startIndex to startIndex + limit (exclusive) 
-    ~ and populates the result array with the values from equityswapsTaken array starting from index startIndex to startIndex + limit - 1. 
-    ~ The startIndex is used to calculate the correct index in the result array by subtracting it from the loop variable i. 
-    ~ Additionally, a check is added to ensure that startIndex is within the bounds of the equityswapsTaken array using a require statement.
-    */
     function getAllSwapsTaken(uint startIndex, uint limit) public view returns (uint[] memory) {
-        require(startIndex < equityswapsTaken.length, "Invalid start index");
-        uint endIndex = startIndex + limit;
-        if (endIndex > equityswapsTaken.length) {
-            endIndex = equityswapsTaken.length;
-        }
-        uint[] memory result = new uint[](endIndex - startIndex);
-        for (uint i = startIndex; i < endIndex; i++) {
-            result[i - startIndex] = equityswapsTaken[i];
-        }        
-        return result;
+        return getSubsetOfOptionsOrSwaps(equityswapsTaken, startIndex, limit);
     }
 
-    /* hedges list under specific ERC20 address: targeted search
-    ~ the startIndex parameter is used to specify the starting index of the array, 
-    ~ and the limit parameter is used to determine the number of items to include in the result. 
-    ~ The endIndex is calculated as the minimum value between startIndex + limit and the length of the full array to ensure that it does not exceed the array bounds. 
-    ~ Then, the actualLimit is calculated as the difference between endIndex and startIndex, 
-    ~ which represents the actual number of items in the result array. 
-    ~ Finally, the subset array is populated with the elements from the fullArray using the calculated indices based on startIndex and actualLimit.
-    */
-    function getOptionsForToken(address _token, uint startIndex, uint limit) public view returns(uint[] memory){
-        uint[] memory fullArray = tokenOptions[_token];
-        require(startIndex < fullArray.length, "Start index exceeds array length");
-        uint endIndex = startIndex + limit > fullArray.length ? fullArray.length : startIndex + limit;
-        uint actualLimit = endIndex - startIndex;
-        uint[] memory subset = new uint[](actualLimit);
-        for (uint i = 0; i < actualLimit; i++) {
-            subset[i] = fullArray[startIndex + i];
-        }
-        return subset;
+    // Function to retrieve a subset of options or swaps for a specific token
+    function getOptionsForToken(address _token, uint startIndex, uint limit) public view returns (uint[] memory) {
+        return getSubsetOfOptionsOrSwaps(tokenOptions[_token], startIndex, limit);
     }
 
-     function getSwapsForToken(address _token, uint startIndex, uint limit) public view returns(uint[] memory){
-        uint[] memory fullArray = tokenSwaps[_token];
-        require(startIndex < fullArray.length, "Start index exceeds array length");
-        uint endIndex = startIndex + limit > fullArray.length ? fullArray.length : startIndex + limit;
-        uint actualLimit = endIndex - startIndex;
-        uint[] memory subset = new uint[](actualLimit);
-        for (uint i = 0; i < actualLimit; i++) {
-            subset[i] = fullArray[startIndex + i];
-        }
-        return subset;
+    function getSwapsForToken(address _token, uint startIndex, uint limit) public view returns (uint[] memory) {
+        return getSubsetOfOptionsOrSwaps(tokenSwaps[_token], startIndex, limit);
     }
 
-    // get hedge details
+    // Function to get hedge details
     function getHedgeDetails(uint256 _optionId) public view returns (hedgingOption memory) {
-        hedgingOption memory hedge = hedgeMap[_optionId];
+        hedgingOption storage hedge = hedgeMap[_optionId];
         require(hedge.owner != address(0), "Option does not exist");
         return hedge;
     }
-    // get deposited tokens count
+
+    // Function to get the length of deposited tokens
     function getDepositedTokensLength() external view returns (uint) {
         return userERC20s[address(this)].length;
     }
-    // get all options count
+
+    // Function to get the length of all options and swaps created
     function getAllOptionsLength() public view returns (uint256) {
         return optionsCreated.length;
     }
-    // get all equity swaps count
+
     function getAllSwapsLength() public view returns (uint256) {
         return equityswapsCreated.length;
     }
-    // get options count under specific token
+
+    // Function to get the count of options under a specific token
     function getOptionsForTokenCount(address _token) public view returns (uint256) {
         return tokenOptions[_token].length;
     }
-    // get swaps count under specific token
+
     function getSwapsForTokenCount(address _token) public view returns (uint256) {
         return tokenSwaps[_token].length;
     }
-    
-    // get protocol analytic values - in fixed base sets
-    // --depracated to direct reading manually per address
-    /*
-    function getHedgesCreatedVolume(address baseAddress) public view returns (uint256) {
-        return hedgesCreatedVolume[baseAddress];
-    }
-    function getHedgesTakenVolume(address baseAddress) public view returns (uint256) {
-        return hedgesTakenVolume[baseAddress];
-    }
-    function getHedgesCostVolume(address baseAddress) public view returns (uint256) {
-        return hedgesCostVolume[baseAddress];
-    }
-    function getHedgesOptionsVolume(address baseAddress) public view returns (uint256) {
-        return optionsVolume[baseAddress];
-    }
-    function getHedgesSwapsVolume(address baseAddress) public view returns (uint256) {
-        return swapsVolume[baseAddress];
-    }
-    function getHedgesSettledVolume(address baseAddress) public view returns (uint256) {
-        return settledVolume[baseAddress];
-    }
-    function getHedgesProfitVolume(address baseAddress) public view returns (uint256) {
-        return protocolBaseProfits[baseAddress];
-    }
-    function getHedgesFeeVolume(address baseAddress) public view returns (uint256) {
-        return protocolBaseFees[baseAddress];
-    }
-    function getCashierFeeVolume(address baseAddress) public view returns (uint256) {
-        return protocolCashierFees[baseAddress];
-    }
-    */
-    // Get cashier deposit withdrawal volume in base equivalent 
-    function getBaseEquivDeposits() public view returns (uint256,uint256,uint256) {
-        return (wethEquivDeposits, usdtEquivDeposits, usdcEquivDeposits);
-    }
-    function getBaseEquivWithdrawals() public view returns (uint256,uint256,uint256) {
-        return (wethEquivWithdrawals, usdtEquivWithdrawals, usdcEquivWithdrawals);
-    }
-    // Get wallet's hedge & costs volume in base equivalent
-    function getuserWriteVolume(address wallet) public view returns (uint256, uint256, uint256) {
-        return (wethEquivUserHedged[wallet], usdtEquivUserHedged[wallet], usdcEquivUserHedged[wallet]);
-    }
-    function getuserTakeVolume(address wallet) public view returns (uint256, uint256, uint256) {
-        return (wethEquivUserCosts[wallet], usdtEquivUserCosts[wallet], usdcEquivUserCosts[wallet]);
-    }
-    // Get wallets profit & loss in base
-    function getUserProfits(address pairAddress, address walletAddress) public view returns (uint256) {
-        return userPLMap[pairAddress][walletAddress].profits;
-    }
-    function getUserLosses(address pairAddress, address walletAddress) public view returns (uint256) {
-        return userPLMap[pairAddress][walletAddress].losses;
-    }
-    // Get distributed revenue; withdrawn to staking contract for revenue
-    function getTotalDistributed() public view returns (uint256) {
-        return userBalanceMap[wethAddress][address(this)].withdrawn;
-    }
-    // Get protocol token balances
-    function getContractTokenBalances(address _token) public view returns (uint256, uint256) {
-        return (userBalanceMap[_token][address(this)].deposited, userBalanceMap[_token][address(this)].withdrawn);
-    }
-    // Get protocol revenue across all 3 bases
-    function getProtocolRevenue() public view returns (uint256, uint256, uint256) {
-        return (userBalanceMap[wethAddress][address(this)].deposited, userBalanceMap[usdtAddress][address(this)].deposited, userBalanceMap[usdcAddress][address(this)].deposited);
-    }
-    // Get array of user or wallet's ERC20 token interactions
-    function getUserTokenList(address wallet) external view returns (address[] memory) {
-        return userERC20s[wallet];
-    }
-    // Get array of all tokens ever deposited to protocol
-    function getProtocolTokenList() external view returns (address[] memory) {
-        return userERC20s[address(this)];
-    }
+
+    // Receive function to accept Ether
     receive() external payable {
         emit Received(msg.sender, msg.value);
     }

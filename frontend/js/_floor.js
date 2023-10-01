@@ -628,7 +628,7 @@ function handleTransactionSuccess(transactionHash) {
 	// Display a success message based on the status
 	var message = "Transaction Submitted Successfully";
 	swal({
-	  title: "Failed.",
+	  title: "Success.",
 	  type: "error",
 	  confirmButtonColor: "#F27474",
 	  text: message,
