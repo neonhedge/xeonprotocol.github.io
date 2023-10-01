@@ -306,7 +306,7 @@ contract HEDGEFUND {
     function createHedge(bool tool, address token, uint256 amount, uint256 cost, uint256 deadline) public nonReentrant {
         require(!locked, "Function is locked");
         locked = true;
-        require(amount > 0 && cost > 0 && deadline > block.timestamp, "Invalid option parameters");
+        require(tool <= 2, amount > 0 && cost > 0 && deadline > block.timestamp, "Invalid option parameters");
         uint256 withdrawable = getWithdrawableBalance(token, msg.sender);
         require(withdrawable > 0, "Insufficient free balance");
         require(token != address(0), "Token address cannot be zero");
@@ -315,15 +315,23 @@ contract HEDGEFUND {
         require(token != address(this), "Token address cannot be contract address");
         // Assign option values directly to the struct
         hedgingOption storage newOption = hedgeMap[optionID];
-            newOption.owner = msg.sender;
-            newOption.token = token;
-            newOption.status = 1;
-            newOption.amount = amount;
+        newOption.owner = msg.sender;
+        newOption.token = token;
+        newOption.status = 1;
+        newOption.amount = amount;
         (newOption.createValue, newOption.paired) = getUnderlyingValue(token, amount);
-            newOption.cost = cost;
-            newOption.dt_expiry = deadline;
-            newOption.dt_created = block.timestamp;
-            newOption.hedgeType = tool ? HedgeType.CALL : HedgeType.SWAP;
+        newOption.cost = cost;
+        newOption.dt_expiry = deadline;
+        newOption.dt_created = block.timestamp;
+        if (tool == 0) {
+            newOption.hedgeType = HedgeType.CALL;
+        } else if (tool == 1) {
+            newOption.hedgeType = HedgeType.PUT;
+        } else if (tool == 2) {
+            newOption.hedgeType = HedgeType.SWAP;
+        } else {
+            revert("Invalid tool option");
+        }
 
         // Update user balances for token in hedge
         userBalance storage hto = userBalanceMap[token][msg.sender]; 
