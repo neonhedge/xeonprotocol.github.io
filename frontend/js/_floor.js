@@ -269,6 +269,8 @@ async function fetchOptionStrip(optionId){
 		let hedgeType;
 		if (result.hedgeType === 'CALL') {
 			hedgeType = 'CALL';
+		} else if (result.hedgeType === 'PUT') {
+			hedgeType = 'PUT';
 		} else if (result.hedgeType === 'SWAP') {
 			hedgeType = 'SWAP';
 		} else {
@@ -294,12 +296,11 @@ async function fetchOptionStrip(optionId){
 		let cost = parseFloat(fromWeiToFixed5(result.cost));
 		//strike value
 		let strikevalue;
-		if(startvalue>0){
+		if(startvalue > 0){
 			strikevalue = cost + startvalue;
 		}else{
 			strikevalue = cost + marketvalue;
 		}
-		
 		//logourl
 		let logourl = result.logourl;
 		//dates to human-readable dates
@@ -349,10 +350,10 @@ async function createForm(){
 	<div class="shl_inputshold delegate_inputshold setBeneField">
 		<label id="typeLabel" class="labels"><img src="imgs/info.png" title="Options or Equity Swaps (read docs)">hedge type:</label>
 		<select id="hedgeType" name="hedgeType">
-			<option value="option1">Call Option</option>
-			<option value="option3">Put Option</option>
-			<option value="option2">Equity Swap</option>
-			<option value="option3">Loan Request (coming)</option>
+			<option value="0">Call Option</option>
+			<option value="1">Put Option</option>
+			<option value="2">Equity Swap</option>
+			<option value="3">Loan Request (coming)</option>
 		</select>
 		<label id="tokenLabel" class="labels"><img src="imgs/info.png" title="token address of the tokens you want to hedge">token Address:</label>
 		<input id="tokenAddy" class="sweetInput shldi benown" aria-invalid="false" autocomplete="ERC20 token to hedge">
@@ -387,9 +388,8 @@ async function createForm(){
 			showCancelButton: true,
 			timer: 4000,
 			animation: "slide-from-top"
-	},function(){//on confirm click
-		var address = $('#submitwallet').val();
-		setBeneficiaryWallet(address);
+	},async function(){//on confirm click
+		await createHedgeSubmit();
 	});
 }
 
@@ -450,3 +450,118 @@ async function fetchUserTokenBalance(tokenAddress){
 	document.getElementById('lockedInUseBalance').textContent = formatStringDecimal(mybalances.lockedInUse);
 	document.getElementById('withdrawableBalance').textContent = formatStringDecimal(mybalances.withdrawableBalance);
 }
+
+//==============================================================
+// Move to writes module
+//==============================================================
+async function createHedgeSubmit() {
+	const accounts = await web3.eth.getAccounts();
+	if (accounts.length === 0) {
+	  alert('Please connect your wallet');
+	  return;
+	}
+  
+	// Get form inputs
+	const hedgeType = document.getElementById('hedgeType').value;
+	const tokenAddy = document.getElementById('tokenAddy').value;
+	const tokenAmount = parseFloat(document.getElementById('tokenAmount').value);
+	const cost = parseFloat(document.getElementById('cost').value);
+	const strikePrice = parseFloat(document.getElementById('strikePrice').value);
+  
+	// Validate form inputs
+	if (tokenAddy.length < 40 || !web3.utils.isAddress(tokenAddy)) {
+		alert('Invalid token address provided');
+		return;
+	}
+	if (!(tokenAmount > 0 && cost > 0 && strikePrice > 0)) {
+		alert('Invalid amounts provided');
+		return;
+	}
+	if (!(hedgeType === 'option1' || hedgeType === 'option2' || hedgeType === 'option3')) {
+		alert('Invalid hedge type');
+		return;
+	}
+	// Convert ether values to Wei
+	const amountWei = web3.utils.toWei(tokenAmount.toString());
+	const costWei = web3.utils.toWei(cost.toString());
+	const strikePriceWei = web3.utils.toWei(strikePrice.toString());
+
+	//estimate gasLimit
+	var encodedData = hedgingInstance.methods.createHedge(
+		hedgeType,
+		tokenAddy,
+		amountWei,
+		costWei,
+		strikePriceWei,
+		deadline
+	).encodeABI();
+	//gas estimation error can occur on overpricing, even the local network test Txs can fail
+	var estimateGas = await web3.eth.estimateGas({
+		data: encodedData,
+		from: accounts[0],
+		to: CONSTANTS.hedgingAddress
+	});
+	// estimate the gasPrice
+	var gasPrice = await web3.eth.getGasPrice(); 
+
+	// Call createHedge function
+	try {
+	  const deadline = Math.floor(Date.now() / 1000);
+
+	  const tx = hedgingInstance.methods.createHedge(
+		hedgeType,
+		tokenAddy,
+		amountWei,
+		costWei,
+		strikePriceWei,
+		deadline
+	  );
+  
+	  tx.send({ from: accounts[0], gasPrice: gasPrice, gasLimit: estimateGas })
+		.on('receipt', function (receipt) { // use .on to avoid blocking behavior - i.e. If Ethereum node experiences delays, our JavaScript code will be blocked while waiting for the transaction receipt 
+		  console.log('Transaction hash:', receipt.transactionHash);
+  
+		  if (receipt.status === true) {
+			alert('Transaction submitted successfully');
+			handleTransactionSuccess(); // Define this function as needed
+		  } else {
+			alert('Transaction failed');
+			handleTransactionFailure(); // Define this function as needed
+		  }
+		})
+		.on('error', function (error) {
+		  console.error('Transaction error:', error);
+		  alert('Transaction failed');
+		  handleTransactionError(error.message); // Define this function as needed
+		});
+	} catch (error) {
+	  console.error('Transaction error:', error);
+	  alert('Transaction failed');
+	}
+  }
+
+  function handleTransactionSuccess(wallet, txHash) {
+	var first = wallet.substring(0, 10); // Get first chars
+	var last = wallet.slice(wallet.length - 5); // Get last chars
+	var nonTxAction = first + ".." + last;
+	var type = "success";
+	var outputCurrency = "";
+  
+	// Show success message and update UI
+	popupSuccess(type, outputCurrency, txHash, "Hedge Created", 0, 0, "", nonTxAction);
+	swal.close();
+  }
+  
+  function handleTransactionFailure(status) {
+	// Display a user-friendly message based on the status
+	var message = status ? "Transaction Failed" : "Transaction Reverted";
+	swal({
+	  title: "Failed.",
+	  type: "error",
+	  confirmButtonColor: "#F27474",
+	  text: message,
+	});
+  }
+  
+
+// END OF JAVASCRIPT
