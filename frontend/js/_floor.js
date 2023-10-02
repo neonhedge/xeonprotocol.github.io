@@ -531,7 +531,7 @@ async function getPairAddress(tokenAddress) {
 
 // Submit call function to hedging contract to create hedge
 async function createHedgeSubmit() {
-	const accounts = await web3.eth.getAccounts();
+	const accounts = await ethereum.request({ method: 'eth_accounts' });
 	if (accounts.length === 0) {
 	  alert('Please connect your wallet');
 	  return;
@@ -629,7 +629,7 @@ function handleTransactionSuccess(transactionHash) {
 	var message = "Transaction Submitted Successfully";
 	swal({
 	  title: "Success.",
-	  type: "error",
+	  type: "success",
 	  confirmButtonColor: "#F27474",
 	  text: message,
 	});

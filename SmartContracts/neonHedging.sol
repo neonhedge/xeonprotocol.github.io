@@ -887,6 +887,12 @@ contract HEDGEFUND {
     }
 
     // Function to retrieve a subset of options or swaps created/taken by a user
+    function getUserOptionsHistory(address user, uint startIndex, uint limit) public view returns (uint[] memory) {
+        return getSubsetOfOptionsOrSwaps(myoptionsHistory[user], startIndex, limit);
+    }
+    function getUserSwapsHistory(address user, uint startIndex, uint limit) public view returns (uint[] memory) {
+        return getSubsetOfOptionsOrSwaps(myswapsHistory[user], startIndex, limit);
+    }
     function getUserOptionsCreated(address user, uint startIndex, uint limit) public view returns (uint[] memory) {
         return getSubsetOfOptionsOrSwaps(myoptionsCreated[user], startIndex, limit);
     }
@@ -904,11 +910,6 @@ contract HEDGEFUND {
     }
 
     // Helper function to retrieve a subset of options or swaps created/taken by all users
-    function getAllOptionsOrSwaps(uint[] storage fullArray, uint startIndex, uint limit) internal view returns (uint[] memory) {
-        return getSubsetOfOptionsOrSwaps(fullArray, startIndex, limit);
-    }
-
-    // Function to retrieve a subset of all options or swaps created
     function getAllOptions(uint startIndex, uint limit) public view returns (uint[] memory) {
         return getAllOptionsOrSwaps(optionsCreated, startIndex, limit);
     }
