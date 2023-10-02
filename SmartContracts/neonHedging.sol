@@ -911,11 +911,11 @@ contract HEDGEFUND {
 
     // Helper function to retrieve a subset of options or swaps created/taken by all users
     function getAllOptions(uint startIndex, uint limit) public view returns (uint[] memory) {
-        return getAllOptionsOrSwaps(optionsCreated, startIndex, limit);
+        return getSubsetOfOptionsOrSwaps(optionsCreated, startIndex, limit);
     }
 
     function getAllSwaps(uint startIndex, uint limit) public view returns (uint[] memory) {
-        return getAllOptionsOrSwaps(equityswapsCreated, startIndex, limit);
+        return getSubsetOfOptionsOrSwaps(equityswapsCreated, startIndex, limit);
     }
 
     // Function to retrieve a subset of options or swaps taken
