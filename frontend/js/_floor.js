@@ -162,61 +162,61 @@ $(document).ready(async function () {
 
 async function addBookmark(optionId) {
 	try {
-	  // Estimate gasLimit
-	  const encodedData = hedgingInstance.methods.bookmarkHedge(optionId).encodeABI();
-	  const estimateGas = await web3.eth.estimateGas({
-		data: encodedData,
-		from: MyGlobals.wallet,
-		to: CONSTANTS.hedgingAddress
-	  });
+		// Estimate gasLimit
+		const encodedData = hedgingInstance.methods.bookmarkHedge(optionId).encodeABI();
+		const estimateGas = await web3.eth.estimateGas({
+			data: encodedData,
+			from: MyGlobals.wallet,
+			to: CONSTANTS.hedgingAddress
+		});
   
-	  // Estimate gasPrice
-	  const gasPrice = await web3.eth.getGasPrice();
-  
-	  // Send transaction
-	  const receipt = await hedgingInstance.methods.bookmarkHedge(optionId).send({
-		from: MyGlobals.wallet,
-		gasPrice: gasPrice,
-		gasLimit: estimateGas,
-	  });
-  
-	  // Bookmark state updated successfully
-	  console.log('Bookmark State Updated:', receipt.events.BookmarkToggle.returnValues.bookmarked);
-  
-	  // Display bookmark state in a browser alert
-	  alert('Bookmark State Updated: ' + receipt.events.BookmarkToggle.returnValues.bookmarked);
-  
-	  const state = receipt.events.bookmarked.returnValues[2];
-	  const hedge = receipt.events.bookmarked.returnValues[1];
-  
-	  const tx_hash = receipt.transactionHash;
-	  const outputCurrency = ''; // or GUN - currency focus is outcome of Tx
-	  const type = 'success'; // or error
-	  const wallet = '';
-	  const receivedTokens = 0;
-  
-	  let message, nonTxAction;
-	  if (state) {
-		message = 'Bookmark saved!';
-		nonTxAction = 'hedge: ' + hedge + ' bookmarked: ';
-	  } else {
-		message = 'Bookmark removed!';
-		nonTxAction = 'hedge: ' + hedge + ' unmarked: ';
-	  }
-  
-	  // Call popupSuccess function without waiting for it to complete (async)
-	  popupSuccess(type, outputCurrency, tx_hash, message, 0, receivedTokens, wallet, nonTxAction);
+		// Estimate gasPrice
+		const gasPrice = await web3.eth.getGasPrice();
+	
+		// Send transaction
+		const receipt = await hedgingInstance.methods.bookmarkHedge(optionId).send({
+			from: MyGlobals.wallet,
+			gasPrice: gasPrice,
+			gasLimit: estimateGas,
+		});
+	
+		// Bookmark state updated successfully
+		console.log('Bookmark State Updated:', receipt.events.BookmarkToggle.returnValues.bookmarked);
+	
+		// Display bookmark state in a browser alert
+		alert('Bookmark State Updated: ' + receipt.events.BookmarkToggle.returnValues.bookmarked);
+	
+		const state = receipt.events.bookmarked.returnValues[2];
+		const hedge = receipt.events.bookmarked.returnValues[1];
+	
+		const tx_hash = receipt.transactionHash;
+		const outputCurrency = ''; // or GUN - currency focus is outcome of Tx
+		const type = 'success'; // or error
+		const wallet = '';
+		const receivedTokens = 0;
+	
+		let message, nonTxAction;
+		if (state) {
+			message = 'Bookmark saved!';
+			nonTxAction = 'hedge: ' + hedge + ' bookmarked: ';
+		} else {
+			message = 'Bookmark removed!';
+			nonTxAction = 'hedge: ' + hedge + ' unmarked: ';
+		}
+	
+		// Call popupSuccess function without waiting for it to complete (async)
+		popupSuccess(type, outputCurrency, tx_hash, message, 0, receivedTokens, wallet, nonTxAction);
 	} catch (error) {
-	  // Handle error
-	  const text = error.message;
-	  swal({
-		title: "Cancelled.",
-		type: "error",
-		allowOutsideClick: true,
-		text: text,
-		html: false,
-		confirmButtonColor: "#8e523c"
-	  });
+		// Handle error
+		const text = error.message;
+		swal({
+			title: "Cancelled.",
+			type: "error",
+			allowOutsideClick: true,
+			text: text,
+			html: false,
+			confirmButtonColor: "#8e523c"
+		});
 	}
 }  
 
@@ -338,7 +338,7 @@ async function createForm() {
 	} else {
 	  truncatedUser = 'Connect Wallet';
 	}
-	
+  
 	const privatize = `
 	  <div class="shl_inputshold delegate_inputshold setBeneField">
 		<label id="typeLabel" class="labels"><img src="imgs/info.png" title="Options or Equity Swaps (read docs)">hedge type:</label>
@@ -354,11 +354,8 @@ async function createForm() {
 		<input id="tokenAmount" class="sweetInput shldi benown" aria-invalid="false" autocomplete="amount of tokens to hedge">
 		<label id="premiumLabel" class="labels"><img src="imgs/info.png" title="cost in paired currency on dex">premium:</label>
 		<input id="premium" class="sweetInput shldi benown" aria-invalid="false" autocomplete="cost in paired currency to buy hedge">
-		<!-- 
-		//cost auto sets strike price for now, writers cushion, buyer's fair threshold on the other hand, OTC rules
 		<label id="strikeLabel" class="labels"><img src="imgs/info.png" title="strike value in paired currency on dex">strike price:</label>
 		<input id="strikePrice" class="sweetInput shldi benown" aria-invalid="false" autocomplete="strike value in paired currency at which hedge breaks even for the buyer">
-		-->
 		<br>
 		<div class="walletBalancesTL">
 		  <p>paste token address above & view your balances: </p>
@@ -539,7 +536,7 @@ async function createHedgeSubmit() {
 	const tokenAddy = document.getElementById('tokenAddy').value;
 	const tokenAmount = parseFloat(document.getElementById('tokenAmount').value);
 	const cost = parseFloat(document.getElementById('premium').value);
-	// const strikePrice = parseFloat(document.getElementById('strikePrice').value); -- cost auto sets strike price for now 
+	const strikePrice = parseFloat(document.getElementById('strikePrice').value);
   
 	// Validate form inputs
 	if (tokenAddy.length < 40 || !web3.utils.isAddress(tokenAddy)) {
@@ -642,6 +639,45 @@ function handleTransactionFailure(status) {
 	  confirmButtonColor: "#F27474",
 	  text: message,
 	});
+}
+
+//==========================================================================
+// Events Listening
+//==========================================================================
+hedgingInstance.events.hedgePurchased()
+  .on('data', function(event) {
+    const listItem = createEventListItem(event);
+    document.getElementById('eventsList').appendChild(listItem);
+  });
+
+hedgingInstance.events.hedgeSettled()
+  .on('data', function(event) {
+    const listItem = createEventListItem(event);
+    document.getElementById('eventsList').appendChild(listItem);
+  });
+
+function createEventListItem(event) {
+	const listItem = document.createElement('li');
+	listItem.classList.add('event-item');
+	
+	const title = document.createElement('span');
+	title.textContent = event.event;
+	listItem.appendChild(title);
+	
+	const amount = document.createElement('span');
+	amount.textContent = 'Amount: ' + (event.returnValues.amount || event.returnValues.payOff);
+	listItem.appendChild(amount);
+	
+	const dealer = document.createElement('span');
+	dealer.textContent = 'Dealer: ' + (event.returnValues.buyer || event.returnValues.token);
+	listItem.appendChild(dealer);
+	
+	const link = document.createElement('a');
+	link.href = 'https://etherscan.io/tx/' + event.transactionHash;
+	link.textContent = 'View Transaction';
+	listItem.appendChild(link);
+	
+	return listItem;
 }
 
 // Listen for the hedgeCreated event

@@ -74,7 +74,7 @@ section.sectionCenter {
 }
 .clubSinnage h4{
 	font-family: 'Neon',monospace, sans-serif, Tahoma, Geneva;
-	font-size: clamp(18px, 3vw, 28px) !important;
+	font-size: clamp(18px, 2vw, 24px) !important;
 	font-weight:400;
 	letter-spacing:normal;
 	text-transform: uppercase;
@@ -94,12 +94,12 @@ aside {
 	align-items: center;
 	box-sizing: border-box;
 	padding: 30px 20px 20px; 
-	padding-top: 0;
+	padding-top: 10px;
 }
 .asideNavs {
 	position: relative;
 	margin: 5px auto;
-	width: 80%;
+	width: 75%;
 }
 @media (min-width: 300px) {
 	.asideNavs {
@@ -153,9 +153,11 @@ aside {
 	transition: 1s;
 
 	height: max-content;
-	margin:2vw;
+	margin:20px 2vw;
+	/*
 	border-left: 0.5px solid #3399ff;
 	border-right: 0.5px solid #3399ff;
+	*/
 	font-family: monospace, sans-serif, "Helvetica Neue", Helvetica, Arial !important;
   }
   
@@ -167,7 +169,7 @@ aside {
   }
   
   .neon-text {
-	font-size: clamp(13px, 1vw, 14px) !important;
+	font-size: clamp(14px, 1vw, 15px) !important;
 	color: #fff;
   }
   
@@ -175,27 +177,29 @@ aside {
 	width: 100%;
 	font-weight: 100;
 	text-align: center;
-	border:0.5px solid #021930;
+	border:0.5px solid #0d4379;
+	border-radius: 20px;
 	padding:0.1vw 0.4vw;
 
-	text-shadow: 0 0 2px #188dd6, 0 0 3px #188dd6, 0 0 15px #188dd6, 0 0 15px #188dd6, 0 0 3px #188dd6, 3px 3px 0.5px #0e567c;
+	text-shadow: 0 0 1px #188dd6, 0 0 2px #188dd6, 0 0 6px #188dd6, 0 0 10px #188dd6, 0 0 2px #188dd6, 2px 2px 0.5px #0e567c;
 	color: #92f1fc;
   }
-
+  /*
   .hedgedVolume {
-	text-shadow: 0 0 2px #188dd6, 0 0 3px #188dd6, 0 0 15px #188dd6, 0 0 15px #188dd6, 0 0 3px #188dd6, 3px 3px 0.5px #0e567c;
+	text-shadow: 0 0 1px #188dd6, 0 0 2px #188dd6, 0 0 10px #188dd6, 0 0 10px #188dd6, 0 0 2px #188dd6, 2px 2px 0.5px #0e567c;
 	color: #92f1fc;
   }
 
   .boughtVolume {
-	text-shadow: 0 0 2px #089353, 0 0 3px #089353, 0 0 15px #089353, 0 0 15px #089353, 0 0 3px #089353, 3px 3px 0.5px #054025;
+	text-shadow: 0 0 1px #089353, 0 0 2px #089353, 0 0 10px #089353, 0 0 10px #089353, 0 0 2px #089353, 2px 2px 0.5px #054025;
   	color: #79deaf;
   }
 
   .settledVolume {
-	text-shadow: 0 0 2px #FA1C16, 0 0 3px #FA1C16, 0 0 15px #FA1C16, 0 0 15px #FA1C16, 0 0 3px #FED128, 3px 3px 0.5px #806914;
+	text-shadow: 0 0 1px #FA1C16, 0 0 2px #FA1C16, 0 0 10px #FA1C16, 0 0 10px #FA1C16, 0 0 2px #FED128, 2px 2px 0.5px #806914;
   	color: #FED128;
   }
+  */
   
   #eventsList {
 	list-style-type: none;
