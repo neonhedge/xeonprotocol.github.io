@@ -12,7 +12,7 @@ async function unlockedWallet() {
 		$('.wallets').css('display', 'none');
 		$('.walletpur').css('display', 'inline-block');
 		return true;
-	} else if (accounts.length === 0 || CONSTANTS.disconnected === 1) {
+	} else if (accounts.length === 0) {
 		$('.wallets').css('display', 'none');
 		$('.wallet_connect').css('display', 'inline-block');
 		return false;
@@ -143,20 +143,28 @@ async function unlockedWallet() {
 		}
 	}
 	
-	async function chainCheck() {
-		const chainID = await ethereum.request({ method: 'eth_chainId' });
-		if (chainID === CONSTANTS.network) {
-		console.log(`${chainID} == ${CONSTANTS.network}`);
-		$('.wallets').css('display', 'none');
-		$('.waiting_init').css('display', 'inline-block');
-		return true;
-		} else if (chainID !== CONSTANTS.network) {
-		console.log(`wrong chain: ${chainID} vs ${CONSTANTS.network}`);
-		$('.wallets').css('display', 'none');
-		$('.network_switch').css('display', 'inline-block');
-		return false;
+	async function chainCheck() {	  
+		try {
+		  const chainID = await web3.eth.getChainId();
+		  
+		  if (chainID === CONSTANTS.network) {
+			console.log(`${chainID} == ${CONSTANTS.network}`);
+			$('.wallets').css('display', 'none');
+			$('.waiting_init').css('display', 'inline-block');
+			return true;
+		  } else if (chainID !== CONSTANTS.network) {
+			console.log(`wrong chain: ${chainID} vs ${CONSTANTS.network}`);
+			$('.wallets').css('display', 'none');
+			$('.network_switch').css('display', 'inline-block');
+			return false;
+		  }
+		} catch (error) {
+		  console.error('Error checking chain:', error);
+		  // Handle errors, e.g., chain ID retrieval failed
+		  return false;
 		}
 	}
+	  
 	
 	async function switchNetwork() {
 		if (window.ethereum) {
@@ -228,46 +236,38 @@ async function unlockedWallet() {
 	
 	async function reqConnect() {
 		try {
-		const permissions = await ethereum.request({
-			method: 'wallet_requestPermissions',
-			params: [{ eth_accounts: {} }],
-		});
-	
-		const accountsPermission = permissions.find(permission => permission.parentCapability === 'eth_accounts');
-		if (accountsPermission) {
-			CONSTANTS.disconnected = 0;
-			console.log(`eth_accounts permission successfully requested! set: ${CONSTANTS.disconnected}`);
+		  const permissions = await web3.eth.requestAccounts();
+		  
+		  if (permissions.length > 0) {
+			console.log(`eth_accounts permission successfully requested!`);
 			initializeConnection();
 			return true;
-		}
+		  }
 		} catch (error) {
-		if (error.code === 4001) {
+		  if (error.code === 4001) {
 			console.log('Permissions needed to continue.');
-			swal(
-			{
-				title: '',
-				text: 'Permissions needed on dashboard..',
-				type: 'info',
-				html: false,
-				dangerMode: false,
-				confirmButtonText: 'try again',
-				cancelButtonText: 'cancel',
-				showConfirmButton: true,
-				showCancelButton: true,
-				timer: 4000,
-				animation: 'slide-from-top',
-			},
-			function () {
-				console.log('permissions retry...');
-				reqConnect();
-			}
-			);
-		} else {
+			swal({
+			  title: '',
+			  text: 'Permissions needed on dashboard..',
+			  type: 'info',
+			  html: false,
+			  dangerMode: false,
+			  confirmButtonText: 'try again',
+			  cancelButtonText: 'cancel',
+			  showConfirmButton: true,
+			  showCancelButton: true,
+			  timer: 4000,
+			  animation: 'slide-from-top',
+			}, function () {
+			  console.log('permissions retry...');
+			  reqConnect();
+			});
+		  } else {
 			console.log(error);
+		  }
 		}
 		return false;
-		}
-	}
+	}	  
 	
 	async function walletCheckProceed() {
 		try {

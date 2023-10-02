@@ -28,117 +28,18 @@
 	<link rel="stylesheet" href="./css/aos.css" />
 	<link rel="stylesheet" href="./css/style.css">
 	<link rel="stylesheet" href="./css/custom.css">
-	<!-- portfolio windows styling -->
+	<!-- windows styling -->
 	<link rel="stylesheet" type="text/css" href="css/_menu.css">
     <link rel="stylesheet" type="text/css" href="css/_floor.css">
     <link rel="stylesheet" type="text/css" href="css/sweetalert/sweetalert.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-	<!-- floor scripts -->
+	<!-- floor scripts -->    
 	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js"></script>
-	<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+    <script src="https://unpkg.com/@metamask/legacy-web3@latest/dist/metamask.web3.min.js"></script>
+	<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script><!-- will upgrade later -->
 	<script type="module" src="js/web3-walletstatus-module.js"></script>
 	<script type="module" src="js/_floor.js"></script>
 	<script type="application/javascript" src="js/sweetalert/sweetalert.min.js"></script>
-
-    <script>
-        //which tab is highlighted
-        $(document).ready(function(){
-			$('#erc20Options').css({'background' : 'rgba(214, 24, 138,0.2)','border' : '1px solid rgb(214, 24, 138)'});//left panel
-			$('#discoverTab').css({'border' : '1px solid #d6188a'});//try #87CEFA
-			//set global
-			window.nav = 1;
-			window.filters = 1;
-			window.readLimit = 30;
-			//check load continuation
-			MyGlobals.outputArray = [];
-			MyGlobals.startIndex = 0;
-			MyGlobals.lastItemIndex = 0;
-			loadOptions(startIndex, readLimit);
-       });
-       $(document).on('click', '#erc20Options', function(e){
-            $('.asideNavsinside').removeAttr('style'); //reset styles
-            $(this).css({'border' : '1px solid rgb(214, 24, 138)', 'background' : 'rgba(214, 24, 138,0.2)'});//set style
-            //set global
-			window.nav = 1;
-			window.filters = 1;
-			//check load continuation
-			MyGlobals.outputArray = [];
-			MyGlobals.startIndex = 0;
-			MyGlobals.lastItemIndex = 0;
-			loadOptions(startIndex, readLimit);
-        });
-        $(document).on('click', '#equitySwaps', function(e){
-            $('.asideNavsinside').removeAttr('style'); //reset styles
-            $(this).css({'border' : '1px solid rgb(214, 24, 138)', 'background' : 'rgba(214, 24, 138,0.2)'});//set style
-            //set global
-			window.nav = 2;
-			window.filters = 1;
-			//check load continuation
-			MyGlobals.outputArray = [];
-			MyGlobals.startIndex = 0;
-			MyGlobals.lastItemIndex = 0;
-			loadOptions(startIndex, readLimit);
-        });
-        $(document).on('click', '#erc20Loans', function(e){
-            $('.asideNavsinside').removeAttr('style'); //reset styles
-            $(this).css({'border' : '1px solid rgb(214, 24, 138)', 'background' : 'rgba(214, 24, 138,0.2)'});//set style
-            //set global
-			window.nav = 3;
-			window.filters = 1;
-			//check load continuation
-			MyGlobals.outputArray = [];
-			MyGlobals.startIndex = 0;
-			MyGlobals.lastItemIndex = 0;
-			loadOptions(startIndex, readLimit);
-        });
-        $(document).on('click', '#socialstream', function(e){
-            $('.asideNavsinside').removeAttr('style'); //reset styles
-            $(this).css({'border' : '1px solid #d6188a', 'background' : '#d6188a'});//set style
-            //set global
-              
-        });
-        //filters
-        $(document).on('click', '#discoverTab', function(e){
-            $('.streamtype').removeAttr('style'); //reset styles
-            $(this).css({'border' : '1px solid #d6188a'});//set style
-            //set global
-			window.filters = 1;
-			//check load continuation
-			MyGlobals.outputArray = [];
-			MyGlobals.startIndex = 0;
-			MyGlobals.lastItemIndex = 0;
-			loadOptions(startIndex, readLimit);
-        });
-        $(document).on('click', '#mypositionsTabs', function(e){
-            $('.streamtype').removeAttr('style'); //reset styles
-            $(this).css({'border' : '1px solid #d6188a'});//set style
-            //set global
-			window.filters = 2;
-			//check load continuation
-			MyGlobals.outputArray = [];
-			MyGlobals.startIndex = 0;
-			MyGlobals.lastItemIndex = 0;
-			loadOptions(startIndex, readLimit);
-        });
-        $(document).on('click', '#bookmarksTab', function(e){
-            $('.streamtype').removeAttr('style'); //reset styles
-            $(this).css({'border' : '1px solid #d6188a'});//set style
-            //set global
-			window.filters = 3;
-			//check load continuation
-			MyGlobals.outputArray = [];
-			MyGlobals.startIndex = 0;
-			MyGlobals.lastItemIndex = 0;
-			loadOptions(startIndex, readLimit);
-        });
-
-       //notes:
-	   //looping script to update options card
-	   //script takes a global new array of optionIDs at any time then uses those IDs to update value, settlement state
-	   //option cards are fetched on nav or tab click or results subset tabs in sets of 30
-	   //each subset fetch stores the last array index to know where it left when fetching more results
-
-    </script>
 </head>
 
 <body>
