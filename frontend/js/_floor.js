@@ -325,69 +325,66 @@ async function fetchOptionStrip(optionId){
 	}
 }
 
-async function createForm(){
-	let trimUser = MyGlobals.wallet;
+async function createForm() {
+	let trimmedUser = MyGlobals.wallet;
 	let truncatedUser = '';
-		const depositedBalance = 0;
-		const withdrawnBalance = 0;
-		const lockedInUseBalance = 0;
-		const withdrawableBalance = 0;
-	//check if address is valid and not empty
-	if(trimUser.length == 42){
-		truncatedUser = truncateAddress(trimUser);
-		//fetch balances for user under token address
-		const mybalances = await getUserBalancesForToken(pastedAddress, userAddress);
-		// Access the balances
-		depositedBalance = mybalances.deposited;
-		withdrawnBalance = mybalances.withdrawn;
-		lockedInUseBalance = mybalances.lockedInUse;
-		withdrawableBalance = mybalances.withdrawableBalance;
-	}else{
-		truncatedUser = 'Connect Wallet';
+	let depositedBalance = 0;
+	let withdrawnBalance = 0;
+	let lockedInUseBalance = 0;
+	let withdrawableBalance = 0;
+  
+	if (trimmedUser.length === 42) {
+	  truncatedUser = truncateAddress(trimmedUser);
+	} else {
+	  truncatedUser = 'Connect Wallet';
 	}
 	
-	var privatize = `
-	<div class="shl_inputshold delegate_inputshold setBeneField">
+	const privatize = `
+	  <div class="shl_inputshold delegate_inputshold setBeneField">
 		<label id="typeLabel" class="labels"><img src="imgs/info.png" title="Options or Equity Swaps (read docs)">hedge type:</label>
 		<select id="hedgeType" name="hedgeType">
-			<option value="0">Call Option</option>
-			<option value="1">Put Option</option>
-			<option value="2">Equity Swap</option>
-			<option value="3">Loan Request (coming)</option>
+		  <option value="0">Call Option</option>
+		  <option value="1">Put Option</option>
+		  <option value="2">Equity Swap</option>
+		  <option value="3">Loan Request (coming)</option>
 		</select>
 		<label id="tokenLabel" class="labels"><img src="imgs/info.png" title="token address of the tokens you want to hedge">token Address:</label>
 		<input id="tokenAddy" class="sweetInput shldi benown" aria-invalid="false" autocomplete="ERC20 token to hedge">
 		<label id="amountLabel" class="labels"><img src="imgs/info.png" title="amount of the tokens you want to hedge P.S should deposit first, visit wallet page">token amount:</label>
 		<input id="tokenAmount" class="sweetInput shldi benown" aria-invalid="false" autocomplete="amount of tokens to hedge">
-		<label id="costLabel" class="labels"><img src="imgs/info.png" title="cost in paired currency on dex">premium:</label>
-		<input id="" class="sweetInput shldi benown" aria-invalid="false" autocomplete="cost in paired currency to buy hedge">
+		<label id="premiumLabel" class="labels"><img src="imgs/info.png" title="cost in paired currency on dex">premium:</label>
+		<input id="premium" class="sweetInput shldi benown" aria-invalid="false" autocomplete="cost in paired currency to buy hedge">
+		<!-- 
+		//cost auto sets strike price for now, writers cushion, buyer's fair threshold on the other hand, OTC rules
 		<label id="strikeLabel" class="labels"><img src="imgs/info.png" title="strike value in paired currency on dex">strike price:</label>
-		<input id="" class="sweetInput shldi benown" aria-invalid="false" autocomplete="strike value in paired currency at which hedge breaks even for the buyer">
+		<input id="strikePrice" class="sweetInput shldi benown" aria-invalid="false" autocomplete="strike value in paired currency at which hedge breaks even for the buyer">
+		-->
 		<br>
 		<div class="walletBalancesTL">
-			<p>paste token address above & view your balances: </p>
-			<span class="walletbalanceSpan">`+truncatedUser+` <img src="imgs/info.png" title="protocol balances on connected wallet"></span></br>
-			<div><span class="walBalTitle">deposited:</span><span id="depositedBalance">`+depositedBalance+`</span></div>
-			<div><span class="walBalTitle">locked:</span><span id="lockedInUseBalance">`+lockedInUseBalance+`</span></div>
-			<div><span class="walBalTitle">withdrawn:</span><span id="withdrawnBalance">`+withdrawnBalance+`</span></div>
-			<div><span class="walBalTitle">available:</span><span id="withdrawableBalance">`+withdrawableBalance+`</span></div>
+		  <p>paste token address above & view your balances: </p>
+		  <span class="walletbalanceSpan">${truncatedUser} <img src="imgs/info.png" title="protocol balances on connected wallet"></span></br>
+		  <div><span class="walBalTitle">deposited:</span><span id="depositedBalance">${depositedBalance}</span></div>
+		  <div><span class="walBalTitle">locked:</span><span id="lockedInUseBalance">${lockedInUseBalance}</span></div>
+		  <div><span class="walBalTitle">withdrawn:</span><span id="withdrawnBalance">${withdrawnBalance}</span></div>
+		  <div><span class="walBalTitle">available:</span><span id="withdrawableBalance">${withdrawableBalance}</span></div>
 		</div>
-	</div>`;
+	  </div>`;
+  
 	swal({
-			title: "Write: Option | Swap | Loan",
-			text: privatize,
-			type: "prompt",  //var alertTypes = ['error', 'warning', 'info', 'success', 'input', 'prompt'];
-			html: true,
-					dangerMode: true,
-					confirmButtonText: "Write",
-					confirmButtonColor: "#171716", //cowboy brown
-					cancelButtonText: "Cancel",
-					closeOnConfirm: false,
-					showLoaderOnConfirm: true,
-			showConfirmButton: true,
-			showCancelButton: true,
-			timer: 4000,
-			animation: "slide-from-top"
+		title: "Write: Option | Swap | Loan",
+		text: privatize,
+		type: "prompt",
+		html: true,
+		dangerMode: true,
+		confirmButtonText: "Write",
+		confirmButtonColor: "#171716",
+		cancelButtonText: "Cancel",
+		closeOnConfirm: false,
+		showLoaderOnConfirm: true,
+		showConfirmButton: true,
+		showCancelButton: true,
+		timer: 4000,
+		animation: "slide-from-top"
 	},async function(){//on confirm click
 		await createHedgeSubmit();
 	});
@@ -541,8 +538,8 @@ async function createHedgeSubmit() {
 	const hedgeType = document.getElementById('hedgeType').value;
 	const tokenAddy = document.getElementById('tokenAddy').value;
 	const tokenAmount = parseFloat(document.getElementById('tokenAmount').value);
-	const cost = parseFloat(document.getElementById('cost').value);
-	const strikePrice = parseFloat(document.getElementById('strikePrice').value);
+	const cost = parseFloat(document.getElementById('premium').value);
+	// const strikePrice = parseFloat(document.getElementById('strikePrice').value); -- cost auto sets strike price for now 
   
 	// Validate form inputs
 	if (tokenAddy.length < 40 || !web3.utils.isAddress(tokenAddy)) {
