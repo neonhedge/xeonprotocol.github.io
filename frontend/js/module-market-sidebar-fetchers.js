@@ -1,5 +1,6 @@
 import { CONSTANTS, getCurrentEthUsdcPriceFromUniswapV2, getTokenETHValue, getTokenUSDValue } from './constants.js';
-async function setCurrent_HedgeSection() {
+import { updateSectionValues_volumes } from './module-market-sidebar-updaters.js';
+async function loadSidebarVolume() {
     // Fetch manually base address by base address. erc20s are sold at 10% discount in weth
     // Reading direct from solidity mappings
     const hedgesCreatedWETH = await contractInstance.hedgesCreatedVolume(CONSTANTS.wethAddress);
@@ -112,3 +113,5 @@ async function setCurrent_HedgeSection() {
         cashierFeesTUSD
     );
 }
+
+export { loadSidebarVolume }
