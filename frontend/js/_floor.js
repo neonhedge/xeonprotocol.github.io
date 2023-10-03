@@ -4,7 +4,8 @@
 import { CONSTANTS, getUserBalancesForToken, truncateAddress, fromWeiToFixed12, fromWeiToFixed5, fromWeiToFixed8, fromWeiToFixed8_unrounded, fromWeiToFixed5_unrounded, fromWeiToFixed2_unrounded, toFixed8_unrounded } from './constants.js';
 import { initWeb3 } from './dapp-web3-utils.js';
 import { unlockedWallet, reqConnect, popupSuccess } from './web3-walletstatus-module.js';
-import { refreshDataOnElements, loadOptions, fetchOptionCard, fetchNameSymbol, prepareTimestamp, noOptionsSwal } from './module-market-card-fetchers.js';
+import { refreshDataOnElements, loadOptions, loadVolumes, fetchOptionCard, fetchNameSymbol, prepareTimestamp, noOptionsSwal } from './module-market-card-fetchers.js';
+import { loadVolumes } from './module-market-sidebar-fetchers.js';
 
 /*=========================================================================
     INITIALIZE WEB3 & LOCAL CONSTANTS
@@ -39,6 +40,9 @@ $(document).ready(function(){
 	MyGlobals.startIndex = 0;
 	MyGlobals.lastItemIndex = 0;
 	loadOptions(MyGlobals.startIndex, window.readLimit);
+
+	//load sidebar volume stats
+	loadVolumes();
 });
 $(document).on('click', '#erc20Options', function(e){
 	$('.asideNavsinside').removeAttr('style'); //reset styles
