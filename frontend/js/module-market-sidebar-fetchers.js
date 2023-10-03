@@ -1,8 +1,8 @@
 import { CONSTANTS, getCurrentEthUsdcPriceFromUniswapV2, getTokenETHValue, getTokenUSDValue } from './constants.js';
 import { updateSectionValues_volumes } from './module-market-sidebar-updaters.js';
+// Load hedge volume: created, bought, settled, payouts, fees
 async function loadSidebarVolume() {
-    // Fetch manually base address by base address. erc20s are sold at 10% discount in weth
-    // Reading direct from solidity mappings
+    
     const hedgesCreatedWETH = await contractInstance.hedgesCreatedVolume(CONSTANTS.wethAddress);
     const hedgesCreatedUSDT = await contractInstance.hedgesCreatedVolume(CONSTANTS.usdtAddress);
     const hedgesCreatedUSDC = await contractInstance.hedgesCreatedVolume(CONSTANTS.usdcAddress);
