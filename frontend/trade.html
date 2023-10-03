@@ -107,7 +107,7 @@
 						<h4 title="P2P options market place">> OTC Markets</h4>
 					</div>
 					<div class="asideNavs">
-						<div class="asideNavsinside" id="erc20Options" title="create - buy - discover and track OTC ERC20 Call | Put Options">Call|Put Options</div>
+						<div class="asideNavsinside" id="erc20Options" title="create - buy - discover and track OTC ERC20 Call | Put Options">Options</div>
 					</div>
 					<div class="asideNavs">
 						<div class="asideNavsinside" id="equitySwaps" title="create - buy - discover and track OTC ERC20 Equity Swaps">Equity Swaps</div>
@@ -314,16 +314,20 @@
 			<div id="sidebar">
 				<div id="volumeStats">
 				  <div class="neon-container">
-					<span class="neon-text">Hedge Volume</span>
-					<span class="neon-amount hedgedVolume">100</span>
+					<span class="neon-text">Hedged Volume</span>
+					<span id="hedgeVolume" class="neon-amount hedgedVolume">100</span>
 				  </div>
 				  <div class="neon-container">
-					<span class="neon-text">Buy Volume</span>
-					<span class="neon-amount boughtVolume">200</span>
+					<span class="neon-text">Premium Volume</span>
+					<span id="premiumVolume" class="neon-amount boughtVolume">200</span>
 				  </div>
 				  <div class="neon-container">
-					<span class="neon-text">Settled Volume</span>
-					<span class="neon-amount settledVolume">300</span>
+					<span class="neon-text">Settle Volume</span>
+					<span id="settleVolume" class="neon-amount settledVolume">300</span>
+				  </div>
+				  <div class="neon-container">
+					<span class="neon-text">Profit Payoffs</span>
+					<span id="payoffVolume" class="neon-amount settledVolume">0</span>
 				  </div>
 				</div>
 				<div id="liveEvents">

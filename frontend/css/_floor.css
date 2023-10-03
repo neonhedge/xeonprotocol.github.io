@@ -93,8 +93,8 @@ aside {
 	transition: 1s;
 	align-items: center;
 	box-sizing: border-box;
-	padding: 30px 20px 20px; 
-	padding-top: 10px;
+	padding: 10px 10px 20px;
+	border: 0.7px solid #3399ff;
 }
 .asideNavs {
 	position: relative;
@@ -116,7 +116,7 @@ aside {
 	border-radius: 7px;
 	cursor: pointer;
 	font-family: monospace, sans-serif, "Helvetica Neue", Helvetica, Arial !important;
-	font-size: clamp(13px, 1vw, 15px) !important;
+	font-size: clamp(14px, 1vw, 15px) !important;
 	letter-spacing: 0;
 	font-weight: 400 !important;
 	text-align: center;
@@ -137,6 +137,7 @@ aside {
 	position: relative;
 	min-height: 500px; /* get clear of CTA section below it */
 	padding: 30px 20px 20px; 
+	padding: 0;
 	box-sizing:border-box;
 	transition: 1s; 
 	
@@ -154,10 +155,10 @@ aside {
 
 	height: max-content;
 	margin:20px 2vw;
-	/*
+	
 	border-left: 0.5px solid #3399ff;
 	border-right: 0.5px solid #3399ff;
-	*/
+	
 	font-family: monospace, sans-serif, "Helvetica Neue", Helvetica, Arial !important;
   }
   
@@ -181,7 +182,7 @@ aside {
 	border-radius: 20px;
 	padding:0.1vw 0.4vw;
 
-	text-shadow: 0 0 1px #188dd6, 0 0 2px #188dd6, 0 0 6px #188dd6, 0 0 10px #188dd6, 0 0 2px #188dd6, 2px 2px 0.5px #0e567c;
+	text-shadow: 0 0 1px #188dd6, 0 0 2px #188dd6, 0 0 4px #188dd6, 0 0 7px #188dd6, 0 0 2px #188dd6, 2px 2px 0.5px #0e567c;
 	color: #92f1fc;
   }
   /*
@@ -216,20 +217,19 @@ aside {
 /* club timeline projects tabs */
 .feedsfilterDockHold{
 	position: sticky;
-	top:64px; /* match aside container */
+	top:70px; /* match aside container */
 	margin:0px auto;
 	max-width: 500px;
 	z-index:2;
 	text-align:center;
-	/* background-color: #363636; */
-	padding: 20px 0px;
+	padding: 20px 5px;
 	border-radius: 10px;
-
 	display: flex;
 	flex-wrap: wrap;
 	align-items: center; /* Align items vertically */
 
 	background-color: rgba(4, 1, 21, 1);
+	border: 0.7px solid #3399ff;
   }
   
 .streamtype {
