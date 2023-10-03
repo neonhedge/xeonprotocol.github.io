@@ -326,6 +326,8 @@ async function fetchOptionCard(optionId){
 		let hedgeType;
 		if (result.hedgeType === 'CALL') {
 			hedgeType = 'CALL';
+		} else if (result.hedgeType === 'PUT') {
+			hedgeType = 'PUT';
 		} else if (result.hedgeType === 'SWAP') {
 			hedgeType = 'SWAP';
 		} else {
