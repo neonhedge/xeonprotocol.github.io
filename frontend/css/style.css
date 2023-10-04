@@ -85,7 +85,7 @@ iframe {
 
 #preload {
   display: block;
-  position: absolute;
+  position: fixed;
   inset: 0;
   width: 100%;
   height: 100%;
@@ -93,9 +93,14 @@ iframe {
   font-size: 3rem;
   font-weight: 800;
   text-align: center;
-  background: radial-gradient(#18142d, #040115 80%) !important;
-  color: rgba(255, 255, 255, 0.9);
   z-index: 99999;
+  overflow: hidden;
+  pointer-events: none;
+
+  background: radial-gradient(#18022f, #040118 80%) !important;
+  color: #08e7fe;/* darker */
+  text-shadow: 0 0 2px #188dd6, 0 0 3px #188dd6, 0 0 15px #188dd6, 0 0 15px #188dd6, 0 0 3px #188dd6, 3px 3px 0.5px #0e567c !important;
+	font-family: 'Neon',monospace, sans-serif, "Helvetica Neue", Helvetica, "Liberation Sans"!important;
 }
 
 .sr-only {
@@ -308,8 +313,8 @@ iframe {
   display: block;
   width: 100%;
   height: 100%;
-  border: 0.3rem solid transparent;
-  border-color: #188dd6 transparent transparent transparent;
+  border: 0.2rem solid transparent;
+  border-color: #000 transparent transparent transparent;
   border-radius: 50%;
   z-index: -8;
   box-shadow: 0 0 .1rem #fff, inset 0 0 .1rem #fff, 0 0 0.7rem var(--neon-border-color), inset 0 0 0.5rem var(--neon-border-color), 0 0 0.3rem var(--neon-border-color), inset 0 0 0.3rem var(--neon-border-color);
@@ -458,7 +463,7 @@ footer {
 button, a.btn {
   background-color: transparent;
   border-radius: 1.8rem;
-  padding: 0.6rem 2rem;
+  padding: 0.5rem 2rem;
   transition: background-color 0.8s, color 0.5s;
   cursor: pointer;
   color: #08e7fe;
@@ -475,12 +480,10 @@ button.btn-cta, a.btn.btn-cta, .btn-dext{
 button.btn-cta:hover, a.btn.btn-cta:hover {
   background-color: #09001d !important;
   border: 0.5px solid #3399ff;
-  color: #188dd6;
 }
 button.btn-border:hover, a.btn.btn-border:hover {
   background-color: #09001d !important;
   border: 0.5px solid #3399ff;
-  color: #0096f4;
 }
 button#goTop, a.btn#goTop {
   width: 38px;
@@ -503,7 +506,7 @@ button#goTop, a.btn#goTop {
 .account a{
   background-color: transparent;
   border-radius: 1.8rem;
-  padding: 0.8rem 2.5rem;
+  padding: 0.4rem 2rem;
   transition: background-color 0.8s, color 0.5s;
   cursor: pointer;
   text-decoration: none;
@@ -593,9 +596,15 @@ header .container {
 header .container img {
   width: 4rem;
 }
+header .container a {
+  display: inherit;
+}
 @media (max-width: 600px) {
   header .container img  {
     width:4rem;
+  }
+  header .container a {
+    display: inherit;
   }
 }
 .mobile-nav-toggle {
