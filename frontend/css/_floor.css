@@ -94,7 +94,7 @@ aside {
 	align-items: center;
 	box-sizing: border-box;
 	padding: 10px 10px 20px;
-	border: 0.7px solid #3399ff;
+	/* border: 0.7px solid #3399ff; */
 }
 .asideNavs {
 	position: relative;
@@ -151,30 +151,29 @@ aside {
 #sidebar {
 	position: sticky;
 	top: 70px;
-	transition: 1s;
-
 	height: max-content;
 	margin:20px 2vw;
+	font-family: monospace, sans-serif, "Helvetica Neue", Helvetica, Arial !important;
 	
 	border-left: 0.5px solid #3399ff;
 	border-right: 0.5px solid #3399ff;
-	
-	font-family: monospace, sans-serif, "Helvetica Neue", Helvetica, Arial !important;
-  }
-  
-  .neon-container {
+	border: unset;
+	transition: 1s;
+}
+
+.neon-container {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 	margin-top: 20px;
-  }
-  
-  .neon-text {
+}
+
+.neon-text {
 	font-size: clamp(14px, 1vw, 15px) !important;
 	color: #fff;
-  }
-  
-  .neon-amount {
+}
+
+.neon-amount {
 	width: 100%;
 	font-weight: 100;
 	text-align: center;
@@ -184,36 +183,36 @@ aside {
 
 	text-shadow: 0 0 1px #188dd6, 0 0 2px #188dd6, 0 0 4px #188dd6, 0 0 7px #188dd6, 0 0 2px #188dd6, 2px 2px 0.5px #0e567c;
 	color: #92f1fc;
-  }
-  /*
-  .hedgedVolume {
-	text-shadow: 0 0 1px #188dd6, 0 0 2px #188dd6, 0 0 10px #188dd6, 0 0 10px #188dd6, 0 0 2px #188dd6, 2px 2px 0.5px #0e567c;
-	color: #92f1fc;
-  }
+}
+/*
+.hedgedVolume {
+text-shadow: 0 0 1px #188dd6, 0 0 2px #188dd6, 0 0 10px #188dd6, 0 0 10px #188dd6, 0 0 2px #188dd6, 2px 2px 0.5px #0e567c;
+color: #92f1fc;
+}
 
-  .boughtVolume {
-	text-shadow: 0 0 1px #089353, 0 0 2px #089353, 0 0 10px #089353, 0 0 10px #089353, 0 0 2px #089353, 2px 2px 0.5px #054025;
-  	color: #79deaf;
-  }
+.boughtVolume {
+text-shadow: 0 0 1px #089353, 0 0 2px #089353, 0 0 10px #089353, 0 0 10px #089353, 0 0 2px #089353, 2px 2px 0.5px #054025;
+color: #79deaf;
+}
 
-  .settledVolume {
-	text-shadow: 0 0 1px #FA1C16, 0 0 2px #FA1C16, 0 0 10px #FA1C16, 0 0 10px #FA1C16, 0 0 2px #FED128, 2px 2px 0.5px #806914;
-  	color: #FED128;
-  }
-  */
-  
-  #eventsList {
+.settledVolume {
+text-shadow: 0 0 1px #FA1C16, 0 0 2px #FA1C16, 0 0 10px #FA1C16, 0 0 10px #FA1C16, 0 0 2px #FED128, 2px 2px 0.5px #806914;
+color: #FED128;
+}
+*/
+
+#eventsList {
 	list-style-type: none;
 	padding: 0;
-  }
-  
-  .event-item {
+}
+
+.event-item {
 	font-size: 12px;
-  }
-  
-  .event-item:hover {
+}
+
+.event-item:hover {
 	background-color: #f0f0f0;
-  }
+}
 /* club timeline projects tabs */
 .feedsfilterDockHold{
 	position: sticky;
@@ -229,14 +228,28 @@ aside {
 	align-items: center; /* Align items vertically */
 
 	background-color: rgba(4, 1, 21, 1);
-	border: 0.7px solid #3399ff;
-  }
+	/* border: 0.7px solid #3399ff; */
+	box-shadow: 0 1vw rgba(0, 0, 0, 0.7);
+}
+
+.feedsfilterDockHold::before {
+    content: "";
+    position: absolute;
+    top: -6px; /* shadow's position */
+    left: 0;
+    right: 0;
+    height: 6px;
+    background: linear-gradient(to right, #07041e, #800080, #07041e); 
+    opacity: 0.6; 
+    z-index: -1; /* Place the shadow behind the div */
+    border-radius: 10px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0); /* Add a 5px box shadow with a transparent color */
+}
   
 .streamtype {
 	flex: 1; /* Expand to fill available space */
 	margin: 0px 1.5%;
 	min-width: 60px;
-	height: 42px;
 	border-radius: 10px;
 	overflow: hidden;
 	color: #08e7fe;
