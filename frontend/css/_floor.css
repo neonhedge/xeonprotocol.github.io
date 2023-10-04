@@ -74,13 +74,14 @@ section.sectionCenter {
 }
 .clubSinnage h4{
 	font-family: 'Neon',monospace, sans-serif, Tahoma, Geneva;
-	font-size: clamp(18px, 2vw, 24px) !important;
-	font-weight:400;
+	font-size: clamp(20px, 2vw, 25px) !important;
+	font-weight:100;
 	letter-spacing:normal;
 	text-transform: uppercase;
 	padding:10px;
 	margin:0px;
 	box-sizing:border-box;
+	color: #08e7fe !important;/* darker */
 }
 .left-paner-parent {
 	position: relative;
@@ -157,7 +158,6 @@ aside {
 	
 	border-left: 0.5px solid #3399ff;
 	border-right: 0.5px solid #3399ff;
-	border: unset;
 	transition: 1s;
 }
 
@@ -169,20 +169,21 @@ aside {
 }
 
 .neon-text {
-	font-size: clamp(14px, 1vw, 15px) !important;
+	font-size: clamp(13px, 1vw, 14px) !important;
 	color: #fff;
 }
 
 .neon-amount {
 	width: 100%;
+	font-size: 1rem;
 	font-weight: 100;
 	text-align: center;
 	border:0.5px solid #0d4379;
-	border-radius: 20px;
+	border-top: unset;
 	padding:0.1vw 0.4vw;
-
-	text-shadow: 0 0 1px #188dd6, 0 0 2px #188dd6, 0 0 4px #188dd6, 0 0 7px #188dd6, 0 0 2px #188dd6, 2px 2px 0.5px #0e567c;
-	color: #92f1fc;
+	/* unknown, unknown, unknown, glow radius, no-effect, shadow */
+	text-shadow: 0 0 1px #188dd6, 0 0 2px #188dd6, 0 0 10px #188dd6, 0 0 1px #188dd6, 0 0 0px #188dd6, 2px 2px 0.5px #0e567c;
+	color: #4ad6e6;
 }
 /*
 .hedgedVolume {
@@ -221,11 +222,11 @@ color: #FED128;
 	max-width: 500px;
 	z-index:2;
 	text-align:center;
-	padding: 20px 5px;
+	padding: 15px 5px;
 	border-radius: 10px;
 	display: flex;
 	flex-wrap: wrap;
-	align-items: center; /* Align items vertically */
+	align-items: center; 
 
 	background-color: rgba(4, 1, 21, 1);
 	/* border: 0.7px solid #3399ff; */
@@ -258,7 +259,7 @@ color: #FED128;
 	letter-spacing: 0;
 	font-weight: 400 !important;
 	border: 0.5px solid #363636;
-	border: 1px solid #3399ff;
+	border: 0.5px solid #3399ff;
 	background-color: #07041e;
 	
 }

@@ -29,7 +29,7 @@ export const MyGlobals = {
 
 //which tab is highlighted
 $(document).ready(function(){
-	$('#erc20Options').css({'background' : 'rgba(214, 24, 138,0.2)','border' : '1px solid rgb(214, 24, 138)'});//left panel
+	$('#erc20Options').css({'background' : 'rgba(214, 24, 138,0.15)','border' : '1px solid rgb(214, 24, 138)'});//left panel
 	$('#discoverTab').css({'border' : '1px solid #d6188a'});//try #87CEFA
 	//set global
 	window.nav = 1;
@@ -46,7 +46,7 @@ $(document).ready(function(){
 });
 $(document).on('click', '#erc20Options', function(e){
 	$('.asideNavsinside').removeAttr('style'); //reset styles
-	$(this).css({'border' : '1px solid rgb(214, 24, 138)', 'background' : 'rgba(214, 24, 138,0.2)'});//set style
+	$(this).css({'border' : '1px solid rgb(214, 24, 138)', 'background' : 'rgba(214, 24, 138,0.15)'});//set style
 	//set global
 	window.nav = 1;
 	window.filters = 1;
@@ -58,7 +58,7 @@ $(document).on('click', '#erc20Options', function(e){
 });
 $(document).on('click', '#equitySwaps', function(e){
 	$('.asideNavsinside').removeAttr('style'); //reset styles
-	$(this).css({'border' : '1px solid rgb(214, 24, 138)', 'background' : 'rgba(214, 24, 138,0.2)'});//set style
+	$(this).css({'border' : '1px solid rgb(214, 24, 138)', 'background' : 'rgba(214, 24, 138,0.15)'});//set style
 	//set global
 	window.nav = 2;
 	window.filters = 1;
@@ -70,7 +70,7 @@ $(document).on('click', '#equitySwaps', function(e){
 });
 $(document).on('click', '#erc20Loans', function(e){
 	$('.asideNavsinside').removeAttr('style'); //reset styles
-	$(this).css({'border' : '1px solid rgb(214, 24, 138)', 'background' : 'rgba(214, 24, 138,0.2)'});//set style
+	$(this).css({'border' : '1px solid rgb(214, 24, 138)', 'background' : 'rgba(214, 24, 138,0.15)'});//set style
 	//set global
 	window.nav = 3;
 	window.filters = 1;
