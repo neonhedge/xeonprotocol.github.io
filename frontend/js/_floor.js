@@ -4,8 +4,8 @@
 import { CONSTANTS, getUserBalancesForToken, truncateAddress, fromWeiToFixed12, fromWeiToFixed5, fromWeiToFixed8, fromWeiToFixed8_unrounded, fromWeiToFixed5_unrounded, fromWeiToFixed2_unrounded, toFixed8_unrounded } from './constants.js';
 import { initWeb3 } from './dapp-web3-utils.js';
 import { unlockedWallet, reqConnect, popupSuccess } from './web3-walletstatus-module.js';
-import { refreshDataOnElements, loadOptions, loadVolumes, fetchOptionCard, fetchNameSymbol, prepareTimestamp, noOptionsSwal } from './module-market-card-fetchers.js';
-import { loadVolumes } from './module-market-sidebar-fetchers.js';
+import { refreshDataOnElements, loadOptions, fetchOptionCard, fetchNameSymbol, prepareTimestamp, noOptionsSwal } from './module-market-card-fetchers.js';
+import { loadSidebarVolume } from './module-market-sidebar-fetchers.js';
 
 /*=========================================================================
     INITIALIZE WEB3 & LOCAL CONSTANTS
@@ -42,7 +42,7 @@ $(document).ready(function(){
 	loadOptions(MyGlobals.startIndex, window.readLimit);
 
 	//load sidebar volume stats
-	loadVolumes();
+	loadSidebarVolume();
 });
 $(document).on('click', '#erc20Options', function(e){
 	$('.asideNavsinside').removeAttr('style'); //reset styles
@@ -660,7 +660,7 @@ hedgingInstance.events.hedgeSettled()
     document.getElementById('eventsList').appendChild(listItem);
   });
 
-function createEventListItem(event) {
+async function createEventListItem(event) {
 	const listItem = document.createElement('li');
 	listItem.classList.add('event-item');
 	
@@ -668,13 +668,18 @@ function createEventListItem(event) {
 	title.textContent = event.event;
 	listItem.appendChild(title);
 	
+	// display cost/premium/value with pair symbol
+	const pairToken = await getPairToken(event.returnValues.optionId);
+	const pairTokenSymbol = await getSymbol(pairToken);
+
 	const amount = document.createElement('span');
-	amount.textContent = 'Amount: ' + (event.returnValues.amount || event.returnValues.payOff);
+	amount.textContent = (event.returnValues.startValue || event.returnValues.payOff) + ' ' + pairTokenSymbol;
 	listItem.appendChild(amount);
-	
+	// trim address
+	const truncatedAddress = truncateAddress((event.returnValues.buyer || event.returnValues.token));
 	const dealer = document.createElement('span');
-	dealer.textContent = 'Dealer: ' + (event.returnValues.buyer || event.returnValues.token);
-	listItem.appendChild(dealer);
+	dealer.textContent = truncatedAddress;
+	listItem.appendChild(dealer);  
 	
 	const link = document.createElement('a');
 	link.href = 'https://etherscan.io/tx/' + event.transactionHash;
@@ -682,6 +687,33 @@ function createEventListItem(event) {
 	listItem.appendChild(link);
 	
 	return listItem;
+}
+
+async function getPairToken(optionId) {
+	const result = await hedgingInstance.methods.getHedgeDetails(optionId).call();
+	return result.paired;
+}
+
+async function getSymbol(tokenAddress) {
+	const tokenAbi = [
+		{
+		  "constant": true,
+		  "inputs": [],
+		  "name": "symbol",
+		  "outputs": [
+			{
+			  "name": "",
+			  "type": "string"
+			}
+		  ],
+		  "payable": false,
+		  "stateMutability": "view",
+		  "type": "function"
+		}
+	];
+	const tokenContract = new web3.eth.Contract(tokenAbi, tokenAddress);
+	const symbol = await tokenContract.methods.symbol().call();
+	return symbol;
 }
 
 // Listen for the hedgeCreated event

@@ -371,7 +371,7 @@ contract HEDGEFUND {
     // > consider limiting the basket feature to loans only where its relevant not with hedges
     // DRAFT - FUNCTION TO EDIT HEDGE; COST, STRIKE, DURATION ONLY BEFORE ITS TAKEN
 
-    // Hedges are bought in paired currency of underlying token
+    // Hedges are bought in quote/paired currency of underlying token
     // For Call and Put Options cost is premium, lockedinuse here but paid out on settlement
     // For Equity Swaps cost is equal to underlying value as 100% collateral is required. There is no premium
     // Strike value is not set here, maturity calculations left to the settlement function
