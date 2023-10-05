@@ -16,7 +16,7 @@
 	<meta name="theme-color" content="#ffffff">
 	<meta name="author" content="Kaveman-x">
 	<!-- title page & SEO meta -->
-	<title>NEON - Marketplace</title>
+	<title>NEON - OTC Room</title>
 	<meta name="description" content="neon hedge is a universal ERC20 hedging and lending platform">
 	<meta name="keywords" content="erc20, crypto, hedging, call options, swaps, lending, collateral, website, html, html5, css">
 	<!-- google fonts -->
@@ -167,9 +167,22 @@
 								<div class="assetsTypeValue flux highlightOption">`+hedgeType+`</div>
 							</div>
 						</div>
-						<div class="optionMark"><span>Strike:</span><span class="oMfigure">`+strikevalue+` `+pairSymbol+`</span></div>
-						<div class="optionMark"><span>Premium:</span><span class="oMfigure">`+cost+` `+pairSymbol+`</span></div>
-						<div class="optionMark"><span>Expires:</span><span class="oMfigure">`+timeToExpiry+` `+timeToExpiry+`</span></div>
+
+						<div class="strategyContainer">
+							<div class="optionMarksHold">
+								<div class="optionMark"><span>Strike:</span><span class="oMfigure">`+strikevalue+` `+pairSymbol+`</span></div>
+								<div class="optionMark"><span>Premium:</span><span class="oMfigure">`+cost+` `+pairSymbol+`</span></div>
+								<div class="optionMark"><span>Expires:</span><span class="oMfigure">`+timeToExpiry+` `+timeToExpiry+`</span></div>
+							</div>
+							<div class="strategyHold">
+								<div class="strategyImage"></div>
+								<div class="strategyDataHold">
+									<!-- two divs, each with values at center: (open profit zone | max loss zone), then use ::before to have text below each (strike price | start price)-->
+									<div class="topValue"></div>
+									<div class="bottomValue"></div>
+								</div>
+							</div>
+						</div>
 						<div class="optionSummary">
 							`+activity_btn+`
 							`+action_btn+`
@@ -516,7 +529,7 @@
 	</div>
 	
 	
-	<!-- scrool to top button -->
+	<!-- Scroll to top button -->
 	<button id="goTop" title="Scroll to top">
 		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 450"><path d="M168.5 164.2l148 146.8c4.7 4.7 4.7 12.3 0 17l-19.8 19.8c-4.7 4.7-12.3 4.7-17 0L160 229.3 40.3 347.8c-4.7 4.7-12.3 4.7-17 0L3.5 328c-4.7-4.7-4.7-12.3 0-17l148-146.8c4.7-4.7 12.3-4.7 17 0z"></path></svg>
 	</button>
