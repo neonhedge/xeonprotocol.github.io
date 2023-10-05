@@ -411,7 +411,7 @@ async function fetchOptionCard(optionId){
 			var projectCard = `
 			<div class="tl_hedgeCard statemark_ill_wish">				
 				<div class="tl_hedgeGrid">
-					<div class="projectLogo" style="background-image:url('imgs/monkeytrain.png')"></div>
+					<div class="projectLogo" style="background-image:url('./imgs/cosmictravel.webp')"></div>
 					<div class="projectName">
 						<div>`+name+`<a class="social_links" href="https://etherscan.io/address/'`+pairAddress+`" target="_blank" alt="SC" title="Go to Etherscan">`+truncatedTokenAdd+`</a></div>
 						<div class="tl_bagsize">`+amount+` `+symbol+`</div>
@@ -427,9 +427,21 @@ async function fetchOptionCard(optionId){
 						<div class="assetsTypeValue flux highlightOption">`+hedgeType+`</div>
 					</div>
 				</div>
-				<div class="optionMark"><span>Strike:</span><span class="oMfigure">`+strikevalue+` `+pairSymbol+`</span></div>
-				<div class="optionMark"><span>Premium:</span><span class="oMfigure">`+cost+` `+pairSymbol+`</span></div>
-				<div class="optionMark"><span>Expires:</span><span class="oMfigure">`+timeToExpiry+` `+timeToExpiry+`</span></div>
+
+				<div class="strategyContainer">
+					<div class="optionMarksHold">
+						<div class="optionMark"><span>Strike:</span><span class="oMfigure">`+strikevalue+` `+pairSymbol+`</span></div>
+						<div class="optionMark"><span>Premium:</span><span class="oMfigure">`+cost+` `+pairSymbol+`</span></div>
+						<div class="optionMark"><span>Expires:</span><span class="oMfigure">`+timeToExpiry+` `+timeToExpiry+`</span></div>
+					</div>
+					<div class="strategyHold">
+						<img class="strategyImage" src="./imgs/call-option.svg" />
+						<div class="strategyDataHold">
+							<div class="topValue">profit zone</div>
+							<div class="bottomValue">max loss 0.0002eth</div>
+						</div>
+					</div>
+				</div>
 				<div class="optionSummary">
 					`+activity_btn+`
 					`+action_btn+`
