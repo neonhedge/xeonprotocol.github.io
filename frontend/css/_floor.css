@@ -671,15 +671,15 @@ fieldset input{
 }
 
 .strategyHold {
-    flex-basis: 50%;
     display: flex;
+  	min-width: 210px;
 }
 
 .strategyImage {
 	display:block;
     flex-basis: 50%;
     height: 100%; /* Take 100% of the height of the .strategyHold */
-	transform: scale(0.75) translateX(12px);
+	transform: scale(0.75) translateX(16.5px);
 }
 
 .strategyDataHold {
