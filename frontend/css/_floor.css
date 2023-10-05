@@ -577,7 +577,7 @@ fieldset input{
 	font-size: 13px;
   }
   
-  /* Option styles */
+  /* Option Values Styles */
   .valueHold {
 	display: flex;
 	justify-content: space-between;
@@ -658,7 +658,70 @@ fieldset input{
   	justify-content: center;
   }
   
-  /* Option mark styles */
+  /* Option Strategy Values & Graphics */
+.strategyContainer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    column-gap: 0.5vw;
+}
+
+.optionMarksHold {
+    flex-basis: 50%;
+}
+
+.strategyHold {
+    flex-basis: 50%;
+    display: flex;
+}
+
+.strategyImage {
+	display:block;
+    flex-basis: 50%;
+    height: 100%; /* Take 100% of the height of the .strategyHold */
+	transform: scale(0.75);
+}
+
+.strategyDataHold {
+	display: flex;
+    flex-basis: 50%;
+	flex-flow: column;
+	justify-content: space-around;
+	align-items: center;
+	font-family: "Space Grotesk", sans-serif;
+	font-weight: 300;
+	font-size: 10.5px;
+}
+
+.topValue {
+	position: relative;
+	color:#23e798;
+	height: 15px;
+	width: 100%;
+	border-radius: 5px;
+}
+.topValue::after{
+	content: "strike price";
+	text-transform: uppercase;
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: -20.5px;
+	width: 100%;
+	height: 2px;
+	color: #fff;
+	font-size: 7px;
+	font-weight: 100;
+	letter-spacing: 0.1px;
+	border-top: 1.2px dashed #36cc86;
+}
+
+.bottomValue {
+	color:#ef7272;
+	white-space: nowrap;
+	letter-spacing: 0.1px;
+	text-align: center;
+}
   .optionMarkContainer {
 	text-align: center;
 	margin-top: 15px;
