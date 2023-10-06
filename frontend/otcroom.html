@@ -104,7 +104,7 @@
 			<div class="left-paner-parent">
 				<aside id="leftpaner">
 					<div class="clubSinnage neon-blue">
-						<h4 title="P2P options market place">> OTC Markets</h4>
+						<h4 title="P2P options market place">> _OTC___Rooms_</h4>
 					</div>
 					<div class="asideNavs">
 						<div class="asideNavsinside" id="erc20Options" title="create - buy - discover and track OTC ERC20 Call | Put Options">Options</div>
@@ -148,7 +148,7 @@
                     </div>
                 </div>
                 <div id="hedgesTimeline" class="hedgesTimeline">
-                    <!-- OTC deal cards in here -->
+                    <!-- OTC Hedge/Deal Cards/Lists (in future) -->
 					<div class="tl_hedgeCard statemark_ill_wish">				
 						<div class="tl_hedgeGrid">
 							<div class="projectLogo" style="background-image:url('./imgs/cosmictravel.webp')"></div>
@@ -159,7 +159,7 @@
 						</div>
 						<div class="valueHold">
 							<div class="assetsValue">
-								<div class="valueTitle">VALUE</div>
+								<div class="valueTitle"></div>
 								<div class="assetsMarketValue flux highlightOption">`+marketvalue+` `+pairSymbol+`</div>
 							</div>
 							<div class="assetsType">
@@ -177,9 +177,8 @@
 							<div class="strategyHold">
 								<img class="strategyImage" src="./imgs/call-option.svg" />
 								<div class="strategyDataHold">
-									<!-- two divs, each with values at center: (open profit zone | max loss zone), then use ::before to have text below each (strike price | start price)-->
-									<div class="topValue">profit zone</div>
-									<div class="bottomValue">max loss 0.0002eth</div>
+									<div class="topValue-call">profit zone</div>
+									<div class="bottomValue-call">max loss 0.0002eth</div>
 								</div>
 							</div>
 						</div>
@@ -192,7 +191,7 @@
 							</div>
 						</div>
 					</div>
-					<div class="hedgeCard statemark_ill_wish">				
+					<div class="tl_hedgeCard statemark_ill_wish">				
 						<div class="tl_hedgeGrid">
 							<div class="projectLogo" style="background-image:url('./imgs/cosmictravel.webp')"></div>
 							<div class="projectName">
@@ -201,25 +200,40 @@
 							</div>
 						</div>
 						<div class="valueHold">
-							<div class="assetsMarketValue flux highlightOption"><div class="valueTitle">VALUE</div>12 ETH</div>
-							<div class="assetsType flux highlightOption">Put Option</div>
+							<div class="assetsValue">
+								<div class="valueTitle"></div>
+								<div class="assetsMarketValue flux highlightOption">`+marketvalue+` `+pairSymbol+`</div>
+							</div>
+							<div class="assetsType">
+								<div class="typeTitle">HEDGE</div>
+								<div class="assetsTypeValue flux highlightOption">`+hedgeType+`</div>
+							</div>
 						</div>
 
-						<div class="optionMark"><span>Strk:</span><span class="oMfigure">`+strikevalue+` `+pairSymbol+`</span></div>
-						<div class="optionMark"><span>Cost:</span><span class="oMfigure">`+cost+` `+pairSymbol+`</span></div>
-						<div class="optionMark"><span>Time:</span><span class="oMfigure">`+timeToExpiry+` `+timeToExpiry+`</span></div>
-						<div class="optionSummary">
-							<div class="option_S_tab _bullbear">
-								<span class="status-dot inprogress"><svg stroke="currentColor" fill="#188dd6" stroke-width="0" viewBox="0 0 16 16" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><circle cx="8" cy="8" r="8"></circle></svg><span style="white-space: nowrap;">Vacant</span></span>
+						<div class="strategyContainer">
+							<div class="optionMarksHold">
+								<div class="optionMark"><span>Strike:</span><span class="oMfigure">`+strikevalue+` `+pairSymbol+`</span></div>
+								<div class="optionMark"><span>Premium:</span><span class="oMfigure">`+cost+` `+pairSymbol+`</span></div>
+								<div class="optionMark"><span>Expires:</span><span class="oMfigure">`+timeToExpiry+` `+timeToExpiry+`</span></div>
 							</div>
-							<div id='"+optionId+"buyButton' class='option_S_tab actionButton buyButton'>Buy Option</div>
+							<div class="strategyHold">
+								<img class="strategyImage" src="./imgs/put-option.svg" />
+								<div class="strategyDataHold">
+									<div class="topValue-put">max loss 0.0002eth</div>
+									<div class="bottomValue-put">profit zone</div>
+								</div>
+							</div>
+						</div>
+						<div class="optionSummary">
+							`+activity_btn+`
+							`+action_btn+`
 							<div class="option_S_tab _bookmarkjump">
 								<a class="view_project" href="hedge.html?id=`+optionId+`" target="_blank" alt="View" title="full details">view</a>
-								<div class='raise_S_tab _bookmarkjump' onclick='"+bookmark+"'><img src='imgs/bookmark_.png' width='18px'/></div>
+								`+bookmark_btn+`
 							</div>
 						</div>
 					</div>
-					<div class="hedgeCard statemark_ill_wish">				
+					<div class="tl_hedgeCard statemark_ill_wish">				
 						<div class="tl_hedgeGrid">
 							<div class="projectLogo" style="background-image:url('./imgs/cosmictravel.webp')"></div>
 							<div class="projectName">
@@ -228,38 +242,30 @@
 							</div>
 						</div>
 						<div class="valueHold">
-							<div class="optionMarketValue flux highlightOption">0.54 ETH</div>
-							<div class="optionType flux highlightOption">PUT OPTION</div>
-						</div>
-						<div class="optionMark"><span>Strk:</span><span class="oMfigure">`+strikevalue+` `+pairSymbol+`</span></div>
-						<div class="optionMark"><span>Cost:</span><span class="oMfigure">`+cost+` `+pairSymbol+`</span></div>
-						<div class="optionMark"><span>Time:</span><span class="oMfigure">`+timeToExpiry+` `+timeToExpiry+`</span></div>
-						<div class="optionSummary">
-							<div class="option_S_tab _bullbear">
-								<span class="status-dot inprogress"><svg stroke="currentColor" fill="#188dd6" stroke-width="0" viewBox="0 0 16 16" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><circle cx="8" cy="8" r="8"></circle></svg><span style="white-space: nowrap;">Vacant</span></span>
+							<div class="assetsValue">
+								<div class="valueTitle"></div>
+								<div class="assetsMarketValue flux highlightOption">`+marketvalue+` `+pairSymbol+`</div>
 							</div>
-							<div id='"+optionId+"buyButton' class='option_S_tab actionButton buyButton'>Buy Option</div>
-							<div class="option_S_tab _bookmarkjump">
-								<a class="view_project" href="hedge.html?id=`+optionId+`" target="_blank" alt="View" title="full details">view</a>
-								<div class='raise_S_tab _bookmarkjump' onclick='"+bookmark+"'><img src='imgs/bookmark_.png' width='18px'/></div>
+							<div class="assetsType">
+								<div class="typeTitle">HEDGE</div>
+								<div class="assetsTypeValue flux highlightOption">`+hedgeType+`</div>
 							</div>
 						</div>
-					</div>
-					<div class="hedgeCard statemark_ill_wish">				
-						<div class="hedgeGrid">
-							<div class="tokenLogoLeft" style="background-image:url('imgs/monkeytrain.png')"></div>
-							<div class="tokenName">
-								<div>`+name+`<a class="social_links" href="https://etherscan.io/address/'`+pairAddress+`" target="_blank" alt="SC" title="Go to Etherscan">`+truncatedTokenAdd+`</a></div>
-								<div class="bagsize">`+amount+` `+symbol+`</div>
+
+						<div class="strategyContainer">
+							<div class="optionMarksHold">
+								<div class="optionMark"><span>Strike:</span><span class="oMfigure">`+strikevalue+` `+pairSymbol+`</span></div>
+								<div class="optionMark"><span>Premium:</span><span class="oMfigure">`+cost+` `+pairSymbol+`</span></div>
+								<div class="optionMark"><span>Expires:</span><span class="oMfigure">`+timeToExpiry+` `+timeToExpiry+`</span></div>
+							</div>
+							<div class="strategyHold">
+								<img class="strategyImage" src="./imgs/call-option.svg" />
+								<div class="strategyDataHold">
+									<div class="topValue-call">profit zone</div>
+									<div class="bottomValue-call">max loss 0.0002eth</div>
+								</div>
 							</div>
 						</div>
-						<div class="valueHold">
-							<div class="optionMarketValue flux highlightOption">`+marketvalue+` `+pairSymbol+`</div>
-							<div class="optionType flux highlightOption">`+hedgeType+`</div>
-						</div>
-						<div class="optionMark"><span>Strk:</span><span class="oMfigure">`+strikevalue+` `+pairSymbol+`</span></div>
-						<div class="optionMark"><span>Cost:</span><span class="oMfigure">`+cost+` `+pairSymbol+`</span></div>
-						<div class="optionMark"><span>Time:</span><span class="oMfigure">`+timeToExpiry+`</span></div>
 						<div class="optionSummary">
 							`+activity_btn+`
 							`+action_btn+`
@@ -269,21 +275,39 @@
 							</div>
 						</div>
 					</div>
-					<div class="hedgeCard statemark_ill_wish">				
-						<div class="hedgeGrid">
-							<div class="tokenLogoLeft" style="background-image:url('imgs/monkeytrain.png')"></div>
-							<div class="tokenName">
+					<div class="tl_hedgeCard statemark_ill_wish">				
+						<div class="tl_hedgeGrid">
+							<div class="projectLogo" style="background-image:url('./imgs/cosmictravel.webp')"></div>
+							<div class="projectName">
 								<div>`+name+`<a class="social_links" href="https://etherscan.io/address/'`+pairAddress+`" target="_blank" alt="SC" title="Go to Etherscan">`+truncatedTokenAdd+`</a></div>
-								<div class="bagsize">`+amount+` `+symbol+`</div>
+								<div class="tl_bagsize">`+amount+` `+symbol+`</div>
 							</div>
 						</div>
 						<div class="valueHold">
-							<div class="optionMarketValue flux highlightOption">`+marketvalue+` `+pairSymbol+`</div>
-							<div class="optionType flux highlightOption">`+hedgeType+`</div>
+							<div class="assetsValue">
+								<div class="valueTitle"></div>
+								<div class="assetsMarketValue flux highlightOption">`+marketvalue+` `+pairSymbol+`</div>
+							</div>
+							<div class="assetsType">
+								<div class="typeTitle">HEDGE</div>
+								<div class="assetsTypeValue flux highlightOption">`+hedgeType+`</div>
+							</div>
 						</div>
-						<div class="optionMark"><span>Strk:</span><span class="oMfigure">`+strikevalue+` `+pairSymbol+`</span></div>
-						<div class="optionMark"><span>Cost:</span><span class="oMfigure">`+cost+` `+pairSymbol+`</span></div>
-						<div class="optionMark"><span>Time:</span><span class="oMfigure">`+timeToExpiry+`</span></div>
+
+						<div class="strategyContainer">
+							<div class="optionMarksHold">
+								<div class="optionMark"><span>Strike:</span><span class="oMfigure">`+strikevalue+` `+pairSymbol+`</span></div>
+								<div class="optionMark"><span>Premium:</span><span class="oMfigure">`+cost+` `+pairSymbol+`</span></div>
+								<div class="optionMark"><span>Expires:</span><span class="oMfigure">`+timeToExpiry+` `+timeToExpiry+`</span></div>
+							</div>
+							<div class="strategyHold">
+								<img class="strategyImage" src="./imgs/call-option.svg" />
+								<div class="strategyDataHold">
+									<div class="topValue-call">profit zone</div>
+									<div class="bottomValue-call">max loss 0.0002eth</div>
+								</div>
+							</div>
+						</div>
 						<div class="optionSummary">
 							`+activity_btn+`
 							`+action_btn+`
@@ -293,21 +317,81 @@
 							</div>
 						</div>
 					</div>
-					<div class="hedgeCard statemark_ill_wish">				
-						<div class="hedgeGrid">
-							<div class="tokenLogoLeft" style="background-image:url('./imgs/cosmictravel.webp')"></div>
-							<div class="tokenName">
+					<div class="tl_hedgeCard statemark_ill_wish">				
+						<div class="tl_hedgeGrid">
+							<div class="projectLogo" style="background-image:url('./imgs/cosmictravel.webp')"></div>
+							<div class="projectName">
 								<div>`+name+`<a class="social_links" href="https://etherscan.io/address/'`+pairAddress+`" target="_blank" alt="SC" title="Go to Etherscan">`+truncatedTokenAdd+`</a></div>
-								<div class="bagsize">`+amount+` `+symbol+`</div>
+								<div class="tl_bagsize">`+amount+` `+symbol+`</div>
 							</div>
 						</div>
 						<div class="valueHold">
-							<div class="optionMarketValue flux highlightOption">`+marketvalue+` `+pairSymbol+`</div>
-							<div class="optionType flux highlightOption">`+hedgeType+`</div>
+							<div class="assetsValue">
+								<div class="valueTitle"></div>
+								<div class="assetsMarketValue flux highlightOption">`+marketvalue+` `+pairSymbol+`</div>
+							</div>
+							<div class="assetsType">
+								<div class="typeTitle">HEDGE</div>
+								<div class="assetsTypeValue flux highlightOption">`+hedgeType+`</div>
+							</div>
 						</div>
-						<div class="optionMark"><span>Strk:</span><span class="oMfigure">`+strikevalue+` `+pairSymbol+`</span></div>
-						<div class="optionMark"><span>Cost:</span><span class="oMfigure">`+cost+` `+pairSymbol+`</span></div>
-						<div class="optionMark"><span>Time:</span><span class="oMfigure">`+timeToExpiry+`</span></div>
+
+						<div class="strategyContainer">
+							<div class="optionMarksHold">
+								<div class="optionMark"><span>Strike:</span><span class="oMfigure">`+strikevalue+` `+pairSymbol+`</span></div>
+								<div class="optionMark"><span>Premium:</span><span class="oMfigure">`+cost+` `+pairSymbol+`</span></div>
+								<div class="optionMark"><span>Expires:</span><span class="oMfigure">`+timeToExpiry+` `+timeToExpiry+`</span></div>
+							</div>
+							<div class="strategyHold">
+								<img class="strategyImage" src="./imgs/put-option.svg" />
+								<div class="strategyDataHold">
+									<div class="topValue-put">max loss 0.0002eth</div>
+									<div class="bottomValue-put">profit zone</div>
+								</div>
+							</div>
+						</div>
+						<div class="optionSummary">
+							`+activity_btn+`
+							`+action_btn+`
+							<div class="option_S_tab _bookmarkjump">
+								<a class="view_project" href="hedge.html?id=`+optionId+`" target="_blank" alt="View" title="full details">view</a>
+								`+bookmark_btn+`
+							</div>
+						</div>
+					</div>
+					<div class="tl_hedgeCard statemark_ill_wish">				
+						<div class="tl_hedgeGrid">
+							<div class="projectLogo" style="background-image:url('./imgs/cosmictravel.webp')"></div>
+							<div class="projectName">
+								<div>`+name+`<a class="social_links" href="https://etherscan.io/address/'`+pairAddress+`" target="_blank" alt="SC" title="Go to Etherscan">`+truncatedTokenAdd+`</a></div>
+								<div class="tl_bagsize">`+amount+` `+symbol+`</div>
+							</div>
+						</div>
+						<div class="valueHold">
+							<div class="assetsValue">
+								<div class="valueTitle"></div>
+								<div class="assetsMarketValue flux highlightOption">`+marketvalue+` `+pairSymbol+`</div>
+							</div>
+							<div class="assetsType">
+								<div class="typeTitle">HEDGE</div>
+								<div class="assetsTypeValue flux highlightOption">`+hedgeType+`</div>
+							</div>
+						</div>
+
+						<div class="strategyContainer">
+							<div class="optionMarksHold">
+								<div class="optionMark"><span>Strike:</span><span class="oMfigure">`+strikevalue+` `+pairSymbol+`</span></div>
+								<div class="optionMark"><span>Premium:</span><span class="oMfigure">`+cost+` `+pairSymbol+`</span></div>
+								<div class="optionMark"><span>Expires:</span><span class="oMfigure">`+timeToExpiry+` `+timeToExpiry+`</span></div>
+							</div>
+							<div class="strategyHold">
+								<img class="strategyImage" src="./imgs/put-option.svg" />
+								<div class="strategyDataHold">
+									<div class="topValue-put">max loss 0.0002eth</div>
+									<div class="bottomValue-put">profit zone</div>
+								</div>
+							</div>
+						</div>
 						<div class="optionSummary">
 							`+activity_btn+`
 							`+action_btn+`
@@ -321,8 +405,8 @@
             </div><!-- timeline close -->
 
 			<div class="rewardsInformer">**
-				SocialFi + OTC = <i class="fa fa-heart" aria-hidden="true"></i>
-				Friendly UI for OTC timeline. Write, buy, discover ERC20 hedges & loans here.
+				Aesthetic UI + OTC = <i class="fa fa-heart" aria-hidden="true"></i>
+				Explore our aesthetic refined UI. Write, Buy, Discover ERC20 hedges & loans here.
 			</div>
 			<div id="sidebar">
 				<div id="volumeStats">
