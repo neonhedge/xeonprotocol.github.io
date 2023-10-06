@@ -373,6 +373,31 @@ async function fetchOptionCard(optionId){
 		let minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
 		let seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
 		let timeToExpiry = days + " D " + hours + " H " + minutes + " M " + seconds + " S";
+
+		//strategy description for the option
+		let strategyWidget, description;
+		if(hedgeType == 'CALL') {
+			description = `In ${timeToExpiry}<br>Taker is in profit when market price is ABOVE strike price. Market - Strike = Profit Margin. <br>Taker has max loss of ${cost}${pairSymbol} if market price is ABOVE strike price.`;
+			strategyWidget = `
+			<div class="strategyHold" title="`+description+`">
+				<img class="strategyImage" src="./imgs/call-option.svg" />
+				<div class="strategyDataHold">
+					<div class="topValue-call">profit zone</div>
+					<div class="bottomValue-call">max loss `+cost+``+pairSymbol+`</div>
+				</div>
+			</div>`;
+		}
+		if(hedgeType == 'PUT') {
+			description = `In ${timeToExpiry}<br>Taker is in profit when market price is BELOW strike price. Strike - Market = Profit Margin. <br>Taker has max loss of ${cost}${pairSymbol} if market price is ABOVE strike price.`;
+			strategyWidget = `
+			<div class="strategyHold" title="`+description+`">
+				<img class="strategyImage" src="./imgs/put-option.svg" />
+				<div class="strategyDataHold">
+					<div class="topValue-put">max loss `+cost+``+pairSymbol+`</div>
+					<div class="bottomValue-put">profit zone</div>
+				</div>
+			</div>`;
+		}
 		//option action button: buy, running/settle, expired
 		let action_btn, activity_btn;
 		if(status == 1){
@@ -401,10 +426,10 @@ async function fetchOptionCard(optionId){
 		var unbookmark = 'removeBookmark("'+optionId+'")';
 		var bookmarkState = await hedgingInstance.methods.getBookmark(MyGlobals.wallet, optionId).call();
 		if(!bookmarkState){
-			var bookmark_btn = "<div class='raise_S_tab _bookmarkjump' onclick='"+bookmark+"'><img src='imgs/bookmark_.png' width='18px'/></div>";
+			var bookmark_btn = "<div class='raise_S_tab _bookmarkjump' onclick='"+bookmark+"'><img src='./imgs/bookmark_.png' width='18px'/></div>";
 		}
 		if(bookmarkState){
-			var bookmark_btn = "<div class='raise_S_tab _bookmarkjump' onclick='"+unbookmark+"'><img src='imgs/unbookmark_.png' width='18px'/></div>";
+			var bookmark_btn = "<div class='raise_S_tab _bookmarkjump' onclick='"+unbookmark+"'><img src='./imgs/unbookmark_.png' width='18px'/></div>";
 		}
 		//display nav 1 - vacant option
 		if(window.nav == 1){
@@ -434,13 +459,7 @@ async function fetchOptionCard(optionId){
 						<div class="optionMark"><span>Premium:</span><span class="oMfigure">`+cost+` `+pairSymbol+`</span></div>
 						<div class="optionMark"><span>Expires:</span><span class="oMfigure">`+timeToExpiry+` `+timeToExpiry+`</span></div>
 					</div>
-					<div class="strategyHold">
-						<img class="strategyImage" src="./imgs/call-option.svg" />
-						<div class="strategyDataHold">
-							<div class="topValue">profit zone</div>
-							<div class="bottomValue">max loss 0.0002eth</div>
-						</div>
-					</div>
+					`+strategyWidget+`
 				</div>
 				<div class="optionSummary">
 					`+activity_btn+`
