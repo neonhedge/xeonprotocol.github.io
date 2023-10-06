@@ -198,7 +198,8 @@ header {
   .user-card .icon{
 	display: block;
 	color:#fff6d4;
-	text-shadow: 0 0 2px #188dd6, 0 0 3px #188dd6, 0 0 5px #188dd6, 0 0 5px #38eeff, 0 0 3px #38eeff, 2px 2px 0.5px #38eeff !important;
+	color:unset;
+	text-shadow: 0 0 2px #188dd6, 0 0 3px #188dd6, 0 0 5px #188dd6, 0 0 5px #38eeff, 0 0 3px #188dd6, 2px 2px 0.5px #188dd6 !important;
 	color: #10102c;
 	font-size: 60px;
 
