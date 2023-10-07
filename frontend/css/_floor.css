@@ -54,8 +54,29 @@ body{
 	background-color: rgba(29, 129, 216, 0.2);
 */
 	background-color: rgba(29, 129, 216, 0.15);
-	display: none;
+	animation: hideDiv 30s forwards;
+	transition: 0.5s;
 }
+@keyframes hideDiv {
+	0% {
+	  opacity: 1;
+	  visibility: visible;
+	}
+	95% {
+		opacity: 0.95;
+	}
+	99.9% {
+	  opacity: 0;
+	  visibility: hidden;
+	}
+	100% {
+	  opacity: 0;
+	  visibility: hidden;
+	  display: none;
+	}
+ }
+
+  
 section.sectionCenter {
 	position: relative;
 	display: grid;
@@ -546,8 +567,8 @@ fieldset input{
 }
 .projectName{
     display: inline-block;
-	font-weight: 600;
-	font-size: clamp(16px, 2vw, 19px);
+	font-weight: 200;
+	font-size: clamp(16px, 1vw, 19px);
 	text-align: left;
 }
 .tl_bagsize {
@@ -621,16 +642,13 @@ fieldset input{
 	background-color: unset; /* disable to shade the value area */
 	color: rgb(8, 231, 254);
   }
-  
   .assetsTypeValue {
 	border-radius: 5px;
 	color: unset;
   }
-
   .assetsMarketValue, .valueTitle {
-	font-size: 18px;
+	font-size: clamp(18px, 2vw, 20px);
   }
-
   .valueTitle {
 	background: url('../imgs/moon4.webp') no-repeat right;
 	background-size: contain;
@@ -772,20 +790,18 @@ fieldset input{
 	display: flex; /* Use flexbox */
 	align-items: center; /* Align text vertically center */
 	width: unset;
-	min-width: 50px;
+	min-width: 75px;
 	letter-spacing: unset;
 	text-align: left;
 	padding-inline: 8px;
 	font-family: "Nunito Sans", monospace, sans-serif !important;
-	font-size: clamp(13px, 1vw, 13.5px);
-	color: rgb(139, 149, 158);
   }
   
   .oMfigure {
 	flex-grow: 1;
 	text-align: left !important;
 	font-size: clamp(15px, 2vw, 17px) !important;
-	font-weight: 500 !important;
+	font-weight: 100 !important;
 	color: #fff !important;
 }
 
