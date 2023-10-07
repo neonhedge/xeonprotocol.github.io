@@ -526,13 +526,11 @@ fieldset input{
     position: relative;
 	width:100%;
     margin:0px auto;
-    border-bottom: 0.5px dotted #a1a1a1;
-	border-bottom: 1.5px solid rgba(15, 8, 46, 0.5);
+	border-bottom: 1.5px solid rgba(22, 13, 60, 0.9);
     text-align: center;
-
+	
     display: flex;
-    justify-content: start;    
-    padding-bottom: 4px;
+    justify-content: start;
     box-sizing: border-box;
 }
 .tl_hedgeCard {
@@ -549,7 +547,6 @@ fieldset input{
 	font-size: clamp(14px, 1vw, 16px);
 	padding: 1vw;
 	box-sizing: border-box;
-	background: linear-gradient(60deg, #131145 0%, #1b1b49 100%) !important;
 	background-image: radial-gradient(#131145, #1b1b49 100%) !important;
 	background: radial-gradient(#131145, #1d1f56 80%) !important;
 	color: #EEE;
