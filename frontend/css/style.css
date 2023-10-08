@@ -84,7 +84,7 @@ iframe {
 }
 
 #preload {
-  display: block;
+  display: none;
   position: fixed;
   inset: 0;
   width: 100%;
@@ -963,7 +963,7 @@ section.er404 {
   margin-bottom: 0;
 }
 #mission, #neon_protocol, #platform, #neon-howitworks, #hedgingTools, #uxDesign, #mediaH1, #timeline, #tokenomics {
-	font-size: clamp(25px, 5vw, 35px);
+	font-size: clamp(25px, 5vw, 36px);
 	font-family: 'Neon',monospace, sans-serif, "Helvetica Neue", Helvetica, "Liberation Sans"!important;
 	font-weight:200;
  /* color:#08e7fe; */
@@ -989,9 +989,9 @@ section.er404 {
   }
 }
 .neon-blue {
-  text-shadow: 0 0 2px #188dd6, 0 0 3px #188dd6, 0 0 15px #188dd6, 0 0 15px #188dd6, 0 0 3px #188dd6, 3px 3px 0.5px #0e567c !important;
-  color: #08e7fe !important;/* darker */
+  text-shadow: 0 0 2px #188dd6, 0 0 3px #188dd6, 0 0 15px #188dd6, 0 0 15px #188dd6, 0 0 3px #188dd6, 3px 3px 0.5px #0e567c !important;  
   color: #92f1fc !important;
+  color: #08e7fe !important;/* darker */
 }
 .howitworks img {
   width: clamp(250px, 30vw, 400px) !important;
@@ -1004,8 +1004,8 @@ section.er404 {
 }
 #glitch {
 	text-shadow: 0 0 2px #188dd6, 0 0 3px #188dd6, 0 0 15px #188dd6, 0 0 15px #188dd6, 0 0 3px #188dd6, 3px 3px 0.5px #0e567c !important;
-  color: #08e7fe !important; /* darker */
   color: #92f1fc !important;
+  color: #08e7fe !important; /* darker */
 	-webkit-animation: fadee 7s infinite alternate;
 	-moz-animation: fadee 7s infinite alternate;
 	-o-animation: fadee 7s infinite alternate;

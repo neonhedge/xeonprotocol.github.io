@@ -37,7 +37,7 @@ body{
 	right: 0;
 	margin-left: 20px;
 	margin-right: 20px;
-	top:-50px;
+	top:-70px;
 	z-index: 10;
 
 	padding: 5px 20px;
@@ -552,15 +552,20 @@ fieldset input{
 	color: #EEE;
   }
 .projectLogo {
+	display: inline-block;
     position: relative;
     margin-inline: 1.5vw;
     width: 50px;
     height: 50px;
+	
     background-position: center;
     background-repeat: no-repeat;
     background-size: contain;
-    border-radius: 50%;
-    display: inline-block;
+
+	border:0.5px solid rgb(8, 231, 254);
+	border-image-source: linear-gradient(to top, #d6188a 20%, #188dd6 100%);
+	border-image-slice: 1;
+	border-radius: 50% !important;
 }
 .projectName{
     display: inline-block;
@@ -923,16 +928,14 @@ fieldset input{
     font-weight:400 !important;
     white-space: nowrap;
 }
-.social_links {
+.blockexplorer {
     display: inline-flex;
     padding: 2px;
     box-sizing: border-box;
-    background-color: #0f0931;
 	margin-left: 2vw;
 	font-size: 14px;
-	box-shadow: 0 0 .1rem #fff, inset 0 0 .1rem #fff, 0 0 0.7rem var(--neon-border-color), inset 0 0 0.5rem var(--neon-border-color), 0 0 0.3rem var(--neon-border-color), inset 0 0 0.3rem var(--neon-border-color);      
 }
-.social_links img{
+.blockexplorer img{
     width:18px;
     color: #252525  !important;
 }
@@ -1055,9 +1058,18 @@ fieldset input{
 .our_social_links{
 	display: inline-block;
 	margin: 0 auto;
-	padding: 2%;
+	padding: 2px;
 	box-sizing: border-box;
-	background-color: #d6188a;
+	background-color: rgb(37, 134, 232);
+	background-color: #39f;
+	box-shadow: 0 0 .1rem #0f0931, inset 0 0 .1rem #0f0931, 0 0 0.4rem var(--neon-border-color), inset 0 0 0.3rem var(--neon-border-color), 0 0 0.2rem var(--neon-border-color), inset 0 0 0.2rem var(--neon-border-color);
+	border-radius: 50%;
+}
+.our_social_links img{
+	display: block;
+	width: 28px;
+	height: 28px;
+	color: rgb(8, 231, 254);
 }
 
 /* CTA must be higher than side pane on floor.html */
