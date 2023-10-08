@@ -311,7 +311,7 @@ color: #FED128;
 	padding: 0.5rem;
 	box-sizing: border-box;
 	background-color: transparent;
-	border: 0.5px solid #08e7fe;
+	/* border: 0.5px solid #08e7fe; */
 	outline: none;
 	overflow: hidden;
 	cursor: pointer;
@@ -320,7 +320,7 @@ color: #FED128;
 	font-weight:100;
 
 	animation: flicker 1.5s infinite alternate;
-	transition: all 0.2s ease-in-out;
+	transition: all 0.5s ease-in-out;
   }
 /* Animate neon flicker */
 @keyframes flicker {
@@ -515,7 +515,7 @@ fieldset input{
 }
 @media (max-width: 900px) {
 	aside, .timelineHold {
-		padding:0 2vw;
+		padding:unset;
 		transition: 0.5s;
 	}
 }
@@ -526,7 +526,9 @@ fieldset input{
     position: relative;
 	width:100%;
     margin:0px auto;
+	/*
 	border-bottom: 1.5px solid rgba(22, 13, 60, 0.9);
+	*/
     text-align: center;
 	
     display: flex;
@@ -545,7 +547,7 @@ fieldset input{
 	line-height: 1.5;
 	font-family: 'modeseven', 'bitwise', sans-serif, "Helvetica Neue", Helvetica, Arial;
 	font-size: clamp(14px, 1vw, 16px);
-	padding: 1vw;
+	padding: 0.8vw;
 	box-sizing: border-box;
 	background-image: radial-gradient(#131145, #1b1b49 100%) !important;
 	background: radial-gradient(#131145, #1d1f56 80%) !important;
@@ -563,8 +565,10 @@ fieldset input{
     background-size: contain;
 
 	border:0.5px solid rgb(8, 231, 254);
+	/*
 	border-image-source: linear-gradient(to top, #d6188a 20%, #188dd6 100%);
 	border-image-slice: 1;
+	*/
 	border-radius: 50% !important;
 }
 .projectName{
@@ -579,6 +583,7 @@ fieldset input{
 	font-size: 14px;
 	color: #188dd6;
 	color:#FFF;
+	color: rgb(139, 149, 158);
 	text-align: left;
 }
   
@@ -610,6 +615,7 @@ fieldset input{
 	display: flex;
 	justify-content: space-around;
 	align-items: center;
+	transform: translateX(10px);
   }
   
   .assetsValue,
@@ -643,10 +649,15 @@ fieldset input{
 	text-shadow: 0 0 1.5vw #38409b;
 	background-color: unset; /* disable to shade the value area */
 	color: rgb(8, 231, 254);
+	transform: translateX(-15px);
+	padding: unset;
   }
   .assetsTypeValue {
 	border-radius: 5px;
 	color: unset;
+	padding: unset;
+	font-size: clamp(15px, 1vw, 15px);
+  	font-weight: 100;
   }
   .assetsMarketValue, .valueTitle {
 	font-size: clamp(18px, 2vw, 20px);
@@ -694,10 +705,10 @@ fieldset input{
 	display:block;
     flex-basis: 50%;
     height: 100%; /* Take 100% of the height of the .strategyHold */
-	transform: scale(0.75) translateX(19.5px);
+	transform: scale(0.75) translateX(10.5px);
 }
 .strategyDataHold {
-	transform: translateX(-10px);
+	transform: translateX(-19.5px);
 	display: flex;
     flex-basis: 50%;
 	flex-flow: column;
@@ -768,18 +779,18 @@ fieldset input{
   
   .optionMark {
 	position: relative;
-	width:200px;
+	width:100%;
 	height: auto;
 	flex-basis: 30%;
 	display: flex;
 	
-	padding: 5px;
+	padding: 0.4vw;
 	box-sizing: border-box;
 	text-align: center;
-	font-size: clamp(13px, 1vw, 14px);
+	font-size: clamp(13px, 1vw, 13.5px);
 	font-weight: 100;
 	line-height: 1;
-	text-transform: capitalize;
+	text-transform: unset;
 	background-color: rgba(0, 0, 0, 0.1);
 	border-radius: 1vw;
 	border: 0.5px solid #08f;
@@ -792,19 +803,39 @@ fieldset input{
 	display: flex; /* Use flexbox */
 	align-items: center; /* Align text vertically center */
 	width: unset;
-	min-width: 75px;
+	min-width: 90px;
 	letter-spacing: unset;
 	text-align: left;
-	padding-inline: 8px;
+	padding-inline: 1vw 0px;
 	font-family: "Nunito Sans", monospace, sans-serif !important;
+	/* font-family: "Space Grotesk", sans-serif !important; */
+	color: rgb(139, 149, 158);
   }
+  @media (max-width: 400px) {
+	.tl_hedgeCard {
+		padding: 1vw;
+	}
+	.optionMark {
+		max-width: 160px;
+		padding: 1vw;
+	}
+	.optionMark span {
+		min-width: 70px;
+	}
+	.strategyHold {
+		transform: scale(0.9);
+	}
+}
   
   .oMfigure {
+	min-width: unset !important;
 	flex-grow: 1;
 	text-align: left !important;
 	font-size: clamp(15px, 2vw, 17px) !important;
 	font-weight: 100 !important;
 	color: #fff !important;
+	padding-inline: unset !important;
+	white-space: nowrap;
 }
 
 .optionSummary{
@@ -819,6 +850,7 @@ fieldset input{
     font-weight:400;
     color:#DDD;
     font-family:monospace, sans-serif, "Helvetica Neue", Helvetica, "Liberation Sans";
+	font-family: "Space Grotesk", sans-serif;
 }
 .statemark_ill_wish{
     background-image: url(../imgs/cosmicwish.webp); /* fallback */
@@ -933,7 +965,7 @@ fieldset input{
     padding: 2px;
     box-sizing: border-box;
 	margin-left: 2vw;
-	font-size: 14px;
+	font-size: 11px;
 }
 .blockexplorer img{
     width:18px;
@@ -1060,9 +1092,10 @@ fieldset input{
 	margin: 0 auto;
 	padding: 2px;
 	box-sizing: border-box;
-	background-color: rgb(37, 134, 232);
 	background-color: rgb(85, 152, 219);
+	background-color: #008db8;
 	box-shadow: 0 0 .1rem #0f0931, inset 0 0 .1rem #0f0931, 0 0 0.4rem var(--neon-border-color), inset 0 0 0.3rem var(--neon-border-color), 0 0 0.2rem var(--neon-border-color), inset 0 0 0.2rem var(--neon-border-color);
+	box-shadow: 0 0 2px #188dd6, 0 0 3px #0e567c, 0 0 7px #188dd6, 0 0 7px #188dd6, 0 0 3px #188dd6, 1px 2px 1.5px #0e567c !important;
 	border-radius: 50%;
 }
 .our_social_links img{
