@@ -435,41 +435,41 @@ async function fetchOptionCard(optionId){
 		if(window.nav == 1){
 			var projectCard = `
 			<div class="tl_hedgeCard statemark_ill_wish">				
-				<div class="tl_hedgeGrid">
-					<div class="projectLogo" style="background-image:url('./imgs/cosmictravel.webp')"></div>
-					<div class="projectName">
-						<div>`+name+`<a class="social_links" href="https://etherscan.io/address/'`+pairAddress+`" target="_blank" alt="SC" title="Go to Etherscan">`+truncatedTokenAdd+`</a></div>
-						<div class="tl_bagsize">`+amount+` `+symbol+`</div>
-					</div>
-				</div>
-				<div class="valueHold">
-					<div class="assetsValue">
-						<div class="valueTitle">VALUE</div>
-						<div class="assetsMarketValue flux highlightOption">`+marketvalue+` `+pairSymbol+`</div>
-					</div>
-					<div class="assetsType">
-						<div class="typeTitle">HEDGE</div>
-						<div class="assetsTypeValue flux highlightOption">`+hedgeType+`</div>
-					</div>
-				</div>
+						<div class="tl_hedgeGrid">
+							<div class="projectLogo" style="background-image:url('./imgs/erc20-uniswap-tr.png')"></div>
+							<div class="projectName">
+								<div>`+name+`<a class="blockexplorer" href="https://etherscan.io/address/'`+pairAddress+`" target="_blank" alt="SC" title="Go to Etherscan">`+truncatedTokenAdd+`</a></div>
+								<div class="tl_bagsize">`+amount+` `+symbol+`</div>
+							</div>
+						</div>
+						<div class="valueHold">
+							<div class="assetsValue">
+								<div class="valueTitle"></div>
+								<div class="assetsMarketValue flux highlightOption">`+marketvalue+` `+pairSymbol+`</div>
+							</div>
+							<div class="assetsType">
+								<div class="typeTitle">HEDGE</div>
+								<div class="assetsTypeValue flux highlightOption">`+hedgeType+`</div>
+							</div>
+						</div>
 
-				<div class="strategyContainer">
-					<div class="optionMarksHold">
-						<div class="optionMark"><span>Strike:</span><span class="oMfigure">`+strikevalue+` `+pairSymbol+`</span></div>
-						<div class="optionMark"><span>Premium:</span><span class="oMfigure">`+cost+` `+pairSymbol+`</span></div>
-						<div class="optionMark"><span>Expires:</span><span class="oMfigure">`+timeToExpiry+` `+timeToExpiry+`</span></div>
-					</div>
-					`+strategyWidget+`
-				</div>
-				<div class="optionSummary">
-					`+activity_btn+`
-					`+action_btn+`
-					<div class="option_S_tab _bookmarkjump">
-						<a class="view_project" href="hedge.html?id=`+optionId+`" target="_blank" alt="View" title="full details">view</a>
-						`+bookmark_btn+`
-					</div>
-				</div>
-			</div>`;
+						<div class="strategyContainer">
+							<div class="optionMarksHold">
+								<div class="optionMark"><span>Strike:</span><span class="oMfigure">`+strikevalue+` `+pairSymbol+`</span></div>
+								<div class="optionMark"><span>Premium:</span><span class="oMfigure">`+cost+` `+pairSymbol+`</span></div>
+								<div class="optionMark"><span>Expires:</span><span class="oMfigure">`+timeToExpiry+` `+timeToExpiry+`</span></div>
+							</div>
+							`+strategyWidget+`
+						</div>
+						<div class="optionSummary">
+							`+activity_btn+`
+							`+action_btn+`
+							<div class="option_S_tab _bookmarkjump">
+								<a class="view_project" href="hedge.html?id=`+optionId+`" target="_blank" alt="View" title="full details">view</a>
+								`+bookmark_btn+`
+							</div>
+						</div>
+					</div>`;
 			$('#hedgesTimeline').append(projectCard);
 		}else{
 			//dont display, already funded
