@@ -16,6 +16,12 @@ header {
 	border-bottom: 0.5px dotted #3399ff !important;
 }
 
+@media (min-width: 55em) {
+	.container {
+		padding-right:unset; /* hack on main style.css file to the menu container, in dapp only */
+	}
+}
+
 body{
 	background-size:contain !important;
 	background-position: center !important;
@@ -94,8 +100,8 @@ section.sectionCenter {
 }
 .clubSinnage h4{
 	font-family: 'Neon',monospace, sans-serif, Tahoma, Geneva;
-	font-size: clamp(20px, 2vw, 25px) !important;
-	font-weight:100;
+	font-size: clamp(22px, 2vw, 27px) !important;
+	font-weight:900;
 	letter-spacing:normal;
 	text-transform: uppercase;
 	padding:10px;
@@ -175,9 +181,6 @@ aside {
 	height: max-content;
 	margin:20px 2vw;
 	font-family: monospace, sans-serif, "Helvetica Neue", Helvetica, Arial !important;
-	
-	border-left: 0.5px solid #00bebeb3;
-	border-right: 0.5px solid #00bebeb3;
 	transition: 1s;
 }
 .neon-container {
@@ -237,12 +240,11 @@ color: #FED128;
 =====================================================*/
 
 .liveEvents {
-  background-color: #212121;
+  background-color: transparent;
   width: 100%;
   height: 100%;
   font-size: 18px;
 }
-
 .scifiUI {
 	display: flex;
 	column-gap:2px;
@@ -250,16 +252,15 @@ color: #FED128;
 	position: relative;
 	width: 100%;
 	margin: 0px auto;
-	padding: 2px;
+	padding: 0;
 	font-size: 12px;
 	color: #00bebe;
-  }
-  
-  .scifiUI li {
+}
+.scifiUI li {
 	display: inline-block;
 	flex-basis: 50%;
-  }
-  .scifiUI li input[type="radio"] {
+}
+.scifiUI li input[type="radio"] {
 	/* For IE 8 and earlier */
 	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
 	/* For IE 9 and later (including IE 11) */
@@ -268,17 +269,17 @@ color: #FED128;
 	opacity: 0;
 	position: absolute;
 	outline: none;
-  }
-  .scifiUI li input[type="radio"]:checked ~ label {
-	background: #00bebe;
+}
+.scifiUI li input[type="radio"]:checked ~ label {
+	background: rgb(8, 231, 254);
 	color: #212121;
 	height: 50px;
 	width: 100%;
 	font-size: 12px;
 	cursor: default;
-	box-shadow: 0 0 10px #00dcdc;
-  }
-  .scifiUI li input[type="radio"]:checked ~ .section {
+	box-shadow: 0 0 10px rgb(8, 231, 254);
+}
+.scifiUI li input[type="radio"]:checked ~ .section {
 	/* For IE 8 and earlier */
 	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(enabled=false)";
 	/* For IE 9 and later (including IE 11) */
@@ -288,30 +289,34 @@ color: #FED128;
 	width: 100%;
 	padding: 2vw;
 	border: 1px solid #00bebe;
+	border:1px solid rgb(8, 231, 254);
 	color: #00dcdc;
+	color:rgb(8, 231, 254);
 	letter-spacing: 0.1em;
 	text-indent: 1em;
 	z-index: 1;
-  }
-  .scifiUI li label {
+}
+.scifiUI li label {
 	display: block;
 	width: 100%;
 	height: 40px;
 	border: 1px solid #00bebeb3;
+	border:1px solid rgb(8, 231, 254);
 	border-bottom: 0;
-	border-radius: 5px 5px 0 0;
+	border-radius: 8px 8px 0 0;
 	color: rgba(0, 190, 190, 0.7);
+	color:rgb(8, 231, 254);
 	line-height: 50px;
 	text-align: center;
 	cursor: pointer;
 	transition: all 200ms ease-in-out;
-  }
-  .scifiUI li label:hover {
+}
+.scifiUI li label:hover {
 	height: 50px;
 	border-color: #00bebe;
 	color: #00bebe;
-  }
-  .scifiUI li .section {
+}
+.scifiUI li .section {
 	/* For IE 8 and earlier */
 	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
 	/* For IE 9 and later (including IE 11) */
@@ -324,12 +329,15 @@ color: #FED128;
 	width: 1000px;
 	padding: 2vw;
 	border: 1px solid #00bebe;
+	border:1px solid rgb(8, 231, 254);
 	background: rgba(0, 190, 190, 0.1);
+	background: rgba(29, 129, 216, 0.15);
+	background: #1d81d80d;
 	color: white;
 	letter-spacing: -1em;
 	text-indent: 1em;
 	transition: all 200ms ease-in-out;
-  }
+}
   
 
 
@@ -931,7 +939,7 @@ fieldset input{
 	min-width: unset !important;
 	flex-grow: 1;
 	text-align: left !important;
-	font-size: clamp(15px, 2vw, 17px) !important;
+	font-size: clamp(16px, 1vw, 18px) !important;
 	font-weight: 100 !important;
 	color: #fff !important;
 	padding-inline: unset !important;
@@ -1197,7 +1205,7 @@ fieldset input{
 	box-shadow: 0 0 .1rem #0f0931, inset 0 0 .1rem #0f0931, 0 0 0.4rem var(--neon-border-color), inset 0 0 0.3rem var(--neon-border-color), 0 0 0.2rem var(--neon-border-color), inset 0 0 0.2rem var(--neon-border-color);
 	box-shadow: 0 0 2px #188dd6, 0 0 3px #0e567c, 0 0 7px #188dd6, 0 0 7px #188dd6, 0 0 3px #188dd6, 1px 2px 1.5px #0e567c !important;
 	border-radius: 50%;
-	border:1px solid #62006b;
+	border:1px solid #000;
 }
 .our_social_links img{
 	display: block;
