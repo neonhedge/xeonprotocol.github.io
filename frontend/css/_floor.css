@@ -659,7 +659,7 @@ fieldset input{
 	box-sizing: border-box;
 	background-image: radial-gradient(#131145, #1b1b49 100%) !important;
 	background: radial-gradient(#131145, #1d1f56 80%) !important;
-	color: #EEE;
+	color: #FFF;
   }
 .projectLogo {
 	display: inline-block;
@@ -957,6 +957,7 @@ fieldset input{
     text-align:center;
     font-weight:400;
     color:#DDD;
+	color:#FFF;
     font-family:monospace, sans-serif, "Helvetica Neue", Helvetica, "Liberation Sans";
 	font-family: "Space Grotesk", sans-serif;
 }
