@@ -176,11 +176,10 @@ aside {
 	margin:20px 2vw;
 	font-family: monospace, sans-serif, "Helvetica Neue", Helvetica, Arial !important;
 	
-	border-left: 0.5px solid #3399ff;
-	border-right: 0.5px solid #3399ff;
+	border-left: 0.5px solid #00bebeb3;
+	border-right: 0.5px solid #00bebeb3;
 	transition: 1s;
 }
-
 .neon-container {
 	display: flex;
 	flex-direction: column;
@@ -233,6 +232,107 @@ color: #FED128;
 .event-item:hover {
 	background-color: #f0f0f0;
 }
+/* ==================================================
+	LIVE BLOCKCHAIN STATS AND EVENTS SIDEBAR STYLES
+=====================================================*/
+
+.liveEvents {
+  background-color: #212121;
+  width: 100%;
+  height: 100%;
+  font-size: 18px;
+}
+
+.scifiUI {
+	display: flex;
+	column-gap:2px;
+	list-style: none;
+	position: relative;
+	width: 100%;
+	margin: 0px auto;
+	padding: 2px;
+	font-size: 12px;
+	color: #00bebe;
+  }
+  
+  .scifiUI li {
+	display: inline-block;
+	flex-basis: 50%;
+  }
+  .scifiUI li input[type="radio"] {
+	/* For IE 8 and earlier */
+	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+	/* For IE 9 and later (including IE 11) */
+	filter: alpha(opacity=0);
+
+	opacity: 0;
+	position: absolute;
+	outline: none;
+  }
+  .scifiUI li input[type="radio"]:checked ~ label {
+	background: #00bebe;
+	color: #212121;
+	height: 50px;
+	width: 100%;
+	font-size: 12px;
+	cursor: default;
+	box-shadow: 0 0 10px #00dcdc;
+  }
+  .scifiUI li input[type="radio"]:checked ~ .section {
+	/* For IE 8 and earlier */
+	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(enabled=false)";
+	/* For IE 9 and later (including IE 11) */
+	filter: alpha(enabled=false);
+
+	opacity: 1;
+	width: 100%;
+	padding: 2vw;
+	border: 1px solid #00bebe;
+	color: #00dcdc;
+	letter-spacing: 0.1em;
+	text-indent: 1em;
+	z-index: 1;
+  }
+  .scifiUI li label {
+	display: block;
+	width: 100%;
+	height: 40px;
+	border: 1px solid #00bebeb3;
+	border-bottom: 0;
+	border-radius: 5px 5px 0 0;
+	color: rgba(0, 190, 190, 0.7);
+	line-height: 50px;
+	text-align: center;
+	cursor: pointer;
+	transition: all 200ms ease-in-out;
+  }
+  .scifiUI li label:hover {
+	height: 50px;
+	border-color: #00bebe;
+	color: #00bebe;
+  }
+  .scifiUI li .section {
+	/* For IE 8 and earlier */
+	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+	/* For IE 9 and later (including IE 11) */
+	filter: alpha(opacity=0);
+
+	opacity: 0;
+	position: absolute;
+	top: 51px;
+	left: 0;
+	width: 1000px;
+	padding: 2vw;
+	border: 1px solid #00bebe;
+	background: rgba(0, 190, 190, 0.1);
+	color: white;
+	letter-spacing: -1em;
+	text-indent: 1em;
+	transition: all 200ms ease-in-out;
+  }
+  
+
+
 /* club timeline projects tabs */
 .feedsfilterDockHold{
 	position: sticky;
@@ -1097,6 +1197,7 @@ fieldset input{
 	box-shadow: 0 0 .1rem #0f0931, inset 0 0 .1rem #0f0931, 0 0 0.4rem var(--neon-border-color), inset 0 0 0.3rem var(--neon-border-color), 0 0 0.2rem var(--neon-border-color), inset 0 0 0.2rem var(--neon-border-color);
 	box-shadow: 0 0 2px #188dd6, 0 0 3px #0e567c, 0 0 7px #188dd6, 0 0 7px #188dd6, 0 0 3px #188dd6, 1px 2px 1.5px #0e567c !important;
 	border-radius: 50%;
+	border:1px solid #62006b;
 }
 .our_social_links img{
 	display: block;
