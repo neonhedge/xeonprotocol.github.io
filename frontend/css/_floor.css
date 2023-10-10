@@ -674,6 +674,7 @@ fieldset input{
 	border-radius: 5px;
 	line-height: 1.5;
 	font-family: 'modeseven', 'bitwise', sans-serif, "Helvetica Neue", Helvetica, Arial;
+	font-family: "Space Grotesk", sans-serif;
 	font-size: clamp(14px, 1vw, 16px);
 	padding: 0.8vw;
 	box-sizing: border-box;
@@ -767,7 +768,9 @@ fieldset input{
   .assetsTypeValue,
   .compositionValue {
 	padding:2px;
-	font-size: clamp(15px, 1vw, 16px);
+	font-family: 'modeseven','bitwise', sans-serif, "Helvetica Neue", Helvetica, Arial !important;
+	font-family: 'bitwise', sans-serif, "Helvetica Neue", Helvetica, Arial !important;
+	font-size: clamp(15px, 1vw, 17px);
 	font-weight: 100;
 	background-color: #0f082e;
 	background-color: #120d39;
@@ -787,8 +790,7 @@ fieldset input{
 	border-radius: 5px;
 	color: unset;
 	padding: unset;
-	font-size: clamp(15px, 1vw, 15px);
-  	font-weight: 100;
+	font-size: clamp(13px, 1vw, 15px);
   }
   .assetsMarketValue, .valueTitle {
 	font-size: clamp(18px, 2vw, 20px);
@@ -945,8 +947,8 @@ fieldset input{
 	letter-spacing: unset;
 	text-align: left;
 	padding-inline: 1vw 0px;
-	font-family: "Nunito Sans", monospace, sans-serif !important;
-	/* font-family: "Space Grotesk", sans-serif !important; */
+	font-family: "Space Grotesk", "Modeseven", sans-serif !important;
+	font-family: monospace, "Space Grotesk", sans-serif !important;
 	color: rgb(139, 149, 158);
   }
   @media (max-width: 400px) {
