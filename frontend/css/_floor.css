@@ -483,7 +483,7 @@ color: #FED128;
 .sitesearchhold{
 	flex-basis: 100%;
 	height: auto;
-	margin-top:30px;
+	margin-top:25px;
 }
 #swap_searcher {
     position: relative;
@@ -736,7 +736,7 @@ fieldset input{
   .valueHold {
 	display: flex;
 	justify-content: space-between;
-	margin: 5px 0;
+	margin: 2px 0;
 	background-color: rgba(15, 8, 46, 0.9);
 	background-color: rgba(15, 8, 46, 0.5);
 	/* border: 0.5px solid rgba(8, 231, 254, 0.5); */
@@ -769,9 +769,10 @@ fieldset input{
   .compositionValue {
 	padding:2px;
 	font-family: 'modeseven','bitwise', sans-serif, "Helvetica Neue", Helvetica, Arial !important;
-	font-family: 'bitwise', sans-serif, "Helvetica Neue", Helvetica, Arial !important;
-	font-size: clamp(15px, 1vw, 17px);
+	font-family: "Space Grotesk",'modeseven','bitwise', sans-serif, "Helvetica Neue", Helvetica, Arial !important;
 	font-weight: 100;
+	font-weight: 400;
+	font-size: clamp(15px, 1vw, 17px);
 	background-color: #0f082e;
 	background-color: #120d39;
 	color: #188dd6;
@@ -810,7 +811,7 @@ fieldset input{
   .assetsType {
 	border: 2px solid #089353; 
 	text-shadow: none;
-	max-width: 120px;
+	max-width: 110px;
 	background-color: #089353;
 	border-radius: 5px;
 
@@ -915,6 +916,10 @@ fieldset input{
 	margin-top: 15px;
 	display: flex;
 	flex-wrap: wrap;
+	max-width: 220px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	word-wrap: none;
   }
   
   .optionMark {
@@ -1238,7 +1243,7 @@ fieldset input{
 	box-shadow: 0 0 .1rem #0f0931, inset 0 0 .1rem #0f0931, 0 0 0.4rem var(--neon-border-color), inset 0 0 0.3rem var(--neon-border-color), 0 0 0.2rem var(--neon-border-color), inset 0 0 0.2rem var(--neon-border-color);
 	box-shadow: 0 0 2px #188dd6, 0 0 3px #0e567c, 0 0 7px #188dd6, 0 0 7px #188dd6, 0 0 3px #188dd6, 1px 2px 1.5px #0e567c !important;
 	border-radius: 50%;
-	border:1px solid #000;
+	border:1px solid #08e7fe;
 }
 .our_social_links img{
 	display: block;
