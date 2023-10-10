@@ -88,8 +88,9 @@ section.sectionCenter {
 	display: grid;
     /* grid-template-columns: auto 1fr 300px; /* 3 column grid with right side bar */ 
 	grid-template-columns: auto 1fr; /* 2 column grid */ 
-	grid-template-columns: auto 1fr 300px;
+	grid-template-columns: auto 1fr 270px;
     min-height: 100vh;
+	padding-bottom: 15vh !important;
 }
 .clubSinnage{
 	position:relative;
@@ -116,7 +117,6 @@ section.sectionCenter {
 aside {
 	position: sticky;
 	top:70px; /* match aside container */
-
 	transition: 1s;
 	align-items: center;
 	box-sizing: border-box;
@@ -139,13 +139,13 @@ aside {
 	width: 100%;
 	line-height: 28px !important;
 	box-sizing: border-box;
-	padding: 2px 1%;
-	border-radius: 7px;
+	padding: 0.3vw 1%;
+  	border-radius: 8px;
 	cursor: pointer;
 	font-family: "Space Grotesk", sans-serif;
 	font-size: clamp(14px, 1vw, 15px) !important;
 	letter-spacing: 0;
-	font-weight: 400 !important;
+	font-weight: 600 !important;
 	text-align: center;
 	color: #F4F4F4;
 	/*
@@ -163,7 +163,6 @@ aside {
 .timelineHold{
 	position: relative;
 	min-height: 500px; /* get clear of CTA section below it */
-	padding: 30px 20px 20px; 
 	padding: 0;
 	box-sizing:border-box;
 	transition: 1s; 
@@ -178,10 +177,13 @@ aside {
 #sidebar {
 	position: sticky;
 	top: 70px;
-	height: max-content;
-	margin:20px 2vw;
+	min-height:300px;
+	height:400px;
 	font-family: monospace, sans-serif, "Helvetica Neue", Helvetica, Arial !important;
 	transition: 1s;
+	transform: translateX(-1vw);
+	box-sizing: border-box;
+	padding-top:10px
 }
 .neon-container {
 	display: flex;
@@ -240,10 +242,10 @@ color: #FED128;
 =====================================================*/
 
 .liveEvents {
-  background-color: transparent;
-  width: 100%;
-  height: 100%;
-  font-size: 18px;
+	background-color: transparent;
+	width: 100%;
+	height: 100%;
+	font-size: 18px;
 }
 .scifiUI {
 	display: flex;
@@ -256,11 +258,12 @@ color: #FED128;
 	font-size: 12px;
 	color: #00bebe;
 }
-.scifiUI li {
+.scifiUI_li {
 	display: inline-block;
 	flex-basis: 50%;
+	background: #1d81d80d; /* match section below */
 }
-.scifiUI li input[type="radio"] {
+.scifiUI_li input[type="radio"] {
 	/* For IE 8 and earlier */
 	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
 	/* For IE 9 and later (including IE 11) */
@@ -270,7 +273,7 @@ color: #FED128;
 	position: absolute;
 	outline: none;
 }
-.scifiUI li input[type="radio"]:checked ~ label {
+.scifiUI_li input[type="radio"]:checked ~ label {
 	background: rgb(8, 231, 254);
 	color: #212121;
 	height: 50px;
@@ -279,7 +282,7 @@ color: #FED128;
 	cursor: default;
 	box-shadow: 0 0 10px rgb(8, 231, 254);
 }
-.scifiUI li input[type="radio"]:checked ~ .section {
+.scifiUI_li input[type="radio"]:checked ~ .section {
 	/* For IE 8 and earlier */
 	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(enabled=false)";
 	/* For IE 9 and later (including IE 11) */
@@ -287,16 +290,22 @@ color: #FED128;
 
 	opacity: 1;
 	width: 100%;
-	padding: 2vw;
+	/* consider removing scroll to show only top 20 txs */
+	max-height: 550px;
+	overflow-y: scroll;
+	
+	padding: 10px;
+	box-sizing: border-box;
 	border: 1px solid #00bebe;
 	border:1px solid rgb(8, 231, 254);
 	color: #00dcdc;
 	color:rgb(8, 231, 254);
-	letter-spacing: 0.1em;
-	text-indent: 1em;
+	letter-spacing: 0px;
+	text-indent: 0;
+	text-align: left;
 	z-index: 1;
 }
-.scifiUI li label {
+.scifiUI_li label {
 	display: block;
 	width: 100%;
 	height: 40px;
@@ -311,12 +320,12 @@ color: #FED128;
 	cursor: pointer;
 	transition: all 200ms ease-in-out;
 }
-.scifiUI li label:hover {
+.scifiUI_li label:hover {
 	height: 50px;
-	border-color: #00bebe;
-	color: #00bebe;
+	border-color: rgb(8, 231, 254);
+	color: rgb(8, 231, 254);
 }
-.scifiUI li .section {
+.scifiUI_li .section {
 	/* For IE 8 and earlier */
 	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
 	/* For IE 9 and later (including IE 11) */
@@ -326,20 +335,30 @@ color: #FED128;
 	position: absolute;
 	top: 51px;
 	left: 0;
-	width: 1000px;
-	padding: 2vw;
+	width: 100%;
+	padding: 10px;
 	border: 1px solid #00bebe;
 	border:1px solid rgb(8, 231, 254);
 	background: rgba(0, 190, 190, 0.1);
 	background: rgba(29, 129, 216, 0.15);
 	background: #1d81d80d;
 	color: white;
-	letter-spacing: -1em;
-	text-indent: 1em;
+	letter-spacing: 0px;
+	text-indent: 0;
+	text-align:left;
 	transition: all 200ms ease-in-out;
 }
-  
-
+.section ul li {
+	display: grid;
+    /* grid-template-columns: auto 1fr 300px; /* 3 column grid with right side bar */ 
+	grid-template-columns: 60px 85px 1fr auto;
+}
+.section ul li span {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	text-align: left;
+}
 
 /* club timeline projects tabs */
 .feedsfilterDockHold{
@@ -349,7 +368,8 @@ color: #FED128;
 	max-width: 500px;
 	z-index:2;
 	text-align:center;
-	padding: 15px 5px;
+	padding: 20px 5px 15px;
+	box-sizing: border-box;
 	border-radius: 10px;
 	display: flex;
 	flex-wrap: wrap;
@@ -357,7 +377,7 @@ color: #FED128;
 
 	background-color: rgba(4, 1, 21, 1);
 	/* border: 0.7px solid #3399ff; */
-	box-shadow: 0 1vw rgba(0, 0, 0, 0.7);
+	box-shadow: 0 1vw rgba(0, 0, 0, 0.8);
 }
 
 .feedsfilterDockHold::before {
@@ -388,7 +408,7 @@ color: #FED128;
 	border: 0.5px solid #363636;
 	border: 0.5px solid #3399ff;
 	background-color: #07041e;
-	
+	background-color: #060921;
 }
 .streamtype .eventAct {
     height: 42px;
@@ -418,16 +438,16 @@ color: #FED128;
 	border-radius: 50%;
 	padding: 0.5rem;
 	box-sizing: border-box;
-	background-color: transparent;
-	/* border: 0.5px solid #08e7fe; */
 	outline: none;
 	overflow: hidden;
 	cursor: pointer;
 	
 	font-family: 'monospace','bitwise', sans-serif, "Helvetica Neue", Helvetica, Arial !important;
 	font-weight:100;
-
+	/*
 	animation: flicker 1.5s infinite alternate;
+	*/
+	border: 1px solid #3399ff;
 	transition: all 0.5s ease-in-out;
   }
 /* Animate neon flicker */
