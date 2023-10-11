@@ -249,6 +249,28 @@ async function onSearchSubmit(event) {
 		console.log('fetching hedge by ID provided...');	
 		await fetchOptionStrip(inputText);
 	}
+	else {
+		const privatize = `Only token address or option ID accepted when filtering data!`;
+  
+	swal({
+		title: "Invalid Prompt",
+		text: privatize,
+		type: "prompt",
+		html: true,
+		dangerMode: true,
+		confirmButtonText: "go back",
+		confirmButtonColor: "#171716",
+		closeOnConfirm: false,
+		showConfirmButton: true,
+		showCancelButton: false,
+		timer: 4000,
+		animation: "slide-from-top"
+	},async function(){//on confirm click
+		//clear search bar
+		document.getElementById("searchBar").value = "";
+
+	});
+	}
 }
 
 async function fetchOptionStrip(optionId) {
