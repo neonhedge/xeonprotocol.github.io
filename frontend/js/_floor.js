@@ -224,7 +224,7 @@ async function addBookmark(optionId) {
 	}
 }  
 
-//search for a project
+// Filter hedges using token address or token id
 async function onSearchSubmit(event) {
 	event.preventDefault();
 	var inputText = $('#searchBar').val();
@@ -242,7 +242,7 @@ async function onSearchSubmit(event) {
 		loadOptions(MyGlobals.startIndex, readLimit);
 
 		// B - Update sidebar with token infor and hedge volume and listen to events
-		
+
 	}
 	// if option ID pasted 
 	else if (Number.isInteger(inputText)) {
@@ -663,6 +663,9 @@ hedgingInstance.events.hedgeSettled()
     const listItem = createEventListItem(event);
     document.getElementById('eventsList').appendChild(listItem);
   });
+
+  // ADD HEDGE MINED - to be used for live transactions on sidebar
+  // when user searches or filters by token address, only events matching the address will be displayed/filtered
 
 async function createEventListItem(event) {
 	const listItem = document.createElement('li');
