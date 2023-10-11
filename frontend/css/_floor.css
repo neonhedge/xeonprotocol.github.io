@@ -784,7 +784,7 @@ fieldset input{
 	text-shadow: 0 0 1.5vw #38409b;
 	background-color: unset; /* disable to shade the value area */
 	color: rgb(8, 231, 254);
-	transform: translateX(-15px);
+	transform: translateX(-25px);
 	padding: unset;
   }
   .assetsTypeValue {
