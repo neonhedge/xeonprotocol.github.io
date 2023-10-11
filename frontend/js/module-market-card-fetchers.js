@@ -518,11 +518,11 @@ async function prepareTimestamp(timeprint){
 	return start;
 }
 async function noOptionsSwal(){
-	$('#sl_leases').empty().append('<span id="sl_refreshing" class="sl_refresh">no hedges found...</span>');
+	$('#hedgesTimeline').empty().append('<span id="sl_refreshing" class="sl_refresh">no hedges found...</span>');
 	//proceed to swal
 	var privatize = '<div class="clms_case">nothing to find here...</div>';
 	swal({
-			title: "Projects Not Found",
+			title: "Options Not Found",
 			text: privatize,
 			type: "info",  //var alertTypes = ['error', 'warning', 'info', 'success', 'input', 'prompt'];
 			html: true,

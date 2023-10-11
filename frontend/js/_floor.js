@@ -29,8 +29,8 @@ export const MyGlobals = {
 
 //which tab is highlighted
 $(document).ready(function(){
-	$('#erc20Options').css({'background' : 'rgba(214, 24, 138,0.15)','border' : '1px solid rgb(214, 24, 138, 0.5)'});//left panel
-	$('#discoverTab').css({'border' : '1px solid rgb(214, 24, 138, 0.5)'});//try #87CEFA
+	$('#erc20Options').css({'background' : 'rgba(214, 24, 138,0.1)','border' : '1px solid #62006b'});//left panel
+	$('#discoverTab').css({'border' : '1px solid #62006b'});//try rgb(8, 231, 254) - bright blue
 	//set global
 	window.nav = 1;
 	window.filters = 1;
@@ -46,7 +46,7 @@ $(document).ready(function(){
 });
 $(document).on('click', '#erc20Options', function(e){
 	$('.asideNavsinside').removeAttr('style'); //reset styles
-	$(this).css({'border' : '1px solid rgb(214, 24, 138, 0.5)', 'background' : 'rgba(214, 24, 138,0.15)'});//set style
+	$(this).css({'border' : '1px solid #62006b', 'background' : 'rgba(214, 24, 138,0.1)'});//set style
 	//set global
 	window.nav = 1;
 	window.filters = 1;
@@ -58,7 +58,7 @@ $(document).on('click', '#erc20Options', function(e){
 });
 $(document).on('click', '#equitySwaps', function(e){
 	$('.asideNavsinside').removeAttr('style'); //reset styles
-	$(this).css({'border' : '1px solid rgb(214, 24, 138, 0.5)', 'background' : 'rgba(214, 24, 138,0.15)'});//set style
+	$(this).css({'border' : '1px solid #62006b', 'background' : 'rgba(214, 24, 138,0.1)'});//set style
 	//set global
 	window.nav = 2;
 	window.filters = 1;
@@ -70,7 +70,7 @@ $(document).on('click', '#equitySwaps', function(e){
 });
 $(document).on('click', '#erc20Loans', function(e){
 	$('.asideNavsinside').removeAttr('style'); //reset styles
-	$(this).css({'border' : '1px solid rgb(214, 24, 138, 0.5)', 'background' : 'rgba(214, 24, 138,0.15)'});//set style
+	$(this).css({'border' : '1px solid #62006b', 'background' : 'rgba(214, 24, 138,0.1)'});//set style
 	//set global
 	window.nav = 3;
 	window.filters = 1;
@@ -82,14 +82,14 @@ $(document).on('click', '#erc20Loans', function(e){
 });
 $(document).on('click', '#socialstream', function(e){
 	$('.asideNavsinside').removeAttr('style'); //reset styles
-	$(this).css({'border' : '1px solid rgb(214, 24, 138, 0.5)', 'background' : 'rgba(214, 24, 138, 0.15)'});//set style
+	$(this).css({'border' : '1px solid #62006b', 'background' : 'rgba(214, 24, 138, 0.15)'});//set style
 	//set global
 		
 });
 //filters
 $(document).on('click', '#discoverTab', function(e){
 	$('.streamtype').removeAttr('style'); //reset styles
-	$(this).css({'border' : '1px solid rgb(214, 24, 138, 0.5)'});//set style
+	$(this).css({'border' : '1px solid #62006b'});//set style
 	//set global
 	window.filters = 1;
 	//check load continuation
@@ -100,7 +100,7 @@ $(document).on('click', '#discoverTab', function(e){
 });
 $(document).on('click', '#mypositionsTabs', function(e){
 	$('.streamtype').removeAttr('style'); //reset styles
-	$(this).css({'border' : '1px solid rgb(214, 24, 138, 0.5)'});//set style
+	$(this).css({'border' : '1px solid #62006b'});//set style
 	//set global
 	window.filters = 2;
 	//check load continuation
@@ -111,7 +111,7 @@ $(document).on('click', '#mypositionsTabs', function(e){
 });
 $(document).on('click', '#bookmarksTab', function(e){
 	$('.streamtype').removeAttr('style'); //reset styles
-	$(this).css({'border' : '1px solid rgb(214, 24, 138, 0.5)'});//set style
+	$(this).css({'border' : '1px solid #62006b'});//set style
 	//set global
 	window.filters = 3;
 	//check load continuation
@@ -227,14 +227,8 @@ async function addBookmark(optionId) {
 //search for a project
 async function onSearchSubmit(event) {
 	event.preventDefault();
-	var inputText = $('#swapsearch').val();
-	if( address > 0){
-		console.log('fetching hedge...');	
-		searchHedge(inputText);
-	}
-}
-
-async function searchHedge(inputText){
+	var inputText = $('#searchBar').val();
+	// if token address pasted
 	if (inputText.length >= 40 && web3.utils.isAddress(inputText) == true) {
 		//set global
 		window.nav = 1;
@@ -243,14 +237,21 @@ async function searchHedge(inputText){
 		MyGlobals.outputArray = [];
 		MyGlobals.startIndex = 0;
 		MyGlobals.lastItemIndex = 0;
-		loadOptions(MyGlobals.startIndex, readLimit);	
+
+		// A - Fetch Options matching address
+		loadOptions(MyGlobals.startIndex, readLimit);
+
+		// B - Update sidebar with token infor and hedge volume and listen to events
+		
 	}
-	if(Number.isInteger(inputText)){
+	// if option ID pasted 
+	else if (Number.isInteger(inputText)) {
+		console.log('fetching hedge by ID provided...');	
 		await fetchOptionStrip(inputText);
 	}
 }
 
-async function fetchOptionStrip(optionId){
+async function fetchOptionStrip(optionId) {
     try{
 		let result = await hedgingInstance.methods.getHedgeDetails(optionId).call();
 		//name and symbol
@@ -400,6 +401,9 @@ document.addEventListener('paste', async function(event) {
     if (event.target.id === 'tokenAddy') {
         await handlePaste(event);
     }
+	if (event.target.id === 'searchBar') {
+		await onSearchSubmit(event);
+	}
 });
 
 async function handlePaste(event) {
