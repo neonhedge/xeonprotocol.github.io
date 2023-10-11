@@ -6,9 +6,8 @@
     width: auto;
 	min-width:218px;
 	max-width:230px;
-	/*background: linear-gradient(220deg, #188dd6, #110f47 80%);
-	background: none;*/
 	background-color: rgba(13, 148, 136, 0.2);
+	background-color: rgba(29, 129, 216, 0.15);
 }
 .walletpur{
 	position:relative;
