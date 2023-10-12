@@ -241,7 +241,9 @@ async function onSearchSubmit(event) {
 		// A - Fetch Options matching address
 		loadOptions(MyGlobals.startIndex, readLimit);
 
-		// B - Update sidebar with token infor and hedge volume and listen to events
+		// B - Update sidebar with token infor: hedge volume and listen to events
+		// determine which sidebar tab is active: stats or events
+		window.sidebarTab 
 
 	}
 	// if option ID pasted 
@@ -414,8 +416,17 @@ async function createForm() {
 	});
 }
 
+// Listerners: create button click, sidebar tab click
 $(document).on('click', '#create_button', function(e){
 	createForm();
+});
+// Listerners: set sidebar globals
+$(document).on('click', '#statsLabel', function(e){
+	window.sidebarTab = 1;
+});
+
+$(document).on('click', '#eventsLabel', function(e){
+	window.sidebarTab = 1;
 });
 
 // Attach event handler to document object for event delegation

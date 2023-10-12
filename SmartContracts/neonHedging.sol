@@ -184,7 +184,7 @@ contract HEDGEFUND {
     
     // all hedges
     uint[] private optionsCreated;
-    uint[] private hedgesTaken;
+    uint[] private optionsTaken;
     uint[] private equityswapsCreated;
     uint[] private equityswapsTaken;
     
@@ -403,7 +403,7 @@ contract HEDGEFUND {
             myswapsTaken[msg.sender].push(_optionId);
         } else if(hedge.hedgeType == HedgeType.CALL) {
             myoptionsHistory[msg.sender].push(_optionId);
-            hedgesTaken.push(_optionId);
+            optionsTaken.push(_optionId);
             myoptionsTaken[msg.sender].push(_optionId);            
         }
         // Log pair tokens involved in protocol revenue
@@ -920,7 +920,7 @@ contract HEDGEFUND {
 
     // Function to retrieve a subset of options or swaps taken
     function getAllOptionsTaken(uint startIndex, uint limit) public view returns (uint[] memory) {
-        return getSubsetOfOptionsOrSwaps(hedgesTaken, startIndex, limit);
+        return getSubsetOfOptionsOrSwaps(optionsTaken, startIndex, limit);
     }
 
     function getAllSwapsTaken(uint startIndex, uint limit) public view returns (uint[] memory) {
