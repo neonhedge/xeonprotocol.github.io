@@ -183,10 +183,12 @@ contract HEDGEFUND {
     mapping(address => uint256[]) public bookmarkedOptions; // Array to store bookmarked optionIds for each user
     
     // all hedges
-    uint[] private optionsCreated;
-    uint[] private optionsTaken;
+    uint[] private optionsCreated;    
     uint[] private equityswapsCreated;
+    uint[] private optionsTaken;
     uint[] private equityswapsTaken;
+    uint[] private optionsSettled;
+    uint[] private equityswapsSettled;
     
     // global counters
     uint public optionID;
@@ -691,14 +693,25 @@ contract HEDGEFUND {
                 logPL(hedgeInfo.payOff, option.paired, option.owner, option.taker, 1);
             }
         }
-        // Log analytics
-        logAnalyticsFees(option.token, hedgeInfo.tokenFee, hedgeInfo.pairedFee, hedgeInfo.tokensDue, option.cost, hedgeInfo.underlyingValue);
+
         // Update hedge
         option.status = 3;
         option.endValue = hedgeInfo.underlyingValue;
         option.dt_settled = block.timestamp;
-        // catch new erc20 address so that wallet can log all underlying token balances credited to it
-        // paired addresses already caught on deposit by wallet
+        
+        // Log settlement stats
+        if(option.hedgeType == HedgeType.CALL || option.hedgeType == HedgeType.PUT) {
+            equitycallsSettled.push(_optionId);            
+        }
+        if(option.hedgeType == HedgeType.SWAP) {
+            equityswapsSettled.push(_optionId);
+        }
+        
+        // Log analytics
+        logAnalyticsFees(option.token, hedgeInfo.tokenFee, hedgeInfo.pairedFee, hedgeInfo.tokensDue, option.cost, hedgeInfo.underlyingValue);
+        
+        // Catch new erc20 address so that wallet can log all underlying token balances credited to it
+        // Paired addresses already caught on deposit by wallet
         if(hedgeInfo.tokensDue > 0 && hedgeInfo.newAddressFlag) {            
             userERC20s[option.taker].push(option.token);            
         }
@@ -925,6 +938,15 @@ contract HEDGEFUND {
 
     function getAllSwapsTaken(uint startIndex, uint limit) public view returns (uint[] memory) {
         return getSubsetOfOptionsOrSwaps(equityswapsTaken, startIndex, limit);
+    }
+
+    // Function to retrieve settled options or swaps
+    function getSettledOptions(uint startIndex, uint limit) public view returns (uint[] memory) {
+        return getSubsetOfOptionsOrSwaps(optionsSettled, startIndex, limit);
+    }
+
+    function getSettledSwaps(uint startIndex, uint limit) public view returns (uint[] memory) {
+        return getSubsetOfOptionsOrSwaps(equityswapsSettled, startIndex, limit);
     }
 
     // Function to retrieve a subset of options or swaps for a specific token
