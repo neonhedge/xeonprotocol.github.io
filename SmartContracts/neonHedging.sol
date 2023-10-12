@@ -145,6 +145,10 @@ contract HEDGEFUND {
     mapping(address => uint[]) private tokenOptions;
     mapping(address => uint[]) private tokenSwaps;
 
+    // mapping of all hedges settled for each erc20
+    mapping(address => uint[]) private optionsSettled;
+    mapping(address => uint[]) private equityswapsSettled;
+
     // mapping of all hedges for user by Id
     mapping(address => uint[]) myoptionsHistory;
     mapping(address => uint[]) myswapsHistory;
@@ -187,8 +191,7 @@ contract HEDGEFUND {
     uint[] private equityswapsCreated;
     uint[] private optionsTaken;
     uint[] private equityswapsTaken;
-    uint[] private optionsSettled;
-    uint[] private equityswapsSettled;
+    
     
     // global counters
     uint public optionID;
@@ -408,6 +411,14 @@ contract HEDGEFUND {
             optionsTaken.push(_optionId);
             myoptionsTaken[msg.sender].push(_optionId);            
         }
+        // Log options for token
+         if(option.hedgeType == HedgeType.CALL || option.hedgeType == HedgeType.PUT) {
+            optionsBought[hedge.token].push(_optionId);            
+        }
+        if(option.hedgeType == HedgeType.SWAP) {
+            equitycallsBought[hedge.token].push(_optionId);
+        }
+
         // Log pair tokens involved in protocol revenue
         if(hedgesTakenVolume[hedge.paired] == 0){
             pairedERC20s[address(this)].push(hedge.paired);
@@ -698,16 +709,16 @@ contract HEDGEFUND {
         option.status = 3;
         option.endValue = hedgeInfo.underlyingValue;
         option.dt_settled = block.timestamp;
-        
-        // Log settlement stats
+
+        // Log settled hedges
         if(option.hedgeType == HedgeType.CALL || option.hedgeType == HedgeType.PUT) {
-            equitycallsSettled.push(_optionId);            
+            optionsSettled[option.token].push(_optionId);            
         }
         if(option.hedgeType == HedgeType.SWAP) {
-            equityswapsSettled.push(_optionId);
+            equitycallsSettled[option].push(_optionId);
         }
         
-        // Log analytics
+        // Log fee / payoff stats
         logAnalyticsFees(option.token, hedgeInfo.tokenFee, hedgeInfo.pairedFee, hedgeInfo.tokensDue, option.cost, hedgeInfo.underlyingValue);
         
         // Catch new erc20 address so that wallet can log all underlying token balances credited to it
@@ -721,7 +732,7 @@ contract HEDGEFUND {
     }
 
     // Log Protocol Revenue
-    // - use userBalanceMap to get raw revenue balances and populate sums frontend
+    // - in frontend use userBalanceMap to get raw revenue balances and populate sums
     function logAnalyticsFees(address token, uint256 tokenFee, uint256 pairedFee, uint256 tokenProfit, uint256 pairProfit, uint256 endValue) internal {
        (address paired, ) = getPairAddressZK(token);
         protocolProfitsTokens[token].add(tokenProfit);
@@ -940,13 +951,13 @@ contract HEDGEFUND {
         return getSubsetOfOptionsOrSwaps(equityswapsTaken, startIndex, limit);
     }
 
-    // Function to retrieve settled options or swaps
-    function getSettledOptions(uint startIndex, uint limit) public view returns (uint[] memory) {
-        return getSubsetOfOptionsOrSwaps(optionsSettled, startIndex, limit);
+    // Function to retrieve settled options or swaps for ERC20 address
+    function getSettledOptionsERC20(address _token, uint startIndex, uint limit) public view returns (uint[] memory) {
+        return getSubsetOfOptionsOrSwaps(optionsSettled[_token], startIndex, limit);
     }
 
-    function getSettledSwaps(uint startIndex, uint limit) public view returns (uint[] memory) {
-        return getSubsetOfOptionsOrSwaps(equityswapsSettled, startIndex, limit);
+    function getSettledSwapsERC20(address _token, uint startIndex, uint limit) public view returns (uint[] memory) {
+        return getSubsetOfOptionsOrSwaps(equitycallsSettled[_token], startIndex, limit);
     }
 
     // Function to retrieve a subset of options or swaps for a specific token
