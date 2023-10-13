@@ -6,19 +6,15 @@ async function loadSidebar() {
     
     const searchInput = $('#searchBar').val();
 
-    if (window.sidebarTab == 1) {
-        // check if address exists in search bar
-        if (searchInput.length >= 40 && web3.utils.isAddress(searchInput) == true) {
-            // filter sidebar infor for token
-            await loadSidebarVolume_Token(searchInput);
-        } else { 
-            // fetch all
-            await loadSidebarVolume_All();
-        }
+    // check if address exists in search bar
+    if (searchInput.length >= 40 && web3.utils.isAddress(searchInput) == true) {
+        // filter sidebar infor for token
+        await loadSidebarVolume_Token(searchInput);
+    } else { 
+        // fetch all
+        await loadSidebarVolume_All();
     }
-    else if (window.sidebarTab == 2) {
-        // live hedge events are filtered in the events listeners by checking #searchBar value
-    }
+    
 }
 
 async function loadSidebarVolume_All() {

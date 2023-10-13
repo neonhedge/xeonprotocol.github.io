@@ -144,7 +144,7 @@ $(document).ready(async function () {
         };
         // Load sections automatically & periodically
         const refreshDealCards = async () => {
-            const asyncFunctions = [ await refreshDataOnElements];
+            const asyncFunctions = [ refreshDataOnElements, loadSidebar ];
             for (const func of asyncFunctions) {
                 await func();
             }
