@@ -5,7 +5,7 @@ import { CONSTANTS, getUserBalancesForToken, truncateAddress, fromWeiToFixed12, 
 import { initWeb3 } from './dapp-web3-utils.js';
 import { unlockedWallet, reqConnect, popupSuccess } from './web3-walletstatus-module.js';
 import { refreshDataOnElements, loadOptions, fetchOptionCard, fetchNameSymbol, prepareTimestamp, noOptionsSwal } from './module-market-card-fetchers.js';
-import { loadSidebarVolume } from './module-market-sidebar-fetchers.js';
+import { loadSidebar, loadSidebarVolume_All, loadSidebarVolume_Token } from './module-market-sidebar-fetchers.js';
 
 /*=========================================================================
     INITIALIZE WEB3 & LOCAL CONSTANTS
@@ -35,14 +35,15 @@ $(document).ready(function(){
 	window.nav = 1;
 	window.filters = 1;
 	window.readLimit = 30;
+	window.sidebarTab = 1; // stats
 	//check load continuation
 	MyGlobals.outputArray = [];
 	MyGlobals.startIndex = 0;
 	MyGlobals.lastItemIndex = 0;
 	loadOptions(MyGlobals.startIndex, window.readLimit);
 
-	//load sidebar volume stats
-	loadSidebarVolume();
+	//load sidebar
+	loadSidebar();
 });
 $(document).on('click', '#erc20Options', function(e){
 	$('.asideNavsinside').removeAttr('style'); //reset styles
@@ -242,9 +243,9 @@ async function onSearchSubmit(event) {
 		loadOptions(MyGlobals.startIndex, readLimit);
 
 		// B - Update sidebar with token infor: hedge volume and listen to events
-		// determine which sidebar tab is active: stats or events
-		window.sidebarTab 
-
+		// function determines what to load based on searchBar input
+		// events are constantly loaded all but filtered only when searchBar contains erc20 address
+		loadSidebar();
 	}
 	// if option ID pasted 
 	else if (Number.isInteger(inputText)) {
@@ -416,17 +417,17 @@ async function createForm() {
 	});
 }
 
-// Listerners: create button click, sidebar tab click
+// Listeners: create button click, sidebar tab click
 $(document).on('click', '#create_button', function(e){
 	createForm();
 });
-// Listerners: set sidebar globals
+// Listeners: set sidebar globals
 $(document).on('click', '#statsLabel', function(e){
 	window.sidebarTab = 1;
 });
 
 $(document).on('click', '#eventsLabel', function(e){
-	window.sidebarTab = 1;
+	window.sidebarTab = 2;
 });
 
 // Attach event handler to document object for event delegation
@@ -685,48 +686,98 @@ function handleTransactionFailure(status) {
 //==========================================================================
 // Events Listening
 //==========================================================================
+hedgingInstance.events.hedgeCreated()
+  .on('data', function(event) {
+    const listItem = createEventListItem(event);
+    document.getElementById('eventsList').appendChild(listItem);
+  });
 hedgingInstance.events.hedgePurchased()
   .on('data', function(event) {
     const listItem = createEventListItem(event);
     document.getElementById('eventsList').appendChild(listItem);
   });
 
-hedgingInstance.events.hedgeSettled()
+  hedgingInstance.events.hedgeSettled()
   .on('data', function(event) {
     const listItem = createEventListItem(event);
     document.getElementById('eventsList').appendChild(listItem);
   });
 
-  // ADD HEDGE MINED - to be used for live transactions on sidebar
-  // when user searches or filters by token address, only events matching the address will be displayed/filtered
+  hedgingInstance.events.minedHedge()
+  .on('data', function(event) {
+    const listItem = createEventListItem(event);
+    document.getElementById('eventsList').appendChild(listItem);
+  });
+
+// Listen to live events
+// ADD HEDGE MINED - to be used for live transactions on sidebar
+// when user searches or filters by token address, only events matching the address will be displayed/filtered
 
 async function createEventListItem(event) {
+	const searchBarValue = getSearchBarValue();
+
+	// Check if the ERC20 token address exists in the search bar
+	const tokenAddressExists = (searchBarValue !== '' && event.returnValues.token === searchBarValue);
+
+	// If the token address exists in the search bar, display only matching list items
+	if (tokenAddressExists) {
+		const listItem = document.createElement('li');
+		listItem.classList.add('event-item');
+
+		const title = document.createElement('span');
+		title.textContent = event.event;
+		listItem.appendChild(title);
+
+		// display cost/premium/value with pair symbol
+		const pairToken = await getPairToken(event.returnValues.optionId);
+		const pairTokenSymbol = await getSymbol(pairToken);
+
+		const amount = document.createElement('span');
+		amount.textContent = (event.returnValues.createValue || event.returnValues.startValue || event.returnValues.endValue || event.returnValues.payOff) + ' ' + pairTokenSymbol;
+		listItem.appendChild(amount);
+
+		// trim address
+		const truncatedAddress = truncateAddress((event.returnValues.writer || event.returnValues.buyer || event.returnValues.miner));
+		const dealer = document.createElement('span');
+		dealer.textContent = truncatedAddress;
+		listItem.appendChild(dealer);
+
+		const link = document.createElement('a');
+		link.href = 'https://etherscan.io/tx/' + event.transactionHash;
+		link.textContent = 'View Transaction';
+		listItem.appendChild(link);
+
+		return listItem;
+  	}
+
+	// If the token address doesn't exist in the search bar, display all list items
 	const listItem = document.createElement('li');
 	listItem.classList.add('event-item');
-	
+
 	const title = document.createElement('span');
 	title.textContent = event.event;
 	listItem.appendChild(title);
-	
+
 	// display cost/premium/value with pair symbol
 	const pairToken = await getPairToken(event.returnValues.optionId);
 	const pairTokenSymbol = await getSymbol(pairToken);
 
 	const amount = document.createElement('span');
-	amount.textContent = (event.returnValues.startValue || event.returnValues.payOff) + ' ' + pairTokenSymbol;
+	amount.textContent = (event.returnValues.createValue || event.returnValues.startValue || event.returnValues.endValue || event.returnValues.payOff) + ' ' + pairTokenSymbol;
 	listItem.appendChild(amount);
+
 	// trim address
-	const truncatedAddress = truncateAddress((event.returnValues.buyer || event.returnValues.token));
+	const truncatedAddress = truncateAddress((event.returnValues.writer || event.returnValues.buyer || event.returnValues.miner));
 	const dealer = document.createElement('span');
 	dealer.textContent = truncatedAddress;
-	listItem.appendChild(dealer);  
-	
+	listItem.appendChild(dealer);
+
 	const link = document.createElement('a');
 	link.href = 'https://etherscan.io/tx/' + event.transactionHash;
 	link.textContent = 'View Transaction';
 	listItem.appendChild(link);
-	
-	return listItem;
+
+  return listItem;
 }
 
 async function getPairToken(optionId) {
