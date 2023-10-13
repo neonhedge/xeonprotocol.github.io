@@ -234,7 +234,7 @@ contract HEDGEFUND {
     event onWithdraw(address indexed token, uint256 indexed amount, address indexed wallet);
     event hedgeCreated(address indexed token, uint256 indexed optionId, uint256 createValue, HedgeType hedgeType, address indexed writer);
     event hedgePurchased(address indexed token, uint256 indexed optionId, uint256 startValue, HedgeType hedgeType, address indexed buyer);
-    event hedgeSettled(address indexed token, uint256 indexed optionId, uint256 endValue, uint256 indexed payOff, uint256 indexed miner);
+    event hedgeSettled(address indexed token, uint256 indexed optionId, uint256 endValue, uint256 payOff, address indexed miner);
     event minedHedge(uint256 optionId, address indexed miner, address indexed token, address indexed paired, uint256 tokenFee, uint256 pairFee);
     event bookmarkToggle(address indexed user, uint256 hedgeId, bool bookmarked);
     event topupRequested(address indexed party, uint256 indexed hedgeId, uint256 topupAmount, bool consent);
