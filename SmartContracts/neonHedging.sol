@@ -989,6 +989,23 @@ contract HEDGEFUND {
         return hedge;
     }
 
+    function getHedgeRange(uint256 startId, uint256 endId) public view returns (hedgingOption[] memory) {
+        require(startId <= endId, "Invalid range");
+        require(endId >= startId, "End option ID must be greater than or equal to start option ID");
+        
+        uint256 rangeSize = endId - startId + 1;
+        hedgingOption[] memory result = new hedgingOption[](rangeSize);
+        
+        for (uint256 i = 0; i < rangeSize; i++) {
+            uint256 optionId = startId + i;
+            hedgingOption storage hedge = hedgeMap[optionId];
+            require(hedge.owner != address(0), "Option does not exist");
+            result[i] = hedge;
+        }
+        
+        return result;
+    }
+
     // Function to get the length of deposited tokens
     function getDepositedTokensLength() external view returns (uint) {
         return userERC20s[address(this)].length;
