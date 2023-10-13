@@ -166,4 +166,4 @@ async function loadSidebarVolume_Token(pairAddress) {
     );
   }
 
-export { loadSidebarVolume_All, loadSidebarVolume_Token }
+export { loadSidebar, loadSidebarVolume_All, loadSidebarVolume_Token }
