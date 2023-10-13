@@ -1,16 +1,18 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity 0.8.4;
 
-// NEON Protocol - ERC20 based tools for hedging and lending.
-// Deposit, Withdraw ERC20 tokens
-// Get underlying value for tokens in WETH, USDT AND USDC
-// Create, Take Call Options, Put Options and Equity Swaps OTC
-// Settle trade in paired tokens or underlying value equivalent on maturity
-// Payout profits and fees to parties, protocol, miner
-// Distribute revenue or third party service stakes
-// Read hedging data storages; array lists, individual mappings and structs, collective mappings and variables
+// NEON Protocol - Universal ERC20 OTC Hedging and Lending. 
+// Protocol accepts an ERC20 address to function as below;
+// - Deposit, Withdraw any ERC20 tokens as collateral
+// - Get underlying value for tokens in WETH, USDT AND USDC as paired currencies
+// - Write or Buy: Call Options, Put Options and Equity Swaps OTC
+// - Requests to edit deal variables, passed on mutual consent
+// - Settle trade in paired tokens or equivalent in underlying assets upon deal maturity
+// - Payout profits and fees to: parties, protocol, miner
+// - Distribute revenue or third party service stakes
+// - Read hedging data storages; array lists, individual mappings and structs, collective mappings and variables
 
-//  Functionality targets
+//  Functionality goals
 //1. to receive any ERC20 token as collateral/underlying tokens
 //2. Price tokens in paired currency via getUnderlyingValue
 //4. enable hedge writing using tokens as underlying assets
@@ -20,7 +22,7 @@ pragma solidity 0.8.4;
 //8. payment and logging of proceeds, fees and commissions for protocol and parties involved
 //9. read smart contract data on wallet balances, hedge activity, revenue logs
 
-// key functions list
+// List of Key Functions in this smart contract
 // - deposit
 // - withdraw
 // - get pair addresses of all erc20
@@ -34,13 +36,13 @@ pragma solidity 0.8.4;
 // - get hedge details by id
 // - fetch hedges array; created, taken, settled
 
-// key dependencies
+// Third Party Key Dependencies
 // 1. getReserves - Uniswap
 // 2. getPair - Uniswap
 // 3. getPairAddressZK - Custom
 // 4. getUnderlyingValue - Custom
 
-//dev notes
+// Dev notes
 // - addresses can deposit or withdraw erc20 tokens 
 // - all tokens are treated as ERC20
 // - uniswap version 2 router is used in beta protocol
@@ -52,6 +54,7 @@ pragma solidity 0.8.4;
 // - each hedge is taxed upon settlement, in relevant tokens (paired or underlying)
 // - contract taxes credited in mappings under address(this) and send out to staking/rewards contract
 // - optionID / optionId used loosely to refer to all hedge types: swaps, call, put
+// - Smart contract does not have support for distributing earnings to staking contract yet
 
 import "./SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
@@ -154,12 +157,12 @@ contract HEDGEFUND {
     mapping(address => uint[]) private equityswapsSettled;
 
     // mapping of all hedges for user by Id
-    mapping(address => uint[]) myoptionsHistory;
-    mapping(address => uint[]) myswapsHistory;
-    mapping(address => uint[]) myoptionsCreated;
-    mapping(address => uint[]) myoptionsTaken;
-    mapping(address => uint[]) myswapsCreated;
-    mapping(address => uint[]) myswapsTaken;
+    mapping(address => uint[]) public myoptionsHistory;
+    mapping(address => uint[]) public myswapsHistory;
+    mapping(address => uint[]) public myoptionsCreated;
+    mapping(address => uint[]) public myoptionsTaken;
+    mapping(address => uint[]) public myswapsCreated;
+    mapping(address => uint[]) public myswapsTaken;
     
     // mapping of all tokens transacted by user
     mapping(address => address[]) public userERC20s;
@@ -167,9 +170,9 @@ contract HEDGEFUND {
 
     // mapping of all protocol profits and fees collected from hedges
     mapping(address => uint256) public protocolProfitsTokens;//liquidated to paired at discount
-    mapping(address => uint256) public protocolpairProfits;
+    mapping(address => uint256) public protocolPairProfits;
     mapping(address => uint256) public protocolFeesTokens;//liquidated to paired at discount
-    mapping(address => uint256) public protocolpairedFees;
+    mapping(address => uint256) public protocolPairedFees;
     mapping(address => uint256) public hedgesCreatedVolume;//volume saved in paired currency
     mapping(address => uint256) public hedgesTakenVolume;
     mapping(address => uint256) public hedgesCostVolume;
@@ -225,7 +228,7 @@ contract HEDGEFUND {
     address public neonAddress;
     address public owner;
 
-    //events
+    // events
     event Received(address, uint);
     event onDeposit(address indexed token, uint256 indexed amount, address indexed wallet);
     event onWithdraw(address indexed token, uint256 indexed amount, address indexed wallet);
@@ -243,7 +246,7 @@ contract HEDGEFUND {
         usdtAddress = 0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9; // USDT address on Arb
         usdcAddress = 0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d; // USDC address on Arb
         neonAddress = 0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d;
-        // variables
+        // Variables
         feeNumerator = 5;
         feeDenominator = 1000;
         owner = msg.sender;
@@ -310,9 +313,9 @@ contract HEDGEFUND {
     }
 
     // Create Hedge: covers both call options and equity swaps. put options to be enabled in Beta V2
-    //cost is in pair currency or pair token
-    //swap collateral must  be equal, settle function relies on this implementation here
-    //put options will have amax loss check to only accept a strike price 50% away max
+    // premium or buying cost paid in paired token of the underlying asset in the deal
+    // no premium for swaps. swap collateral must  be equal for both parties, settle function relies on this implementation here
+    // put options will have a max loss check to only accept a strike price 50% away max
     function createHedge(uint tool, address token, uint256 amount, uint256 cost, uint256 deadline) public nonReentrant {
         require(!locked, "Function is locked");
         locked = true;
@@ -416,10 +419,10 @@ contract HEDGEFUND {
             myoptionsTaken[msg.sender].push(_optionId);            
         }
         // Log options for token
-         if(option.hedgeType == HedgeType.CALL || option.hedgeType == HedgeType.PUT) {
+         if(hedge.hedgeType == HedgeType.CALL || hedge.hedgeType == HedgeType.PUT) {
             optionsBought[hedge.token].push(_optionId);            
         }
-        if(option.hedgeType == HedgeType.SWAP) {
+        if(hedge.hedgeType == HedgeType.SWAP) {
             equityswapsBought[hedge.token].push(_optionId);
         }
 
@@ -719,7 +722,7 @@ contract HEDGEFUND {
             optionsSettled[option.token].push(_optionId);            
         }
         if(option.hedgeType == HedgeType.SWAP) {
-            equitycallsSettled[option].push(_optionId);
+            equityswapsSettled[option.token].push(_optionId);
         }
         
         // Log fee / payoff stats
@@ -742,7 +745,7 @@ contract HEDGEFUND {
         protocolProfitsTokens[token].add(tokenProfit);
         protocolPairProfits[paired].add(pairProfit);
         protocolFeesTokens[token].add(tokenFee);
-        protocolpairedFees[paired].add(pairedFee);
+        protocolPairedFees[paired].add(pairedFee);
         settledVolume[paired].add(endValue);
     }
 
@@ -909,77 +912,72 @@ contract HEDGEFUND {
         return result;
     }
 
-    // Helper function to retrieve a subset of options or swaps
-    function getSubsetOfOptionsOrSwaps(uint[] storage fullArray, uint startIndex, uint limit) internal view returns (uint[] memory) {
-        return getSubset(fullArray, startIndex, limit);
-    }
-
     // Function to retrieve a subset of options or swaps created/taken by a user
     function getUserOptionsHistory(address user, uint startIndex, uint limit) public view returns (uint[] memory) {
-        return getSubsetOfOptionsOrSwaps(myoptionsHistory[user], startIndex, limit);
+        return getSubset(myoptionsHistory[user], startIndex, limit);
     }
     function getUserSwapsHistory(address user, uint startIndex, uint limit) public view returns (uint[] memory) {
-        return getSubsetOfOptionsOrSwaps(myswapsHistory[user], startIndex, limit);
+        return getSubset(myswapsHistory[user], startIndex, limit);
     }
     function getUserOptionsCreated(address user, uint startIndex, uint limit) public view returns (uint[] memory) {
-        return getSubsetOfOptionsOrSwaps(myoptionsCreated[user], startIndex, limit);
+        return getSubset(myoptionsCreated[user], startIndex, limit);
     }
 
     function getUserSwapsCreated(address user, uint startIndex, uint limit) public view returns (uint[] memory) {
-        return getSubsetOfOptionsOrSwaps(myswapsCreated[user], startIndex, limit);
+        return getSubset(myswapsCreated[user], startIndex, limit);
     }
 
     function getUserOptionsTaken(address user, uint startIndex, uint limit) public view returns (uint[] memory) {
-        return getSubsetOfOptionsOrSwaps(myoptionsTaken[user], startIndex, limit);
+        return getSubset(myoptionsTaken[user], startIndex, limit);
     }
 
     function getUserSwapsTaken(address user, uint startIndex, uint limit) public view returns (uint[] memory) {
-        return getSubsetOfOptionsOrSwaps(myswapsTaken[user], startIndex, limit);
+        return getSubset(myswapsTaken[user], startIndex, limit);
     }
 
     // Helper function to retrieve a subset of options or swaps created/taken by all users
     function getAllOptions(uint startIndex, uint limit) public view returns (uint[] memory) {
-        return getSubsetOfOptionsOrSwaps(optionsCreated, startIndex, limit);
+        return getSubset(optionsCreated, startIndex, limit);
     }
 
     function getAllSwaps(uint startIndex, uint limit) public view returns (uint[] memory) {
-        return getSubsetOfOptionsOrSwaps(equityswapsCreated, startIndex, limit);
+        return getSubset(equityswapsCreated, startIndex, limit);
     }
 
     // Function to retrieve a subset of options or swaps taken
     function getAllOptionsTaken(uint startIndex, uint limit) public view returns (uint[] memory) {
-        return getSubsetOfOptionsOrSwaps(optionsTaken, startIndex, limit);
+        return getSubset(optionsTaken, startIndex, limit);
     }
 
     function getAllSwapsTaken(uint startIndex, uint limit) public view returns (uint[] memory) {
-        return getSubsetOfOptionsOrSwaps(equityswapsTaken, startIndex, limit);
+        return getSubset(equityswapsTaken, startIndex, limit);
     }
 
     // Function to retrieve purchased options or swaps for ERC20 address
     function getBoughtOptionsERC20(address _token, uint startIndex, uint limit) public view returns (uint[] memory) {
-        return getSubsetOfOptionsOrSwaps(optionsBought[_token], startIndex, limit);
+        return getSubset(optionsBought[_token], startIndex, limit);
     }
 
     function getBoughtSwapsERC20(address _token, uint startIndex, uint limit) public view returns (uint[] memory) {
-        return getSubsetOfOptionsOrSwaps(equityswapsBought[_token], startIndex, limit);
+        return getSubset(equityswapsBought[_token], startIndex, limit);
     }
 
     // Function to retrieve settled options or swaps for ERC20 address
     function getSettledOptionsERC20(address _token, uint startIndex, uint limit) public view returns (uint[] memory) {
-        return getSubsetOfOptionsOrSwaps(optionsSettled[_token], startIndex, limit);
+        return getSubset(optionsSettled[_token], startIndex, limit);
     }
 
     function getSettledSwapsERC20(address _token, uint startIndex, uint limit) public view returns (uint[] memory) {
-        return getSubsetOfOptionsOrSwaps(equitycallsSettled[_token], startIndex, limit);
+        return getSubset(equityswapsSettled[_token], startIndex, limit);
     }
 
     // Function to retrieve a subset of options or swaps for a specific token
     function getOptionsForToken(address _token, uint startIndex, uint limit) public view returns (uint[] memory) {
-        return getSubsetOfOptionsOrSwaps(tokenOptions[_token], startIndex, limit);
+        return getSubset(tokenOptions[_token], startIndex, limit);
     }
 
     function getSwapsForToken(address _token, uint startIndex, uint limit) public view returns (uint[] memory) {
-        return getSubsetOfOptionsOrSwaps(tokenSwaps[_token], startIndex, limit);
+        return getSubset(tokenSwaps[_token], startIndex, limit);
     }
 
     // Function to get hedge details
@@ -990,28 +988,27 @@ contract HEDGEFUND {
     }
 
     function getHedgeRange(uint256 startId, uint256 endId) public view returns (hedgingOption[] memory) {
-        require(startId <= endId, "Invalid range");
-        require(endId >= startId, "End option ID must be greater than or equal to start option ID");
-        
+        require(endId >= startId, "Invalid range");
+
         uint256 rangeSize = endId - startId + 1;
         hedgingOption[] memory result = new hedgingOption[](rangeSize);
-        
+
         for (uint256 i = 0; i < rangeSize; i++) {
             uint256 optionId = startId + i;
             hedgingOption storage hedge = hedgeMap[optionId];
-            require(hedge.owner != address(0), "Option does not exist");
-            result[i] = hedge;
+            if (hedge.owner != address(0)) {
+                result[i] = hedge;
+            }
         }
-        
+
         return result;
     }
 
-    // Function to get the length of deposited tokens
+    // Gas efficiency optimized by fetching length backend
     function getDepositedTokensLength() external view returns (uint) {
         return userERC20s[address(this)].length;
     }
 
-    // Function to get the length of all options and swaps created
     function getAllOptionsLength() public view returns (uint256) {
         return optionsCreated.length;
     }
@@ -1020,7 +1017,6 @@ contract HEDGEFUND {
         return equityswapsCreated.length;
     }
 
-    // Function to get the count of options under a specific token
     function getOptionsForTokenCount(address _token) public view returns (uint256) {
         return tokenOptions[_token].length;
     }
