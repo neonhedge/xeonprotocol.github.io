@@ -1,7 +1,27 @@
 import { CONSTANTS, getCurrentEthUsdcPriceFromUniswapV2, getTokenETHValue, getTokenUSDValue } from './constants.js';
 import { updateSectionValues_volumes } from './module-market-sidebar-updaters.js';
 // Load hedge volume: created, bought, settled, payouts, fees
-async function loadSidebarVolume() {
+// Load token stats and information when searchBar contains token address
+async function loadSidebar() {
+    
+    const searchInput = $('#searchBar').val();
+
+    if (window.sidebarTab == 1) {
+        // check if address exists in search bar
+        if (searchInput.length >= 40 && web3.utils.isAddress(searchInput) == true) {
+            // filter sidebar infor for token
+            await loadSidebarVolume_Token(searchInput);
+        } else { 
+            // fetch all
+            await loadSidebarVolume_All();
+        }
+    }
+    else if (window.sidebarTab == 2) {
+        // live hedge events are filtered in the events listeners by checking #searchBar value
+    }
+}
+
+async function loadSidebarVolume_All() {
     
     const hedgesCreatedWETH = await contractInstance.hedgesCreatedVolume(CONSTANTS.wethAddress);
     const hedgesCreatedUSDT = await contractInstance.hedgesCreatedVolume(CONSTANTS.usdtAddress);
@@ -114,4 +134,36 @@ async function loadSidebarVolume() {
     );
 }
 
-export { loadSidebarVolume }
+async function loadSidebarVolume_Token(pairAddress) {
+    const boughtOptions = await contract.methods.getBoughtOptionsERC20(pairAddress, startIndex, limit).call();
+    const boughtSwaps = await contract.methods.getBoughtSwapsERC20(pairAddress, startIndex, limit).call();
+    const settledOptions = await contract.methods.getSettledOptionsERC20(pairAddress, startIndex, limit).call();
+    const settledSwaps = await contract.methods.getSettledSwapsERC20(pairAddress, startIndex, limit).call();
+    const options = await contract.methods.getOptionsForToken(pairAddress, startIndex, limit).call();
+    const swaps = await contract.methods.getSwapsForToken(pairAddress, startIndex, limit).call();
+
+    // token price in paired currency
+    const [tokenPrice, pairedSymbol] = await getTokenETHValue(pairAddress);
+
+  
+    const boughtOptionsCount = boughtOptions.length;
+    const boughtSwapsCount = boughtSwaps.length;
+    const settledOptionsCount = settledOptions.length;
+    const settledSwapsCount = settledSwaps.length;
+    const optionsCount = options.length;
+    const swapsCount = swaps.length;
+  
+    // Call the updateSectionValues_hedges function
+    updateSectionValues_volumesERC20(
+        tokenPrice,
+        pairedSymbol,
+        boughtOptionsCount,
+        boughtSwapsCount,
+        settledOptionsCount,
+        settledSwapsCount,
+        optionsCount,
+        swapsCount
+    );
+  }
+
+export { loadSidebarVolume_All, loadSidebarVolume_Token }
