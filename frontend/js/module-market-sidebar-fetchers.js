@@ -1,5 +1,5 @@
 import { CONSTANTS, getCurrentEthUsdcPriceFromUniswapV2, getTokenETHValue, getTokenUSDValue } from './constants.js';
-import { updateSectionValues_volumes } from './module-market-sidebar-updaters.js';
+import { updateSectionValues_volumes, updateSectionValues_volumesERC20 } from './module-market-sidebar-updaters.js';
 // Load hedge volume: created, bought, settled, payouts, fees
 // Load token stats and information when searchBar contains token address
 async function loadSidebar() {
@@ -130,17 +130,37 @@ async function loadSidebarVolume_All() {
     );
 }
 
-async function loadSidebarVolume_Token(pairAddress) {
-    const boughtOptions = await contract.methods.getBoughtOptionsERC20(pairAddress, startIndex, limit).call();
-    const boughtSwaps = await contract.methods.getBoughtSwapsERC20(pairAddress, startIndex, limit).call();
-    const settledOptions = await contract.methods.getSettledOptionsERC20(pairAddress, startIndex, limit).call();
-    const settledSwaps = await contract.methods.getSettledSwapsERC20(pairAddress, startIndex, limit).call();
-    const options = await contract.methods.getOptionsForToken(pairAddress, startIndex, limit).call();
-    const swaps = await contract.methods.getSwapsForToken(pairAddress, startIndex, limit).call();
+async function loadSidebarVolume_Token(tokenAddress) {
+    const boughtOptions = await contract.methods.getBoughtOptionsERC20(tokenAddress, startIndex, limit).call();
+    const boughtSwaps = await contract.methods.getBoughtSwapsERC20(tokenAddress, startIndex, limit).call();
+    const settledOptions = await contract.methods.getSettledOptionsERC20(tokenAddress, startIndex, limit).call();
+    const settledSwaps = await contract.methods.getSettledSwapsERC20(tokenAddress, startIndex, limit).call();
+    const options = await contract.methods.getOptionsForToken(tokenAddress, startIndex, limit).call();
+    const swaps = await contract.methods.getSwapsForToken(tokenAddress, startIndex, limit).call();
 
     // token price in paired currency
-    const [tokenPrice, pairedSymbol] = await getTokenETHValue(pairAddress);
+    const [tokenPrice, pairedSymbol] = await getTokenETHValue(tokenAddress);
 
+    // fetch more infor
+    // standard ERC20 ABI
+	  const erc20ABI = [
+		{
+		  constant: true,
+		  inputs: [],
+		  name: 'name',
+		  outputs: [{ name: '', type: 'string' }],
+		  type: 'function',
+		},
+		{
+		  constant: true,
+		  inputs: [],
+		  name: 'symbol', // Add the symbol function
+		  outputs: [{ name: '', type: 'string' }],
+		  type: 'function',
+		},
+	];
+	let tokenContract = new web3.eth.Contract(erc20ABI, tokenAddress);
+	let tokenName = await tokenContract.methods.name().call(); 
   
     const boughtOptionsCount = boughtOptions.length;
     const boughtSwapsCount = boughtSwaps.length;
@@ -151,6 +171,8 @@ async function loadSidebarVolume_Token(pairAddress) {
   
     // Call the updateSectionValues_hedges function
     updateSectionValues_volumesERC20(
+        tokenAddress,
+        tokenName,
         tokenPrice,
         pairedSymbol,
         boughtOptionsCount,

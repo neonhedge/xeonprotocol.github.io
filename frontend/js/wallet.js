@@ -3,6 +3,7 @@
 ==========================================================================*/
 import { isValidEthereumAddress, getUserBalancesForToken } from './constants.js';
 import { initWeb3 } from './dapp-web3-utils.js';
+import { unlockedWallet, reqConnect} from './web3-walletstatus-module.js';
 import { fetchSection_Networth, fetchSection_BalanceList, fetchSection_HedgePanel, fetchSection_RewardsPanel, fetchSection_StakingPanel } from './module-wallet-section-fetchers.js';
 import { loadHedgesModule } from './module-wallet-section-hedgesList.js';
 
