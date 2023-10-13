@@ -70,36 +70,66 @@ async function refreshDataOnElements() {
 async function loadOptions(){
 	//CALL OPTIONS
 	if (window.nav === 1 && window.filters === 1) { // Get vacant call options, exclude taken
-		if (MyGlobals.lastItemIndex !== 0) {
-		  if (window.readLimit + 1 > MyGlobals.lastItemIndex) {
-			window.readLimit = MyGlobals.lastItemIndex - 1;
-		  }
-		  MyGlobals.startIndex = MyGlobals.lastItemIndex - window.readLimit - 1;
-		} else { // Start from the latest item in the array, our solidity reads incrementally so subtract window.readLimit -1 point to pick correct starting point for reads
-		  let allHedgesLength = await hedgingInstance.methods.getAllHedgesLength().call();
-		  MyGlobals.startIndex = allHedgesLength - window.readLimit - 1;
+		//FILTER BY TOKEN ADDRESS
+		let filterAddress = $('#searchBar').val();
+		if(window.nav == 1 && window.filters == 4 && filterAddress.length >= 40 && web3.utils.isAddress(filterAddress) == true){//filter by token address
+			if (MyGlobals.lastItemIndex !== 0) {
+				if (window.readLimit + 1 > MyGlobals.lastItemIndex) {
+					window.readLimit = MyGlobals.lastItemIndex - 1;
+				}
+				MyGlobals.startIndex = MyGlobals.lastItemIndex - 1 - window.readLimit;
+			} else { // Start from the latest item in the array, our solidity reads incrementally so subtract window.readLimit -1 point to pick correct starting point for reads
+				let allHedgesLength = await hedgingInstance.methods.getOptionsForTokenCount(filterAddress).call();
+				MyGlobals.startIndex = allHedgesLength - 1 - window.readLimit;
+			}
+				
+			let optionsArray = await hedgingInstance.methods.getOptionsForToken(filterAddress, MyGlobals.startIndex, window.readLimit).call();
+
+			if (optionsArray.length > 0) {
+				$('#hedgesTimeline').empty();		
+				// Update MyGlobals.outputArray directly
+				MyGlobals.MyGlobals.outputArray.push(...optionsArray);		
+				for (const hedgeID of optionsArray) {
+					await fetchOptionCard(hedgeID);
+				}		
+				// Update last result index
+				MyGlobals.lastItemIndex = MyGlobals.startIndex;
+			} else {
+				noOptionsSwal();
+			}
 		}
-	  
-		let optionsArray = await hedgingInstance.methods.getAllHedges(MyGlobals.startIndex, window.readLimit).call();
-		let takenArray = await hedgingInstance.methods.getAllHedgesTaken(MyGlobals.startIndex, 1000000000).call();
-	  
-		// Use filter() method to get vacant options
-		let vacantOptionsArray = optionsArray.filter(hedgeID => !takenArray.includes(hedgeID));
-	  
-		if (vacantOptionsArray.length > 0) {
-		  $('#hedgesTimeline').empty();
-	  
-		  // Update MyGlobals.outputArray directly
-		  MyGlobals.MyGlobals.outputArray.push(...vacantOptionsArray);
-	  
-		  for (const hedgeID of vacantOptionsArray) {
-			await fetchOptionCard(hedgeID);
-		  }
-	  
-		  // Update last result index
-		  MyGlobals.lastItemIndex = MyGlobals.startIndex;
-		} else {
-		  noOptionsSwal();
+		else { // UNFILTERED FETCH ALL OPTIONS
+			if (MyGlobals.lastItemIndex !== 0) {
+				if (window.readLimit + 1 > MyGlobals.lastItemIndex) {
+				  window.readLimit = MyGlobals.lastItemIndex - 1;
+				}
+				MyGlobals.startIndex = MyGlobals.lastItemIndex - window.readLimit - 1;
+			} else { // Start from the latest item in the array, our solidity reads incrementally so subtract window.readLimit -1 point to pick correct starting point for reads
+				let allHedgesLength = await hedgingInstance.methods.getAllHedgesLength().call();
+				MyGlobals.startIndex = allHedgesLength - window.readLimit - 1;
+			}
+			
+			let optionsArray = await hedgingInstance.methods.getAllHedges(MyGlobals.startIndex, window.readLimit).call();
+			let takenArray = await hedgingInstance.methods.getAllHedgesTaken(MyGlobals.startIndex, 1000000000).call();
+			
+			// Use filter() method to get vacant options
+			let vacantOptionsArray = optionsArray.filter(hedgeID => !takenArray.includes(hedgeID));
+			
+			if (vacantOptionsArray.length > 0) {
+				$('#hedgesTimeline').empty();
+			
+				// Update MyGlobals.outputArray directly
+				MyGlobals.MyGlobals.outputArray.push(...vacantOptionsArray);
+			
+				for (const hedgeID of vacantOptionsArray) {
+				  await fetchOptionCard(hedgeID);
+				}
+			
+				// Update last result index
+				MyGlobals.lastItemIndex = MyGlobals.startIndex;
+			} else {
+				noOptionsSwal();
+			}
 		}
 	}
 	  
@@ -153,70 +183,73 @@ async function loadOptions(){
 		}
 	}
 
-	//FILTER BY TOKEN ADDRESS
-	let filterAddress = $('#swapsearch').val();
-	if(window.nav == 1 && window.filters == 4 && filterAddress.length >= 40 && web3.utils.isAddress(filterAddress) == true){//filter by token address
-		if (MyGlobals.lastItemIndex !== 0) {
-			if (window.readLimit + 1 > MyGlobals.lastItemIndex) {
-				window.readLimit = MyGlobals.lastItemIndex - 1;
-			}
-			MyGlobals.startIndex = MyGlobals.lastItemIndex - 1 - window.readLimit;
-		} else { // Start from the latest item in the array, our solidity reads incrementally so subtract window.readLimit -1 point to pick correct starting point for reads
-			let allHedgesLength = await hedgingInstance.methods.getHedgesForTokenCount(filterAddress).call();
-			MyGlobals.startIndex = allHedgesLength - 1 - window.readLimit;
-		}
-			
-		let optionsArray = await hedgingInstance.methods.getHedgesForToken(filterAddress, MyGlobals.startIndex, window.readLimit).call();
-
-		if (optionsArray.length > 0) {
-			$('#hedgesTimeline').empty();		
-			// Update MyGlobals.outputArray directly
-			MyGlobals.MyGlobals.outputArray.push(...optionsArray);		
-			for (const hedgeID of optionsArray) {
-				await fetchOptionCard(hedgeID);
-			}		
-			// Update last result index
-			MyGlobals.lastItemIndex = MyGlobals.startIndex;
-		} else {
-			noOptionsSwal();
-		}
-	}
 
 	/*===================================================================================================
 
 	====================================================================================================*/
 	//EQUITY SWAPS
 	if (window.nav === 2 && window.filters === 1) { // Get vacant equity swaps, exclude taken
-		if (MyGlobals.lastItemIndex !== 0) {
-		  if (window.readLimit + 1 > MyGlobals.lastItemIndex) {
-			window.readLimit = MyGlobals.lastItemIndex - 1;
-		  }
-		  MyGlobals.startIndex = MyGlobals.lastItemIndex - window.readLimit - 1;
-		} else { // Start from the latest item in the array, our solidity reads incrementally so subtract window.readLimit -1 point to pick correct starting point for reads
-		  let allSwapsLength = await hedgingInstance.methods.getAllSwapsLength().call();
-		  MyGlobals.startIndex = allSwapsLength - window.readLimit - 1;
-		}
-	  
-		let optionsArray = await hedgingInstance.methods.getAllSwaps(MyGlobals.startIndex, window.readLimit).call();
-		let takenArray = await hedgingInstance.methods.getAllSwapsTaken(MyGlobals.startIndex, 1000000000).call();
-	  
-		// Use filter() method to get vacant swaps
-		let vacantOptionsArray = optionsArray.filter(hedgeID => !takenArray.includes(hedgeID));
-	  
-		if (vacantOptionsArray.length > 0) {
-		  $('#hedgesTimeline').empty();
-	  
-		  // Update MyGlobals.outputArray directly
-		  MyGlobals.MyGlobals.outputArray.push(...vacantOptionsArray);
-	  
-		  for (const hedgeID of vacantOptionsArray) {
-			await fetchOptionCard(hedgeID);
-		  }
-	  
-		  // Update last result index
-		  MyGlobals.lastItemIndex = MyGlobals.startIndex;
-		} else {
-		  noOptionsSwal();
+
+		//FILTER BY TOKEN ADDRESS
+		let filterAddress2 = $('#searchBar').val();
+		if(window.nav == 1 && window.filters == 4 && filterAddress2.length >= 40 && web3.utils.isAddress(filterAddress2) == true){//filter by token address
+			if (MyGlobals.lastItemIndex !== 0) {
+				if (window.readLimit + 1 > MyGlobals.lastItemIndex) {
+					window.readLimit = MyGlobals.lastItemIndex - 1;
+				}
+				MyGlobals.startIndex = MyGlobals.lastItemIndex - 1 - window.readLimit;
+			} else { // Start from the latest item in the array, our solidity reads incrementally so subtract window.readLimit -1 point to pick correct starting point for reads
+				let allSwapsLength = await hedgingInstance.methods.getSwapsForTokenCount(filterAddress).call();
+				MyGlobals.startIndex = allSwapsLength - 1 - window.readLimit;
+			}
+				
+			let optionsArray = await hedgingInstance.methods.getSwapsForToken(filterAddress2, MyGlobals.startIndex, window.readLimit).call();
+
+			if (optionsArray.length > 0) {
+				$('#hedgesTimeline').empty();		
+				// Update MyGlobals.outputArray directly
+				MyGlobals.MyGlobals.outputArray.push(...optionsArray);		
+				for (const hedgeID of optionsArray) {
+					await fetchOptionCard(hedgeID);
+				}		
+				// Update last result index
+				MyGlobals.lastItemIndex = MyGlobals.startIndex;
+			} else {
+				noOptionsSwal();
+			}
+		}// UNFILTERED - FETCH ALL SWAPS
+		else {
+			if (MyGlobals.lastItemIndex !== 0) {
+				if (window.readLimit + 1 > MyGlobals.lastItemIndex) {
+				  window.readLimit = MyGlobals.lastItemIndex - 1;
+				}
+				MyGlobals.startIndex = MyGlobals.lastItemIndex - window.readLimit - 1;
+			} else { // Start from the latest item in the array, our solidity reads incrementally so subtract window.readLimit -1 point to pick correct starting point for reads
+				let allSwapsLength = await hedgingInstance.methods.getAllSwapsLength().call();
+				MyGlobals.startIndex = allSwapsLength - window.readLimit - 1;
+			}
+			
+			let optionsArray = await hedgingInstance.methods.getAllSwaps(MyGlobals.startIndex, window.readLimit).call();
+			let takenArray = await hedgingInstance.methods.getAllSwapsTaken(MyGlobals.startIndex, 1000000000).call();
+			
+			// Use filter() method to get vacant swaps
+			let vacantOptionsArray = optionsArray.filter(hedgeID => !takenArray.includes(hedgeID));
+			
+			if (vacantOptionsArray.length > 0) {
+				$('#hedgesTimeline').empty();
+			
+				// Update MyGlobals.outputArray directly
+				MyGlobals.MyGlobals.outputArray.push(...vacantOptionsArray);
+			
+				for (const hedgeID of vacantOptionsArray) {
+				  await fetchOptionCard(hedgeID);
+				}
+			
+				// Update last result index
+				MyGlobals.lastItemIndex = MyGlobals.startIndex;
+			} else {
+				noOptionsSwal();
+			}
 		}
 	}
 	//EQUITY SWAPS MY POSITIONS
@@ -264,35 +297,6 @@ async function loadOptions(){
 				await fetchOptionCard(hedgeID);
 			}
 		}else {//no hedges
-			noOptionsSwal();
-		}
-	}
-
-	//FILTER BY TOKEN ADDRESS
-	let filterAddress2 = $('#swapsearch').val();
-	if(window.nav == 1 && window.filters == 4 && filterAddress2.length >= 40 && web3.utils.isAddress(filterAddress2) == true){//filter by token address
-		if (MyGlobals.lastItemIndex !== 0) {
-			if (window.readLimit + 1 > MyGlobals.lastItemIndex) {
-				window.readLimit = MyGlobals.lastItemIndex - 1;
-			}
-			MyGlobals.startIndex = MyGlobals.lastItemIndex - 1 - window.readLimit;
-		} else { // Start from the latest item in the array, our solidity reads incrementally so subtract window.readLimit -1 point to pick correct starting point for reads
-			let allSwapsLength = await hedgingInstance.methods.getSwapsForTokenCount(filterAddress).call();
-			MyGlobals.startIndex = allSwapsLength - 1 - window.readLimit;
-		}
-			
-		let optionsArray = await hedgingInstance.methods.getSwapsForToken(filterAddress2, MyGlobals.startIndex, window.readLimit).call();
-
-		if (optionsArray.length > 0) {
-			$('#hedgesTimeline').empty();		
-			// Update MyGlobals.outputArray directly
-			MyGlobals.MyGlobals.outputArray.push(...optionsArray);		
-			for (const hedgeID of optionsArray) {
-				await fetchOptionCard(hedgeID);
-			}		
-			// Update last result index
-			MyGlobals.lastItemIndex = MyGlobals.startIndex;
-		} else {
 			noOptionsSwal();
 		}
 	}

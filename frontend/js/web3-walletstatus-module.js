@@ -54,7 +54,7 @@ async function unlockedWallet() {
 			}
 		} else {
 			if (switchNetwork()) {
-				initializeConnection();
+				await initializeConnection();
 			} else {
 				// Handle error from switchNetwork function
 			}
@@ -69,7 +69,7 @@ async function unlockedWallet() {
 			console.log("Please connect to MetaMask.");
 		} else if (wallets[0] !== window.currentAccount) {
 			window.currentAccount = wallets[0];
-			initializeConnection();
+			await initializeConnection();
 		}
 	}
 
@@ -81,7 +81,7 @@ async function unlockedWallet() {
 			$(".wallets").css("display", "none");
 			$(".network_switch").css("display", "inline-block");
 		} else {
-			initializeConnection();
+			await initializeConnection();
 			console.log("Reading eth mainnet");
 		}
 	}
@@ -130,6 +130,7 @@ async function unlockedWallet() {
 		try {
 		const block = await window.web3.eth.getBlockNumber();
 		document.getElementById('blocknumber').innerHTML = `<a href="${CONSTANTS.etherScan}/block/${block}" target="_blank">${block}</a>`;
+		console.log('block: ', block);
 		} catch (error) {
 		console.log(error);
 		swal({
@@ -145,7 +146,14 @@ async function unlockedWallet() {
 	
 	async function chainCheck() {	  
 		try {
-		  const chainID = await web3.eth.getChainId();
+		  await window.web3.eth.getChainId()
+		.then((chainId) => {
+			console.log("Chain ID:", chainId);
+			const chainID = chainId;
+		})
+		.catch((error) => {
+			console.error("Error fetching chain ID:", error);
+		});
 		  
 		  if (chainID === CONSTANTS.network) {
 			console.log(`${chainID} == ${CONSTANTS.network}`);
@@ -194,7 +202,7 @@ async function unlockedWallet() {
 				});
 				$('.wallets').css('display', 'none');
 				$('.walletpur').css('display', 'inline-block');
-				initializeConnection();
+				await initializeConnection();
 			} catch (addError) {
 				console.log(addError);
 				$('.network_switch').css('display', 'inline-block');
@@ -240,7 +248,7 @@ async function unlockedWallet() {
 		  
 		  if (permissions.length > 0) {
 			console.log(`eth_accounts permission successfully requested!`);
-			initializeConnection();
+			await initializeConnection();
 			return true;
 		  }
 		} catch (error) {
@@ -356,7 +364,11 @@ async function unlockedWallet() {
 	// Make sure to call the required functions to start the process
 	$(document).ready(function (e) {
 		$('.waiting_init').css('display', 'inline-block');
-		initializeConnection();
+		try{
+			initializeConnection();
+		} catch (error) {
+			console.log(error);
+		}
 	});
 	
 	$(document).on('click', '.wallet_connect', function () {
