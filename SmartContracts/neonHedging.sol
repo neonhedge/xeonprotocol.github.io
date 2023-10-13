@@ -232,9 +232,9 @@ contract HEDGEFUND {
     event Received(address, uint);
     event onDeposit(address indexed token, uint256 indexed amount, address indexed wallet);
     event onWithdraw(address indexed token, uint256 indexed amount, address indexed wallet);
-    event hedgeCreated(address indexed token, uint256 indexed optionId, uint256 amount, HedgeType hedgeType, uint256 cost);
-    event hedgePurchased(address indexed token, uint256 indexed optionId, uint256 startValue, HedgeType hedgeType, address buyer);
-    event hedgeSettled(address indexed token, uint256 indexed optionId, uint256 amount, uint256 indexed payOff, uint256 endValue);
+    event hedgeCreated(address indexed token, uint256 indexed optionId, uint256 createValue, HedgeType hedgeType, address indexed writer);
+    event hedgePurchased(address indexed token, uint256 indexed optionId, uint256 startValue, HedgeType hedgeType, address indexed buyer);
+    event hedgeSettled(address indexed token, uint256 indexed optionId, uint256 endValue, uint256 indexed payOff, uint256 indexed miner);
     event minedHedge(uint256 optionId, address indexed miner, address indexed token, address indexed paired, uint256 tokenFee, uint256 pairFee);
     event bookmarkToggle(address indexed user, uint256 hedgeId, bool bookmarked);
     event topupRequested(address indexed party, uint256 indexed hedgeId, uint256 topupAmount, bool consent);
@@ -372,7 +372,7 @@ contract HEDGEFUND {
         if(newOption.paired == usdcAddress){usdcEquivUserHedged[msg.sender] += newOption.createValue;}
 
         // Emit
-        emit hedgeCreated(token, optionID, amount, newOption.hedgeType, cost);
+        emit hedgeCreated(token, optionID, newOption.createValue, newOption.hedgeType, msg.sender);
         locked = false;
     }
 
@@ -734,7 +734,7 @@ contract HEDGEFUND {
             userERC20s[option.taker].push(option.token);            
         }
         // Emit
-        emit hedgeSettled(option.token, _optionId, option.amount, hedgeInfo.payOff, hedgeInfo.underlyingValue);
+        emit hedgeSettled(option.token, _optionId, hedgeInfo.underlyingValue, hedgeInfo.payOff, msg.sender);
         emit minedHedge(_optionId, msg.sender, option.token, option.paired, hedgeInfo.tokenFee, hedgeInfo.pairedFee);
     }
 
