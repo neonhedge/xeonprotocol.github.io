@@ -141,9 +141,13 @@ contract HEDGEFUND {
     // mapping topup requests 
     mapping(uint => topupData) public topupMap;
 
-    // mapping of all hedges & swaps for each erc20
+    // mapping of all hedges created for each erc20
     mapping(address => uint[]) private tokenOptions;
     mapping(address => uint[]) private tokenSwaps;
+
+    // mapping of all hedges taken for each erc20
+    mapping(address => uint[]) private optionsBought;
+    mapping(address => uint[]) private equityswapsBought;
 
     // mapping of all hedges settled for each erc20
     mapping(address => uint[]) private optionsSettled;
@@ -416,7 +420,7 @@ contract HEDGEFUND {
             optionsBought[hedge.token].push(_optionId);            
         }
         if(option.hedgeType == HedgeType.SWAP) {
-            equitycallsBought[hedge.token].push(_optionId);
+            equityswapsBought[hedge.token].push(_optionId);
         }
 
         // Log pair tokens involved in protocol revenue
@@ -949,6 +953,15 @@ contract HEDGEFUND {
 
     function getAllSwapsTaken(uint startIndex, uint limit) public view returns (uint[] memory) {
         return getSubsetOfOptionsOrSwaps(equityswapsTaken, startIndex, limit);
+    }
+
+    // Function to retrieve purchased options or swaps for ERC20 address
+    function getBoughtOptionsERC20(address _token, uint startIndex, uint limit) public view returns (uint[] memory) {
+        return getSubsetOfOptionsOrSwaps(optionsBought[_token], startIndex, limit);
+    }
+
+    function getBoughtSwapsERC20(address _token, uint startIndex, uint limit) public view returns (uint[] memory) {
+        return getSubsetOfOptionsOrSwaps(equityswapsBought[_token], startIndex, limit);
     }
 
     // Function to retrieve settled options or swaps for ERC20 address
