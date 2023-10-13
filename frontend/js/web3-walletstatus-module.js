@@ -54,7 +54,25 @@ async function unlockedWallet() {
 			}
 		} else {
 			if (switchNetwork()) {
-				await initializeConnection();
+				//await initializeConnection();
+				// pop up retry swal to recall initializeConnection
+				swal(
+					{
+						title: 'Ooops...',
+						text: 'Failed to initialize Chain and Wallet. \nClick retry button to try again.',
+						type: 'info',
+						html: false,
+						dangerMode: false,
+						confirmButtonText: 'retry',
+						cancelButtonText: 'cancel',
+						showConfirmButton: true,
+						showCancelButton: true,
+						timer: 10000,
+						animation: 'slide-from-top',
+					}, function () {
+						console.log('intialize retry...');
+						initializeConnection();
+					}); 
 			} else {
 				// Handle error from switchNetwork function
 			}
@@ -62,7 +80,7 @@ async function unlockedWallet() {
 	}
 
 	async function handleAccountChange(wallets) {
-		console.log("Account changed:", accounts);
+		console.log("Account changed:", wallets);
     	let wallet = wallets[0];
 		wallet = wallets.length ? wallets[0] : null;
 		if (wallets.length === 0) {
@@ -128,9 +146,9 @@ async function unlockedWallet() {
 	
 	async function currentBlock() {
 		try {
-		const block = await window.web3.eth.getBlockNumber();
-		document.getElementById('blocknumber').innerHTML = `<a href="${CONSTANTS.etherScan}/block/${block}" target="_blank">${block}</a>`;
-		console.log('block: ', block);
+			const block = await window.web3.eth.getBlockNumber();
+			document.getElementById('blocknumber').innerHTML = `<a href="${CONSTANTS.etherScan}/block/${block}" target="_blank">${block}</a>`;
+			console.log('block: ', block);
 		} catch (error) {
 		console.log(error);
 		swal({
@@ -146,26 +164,26 @@ async function unlockedWallet() {
 	
 	async function chainCheck() {	  
 		try {
-		  await window.web3.eth.getChainId()
-		.then((chainId) => {
-			console.log("Chain ID:", chainId);
-			const chainID = chainId;
-		})
-		.catch((error) => {
-			console.error("Error fetching chain ID:", error);
-		});
-		  
-		  if (chainID === CONSTANTS.network) {
-			console.log(`${chainID} == ${CONSTANTS.network}`);
-			$('.wallets').css('display', 'none');
-			$('.waiting_init').css('display', 'inline-block');
-			return true;
-		  } else if (chainID !== CONSTANTS.network) {
-			console.log(`wrong chain: ${chainID} vs ${CONSTANTS.network}`);
-			$('.wallets').css('display', 'none');
-			$('.network_switch').css('display', 'inline-block');
-			return false;
-		  }
+			await window.web3.eth.getChainId()
+			.then((chainId) => {
+				console.log("Chain ID:", chainId);
+				const chainID = chainId;
+
+				if (chainID === CONSTANTS.network) {
+					console.log(`${chainID} == ${CONSTANTS.network}`);
+					$('.wallets').css('display', 'none');
+					$('.waiting_init').css('display', 'inline-block');
+					return true;
+				} else if (chainID !== CONSTANTS.network) {
+					console.log(`wrong chain: ${chainID} vs ${CONSTANTS.network}`);
+					$('.wallets').css('display', 'none');
+					$('.network_switch').css('display', 'inline-block');
+					return false;
+				}
+			})
+			.catch((error) => {
+				console.error("Error fetching chain ID:", error);
+			});		  
 		} catch (error) {
 		  console.error('Error checking chain:', error);
 		  // Handle errors, e.g., chain ID retrieval failed

@@ -425,6 +425,10 @@ input, textarea {
   font-size: 1.2rem;
 }
 
+fieldset input {
+  display: none !important;
+}
+
 button, a.btn {
   font-family: "Space Grotesk", sans-serif;
   font-size: 1.12rem;
