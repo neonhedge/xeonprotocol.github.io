@@ -80,8 +80,7 @@ body{
 	  visibility: hidden;
 	  display: none;
 	}
- }
-
+}
   
 section.sectionCenter {
 	position: relative;
@@ -206,7 +205,7 @@ aside {
 	padding:0.1vw 0.4vw;
 	/* unknown, unknown, unknown, glow radius, no-effect, shadow */
 	text-shadow: 0 0 1px #188dd6, 0 0 2px #188dd6, 0 0 10px #188dd6, 0 0 1px #188dd6, 0 0 0px #188dd6, 2px 2px 0.5px #0e567c;
-	color: #4ad6e6;
+	color: #08e7fe;
 }
 /*
 .hedgedVolume {
@@ -360,6 +359,39 @@ color: #FED128;
 	text-align: left;
 }
 
+/* Token Summary Cards */
+.tokenStats {
+	position: relative;
+	display:block;
+}
+.tokenHead {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-content: center;
+	text-align: center;
+}
+.sidebarLogo {
+	margin: unset !important;
+	margin:0px auto !important;
+}
+.sidebarName {
+	text-align: center !important;
+}
+.token_links {
+	width: 100%;
+	line-height: 20px;
+	font-size: 14px;
+}
+.etherscanLink {
+	display: inline-flex;
+	padding: 2px;
+	box-sizing: border-box;
+	font-size: 12px;
+	font-weight: 100;
+	color: rgb(139, 149, 158) !important;
+}
 /* club timeline projects tabs */
 .feedsfilterDockHold{
 	position: sticky;
@@ -580,14 +612,15 @@ fieldset input{
 	border-radius:10px;
 	border: 0.5px solid #d6188a;
 	border: 0.5px solid #188dd6;
-	background-color: #3d3d3d;
+	background-color: #000;
 	color:#DDD;
 	text-align:center;
 	padding:2px;
 }
 .walletBalancesTL{
 	margin:5px 0;
-	background-color: #2e2e2e;
+	background-color: #000;
+	border: 0.5px solid #08f;
 	border-radius:5px;
 	
 	display: flex;
@@ -598,24 +631,25 @@ fieldset input{
 	flex: 1; /* Expand to fill available space */
 	margin-inline:2px;
 	min-width: 70px;
-	border-left:0.5px solid #3d3d3d;
+	border-top:0.5px solid #08f;
 }
 .walletBalancesTL span{
 	flex-basis: 100%;
 	display: inline-block;
 	margin:5px 0;
 	color:#188dd6;
-	font-family: 'modeseven','bitwise', sans-serif, "Helvetica Neue", Helvetica, Arial !important;
+	color: rgb(8, 231, 254);
+	font-family: 'modeseven','bitwise', sans-serif, "Helvetica Neue", Helvetica, Arial;
+	font-family: "Space Grotesk", sans-serif;
 	font-size: 13.5px;
 	letter-spacing: 0;
-	text-transform: uppercase;
 }
 .walletBalancesTL p {
 	font-size: 13px !important;
 	padding:5px 10px 0 !important;
 	width: 100%;
 	text-align: center !important;
-	text-transform: uppercase;
+	text-transform: capitalize;
 }
 .walletbalanceSpan img{
 	width:12px;

@@ -33,6 +33,7 @@ body.stop-scrolling {
 
   background: linear-gradient(150deg, #d6188a, #040115 20%) !important;
   font-family: monospace, sans-serif, "Helvetica Neue", Helvetica, "Liberation Sans"!important;
+  font-family: "Space Grotesk", "Nunito", sans-serif !important;
   text-align: center;
   overflow: hidden;
   display: none;
@@ -64,7 +65,7 @@ body.stop-scrolling {
     color: #ddd;
     font-size: 14.5px;
     text-align: center;
-    font-weight: 300;
+    font-weight: 100;
     position: relative;
     text-align: inherit;
     float: none;
