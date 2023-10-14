@@ -7,7 +7,7 @@ async function loadSidebar() {
     const searchInput = $('#searchBar').val();
 
     // check if address exists in search bar
-    if (searchInput.length >= 40 && web3.utils.isAddress(searchInput) == true) {
+    if (searchInput.length >= 40 && window.web3.utils.isAddress(searchInput) == true) {
         // filter sidebar infor for token
         await loadSidebarVolume_Token(searchInput);
     } else { 

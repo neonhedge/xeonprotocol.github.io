@@ -29,8 +29,9 @@ function updateSectionValues_volumesERC20(tokenAddress, tokenName, tokenPrice, p
     <div class="projectName sidebarName">
       <div>`+tokenName+`</div>
       <div class="token_links">
+        <a class="etherscanLink" href="https://arbiscan.io/address/`+tokenAddress+`" target="_blank" alt="SC" title="view on Arbitrum Explorer">`+trancutedAddress+`</a>
+        <a class="etherscanLink" href="https://www.dextools.io/app/en/arbitrum/pair-explorer/`+tokenAddress+`" target="_blank" alt="SC" title="Go to Arbitrum Explorer"><img src="./imgs/dextools.png" alt="dextools"></a>
         <span>`+tokenPrice+` `+pairedSymbol+`</span>
-        <a class="etherscanLink" href="https://etherscan.io/address/'`+tokenAddress+`" target="_blank" alt="SC" title="Go to Etherscan">`+trancutedAddress+`</a>
       </div>
     </div>
   </div>

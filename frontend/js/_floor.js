@@ -4,7 +4,7 @@
 import { CONSTANTS, getUserBalancesForToken, truncateAddress, fromWeiToFixed12, fromWeiToFixed5, fromWeiToFixed8, fromWeiToFixed8_unrounded, fromWeiToFixed5_unrounded, fromWeiToFixed2_unrounded, toFixed8_unrounded } from './constants.js';
 import { initWeb3 } from './dapp-web3-utils.js';
 import { unlockedWallet, reqConnect, popupSuccess } from './web3-walletstatus-module.js';
-import { refreshDataOnElements, loadOptions, fetchOptionCard, fetchNameSymbol, prepareTimestamp, noOptionsSwal } from './module-market-card-fetchers.js';
+import { refreshDataOnElements, loadOptions, fetchOptionStrip, fetchNameSymbol, prepareTimestamp, noOptionsSwal } from './module-market-card-fetchers.js';
 import { loadSidebar, loadSidebarVolume_All, loadSidebarVolume_Token } from './module-market-sidebar-fetchers.js';
 
 /*=========================================================================
@@ -273,85 +273,6 @@ async function onSearchSubmit(event) {
 		document.getElementById("searchBar").value = "";
 
 	});
-	}
-}
-
-async function fetchOptionStrip(optionId) {
-    try{
-		let result = await hedgingInstance.methods.getHedgeDetails(optionId).call();
-		//name and symbol
-		let name; let symbol;
-		fetchNameSymbol(result.token).then(t=>{name=t.name,symbol=t.symbol}).catch(e=>console.error(e));
-		//token & pair address
-		let tokenAddress = result.token;
-		let truncatedTokenAdd = tokenAddress.substring(0, 6) + '...' + tokenAddress.slice(-3);
-		let pairAddress = result.paired;
-		let truncatedPairAdd = pairAddress.substring(0, 6) + '...' + pairAddress.slice(-3);
-		//owner
-		let owner = result.owner;
-        let truncatedOwner = owner.substring(0, 6) + '...' + owner.slice(-3);
-		//taker
-		let taker = result.taker;
-        let truncatedTaker = taker.substring(0, 6) + '...' + taker.slice(-3);
-		//hedge status
-		let status = parseFloat(result.status);
-		//hedge type
-		let hedgeType;
-		if (result.hedgeType === 'CALL') {
-			hedgeType = 'CALL';
-		} else if (result.hedgeType === 'PUT') {
-			hedgeType = 'PUT';
-		} else if (result.hedgeType === 'SWAP') {
-			hedgeType = 'SWAP';
-		} else {
-			console.log('Hedge type is unknown');
-		}
-		//amount
-		let amount = parseFloat((result.amount / Math.pow(10, MyGlobals.decimals)).toFixed(2));
-		//market value
-		const [marketvalue, pairedAddress] = await hedgingInstance.methods.getUnderlyingValue(tokenAddress, result.amount).call();
-		let pairSymbol;
-		if (pairedAddress === '0xdac17f958d2ee523a2206206994597c13d831ec7') {
-			pairSymbol = 'USDT';
-		} else if (pairedAddress === '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48') {
-			pairSymbol = 'USDC';
-		} else if (pairedAddress === '0x0000000000000000000000000000000000000000') {
-			pairSymbol = 'ETH';
-		}
-		//start value
-		let startvalue = parseFloat(fromWeiToFixed5(result.startvalue));
-		//end value
-		let endvalue = parseFloat(fromWeiToFixed5(result.endvalue));
-		//cost value
-		let cost = parseFloat(fromWeiToFixed5(result.cost));
-		//strike value
-		let strikevalue;
-		if(startvalue > 0){
-			strikevalue = cost + startvalue;
-		}else{
-			strikevalue = cost + marketvalue;
-		}
-		//logourl
-		let logourl = result.logourl;
-		//dates to human-readable dates
-		let dt_created = new Date(result.dt_created * 1000).toLocaleString();
-		let dt_started = new Date(result.dt_started * 1000).toLocaleString();
-		let dt_expiry = new Date(result.dt_expiry * 1000).toLocaleString();
-		// Calculate time left for dt_expiry
-		let timeNow = new Date().getTime();
-		let timeDiff = result.dt_expiry * 1000 - timeNow;
-		let days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
-		let hours = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-		let minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
-		let seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
-		let timeToExpiry = days + " D " + hours + " H " + minutes + " M " + seconds + " S";
-		//prepare strip
-		var resultStrip = '<a href="hedge.html?id='+optionId+'" class="searchresultStrip"><div class="projectLogoLeft" style="background-image:url(' + logourl + ')"></div><div class="projectName">' + symbol + '</div><div class="projectName">' + amount + '</div><div class="projectName"> Value: ' + marketvalue + ' '+ pairSymbol +'</div></a>';
-		
-		$('#searchresult').empty().append(resultStrip);
-		
-	}catch(error) {
-		console.log(error);
 	}
 }
 
