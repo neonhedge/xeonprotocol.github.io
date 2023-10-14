@@ -30,29 +30,35 @@ function updateSectionValues_volumesERC20(tokenAddress, tokenName, tokenPrice, p
       <div>`+tokenName+`</div>
       <div class="token_links">
         <a class="etherscanLink" href="https://arbiscan.io/address/`+tokenAddress+`" target="_blank" alt="SC" title="view on Arbitrum Explorer">`+trancutedAddress+`</a>
-        <a class="etherscanLink" href="https://www.dextools.io/app/en/arbitrum/pair-explorer/`+tokenAddress+`" target="_blank" alt="SC" title="Go to Arbitrum Explorer"><img src="./imgs/dextools.png" alt="dextools"></a>
+        <a class="etherscanLink" href="https://www.dextools.io/app/en/arbitrum/pair-explorer/`+tokenAddress+`" target="_blank" alt="SC" title="Go to Arbitrum Explorer">`+trancutedAddress+`</a>
         <span>`+tokenPrice+` `+pairedSymbol+`</span>
       </div>
     </div>
   </div>
   <div class="neon-container">
     <span class="neon-text">Hedges Bought</span>
-    <span id="premiumVolume" class="neon-amount boughtVolume">`+boughtOptionsCount + boughtSwapsCount+`</span>
+    <span class="neon-amount boughtVolume">`+boughtOptionsCount + boughtSwapsCount+`</span>
   </div>
   <div class="neon-container">
     <span class="neon-text">Options</span>
-    <span id="payoffVolume" class="neon-amount settledVolume">`+optionsCount+`</span>
+    <span class="neon-amount settledVolume">`+optionsCount+`</span>
   </div>
   <div class="neon-container">
     <span class="neon-text">Swaps</span>
-    <span id="payoffVolume" class="neon-amount settledVolume">`+swapsCount+`</span>
+    <span class="neon-amount settledVolume">`+swapsCount+`</span>
   </div>
   <div class="neon-container">
     <span class="neon-text">Hedges Settled</span>
-    <span id="settleVolume" class="neon-amount settledVolume">`+settledOptionsCount + settledSwapsCount+`</span>
+    <span class="neon-amount settledVolume">`+settledOptionsCount + settledSwapsCount+`</span>
   </div>`;
   
+  // Hide the volumeStats div and show the tokenStats div
+  const volumeStatsDiv = document.getElementById('volumeStats');
+  const tokenStatsDiv = document.getElementById('tokenStats');
+
+  volumeStatsDiv.style.display = 'none';
+  tokenStatsDiv.style.display = 'block';
   // Update hedges traded and created
-  document.getElementById("hedgeVolume").empty().append = tokenHeader;
+  document.getElementById("tokenStats").empty().append = tokenHeader;
 }
   export { updateSectionValues_volumes, updateSectionValues_volumesERC20 };
