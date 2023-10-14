@@ -1959,6 +1959,17 @@ section.er404 {
 #mint h4{
   text-align: center;
 }
+.experienceCont {
+  position: relative;
+  overflow: hidden;
+  overflow-y: visible;
+  grid-template-columns: 1fr 30% !important;
+}
+.experience{
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
 /*--------------------------------------------------------*/
 /*	9. CAROUSELS */
 /*--------------------------------------------------------*/
