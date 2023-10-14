@@ -1,11 +1,11 @@
 /*=========================================================================
     Import modules
 ==========================================================================*/
-import { CONSTANTS, getUserBalancesForToken, truncateAddress, fromWeiToFixed12, fromWeiToFixed5, fromWeiToFixed8, fromWeiToFixed8_unrounded, fromWeiToFixed5_unrounded, fromWeiToFixed2_unrounded, toFixed8_unrounded } from './constants.js';
+import { CONSTANTS, getUserBalancesForToken, truncateAddress, getPairToken, getSymbol, fromWeiToFixed12, fromWeiToFixed5, fromWeiToFixed8, fromWeiToFixed8_unrounded, fromWeiToFixed5_unrounded, fromWeiToFixed2_unrounded, toFixed8_unrounded } from './constants.js';
 import { initWeb3 } from './dapp-web3-utils.js';
 import { unlockedWallet, reqConnect, popupSuccess } from './web3-walletstatus-module.js';
 import { refreshDataOnElements, loadOptions, fetchOptionStrip, fetchNameSymbol, prepareTimestamp, noOptionsSwal } from './module-market-card-fetchers.js';
-import { loadSidebar, loadSidebarVolume_All, loadSidebarVolume_Token } from './module-market-sidebar-fetchers.js';
+import { loadSidebar, loadSidebarVolume_All, loadSidebarVolume_Token, loadPastEvents } from './module-market-sidebar-fetchers.js';
 
 /*=========================================================================
     INITIALIZE WEB3 & LOCAL CONSTANTS
@@ -44,6 +44,9 @@ $(document).ready(function(){
 
 	//load sidebar
 	loadSidebar();
+
+	//load past events
+	loadPastEvents();
 });
 $(document).on('click', '#erc20Options', function(e){
 	$('.asideNavsinside').removeAttr('style'); //reset styles
@@ -662,11 +665,14 @@ async function createEventListItem(event) {
 		const dealer = document.createElement('span');
 		dealer.textContent = truncatedAddress;
 		listItem.appendChild(dealer);
-
+		
+		// tx link
+		const linkSpan = document.createElement('span'); 
 		const link = document.createElement('a');
 		link.href = 'https://etherscan.io/tx/' + event.transactionHash;
 		link.textContent = 'View Transaction';
-		listItem.appendChild(link);
+		linkSpan.appendChild(link);
+		listItem.appendChild(linkSpan);
 
 		return listItem;
   	}
@@ -699,33 +705,6 @@ async function createEventListItem(event) {
 	listItem.appendChild(link);
 
   return listItem;
-}
-
-async function getPairToken(optionId) {
-	const result = await hedgingInstance.methods.getHedgeDetails(optionId).call();
-	return result.paired;
-}
-
-async function getSymbol(tokenAddress) {
-	const tokenAbi = [
-		{
-		  "constant": true,
-		  "inputs": [],
-		  "name": "symbol",
-		  "outputs": [
-			{
-			  "name": "",
-			  "type": "string"
-			}
-		  ],
-		  "payable": false,
-		  "stateMutability": "view",
-		  "type": "function"
-		}
-	];
-	const tokenContract = new web3.eth.Contract(tokenAbi, tokenAddress);
-	const symbol = await tokenContract.methods.symbol().call();
-	return symbol;
 }
 
 // Listen for the hedgeCreated event

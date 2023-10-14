@@ -1,4 +1,4 @@
-import { CONSTANTS, getCurrentEthUsdcPriceFromUniswapV2, getTokenETHValue, getTokenUSDValue } from './constants.js';
+import { CONSTANTS, getCurrentEthUsdcPriceFromUniswapV2, getTokenETHValue, getTokenUSDValue, truncateAddress, getPairToken, getSymbol, } from './constants.js';
 import { updateSectionValues_volumes, updateSectionValues_volumesERC20 } from './module-market-sidebar-updaters.js';
 // Load hedge volume: created, bought, settled, payouts, fees
 // Load token stats and information when searchBar contains token address
@@ -184,4 +184,119 @@ async function loadSidebarVolume_Token(tokenAddress) {
     );
   }
 
-export { loadSidebar, loadSidebarVolume_All, loadSidebarVolume_Token }
+  // Function to fetch the past events: hedgeCreated, hedgePurchased, hedgeSettled, minedHedge
+  // Exploring Arbitrums official API - its the most convinient and well documented
+  async function loadPastEvents() {
+    const apiUrl = 'https://api.arbiscan.io/api';
+    const apiKey = 'YourApiKeyToken'; 
+  
+    const latestBlock = 'latest'; 
+    const fromBlock = latestBlock - 100;
+    const toBlock = latestBlock;
+
+    const topic0_hedgeCreated = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef';
+    const topic0_hedgePurchased = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef';
+    const topic0_hedgeSettled = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef';
+    const topic0_minedHedge = '0x123456789abcdef';
+  
+    const url_hedgeCreated = `${apiUrl}?module=logs&action=getLogs&fromBlock=${fromBlock}&toBlock=${toBlock}&topic0=${topic0_hedgeCreated}&apikey=${apiKey}`;
+    const url_hedgePurchased = `${apiUrl}?module=logs&action=getLogs&fromBlock=${fromBlock}&toBlock=${toBlock}&topic0=${topic0_hedgePurchased}&apikey=${apiKey}`;
+    const url_hedgeSettled = `${apiUrl}?module=logs&action=getLogs&fromBlock=${fromBlock}&toBlock=${toBlock}&topic0=${topic0_hedgeSettled}&apikey=${apiKey}`;
+    const url_minedHedge = `${apiUrl}?module=logs&action=getLogs&fromBlock=${fromBlock}&toBlock=${toBlock}&topic0=${topic0_minedHedge}&apikey=${apiKey}`;
+
+    try {
+        const response_hedgeCreated = await fetch(url_hedgeCreated);
+        const response_hedgePurchased = await fetch(url_hedgePurchased);
+        const response_hedgeSettled = await fetch(url_hedgeSettled);
+        const response_minedHedge = await fetch(url_minedHedge);
+    
+        const data_hedgeCreated = await response_hedgeCreated.json();
+        const data_hedgePurchased = await response_hedgePurchased.json();
+        const data_hedgeSettled = await response_hedgeSettled.json();
+        const data_minedHedge = await response_minedHedge.json();
+    
+        const events_hedgeCreated = data_hedgeCreated.result;
+        const events_hedgePurchased = data_hedgePurchased.result;
+        const events_hedgeSettled = data_hedgeSettled.result;
+        const events_minedHedge = data_minedHedge.result;
+        
+        /* 
+        // Considering the returned result by arbitrum is an array of objects, we read it in the pprepareEventListItem as this;
+        const firstTopic = data_hedgeCreated.result[0].topics[0];
+        const lastTopic = data_hedgeCreated.result[0].topics[data_hedgeCreated.result[0].topics.length - 1];
+        const data = data_hedgeCreated.result[0].data;
+        */
+
+        // eventOne
+        events_hedgeCreated.slice(0, 100).forEach((event) => {
+            prepareEventListItem(event, topic0_hedgeCreated);
+        });
+        // eventTwo
+        events_hedgePurchased.slice(0, 100).forEach((event) => {
+            prepareEventListItem(event, topic0_hedgePurchased);
+        });
+        // eventThree
+        events_hedgeSettled.slice(0, 100).forEach((event) => {
+            prepareEventListItem(event, topic0_hedgeSettled);
+        });
+        // eventFour
+        events_minedHedge.slice(0, 100).forEach((event) => {
+            prepareEventListItem(event, topic0_minedHedge);
+        });
+
+    } catch (error) {
+        console.error('Error fetching events:', error);
+        // Handle the error or display an error message
+    }
+}
+
+function prepareEventListItem(event, eventTopic) {
+    // Display the events in the sidebar div
+    const sidebarDiv = document.getElementById('eventsList');
+    // Create the list item
+    const listItem = document.createElement('li');
+    
+    /* OUR event.returnValues. approach is based on live events, here for placeholder only
+    // we will change to array objects parsing during live testing after knowing how indexed topics are ordered for each event
+    */
+    // title
+    const titleSpan = document.createElement('span');
+    titleSpan.textContent = event.title;
+    listItem.appendChild(titleSpan);
+    
+    // amount/value
+    const amountSpan = document.createElement('span');
+    const pairToken = getPairToken(event.returnValues.optionId);
+    const pairTokenSymbol = getSymbol(pairToken);
+    if(eventTopic == '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef') {//if hedgeCreated
+        amountSpan.textContent = (event.returnValues.createValue) + ' ' + pairTokenSymbol;
+    }
+    if(eventTopic == '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef') {//if hedgePurchased
+        amountSpan.textContent = (event.returnValues.payOff) + ' ' + pairTokenSymbol;
+    }
+    if(eventTopic == '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef') {//if hedgeSettled
+        amountSpan.textContent = (event.returnValues.endValue) + ' ' + pairTokenSymbol;
+    }
+    if(eventTopic == '0x123456789abcdef') {//if minedHedge
+        amountSpan.textContent = (event.returnValues.payOff) + ' ' + pairTokenSymbol;
+    }
+    listItem.appendChild(amountSpan);
+    
+    // address
+    const dealerSpan = document.createElement('span');
+    dealerSpan.textContent = truncateAddress((event.returnValues.writer || event.returnValues.buyer || event.returnValues.miner));
+    listItem.appendChild(dealerSpan);
+    
+    // link
+    const txSpan = document.createElement('span');
+    const link = document.createElement('a');
+    link.href = 'https://arbiscan.io/tx/' + event.transactionHash;
+    link.textContent = 'Transaction';
+    txSpan.appendChild(link);
+    listItem.appendChild(txSpan);
+    
+    // Add list item to the sidebar
+    sidebarDiv.appendChild(listItem);
+}
+
+export { loadSidebar, loadSidebarVolume_All, loadSidebarVolume_Token, loadPastEvents }
