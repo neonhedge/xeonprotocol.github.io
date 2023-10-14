@@ -19,41 +19,41 @@ async function loadSidebar() {
 
 async function loadSidebarVolume_All() {
     
-    const hedgesCreatedWETH = await contractInstance.hedgesCreatedVolume(CONSTANTS.wethAddress);
-    const hedgesCreatedUSDT = await contractInstance.hedgesCreatedVolume(CONSTANTS.usdtAddress);
-    const hedgesCreatedUSDC = await contractInstance.hedgesCreatedVolume(CONSTANTS.usdcAddress);
+    const hedgesCreatedWETH = await hedgingInstance.hedgesCreatedVolume(CONSTANTS.wethAddress);
+    const hedgesCreatedUSDT = await hedgingInstance.hedgesCreatedVolume(CONSTANTS.usdtAddress);
+    const hedgesCreatedUSDC = await hedgingInstance.hedgesCreatedVolume(CONSTANTS.usdcAddress);
 
-    const hedgesTradedWETH = await contractInstance.hedgesTakenVolume(CONSTANTS.wethAddress);
-    const hedgesTradedUSDT = await contractInstance.hedgesTakenVolume(CONSTANTS.usdtAddress);
-    const hedgesTradedUSDC = await contractInstance.hedgesTakenVolume(CONSTANTS.usdcAddress);
+    const hedgesTradedWETH = await hedgingInstance.hedgesTakenVolume(CONSTANTS.wethAddress);
+    const hedgesTradedUSDT = await hedgingInstance.hedgesTakenVolume(CONSTANTS.usdtAddress);
+    const hedgesTradedUSDC = await hedgingInstance.hedgesTakenVolume(CONSTANTS.usdcAddress);
 
-    const hedgeCostsWETH = await contractInstance.hedgesCostVolume(CONSTANTS.wethAddress);
-    const hedgeCostsUSDT = await contractInstance.hedgesCostVolume(CONSTANTS.usdtAddress);
-    const hedgeCostsUSDC = await contractInstance.hedgesCostVolume(CONSTANTS.usdcAddress);
+    const hedgeCostsWETH = await hedgingInstance.hedgesCostVolume(CONSTANTS.wethAddress);
+    const hedgeCostsUSDT = await hedgingInstance.hedgesCostVolume(CONSTANTS.usdtAddress);
+    const hedgeCostsUSDC = await hedgingInstance.hedgesCostVolume(CONSTANTS.usdcAddress);
 
-    const optionsVolumeWETH = await contractInstance.optionsVolume(CONSTANTS.wethAddress);
-    const optionsVolumeUSDT = await contractInstance.optionsVolume(CONSTANTS.usdtAddress);
-    const optionsVolumeUSDC = await contractInstance.optionsVolume(CONSTANTS.usdcAddress);
+    const optionsVolumeWETH = await hedgingInstance.optionsVolume(CONSTANTS.wethAddress);
+    const optionsVolumeUSDT = await hedgingInstance.optionsVolume(CONSTANTS.usdtAddress);
+    const optionsVolumeUSDC = await hedgingInstance.optionsVolume(CONSTANTS.usdcAddress);
 
-    const swapsVolumeWETH = await contractInstance.swapsVolume(CONSTANTS.wethAddress);
-    const swapsVolumeUSDT = await contractInstance.swapsVolume(CONSTANTS.usdtAddress);
-    const swapsVolumeUSDC = await contractInstance.swapsVolume(CONSTANTS.usdcAddress);
+    const swapsVolumeWETH = await hedgingInstance.swapsVolume(CONSTANTS.wethAddress);
+    const swapsVolumeUSDT = await hedgingInstance.swapsVolume(CONSTANTS.usdtAddress);
+    const swapsVolumeUSDC = await hedgingInstance.swapsVolume(CONSTANTS.usdcAddress);
     
-    const settledVolumeWETH = await contractInstance.settledVolume(CONSTANTS.wethAddress);
-    const settledVolumeUSDT = await contractInstance.settledVolume(CONSTANTS.usdtAddress);
-    const settledVolumeUSDC = await contractInstance.settledVolume(CONSTANTS.usdcAddress);
+    const settledVolumeWETH = await hedgingInstance.settledVolume(CONSTANTS.wethAddress);
+    const settledVolumeUSDT = await hedgingInstance.settledVolume(CONSTANTS.usdtAddress);
+    const settledVolumeUSDC = await hedgingInstance.settledVolume(CONSTANTS.usdcAddress);
     
-    const hedgeProfitsWETH = await contractInstance.protocolBaseProfits(CONSTANTS.wethAddress);
-    const hedgeProfitsUSDT = await contractInstance.protocolBaseProfits(CONSTANTS.usdtAddress);
-    const hedgeProfitsUSDC = await contractInstance.protocolBaseProfits(CONSTANTS.usdcAddress);
+    const hedgeProfitsWETH = await hedgingInstance.protocolBaseProfits(CONSTANTS.wethAddress);
+    const hedgeProfitsUSDT = await hedgingInstance.protocolBaseProfits(CONSTANTS.usdtAddress);
+    const hedgeProfitsUSDC = await hedgingInstance.protocolBaseProfits(CONSTANTS.usdcAddress);
 
-    const hedgeFeesWETH = await contractInstance.protocolBaseFees(CONSTANTS.wethAddress);
-    const hedgeFeesUSDT = await contractInstance.protocolBaseFees(CONSTANTS.usdtAddress);
-    const hedgeFeesUSDC = await contractInstance.protocolBaseFees(CONSTANTS.usdcAddress);
+    const hedgeFeesWETH = await hedgingInstance.protocolBaseFees(CONSTANTS.wethAddress);
+    const hedgeFeesUSDT = await hedgingInstance.protocolBaseFees(CONSTANTS.usdtAddress);
+    const hedgeFeesUSDC = await hedgingInstance.protocolBaseFees(CONSTANTS.usdcAddress);
 
-    const cashierFeesWETH = await contractInstance.protocolCashierFees(CONSTANTS.wethAddress);
-    const cashierFeesUSDT = await contractInstance.protocolCashierFees(CONSTANTS.usdtAddress);
-    const cashierFeesUSDC = await contractInstance.protocolCashierFees(CONSTANTS.usdcAddress);
+    const cashierFeesWETH = await hedgingInstance.protocolCashierFees(CONSTANTS.wethAddress);
+    const cashierFeesUSDT = await hedgingInstance.protocolCashierFees(CONSTANTS.usdtAddress);
+    const cashierFeesUSDC = await hedgingInstance.protocolCashierFees(CONSTANTS.usdcAddress);
   
     // Fetch ETH to USD conversion rate
     const ethUsdPrice = await getCurrentEthUsdcPriceFromUniswapV2();
