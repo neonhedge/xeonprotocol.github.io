@@ -188,7 +188,7 @@ iframe {
 }
 
 .mx-w-25 {
-  max-width: 25rem;
+  max-width: 20rem;
 }
 
 .p-0 {
@@ -1006,7 +1006,7 @@ section.er404 {
   margin-bottom: 0;
 }
 #mission, #neon_protocol, #platform, #neon-howitworks, #hedgingTools, #uxDesign, #mediaH1, #timeline, #tokenomics {
-	font-size: clamp(25px, 5vw, 36px);
+	font-size: clamp(26px, 5vw, 37px);
 	font-family: 'Neon',monospace, sans-serif, "Helvetica Neue", Helvetica, "Liberation Sans"!important;
 	font-weight:500;
  /* color:#08e7fe; */
