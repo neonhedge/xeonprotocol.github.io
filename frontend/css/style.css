@@ -350,8 +350,18 @@ iframe {
     order: 2;
   }
 }
+
+.intro-container {
+  margin-top:0;
+  /* background-color: rgba(0, 0, 0, 0.3); */
+  border-radius: 2rem;
+}
 .introductionHold {
   margin:0 !important;
+  background-color: rgba(0,0,0,0.95);
+  background: radial-gradient(rgba(4, 1, 21, 0.7) 20%, rgba(4, 1, 21, 0.95) 80%) !important;
+  background: radial-gradient(rgba(4, 1, 21, 0.95) 40%, rgba(4, 1, 21, 0.7) 80%) !important;
+  border-radius: 2rem;
 }
 
 .introductionHold p{
@@ -365,14 +375,40 @@ iframe {
   max-width: 550px;
   font-size: clamp(27px, 6vw, 37px);
   max-width: 600px;
+  line-height: 1;
+  line-height: unset !important;
+  border-radius: 1.5vw;
 }
 .introductionHold small{
   box-sizing: content-box;
   display: block;
-  text-align: justify;
+}
+.introductionHold h1, .introductionHold p, .introductionHold small, .buttonsHold{
+  padding-inline-start: 1rem;
+  box-sizing: border-box;
 }
 .buttonsHold{
   margin-top:1vh !important;
+}
+@media (max-width: 600px) {
+  .introductionHold {
+    text-align: left;
+    padding-inline: 3vw;
+  }
+  .introductionHold p {
+    text-align: left;
+    margin-bottom:20px;
+    /* max-width: none;
+    */
+  }
+  .buttonsHold {
+    display: grid;
+    grid-template-columns: repeat(2,1fr);
+    margin-block:10vw !important;
+  }
+  .introductionHold small{
+    display: block;
+  }
 }
 
 /*--------------------------------------------------------*/
@@ -837,12 +873,7 @@ section.cta .container {
   place-items: center;
   gap: 2rem;
 }
-.introductionHold p{
-  line-height: 1;
-  line-height: unset !important;
-  background-color: rgba(0,0,0,0.5);
-  border-radius: 2vw;
-}
+
 section.er404 {
   display: flex;
   justify-content: center;
@@ -853,6 +884,11 @@ section.er404 {
   background: linear-gradient(180deg, #188dd6, #040115 80%);
 }
 
+
+/*--------------------------------------------------------*/
+/*	X. CUSTOM BODY STYLES */
+/*--------------------------------------------------------*/
+
 #slider {
   color: rgba(255, 255, 255, 0.9);
   display: flex;
@@ -860,12 +896,18 @@ section.er404 {
   align-items: center;
   flex-direction: column;
   gap: 2rem;
-  background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.5)), url('../imgs/tgbconcept.png');
+  /* background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.5)), url('../imgs/tgbconcept.png'); */
+  background-color: rgba(0, 0, 0, 0.3);
   background-size: 100%, auto;
   background-repeat: no-repeat;
 }
 #slider div.grid {
   gap: 1rem;
+  z-index: 10;
+}
+#slider canvas {
+  position: absolute;
+  top:0;
 }
 #slider h1 {
   margin-top: 2rem;
@@ -891,7 +933,9 @@ section.er404 {
   #slider .container h1 {
     font-size: 2.2rem;
     margin-bottom: 1.2rem;
-    margin-top:-2vw;
+   /* changed with old NEON BG
+   margin-top:-2vw;
+   */
     display: block;
     text-align: left;
   }
@@ -911,7 +955,6 @@ section.er404 {
     min-height: 50rem;
   }
 }
-
 
 @media (min-width: 55em) {
   section.intro h1 {
@@ -933,12 +976,7 @@ section.er404 {
     margin-block: 0;
   }
 }
-/*--------------------------------------------------------*/
-/*	X. CUSTOM BODY STYLES */
-/*--------------------------------------------------------*/
-.intro-container {
-  margin-top:0;
-}
+
 /*=======================================
     MOON MISSION
   =====================================*/
@@ -970,28 +1008,9 @@ section.er404 {
 #mission, #neon_protocol, #platform, #neon-howitworks, #hedgingTools, #uxDesign, #mediaH1, #timeline, #tokenomics {
 	font-size: clamp(25px, 5vw, 36px);
 	font-family: 'Neon',monospace, sans-serif, "Helvetica Neue", Helvetica, "Liberation Sans"!important;
-	font-weight:200;
+	font-weight:500;
  /* color:#08e7fe; */
  letter-spacing: 1px;
-}
-@media (max-width: 600px) {
-  .introductionHold {
-    text-align: left;
-    padding-inline: 3vw;
-  }
-  .introductionHold p {
-    text-align: justify;
-    margin-bottom:20px;
-    max-width: none;
-  }
-  .buttonsHold {
-    display: grid;
-    grid-template-columns: repeat(2,1fr);
-    margin-top:10vw !important;
-  }
-  .introductionHold small{
-    display: block;
-  }
 }
 .neon-blue {
   text-shadow: 0 0 2px #188dd6, 0 0 3px #188dd6, 0 0 15px #188dd6, 0 0 15px #188dd6, 0 0 3px #188dd6, 3px 3px 0.5px #0e567c !important;  
