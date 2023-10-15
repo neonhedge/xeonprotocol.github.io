@@ -188,7 +188,7 @@ iframe {
 }
 
 .mx-w-25 {
-  max-width: 20rem;
+  max-width: 18rem;
 }
 
 .p-0 {
@@ -263,6 +263,24 @@ iframe {
   }
   .maskotDiv {
     display: none;
+  }
+  .introductionHold {
+    text-align: left;
+    padding-inline: 3vw;
+  }
+  .introductionHold p {
+    text-align: left;
+    margin-bottom:20px;
+    /* max-width: none;
+    */
+  }
+  .buttonsHold {
+    display: grid;
+    grid-template-columns: repeat(2,1fr);
+    margin-block:10vw !important;
+  }
+  .introductionHold small{
+    display: block;
   }
 }
 
@@ -359,8 +377,9 @@ iframe {
 .introductionHold {
   margin:0 !important;
   background-color: rgba(0,0,0,0.95);
-  background: radial-gradient(rgba(4, 1, 21, 0.7) 20%, rgba(4, 1, 21, 0.95) 80%) !important;
-  background: radial-gradient(rgba(4, 1, 21, 0.95) 40%, rgba(4, 1, 21, 0.7) 80%) !important;
+  background: radial-gradient(rgba(4, 1, 21, 0.7) 20%, rgba(4, 1, 21, 0.95) 80%) !important;/* shades outwards */
+  background: radial-gradient(rgba(4, 1, 21, 0.95) 40%, rgba(4, 1, 21, 0.7) 80%) !important;/* shades inwards - blurry bg effect */
+  
   border-radius: 2rem;
 }
 
@@ -551,9 +570,10 @@ button#goTop, a.btn#goTop {
   cursor: pointer;
   text-decoration: none;
   color: rgb(8, 231, 254);
-}
-.account a{
   background-color:rgba(13, 148, 136, 0.2);
+
+  border: 0.5px solid #3399ff;
+  background-color: rgba(29, 129, 216, 0.15);
 }
 .account a:hover {
   background-color: rgba(13, 148, 136, 0.2);
@@ -897,7 +917,7 @@ section.er404 {
   flex-direction: column;
   gap: 2rem;
   /* background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.5)), url('../imgs/tgbconcept.png'); */
-  background-color: rgba(0, 0, 0, 0.3);
+  background-color: rgba(0, 0, 0, 0.5);
   background-size: 100%, auto;
   background-repeat: no-repeat;
 }
@@ -908,6 +928,7 @@ section.er404 {
 #slider canvas {
   position: absolute;
   top:0;
+  width:100%;
 }
 #slider h1 {
   margin-top: 2rem;
@@ -1006,7 +1027,7 @@ section.er404 {
   margin-bottom: 0;
 }
 #mission, #neon_protocol, #platform, #neon-howitworks, #hedgingTools, #uxDesign, #mediaH1, #timeline, #tokenomics {
-	font-size: clamp(26px, 5vw, 37px);
+	font-size: clamp(26px, 5vw, 36px);
 	font-family: 'Neon',monospace, sans-serif, "Helvetica Neue", Helvetica, "Liberation Sans"!important;
 	font-weight:500;
  /* color:#08e7fe; */
@@ -1809,7 +1830,8 @@ section.er404 {
 ===================================*/
 #roadmap{
   background-image: url("../imgs/launch.webp"), radial-gradient(#16112f, #040115 80%); 
-  background-size: 40%;
+  background-color: #16112f;
+  background-size: 35%;
   background-position: center;
   background-repeat:repeat-x;
 }
