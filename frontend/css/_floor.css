@@ -101,8 +101,8 @@ section.sectionCenter {
 }
 .clubSinnage h4{
 	font-family: 'Neon',monospace, sans-serif, Tahoma, Geneva;
-	font-size: clamp(22px, 2vw, 27px) !important;
-	font-weight:900;
+	font-size: clamp(22px, 3vw, 28px) !important;
+	font-weight:100;
 	letter-spacing:normal;
 	text-transform: uppercase;
 	padding:10px;
@@ -137,15 +137,13 @@ aside {
 	position: relative;
 	margin: 10px auto;
 	width: 100%;
-	line-height: 28px !important;
 	box-sizing: border-box;
-	padding: 0.3vw 1%;
+	padding: 0.5vw 1%;
   	border-radius: 8px;
 	cursor: pointer;
 	font-family: "Space Grotesk", sans-serif;
 	font-size: clamp(14px, 1vw, 15px) !important;
 	letter-spacing: 0;
-	font-weight: 600 !important;
 	text-align: center;
 	color: #F4F4F4;
 	/*
