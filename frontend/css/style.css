@@ -386,13 +386,9 @@ iframe {
 .introductionHold p{
   padding-block:1vw;
   box-sizing: content-box;
-}
-/* new big font look - remove all the below lines if we discarding this small font look
-- also remember to remove the small text & restore commented last text */
-.introductionHold p{
-  font-size: clamp(24px, 5vw, 34px);
   max-width: 550px;
   font-size: clamp(27px, 6vw, 37px);
+  font-weight: 100;
   max-width: 600px;
   line-height: 1;
   line-height: unset !important;

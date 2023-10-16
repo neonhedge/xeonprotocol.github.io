@@ -35,8 +35,8 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 	<!-- floor scripts -->    
 	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js"></script>
-    <script src="https://unpkg.com/@metamask/legacy-web3@latest/dist/metamask.web3.min.js"></script>
-	<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script><!-- will upgrade later -->
+    <!-- <script src="https://unpkg.com/@metamask/legacy-web3@latest/dist/metamask.web3.min.js"></script> -- //legacy -->
+	<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
 	<script type="module" src="js/web3-walletstatus-module.js"></script>
 	<script type="module" src="js/_floor.js"></script>
 	<script type="application/javascript" src="js/sweetalert/sweetalert.min.js"></script>
@@ -104,7 +104,7 @@
 			<div class="left-paner-parent">
 				<aside id="leftpaner">
 					<div class="clubSinnage neon-blue">
-						<h4 title="P2P options market place">> _OTC__Markets</h4> <!-- _OTC___Rooms_ -->
+						<h4 title="P2P options market place">> _OTC_Markets</h4> <!-- _OTC___Rooms_ -->
 					</div>
 					<div class="asideNavs">
 						<div class="asideNavsinside" id="erc20Options" title="create - buy - discover and track OTC ERC20 Call | Put Options">ERC20 Options</div>
@@ -142,7 +142,7 @@
                     <div class="sitesearchhold" id="feedsearchhold">
                         <form id="swap_searcher" action="" method="post" onsubmit="onSearchSubmit(event);">
 							<input type="submit" id="searchaddress" class="site_search_btn" value="" />
-                        	<input id="swapsearch" class="search-input" type="text" name="search" placeholder=" filter token address.." autocomplete="off" spellcheck="false"  /> 
+                        	<input id="searchBar" class="search-input" type="text" name="search" placeholder=" filter token address.." autocomplete="off" spellcheck="false"  /> 
                         </form>
                         <div id="searchresult"></div>
                     </div>
@@ -434,7 +434,10 @@
 								  <span class="neon-text">Profit Payoffs</span>
 								  <span id="payoffVolume" class="neon-amount settledVolume">0</span>
 								</div>
-							  </div>
+							</div>
+							<div id="tokenStats">
+								<!-- append token summary here -->
+							</div>
 						</div>
 						</li>
 						<li class="scifiUI_li">
@@ -534,7 +537,7 @@
 				<a class="footermaskot" href="/">	
 					<img src="./imgs/maskot3.webp" alt="logo">
 				</a>
-				<p class="mb-2">Neon Protocol - Building Advanced OTC Tools to enable Universal ERC20 Hedging and Lending.</p>
+				<p class="mb-2">Neon Protocol - Universal ERC20 Hedging and Lending.</p>
 
 				<!-- social links -->
 				<ul class="inline-list">
