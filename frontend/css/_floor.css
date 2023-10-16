@@ -14,7 +14,7 @@
 header {
 	padding-block: unset !important;
 	padding-top: 1.2rem !important;
-	border-bottom: 0.5px solid #071432 !important;
+	border-bottom: 0.5px solid #15213c !important; /* darker #071432 */
 }
 
 @media (min-width: 55em) {
