@@ -371,27 +371,25 @@ iframe {
 
 .intro-container {
   margin-top:0;
-  /* background-color: rgba(0, 0, 0, 0.3); */
+  /*
+  background-image: linear-gradient(to bottom right,#0401154d,#040115e6); */
   border-radius: 2rem;
 }
 .introductionHold {
   margin:0 !important;
-  background-color: rgba(0,0,0,0.95);
-  background: radial-gradient(rgba(4, 1, 21, 0.7) 20%, rgba(4, 1, 21, 0.95) 80%) !important;/* shades outwards */
-  background: radial-gradient(rgba(4, 1, 21, 0.95) 40%, rgba(4, 1, 21, 0.7) 80%) !important;/* shades inwards - blurry bg effect */
-  
+  /* - shade the whole container not just the card 
+  background: radial-gradient(rgba(4, 1, 21, 0.7) 20%, rgba(4, 1, 21, 0.95) 80%) !important; */
+  background: radial-gradient(rgba(4, 1, 21, 0.95) 40%, rgba(4, 1, 21, 0.7) 80%) !important;/* shades inwards - blurry bg effect */  
   border-radius: 2rem;
 }
 
 .introductionHold p{
   padding-block:1vw;
   box-sizing: content-box;
-  max-width: 550px;
+  max-width: 600px;
   font-size: clamp(27px, 6vw, 37px);
   font-weight: 100;
-  max-width: 600px;
-  line-height: 1;
-  line-height: unset !important;
+  line-height: 1.5;
   border-radius: 1.5vw;
 }
 .introductionHold small{
@@ -566,6 +564,7 @@ button#goTop, a.btn#goTop {
   cursor: pointer;
   text-decoration: none;
   color: rgb(8, 231, 254);
+  font-weight:100;
   background-color:rgba(13, 148, 136, 0.2);
 
   border: 0.5px solid #3399ff;
@@ -913,7 +912,7 @@ section.er404 {
   flex-direction: column;
   gap: 2rem;
   /* background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.5)), url('../imgs/tgbconcept.png'); */
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.6);
   background-size: 100%, auto;
   background-repeat: no-repeat;
 }
@@ -1038,6 +1037,7 @@ section.er404 {
   width: clamp(250px, 30vw, 400px) !important;
 }
 #trav {
+  letter-spacing: 0.5vw;
 	-webkit-animation: blink 0.01s infinite alternate;
 	-moz-animation: blink 0.01s infinite alternate;
 	-o-animation: blink 0.01s infinite alternate;
@@ -2071,7 +2071,8 @@ footer .container {
 @media (min-width: 55em) {
   footer .container {
     grid-template-columns: repeat(5, 1fr);
-    place-items:stretch;
+    place-items: stretch;
+    place-items: center;
   }
   footer .container p:last-child {
     width: 100%;
@@ -2100,12 +2101,14 @@ footer .container li a:hover {
 .footerContainer {
   text-align: center;
   padding-top: 5vw;
+  padding-top: unset;
 }
 .badgeLeft {
   margin-top:-5vw;
   /* delete everything below to top:-10vw; for original flow */
   margin-top: unset;
-  margin-top: -15%;
+  top: -35%;
+  top:unset;
   position: relative;
 }
 .badgeLeft a.footermaskot{
@@ -2116,6 +2119,7 @@ footer .container li a:hover {
 }
 .badgeLeft p {
   font-weight: 600;
+  margin-top: -1rem;
 }
 /*--------------------------------------------------------*/
 /*	11. MODALS */

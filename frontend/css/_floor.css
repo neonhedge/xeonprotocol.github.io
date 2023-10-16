@@ -13,7 +13,8 @@
 
 header {
 	padding-block: unset !important;
-	border-bottom: 0.5px dotted #3399ff !important;
+	padding-top: 1.2rem !important;
+	border-bottom: 0.5px solid #071432 !important;
 }
 
 @media (min-width: 55em) {
@@ -175,7 +176,7 @@ aside {
 /* right section - sidebar - live preview window */
 #sidebar {
 	position: sticky;
-	top: 70px;
+	top: 80px;
 	min-height:300px;
 	height:400px;
 	font-family: monospace, sans-serif, "Helvetica Neue", Helvetica, Arial !important;
@@ -200,7 +201,7 @@ aside {
 	font-size: 1rem;
 	font-weight: 100;
 	text-align: center;
-	border:0.5px dotted;
+	border:0.5px dotted #3399ff;
 	border-top: unset;
 	padding:0.1vw 0.4vw;
 	/* unknown, unknown, unknown, glow radius, no-effect, shadow */
@@ -295,9 +296,8 @@ color: #FED128;
 	
 	padding: 10px;
 	box-sizing: border-box;
-	border: 1px solid #00bebe;
 	border:1px solid rgb(8, 231, 254);
-	color: #00dcdc;
+	border: 0.5px solid #3399ff;
 	color:rgb(8, 231, 254);
 	letter-spacing: 0px;
 	text-indent: 0;
@@ -308,8 +308,8 @@ color: #FED128;
 	display: block;
 	width: 100%;
 	height: 40px;
-	border: 1px solid #00bebeb3;
 	border:1px solid rgb(8, 231, 254);
+	border: 0.5px solid #3399ff;
 	border-bottom: 0;
 	border-radius: 8px 8px 0 0;
 	color: rgba(0, 190, 190, 0.7);
@@ -322,6 +322,7 @@ color: #FED128;
 .scifiUI_li label:hover {
 	height: 50px;
 	border-color: rgb(8, 231, 254);
+	border-color: #3399ff;
 	color: rgb(8, 231, 254);
 }
 .scifiUI_li .section {
@@ -336,8 +337,8 @@ color: #FED128;
 	left: 0;
 	width: 100%;
 	padding: 10px;
-	border: 1px solid #00bebe;
 	border:1px solid rgb(8, 231, 254);
+	border: 1px solid #3399ff;
 	background: rgba(0, 190, 190, 0.1);
 	background: rgba(29, 129, 216, 0.15);
 	background: #1d81d80d;
