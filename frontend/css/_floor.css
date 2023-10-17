@@ -118,8 +118,8 @@ aside {
 	top:100px; /* match aside container */
 	transition: 1s;
 	align-items: center;
+	padding: 0 10px 20px;
 	box-sizing: border-box;
-	padding: 0 0 20px;
 	/* border: 0.7px solid #3399ff; */
 	caret-color:transparent;
 }
@@ -394,7 +394,7 @@ color: #FED128;
 /* club timeline projects tabs */
 .feedsfilterDockHold{
 	position: sticky;
-	top:70px; /* match aside container */
+	top:85px;
 	margin:0px auto;
 	max-width: 500px;
 	z-index:2;
@@ -418,8 +418,8 @@ color: #FED128;
     left: 0;
     right: 0;
     height: 6px;
-    background: linear-gradient(to right, #07041e, #800080, #07041e); 
-    opacity: 0.6; 
+    background: linear-gradient(to right, #060317, #800080, #060317); 
+    opacity: 0.9;
     z-index: -1; /* Place the shadow behind the div */
     border-radius: 10px;
     box-shadow: 0 0 5px rgba(0, 0, 0, 0); /* Add a 5px box shadow with a transparent color */

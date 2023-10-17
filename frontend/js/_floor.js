@@ -30,7 +30,7 @@ export const MyGlobals = {
 //which tab is highlighted
 $(document).ready(function(){
 	$('#erc20Options').css({'background' : 'rgba(214, 24, 138,0.1)','border' : '1px solid #62006b'});//left panel
-	$('#discoverTab').css({'border' : '1px solid #62006b'});//try rgb(8, 231, 254) - bright blue
+	$('#discoverTab').css({'background' : 'rgba(214, 24, 138, 0.1)','border' : '1px solid #62006b'});//try rgb(8, 231, 254) - bright blue
 	//set global
 	window.nav = 1;
 	window.filters = 1;
@@ -93,7 +93,7 @@ $(document).on('click', '#socialstream', function(e){
 //filters
 $(document).on('click', '#discoverTab', function(e){
 	$('.streamtype').removeAttr('style'); //reset styles
-	$(this).css({'border' : '1px solid #62006b'});//set style
+	$(this).css({'border' : '1px solid #62006b', 'background' : 'rgba(214, 24, 138, 0.1)'});//set style
 	//set global
 	window.filters = 1;
 	//check load continuation
@@ -104,7 +104,7 @@ $(document).on('click', '#discoverTab', function(e){
 });
 $(document).on('click', '#mypositionsTabs', function(e){
 	$('.streamtype').removeAttr('style'); //reset styles
-	$(this).css({'border' : '1px solid #62006b'});//set style
+	$(this).css({'border' : '1px solid #62006b', 'background' : 'rgba(214, 24, 138, 0.1)'});//set style
 	//set global
 	window.filters = 2;
 	//check load continuation
@@ -115,7 +115,7 @@ $(document).on('click', '#mypositionsTabs', function(e){
 });
 $(document).on('click', '#bookmarksTab', function(e){
 	$('.streamtype').removeAttr('style'); //reset styles
-	$(this).css({'border' : '1px solid #62006b'});//set style
+	$(this).css({'border' : '1px solid #62006b', 'background' : 'rgba(214, 24, 138, 0.1)'});//set style
 	//set global
 	window.filters = 3;
 	//check load continuation
