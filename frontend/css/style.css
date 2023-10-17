@@ -641,6 +641,7 @@ header {
   color: rgba(255, 255, 255, 0.9);
   transition: all 0.6s ease-in-out;
   z-index: 999;
+  caret-color:transparent;
 }
 header.bg {
   background-color: #040115;
@@ -865,6 +866,7 @@ section.page-title {
   background: linear-gradient(7deg, #0f0b3f, #050c1c 90%);
   background: #040115;
   border-bottom-left-radius: 4rem;
+  caret-color:transparent;
 }
 section.page-title h1 {
   margin-bottom: 0.6rem;
