@@ -98,6 +98,7 @@ section.sectionCenter {
 	margin:0px;
 	box-sizing:border-box;
 	text-align:left;
+	border-bottom: 0.5px dotted #188dd6;
 }
 .clubSinnage h4{
 	font-family: 'Neon',monospace, sans-serif, Tahoma, Geneva;
@@ -1144,7 +1145,7 @@ fieldset input{
     padding: 2px;
     box-sizing: border-box;
 	margin-left: 2vw;
-	font-size: 11px;
+	font-size: 10px;
 }
 .blockexplorer img{
     width:18px;

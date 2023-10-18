@@ -24,8 +24,8 @@ async function unlockedWallet() {
 		const ethereum = window.ethereum;
 
 		ethereum.on("connect", (chainID) => {
-			window.chainID = chainID.chainId;
-			console.log("Connected to chain:", window.chainID);
+			CONSTANTS.chainID = chainID.chainId;
+			console.log("Connected to chain:", CONSTANTS.chainID);
 		});
 
 		ethereum.on("accountsChanged", (accounts) => {
@@ -43,6 +43,10 @@ async function unlockedWallet() {
 	async function initializeConnection() {
 		const correctChain = await chainCheck();
 		if (correctChain) {
+			// waiting stance
+			$('.wallets').css('display', 'none');
+			$('.walletpur').css('display', 'inline-block');
+
 			currentBlock();
 			setInterval(currentBlock, 40000);
 
@@ -53,29 +57,25 @@ async function unlockedWallet() {
 				setInterval(walletCheckProceed, 40000);
 			}
 		} else {
-			if (switchNetwork()) {
-				//await initializeConnection();
-				// pop up retry swal to recall initializeConnection
-				swal(
-					{
-						title: 'Ooops...',
-						text: 'Failed to initialize Chain and Wallet. \nClick retry button to try again.',
-						type: 'info',
-						html: false,
-						dangerMode: false,
-						confirmButtonText: 'retry',
-						cancelButtonText: 'cancel',
-						showConfirmButton: true,
-						showCancelButton: true,
-						timer: 10000,
-						animation: 'slide-from-top',
-					}, function () {
-						console.log('intialize retry...');
-						initializeConnection();
-					}); 
-			} else {
-				// Handle error from switchNetwork function
-			}
+			//waiting stance
+			$('.wallets').css('display', 'none');
+			$('.network_switch').css('display', 'inline-block');
+			switchNetwork();
+
+			swal({
+				title: 'Switch to Sepolia Testnet...',
+				type: 'info',
+				text: 'Please switch to the Sepolia Testnet.',
+				showConfirmButton: true,
+				showCancelButton: true,
+				confirmButtonText: 'Switch',
+				cancelButtonText: 'Cancel',
+				animation: 'slide-from-top',
+				}).then((result) => {
+				if (result.value) {
+					switchNetwork();
+				}
+			});
 		}
 	}
 
@@ -93,9 +93,9 @@ async function unlockedWallet() {
 
 	async function handleNetworkChange(networkId) {
 		console.log("Network changed:", networkId);
-		window.chainID = networkId;
+		CONSTANTS.chainID = networkId;
 		if (networkId !== CONSTANTS.network) {
-			console.log("Reading other chain:", networkId);
+			console.log("Reading chain:" + networkId + ", instead of, " + CONSTANTS.network);
 			$(".wallets").css("display", "none");
 			$(".network_switch").css("display", "inline-block");
 		} else {
@@ -162,103 +162,121 @@ async function unlockedWallet() {
 		}
 	}
 	
-	async function chainCheck() {	  
+	async function chainCheck() {
 		try {
-			await window.web3.eth.getChainId()
-			.then((chainId) => {
-				console.log("Chain ID:", chainId);
-				const chainID = chainId;
-
-				if (chainID === CONSTANTS.network) {
-					console.log(`${chainID} == ${CONSTANTS.network}`);
-					$('.wallets').css('display', 'none');
-					$('.waiting_init').css('display', 'inline-block');
-					return true;
-				} else if (chainID !== CONSTANTS.network) {
-					console.log(`wrong chain: ${chainID} vs ${CONSTANTS.network}`);
-					$('.wallets').css('display', 'none');
-					$('.network_switch').css('display', 'inline-block');
-					return false;
-				}
-			})
-			.catch((error) => {
-				console.error("Error fetching chain ID:", error);
-			});		  
+			const [chainId, networkId] = await Promise.all([
+				window.web3.eth.getChainId(),
+				// alt approach
+				// window.web3.eth.net.getId(),
+				Promise.resolve(CONSTANTS.network),
+			]);
+			
+			// Returned as  HEX from getChainId so Convert to string	 
+			const chainIdString = '0x' + chainId.toString(16);  
+			console.log("Chain ID:", chainIdString);
+			console.log("default ID:", networkId);
+		
+			if (networkId === CONSTANTS.chainID.toLowerCase() || chainIdString.toLowerCase() === networkId.toLowerCase()) {
+				console.log("correct chain: ", chainIdString);
+				$('.wallets').css('display', 'none');
+				$('.waiting_init').css('display', 'inline-block');
+				return true;
+			} else {
+				console.log("wrong chain: ", chainIdString);
+				$('.wallets').css('display', 'none');
+				$('.network_switch').css('display', 'inline-block');
+				return false;
+			}
 		} catch (error) {
-		  console.error('Error checking chain:', error);
-		  // Handle errors, e.g., chain ID retrieval failed
+		  console.error('chain ID retrieval failed:', error);
 		  return false;
 		}
-	}
-	  
+	}  
 	
 	async function switchNetwork() {
 		if (window.ethereum) {
-		try {
-			await window.ethereum.request({
-			method: 'wallet_switchEthereumChain',
-			params: [{ chainId: '0x5' }],
-			});
-		} catch (error) {
-			if (error.code === 4902) {
 			try {
 				await window.ethereum.request({
-				method: 'wallet_addEthereumChain',
-				params: [
-					{
-					chainId: '0x5',
-					chainName: 'Goerli Testnet',
-					nativeCurrency: {
-						name: 'GOERLI',
-						symbol: 'ETH',
-						decimals: 18,
-					},
-					blockExplorerUrls: [CONSTANTS.etherScan],
-					rpcUrls: ['https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161'],
-					},
-				],
+					method: 'wallet_switchEthereumChain',
+					params: [{ chainId: '0xaa36a7' }] // Use the Sepolia testnet chain ID
 				});
-				$('.wallets').css('display', 'none');
-				$('.walletpur').css('display', 'inline-block');
+				// success
+				console.log('Successfully switched to the Sepolia Testnet');
 				await initializeConnection();
-			} catch (addError) {
-				console.log(addError);
-				$('.network_switch').css('display', 'inline-block');
-				swal(
-				{
-					title: '',
-					text: 'Please Switch Network',
-					type: 'info',
-					html: false,
-					dangerMode: false,
-					confirmButtonText: 'switch',
-					cancelButtonText: 'cancel',
-					showConfirmButton: true,
-					showCancelButton: true,
-					timer: 4000,
-					animation: 'slide-from-top',
-				},
-				function () {
-					switchNetwork();
+				return true;
+			} catch (error) {
+				//	error
+				console.log('Error switching to Sepolia Testnet:', error);
+				if (error.code === 4902) {
+					try {
+						await window.ethereum.request({
+							method: 'wallet_addEthereumChain',
+							params: [
+								{
+								chainId: '0xaa36a7', // Use the Sepolia testnet chain ID
+								chainName: 'Sepolia Testnet',
+								nativeCurrency: {
+									name: 'SEPOLIA',
+									symbol: 'ETH',
+									decimals: 18
+								},
+								blockExplorerUrls: [CONSTANTS.etherScan],
+								rpcUrls: ['https://rpc.sepolia.io'] // Use the Sepolia testnet RPC URL
+								}
+							]
+						});
+						await initializeConnection();
+						return true;
+					} catch (addError) {
+						console.log('add error', addError);
+						$('.wallets').css('display', 'none');
+						$('.network_switch').css('display', 'inline-block');
+						swal({
+							title: 'Failed to Switch Network',
+							type: 'info',
+							text: 'Try again to switch to the Sepolia Testnet.',
+							showConfirmButton: true,
+							showCancelButton: true,
+							confirmButtonText: 'Switch',
+							cancelButtonText: 'Cancel',
+							animation: 'slide-from-top',
+							}).then((result) => {
+							if (result.value) {
+								switchNetwork();
+							}
+						});
+					}
+					return false;
+				} else {
+					console.log('switch error', error);
+					$('.wallets').css('display', 'none');
+					$('.network_switch').css('display', 'inline-block');
+					swal({
+						title: 'Switch Denied..',
+						type: 'info',
+						text: 'Please switch to the Sepolia Testnet.',
+						showConfirmButton: true,
+						showCancelButton: true,
+						confirmButtonText: 'Switch',
+						cancelButtonText: 'Cancel',
+						animation: 'slide-from-top',
+						}).then((result) => {
+						if (result.value) {
+							switchNetwork();
+						}
+					});
 				}
-				);
 				return false;
 			}
-			} else {
-			console.log(error);
-			$('.network_switch').css('display', 'inline-block');
-			return false;
-			}
-		}
 		} else {
-		swal({
+		  swal({
 			title: 'Hold on!',
 			type: 'error',
 			confirmButtonColor: '#F27474',
 			text: 'MetaMask is not installed. Please consider installing it: https://metamask.io/download.html',
-		});
+		  });
 		}
-	}
+	}	  
 	
 	async function reqConnect() {
 		try {
