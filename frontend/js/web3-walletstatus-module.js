@@ -102,7 +102,7 @@ async function unlockedWallet() {
 			$(".network_switch").css("display", "inline-block");
 		} else {
 			await initializeConnection();
-			console.log("Reading eth mainnet");
+			console.log("Reading from mainnet: ", networkId);
 		}
 	}
 
@@ -253,7 +253,7 @@ async function unlockedWallet() {
 					$('.wallets').css('display', 'none');
 					$('.network_switch').css('display', 'inline-block');
 					swal({
-						title: 'Switch Denied..',
+						title: 'Request Denied by User..',
 						type: 'info',
 						text: 'Please switch to the Sepolia Testnet.',
 						showConfirmButton: true,
@@ -292,7 +292,7 @@ async function unlockedWallet() {
 			console.log('Permissions needed to continue.');
 			swal({
 			  title: '',
-			  text: 'Permissions needed on dashboard..',
+			  text: 'Permissions needed here..',
 			  type: 'info',
 			  html: false,
 			  dangerMode: false,
