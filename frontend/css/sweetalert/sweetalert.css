@@ -326,7 +326,8 @@ body.stop-scrolling {
   background-color: #d94800; 
 }
 .sweet-alert .sa-icon.sa-info {
-  border-color: #c8831b; 
+  border-color: #08e7fe; 
+  box-shadow: 0 0 2px #188dd6, 0 0 3px #188dd6, 0 0 15px #188dd6, 0 0 15px #188dd6, 0 0 3px #188dd6, 3px 3px 0.5px #0e567c !important;
 }
 .sweet-alert .sa-icon.sa-info::before {
   content: "";
@@ -337,7 +338,7 @@ body.stop-scrolling {
   left: 50%;
   border-radius: 2px;
   margin-left: -2px;
-  background-color: #c8831b; 
+  background-color: #08e7fe; 
 }
 .sweet-alert .sa-icon.sa-info::after {
   content: "";
@@ -347,7 +348,7 @@ body.stop-scrolling {
   border-radius: 30%;
   margin-left: -3px;
   top: 15px;
-  background-color: #c8831b;
+  background-color: #08e7fe;
   left: 50%; 
 }
 .sweet-alert .sa-icon.sa-success {
