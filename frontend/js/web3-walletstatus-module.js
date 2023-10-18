@@ -62,20 +62,22 @@ async function unlockedWallet() {
 			$('.network_switch').css('display', 'inline-block');
 			switchNetwork();
 
-			swal({
-				title: 'Switch to Sepolia Testnet...',
-				type: 'info',
-				text: 'Please switch to the Sepolia Testnet.',
-				showConfirmButton: true,
-				showCancelButton: true,
-				confirmButtonText: 'Switch',
-				cancelButtonText: 'Cancel',
-				animation: 'slide-from-top',
-				}).then((result) => {
-				if (result.value) {
+			swal(
+				{
+					title: 'Switch to Sepolia Testnet...',
+					text: 'Failed to initialize Chain and Wallet. \nClick retry button to try again.',
+					type: 'info',
+					html: false,
+					dangerMode: false,
+					confirmButtonText: 'retry',
+					cancelButtonText: 'cancel',
+					showConfirmButton: true,
+					showCancelButton: true,
+					animation: 'slide-from-top',
+				}, function () {
+					console.log('initialize retry...');
 					switchNetwork();
-				}
-			});
+				}); 
 		}
 	}
 
@@ -200,7 +202,7 @@ async function unlockedWallet() {
 					method: 'wallet_switchEthereumChain',
 					params: [{ chainId: '0xaa36a7' }] // Use the Sepolia testnet chain ID
 				});
-				// success
+				// success in switch, reinitialize
 				console.log('Successfully switched to the Sepolia Testnet');
 				await initializeConnection();
 				return true;
@@ -213,7 +215,7 @@ async function unlockedWallet() {
 							method: 'wallet_addEthereumChain',
 							params: [
 								{
-								chainId: '0xaa36a7', // Use the Sepolia testnet chain ID
+								chainId: '0xaa36a7', // using the Sepolia testnet chain ID
 								chainName: 'Sepolia Testnet',
 								nativeCurrency: {
 									name: 'SEPOLIA',
@@ -221,7 +223,7 @@ async function unlockedWallet() {
 									decimals: 18
 								},
 								blockExplorerUrls: [CONSTANTS.etherScan],
-								rpcUrls: ['https://rpc.sepolia.io'] // Use the Sepolia testnet RPC URL
+								rpcUrls: ['https://rpc.sepolia.io'] // using the Sepolia testnet RPC URL
 								}
 							]
 						});
@@ -240,11 +242,10 @@ async function unlockedWallet() {
 							confirmButtonText: 'Switch',
 							cancelButtonText: 'Cancel',
 							animation: 'slide-from-top',
-							}).then((result) => {
-							if (result.value) {
+							}, function () {
+								console.log('initialize retry...');
 								switchNetwork();
-							}
-						});
+							});
 					}
 					return false;
 				} else {
@@ -260,17 +261,16 @@ async function unlockedWallet() {
 						confirmButtonText: 'Switch',
 						cancelButtonText: 'Cancel',
 						animation: 'slide-from-top',
-						}).then((result) => {
-						if (result.value) {
+						}, function () {
+							console.log('initialize retry...');
 							switchNetwork();
-						}
-					});
+						}); 
 				}
 				return false;
 			}
 		} else {
 		  swal({
-			title: 'Hold on!',
+			title: 'Web3 Provider Missing!',
 			type: 'error',
 			confirmButtonColor: '#F27474',
 			text: 'MetaMask is not installed. Please consider installing it: https://metamask.io/download.html',
