@@ -350,14 +350,7 @@ contract HEDGEFUND {
 
         emit hedgeCreated(token, optionID, newOption.createValue, newOption.hedgeType, msg.sender);
     }
-
-    // DRAFT - FUNCTION TO ADD/REMOVE TOKENS TO BASKET; TOKEN & AMOUNT
-    // > mapping inside hedge struct, with tokenaddress & amount, 3 slots max allowed when adding
-    // > same mapping is checked & iterated on settlement whilst deducting from totalPayOff 
-    // > only same pair tokens can be in same basket, this brings settlement efficiency when iterating as above
-    // > consider limiting the basket feature to loans only where its relevant not with hedges
-    // DRAFT - FUNCTION TO EDIT HEDGE; COST, STRIKE, DURATION ONLY BEFORE ITS TAKEN
-
+    
     // Hedges are bought in quote/paired currency of underlying token
     // For Call and Put Options cost is premium, lockedinuse here but paid out on settlement
     // For Equity Swaps cost is equal to underlying value as 100% collateral is required. There is no premium
@@ -551,36 +544,30 @@ contract HEDGEFUND {
             if (hedgeInfo.marketOverStart) {
                 // Taker profit in pair currency = underlying - cost - strike value
                 hedgeInfo.payOff = hedgeInfo.underlyingValue.sub(option.startValue.add(option.cost));
-                // DRAFT - for bundled underlying assets, take list of all tokens in basket & iterate payment code below until payOff is zero {
-                // ..
-                // ..
-                    // Convert to equivalent tokens lockedInUse by owner, factor fee
-                    (hedgeInfo.priceNow, ) = getUnderlyingValue(option.token, 1);
-                    hedgeInfo.tokensDue = hedgeInfo.payOff.div(hedgeInfo.priceNow);
-                    // Check if collateral is enough, otherwise use max balance from Owner lockedInUse
-                    if (otiU.lockedinuse < hedgeInfo.tokensDue){
-                        hedgeInfo.tokensDue = otiU.lockedinuse;
-                    }
-                    hedgeInfo.tokenFee = calculateFee(hedgeInfo.tokensDue);
-                    // Move payoff - in underlying, take full gains from owner, credit taxed payoff to taker, pocket difference
-                    ttiU.deposited += hedgeInfo.tokensDue.sub(hedgeInfo.tokenFee);
-                    otiU.lockedinuse -= option.amount - hedgeInfo.tokensDue;
-                    otiU.withdrawn += hedgeInfo.tokensDue;
-                    // Restore winners collateral
-                    oti.deposited += option.cost.sub(hedgeInfo.pairedFee);
-                    tti.lockedinuse -= option.cost;
-                    tti.withdrawn += option.cost;
-                    // Move cost - credit taxes in both, as profit is in underlying and cost is in pair
-                    ccUT.deposited += (hedgeInfo.tokenFee * 85).div(100);
-                    ccBT.deposited += (hedgeInfo.pairedFee * 85).div(100);
-                    // Miner fee - 15% of protocol fee for settling option. Mining call options always come with 2 token fees
-                    minrT.deposited += (hedgeInfo.tokenFee * 15).div(100);
-                    minrB.deposited += (hedgeInfo.pairedFee * 15).div(100);
-                    // Log wallet PL: 0 - owner won, 1 taker won
-                    logPL(hedgeInfo.payOff - calculateFee(hedgeInfo.payOff), option.paired, option.owner, option.taker, 1);
-                //  ..
-                //  ..
-                // }
+                // Convert to equivalent tokens lockedInUse by owner, factor fee
+                (hedgeInfo.priceNow, ) = getUnderlyingValue(option.token, 1);
+                hedgeInfo.tokensDue = hedgeInfo.payOff.div(hedgeInfo.priceNow);
+                // Check if collateral is enough, otherwise use max balance from Owner lockedInUse
+                if (otiU.lockedinuse < hedgeInfo.tokensDue){
+                    hedgeInfo.tokensDue = otiU.lockedinuse;
+                }
+                hedgeInfo.tokenFee = calculateFee(hedgeInfo.tokensDue);
+                // Move payoff - in underlying, take full gains from owner, credit taxed payoff to taker, pocket difference
+                ttiU.deposited += hedgeInfo.tokensDue.sub(hedgeInfo.tokenFee);
+                otiU.lockedinuse -= option.amount - hedgeInfo.tokensDue;
+                otiU.withdrawn += hedgeInfo.tokensDue;
+                // Restore winners collateral
+                oti.deposited += option.cost.sub(hedgeInfo.pairedFee);
+                tti.lockedinuse -= option.cost;
+                tti.withdrawn += option.cost;
+                // Move cost - credit taxes in both, as profit is in underlying and cost is in pair
+                ccUT.deposited += (hedgeInfo.tokenFee * 85).div(100);
+                ccBT.deposited += (hedgeInfo.pairedFee * 85).div(100);
+                // Miner fee - 15% of protocol fee for settling option. Mining call options always come with 2 token fees
+                minrT.deposited += (hedgeInfo.tokenFee * 15).div(100);
+                minrB.deposited += (hedgeInfo.pairedFee * 15).div(100);
+                // Log wallet PL: 0 - owner won, 1 taker won
+                logPL(hedgeInfo.payOff - calculateFee(hedgeInfo.payOff), option.paired, option.owner, option.taker, 1);
             } else {
                 // Move payoff - owner wins cost & losses nothing. 
                 oti.deposited += option.cost.sub(hedgeInfo.pairedFee);
@@ -667,7 +654,7 @@ contract HEDGEFUND {
                 if (hedgeInfo.payOff > option.cost) {
                     hedgeInfo.payOff = option.cost;
                 }
-                // Move payoff - loss of paired cost to taker only, owner loses nothing
+                // Move payoff - loss of paired currency cost to taker only, owner loses nothing
                 // 1. credit equivalent payoff in paired to owner
                 // 2. credit takers full cost back & then debit loss using withrawn instantly
                 oti.deposited += hedgeInfo.payOff.sub(hedgeInfo.pairedFee);
@@ -697,7 +684,7 @@ contract HEDGEFUND {
             equityswapsSettled[option.token].push(_optionId);
         }
         
-        // Log fee / payoff stats
+        // Log fees and payoff value
         logAnalyticsFees(option.token, hedgeInfo.tokenFee, hedgeInfo.pairedFee, hedgeInfo.tokensDue, option.cost, hedgeInfo.underlyingValue);
         
         // Catch new erc20 address so that wallet can log all underlying token balances credited to it
@@ -710,7 +697,7 @@ contract HEDGEFUND {
         emit minedHedge(_optionId, msg.sender, option.token, option.paired, hedgeInfo.tokenFee, hedgeInfo.pairedFee);
     }
 
-    // Log Protocol Revenue
+    // Log Protocol Revenue 
     // - in frontend use userBalanceMap to get raw revenue balances and populate sums
     function logAnalyticsFees(address token, uint256 tokenFee, uint256 pairedFee, uint256 tokenProfit, uint256 pairProfit, uint256 endValue) internal {
        (address paired, ) = getPairAddressZK(token);
