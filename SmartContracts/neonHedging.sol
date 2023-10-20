@@ -312,11 +312,11 @@ contract HEDGEFUND {
         emit onWithdraw(token, amount, msg.sender);
     }
 
-    // Create Hedge: covers both call options and equity swaps. put options to be enabled in Beta V2
+    // Write Hedge: covers both call options and equity swaps. put options to be enabled in Beta V2
     // premium or buying cost paid in paired token of the underlying asset in the deal
     // no premium for swaps. swap collateral must  be equal for both parties, settle function relies on this implementation here
     // put options will have a max loss check to only accept a strike price 50% away max
-    function createHedge(uint tool, address token, uint256 amount, uint256 cost, uint256 deadline) public nonReentrant {
+    function writeHedge(uint tool, address token, uint256 amount, uint256 cost, uint256 deadline) public nonReentrant {
         require(!locked, "Function is locked");
         locked = true;
         require(tool <= 2 && amount > 0 && cost > 0 && deadline > block.timestamp, "Invalid option parameters");
