@@ -66,11 +66,10 @@ import "@uniswap/v2-periphery/contracts/interfaces/IUniswapV2Router02.sol";
 contract HEDGEFUND {
 
     using SafeMath for uint256;
-    bool private locked = false;
     bool private isExecuting;
 
     modifier nonReentrant() {
-        require(!isExecuting, "Function is currently being executed");
+        require(!isExecuting, "Only one instance of the function at a time");
         isExecuting = true;
         _;
         isExecuting = false;
@@ -317,41 +316,20 @@ contract HEDGEFUND {
     // no premium for swaps. swap collateral must  be equal for both parties, settle function relies on this implementation here
     // put options will have a max loss check to only accept a strike price 50% away max
     function writeHedge(uint tool, address token, uint256 amount, uint256 cost, uint256 deadline) public nonReentrant {
-        require(!locked, "Function is locked");
-        locked = true;
         require(tool <= 2 && amount > 0 && cost > 0 && deadline > block.timestamp, "Invalid option parameters");
-        uint256 withdrawable = getWithdrawableBalance(token, msg.sender);
-        require(withdrawable > 0, "Insufficient free balance");
-        require(token != address(0), "Token address cannot be zero");
-        require(token != UNISWAP_ROUTER_ADDRESS, "Token address cannot be router address");
-        require(token != UNISWAP_FACTORY_ADDRESS, "Token address cannot be factory address");
-        require(token != address(this), "Token address cannot be contract address");
-        // Assign option values directly to the struct
-        hedgingOption storage newOption = hedgeMap[optionID];
-        newOption.owner = msg.sender;
-        newOption.token = token;
-        newOption.status = 1;
-        newOption.amount = amount;
-        (newOption.createValue, newOption.paired) = getUnderlyingValue(token, amount);
-        newOption.cost = cost;
-        newOption.dt_expiry = deadline;
-        newOption.dt_created = block.timestamp;
-        if (tool == 0) {
-            newOption.hedgeType = HedgeType.CALL;
-        } else if (tool == 1) {
-            newOption.hedgeType = HedgeType.PUT;
-        } else if (tool == 2) {
-            newOption.hedgeType = HedgeType.SWAP;
-        } else {
-            revert("Invalid tool option");
-        }
+        require(token != address(0) && token != UNISWAP_ROUTER_ADDRESS && token != UNISWAP_FACTORY_ADDRESS && token != address(this), "Invalid token address");
 
-        // Update user balances for token in hedge
-        userBalance storage hto = userBalanceMap[token][msg.sender]; 
+        hedgingOption storage newOption = hedgeMap[optionID];
+        (newOption.createValue, newOption.paired) = getUnderlyingValue(token, amount);
+        newOption = hedgingOption(
+            false, false, false, msg.sender, address(0), token, address(0), 1, amount, newOption.createValue, 0, 0, cost, block.timestamp, 0, deadline, 0, tool == 0 ? HedgeType.CALL : tool == 1 ? HedgeType.PUT : HedgeType.SWAP, new uint256[](0)
+        );
+
+        userBalance storage hto = userBalanceMap[token][msg.sender];
         hto.lockedinuse += amount;
-        // Update arrays
+
         if (newOption.hedgeType == HedgeType.SWAP) {
-            require(cost >= newOption.createValue, " Swap collateral must be equal value");
+            require(cost >= newOption.createValue, "Swap collateral must be equal value");
             myswapsHistory[msg.sender].push(optionID);
             myswapsCreated[msg.sender].push(optionID);
             equityswapsCreated.push(optionID);
@@ -362,18 +340,15 @@ contract HEDGEFUND {
             optionsCreated.push(optionID);
             tokenSwaps[token].push(optionID);
         }
-        // Log protocol analytics
+
         optionID++;
         hedgesCreatedVolume[newOption.paired].add(newOption.createValue);
 
-        // Wallet hedge volume in main paited currency only
-        if(newOption.paired == wethAddress){wethEquivUserHedged[msg.sender] += newOption.createValue;}
-        if(newOption.paired == usdtAddress){usdtEquivUserHedged[msg.sender] += newOption.createValue;}
-        if(newOption.paired == usdcAddress){usdcEquivUserHedged[msg.sender] += newOption.createValue;}
+        if (newOption.paired == wethAddress) wethEquivUserHedged[msg.sender] += newOption.createValue;
+        if (newOption.paired == usdtAddress) usdtEquivUserHedged[msg.sender] += newOption.createValue;
+        if (newOption.paired == usdcAddress) usdcEquivUserHedged[msg.sender] += newOption.createValue;
 
-        // Emit
         emit hedgeCreated(token, optionID, newOption.createValue, newOption.hedgeType, msg.sender);
-        locked = false;
     }
 
     // DRAFT - FUNCTION TO ADD/REMOVE TOKENS TO BASKET; TOKEN & AMOUNT
@@ -388,8 +363,6 @@ contract HEDGEFUND {
     // For Equity Swaps cost is equal to underlying value as 100% collateral is required. There is no premium
     // Strike value is not set here, maturity calculations left to the settlement function
     function buyHedge(uint256 _optionId) public nonReentrant {
-        require(!locked, "Function is locked");
-        locked = true;
         hedgingOption storage hedge = hedgeMap[_optionId];
         userBalance storage stk = userBalanceMap[hedge.paired][msg.sender];
         require(getWithdrawableBalance(hedge.paired, msg.sender) >= hedge.cost, "Insufficient free pair currency balance");
@@ -445,7 +418,6 @@ contract HEDGEFUND {
 
         // Emit the hedgePurchased event
         emit hedgePurchased(hedge.token, _optionId, hedge.startValue, hedge.hedgeType, msg.sender);
-        locked = false;
     }
 
     // topup Request & Accept function
