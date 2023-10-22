@@ -583,11 +583,14 @@ button#goTop, a.btn#goTop {
   position: absolute;
   padding: 6px !important;
   left: -100px;
+  transform: translateY(20%);
+
 }
 .x-app-socials img {
-  width: 29px !important;
+  width: 22px !important;
   height: auto;
   border-radius: unset;
+  transform: scale(0.75);
 }
 /* go to top */
 button#goTop svg, a.btn#goTop svg {
@@ -1230,6 +1233,7 @@ section.er404 {
     min-height: 400px;
   }
 }
+/* ecosystem design */
 .sectionH1{
   margin-block: 5vw;
   font-size: clamp(28px, 3vw, 40px) !important;
