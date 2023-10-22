@@ -86,7 +86,7 @@ function init() {
     var pinkMat = new THREE.MeshPhongMaterial({
         color: 0x090a21, //gold sun 0xF66120
         emissive: 0x090a21,
-        specular: 0xf542b9, //yellow filter, purple filter 0xf542b9, light blue 0x42ecf5
+        specular: 0x42ecf5, //yellow filter, purple filter 0xf542b9, light blue 0x42ecf5
         shininess: 10,
         shading: THREE.FlatShading,
         transparent: 1,
@@ -95,7 +95,7 @@ function init() {
     var pinkMat2 = new THREE.MeshPhongMaterial({
         color: 0x090a21,
         emissive: 0x090a21,
-       specular: 0xf542b9,
+       specular: 0x42ecf5,
         shininess: 10,
         shading: THREE.FlatShading,
         transparent: 1,
@@ -251,7 +251,7 @@ function onMouseDown(event) {
                         
                         info.innerHTML = " <span>Neon</span> Protocol";
                  
-                        description.innerHTML = "Universal ERC20 <span>Hedging</span> and <span>Lending</span> ecosystem<br/><br/><div>Click on the other planets to learn more ...<div>";
+                        description.innerHTML = "Universal ERC20 <span>Hedging</span> and <span>Lending</span> ecosystem comprising 3 Platforms.<br/><br/><div>Click on the ecosystem planets to learn more ...<div>";
                     }
                     if (planetViewed == 2 || planetViewed==3 || planetViewed==4) {
                         planetViewed = 1;
@@ -277,7 +277,7 @@ function onMouseDown(event) {
 
                   info.innerHTML = " <span>Neon</span> Protocol";
                  
-                        description.innerHTML = "Universal ERC20 <span>Hedging</span> and <span>Lending</span> ecosystem<br/><br/><div>Click on the other planets to learn more ...<div>";
+                        description.innerHTML = "Universal ERC20 <span>Hedging</span> and <span>Lending</span> ecosystem comprising 3 Platforms.<br/><br/><div>Click on the ecosystem planets to learn more ...<div>";
                     }
                 }
                 if (currentcolor == 0x089353) {
