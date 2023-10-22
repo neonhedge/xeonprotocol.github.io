@@ -13,7 +13,7 @@ main {
     align-items: center;
     flex-direction: column;
     gap: 2rem;
-    background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 1)), url('../imgs/tgbconcept.png');
+    background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.8)), url('../imgs/banner-bg.webp');
     background-size: 100%, auto;
     background-repeat: no-repeat;
     padding-block: 6rem;

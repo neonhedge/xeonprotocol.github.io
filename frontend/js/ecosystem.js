@@ -83,10 +83,18 @@ function init() {
         scene.add(sphereTab[i]);
     }
     //////Sun////////
+    // Generate a random number between 0x42ecf5 and 0xf542b9 for the specular color
+    var minSpecular = 0x42ecf5;
+    var maxSpecular = 0xf542b9;
+    var randomSpecular = Math.floor(Math.random() * (maxSpecular - minSpecular + 1)) + minSpecular;
+
+    // Convert the random specular number to a hexadecimal color string
+    var randomSpecularHex = '#' + randomSpecular.toString(16);
+
     var pinkMat = new THREE.MeshPhongMaterial({
         color: 0x090a21, //gold sun 0xF66120
         emissive: 0x090a21,
-        specular: 0x42ecf5, //yellow filter, purple filter 0xf542b9, light blue 0x42ecf5
+        specular: randomSpecularHex, //yellow filter, purple filter 0xf542b9, light blue 0x42ecf5
         shininess: 10,
         shading: THREE.FlatShading,
         transparent: 1,
@@ -95,7 +103,7 @@ function init() {
     var pinkMat2 = new THREE.MeshPhongMaterial({
         color: 0x090a21,
         emissive: 0x090a21,
-       specular: 0x42ecf5,
+       specular: randomSpecularHex,
         shininess: 10,
         shading: THREE.FlatShading,
         transparent: 1,
@@ -113,8 +121,8 @@ function init() {
         shading: THREE.FlatShading
     });
     var material2 = new THREE.MeshPhongMaterial({
-        color: 0x26D7E7,
-        emissive: 0x26D7E7,
+        color: 0x1AC4D4,
+        emissive: 0x1AC4D4,
         shading: THREE.FlatShading
     });
     var material4 = new THREE.MeshPhongMaterial({
@@ -313,7 +321,7 @@ function onMouseDown(event) {
                         });
                     }
                 }
-                   if (currentcolor == 0x26D7E7) {
+                   if (currentcolor == 0x1AC4D4) {
                     if (planetViewed == 1 || planetViewed==2 || planetViewed==4) {
                         planetViewed = 3;
                         info.innerHTML = ' Neon <span id="couleur">Lend</span>';
