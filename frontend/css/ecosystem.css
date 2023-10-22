@@ -46,7 +46,6 @@ main {
     left: 50px;
 }
 #ecosystemContainer #ecosystemWelcome #lastSentence {
-    font-family: "Raleway";
     margin: 0;
     font-weight: 400;
     font-size: 14pt;
@@ -60,7 +59,6 @@ main {
 }
 #ecosystemContainer #ecosystemWelcome #universe {
     text-transform: uppercase;
-    font-family: "Raleway";
     font-weight: 800;
 }
 #ecosystemContainer #ecoContent {
@@ -73,19 +71,29 @@ main {
     margin: 0;
 }
 #ecosystemContainer #ecoContent span {
-    font-family: Raleway;
     font-weight: 600;
 }
 #ecosystemContainer #ecoContent #ecoContentTitle {
-    font-family: Raleway;
-    color: white;
+    font-size: clamp(26px, 5vw, 36px);
+    font-family: 'Neon',monospace, sans-serif, "Helvetica Neue", Helvetica, "Liberation Sans" !important;
+    font-weight: 500;
+    letter-spacing: 1px;
+
+    color: #08e7fe;
+    text-shadow: 0 0 2px #188dd6, 0 0 3px #188dd6, 0 0 15px #188dd6, 0 0 15px #188dd6, 0 0 3px #188dd6, 3px 3px 0.5px #0e567c !important;
     opacity: 1;
     font-weight: 200;
     letter-spacing: 1.5px;
     font-size: 26pt;
 }
 #ecosystemContainer #ecoContent #ecoContentTitle span {
-    color: #f66120;
+    font-size: clamp(26px, 5vw, 36px);
+    font-family: 'Neon',monospace, sans-serif, "Helvetica Neue", Helvetica, "Liberation Sans" !important;
+    font-weight: 500;
+    letter-spacing: 1px;
+
+    color: #08e7fe;
+    text-shadow: 0 0 2px #188dd6, 0 0 3px #188dd6, 0 0 15px #188dd6, 0 0 15px #188dd6, 0 0 3px #188dd6, 3px 3px 0.5px #0e567c !important;
 }
 #ecosystemContainer #ecoContent #ecoContentTitle div {
     font-size: 12pt;
@@ -95,19 +103,17 @@ main {
     letter-spacing: 1.5px;
     margin: 0;
     font-size: 16pt;
-    font-family: Raleway;
     font-weight: 200;
     color: white;
 }
 #ecosystemContainer #ecoContent #description {
     color: white;
     letter-spacing: 1.5px;
-    font-family: Raleway;
     font-weight: 200;
     font-size: 16pt;
 }
 #ecosystemContainer #ecoContent #description span {
-    color: #f66120;
+    color: #08e7fe;
 }
 #ecosystemContainer #ecoContent #description div {
     color: #acacac;

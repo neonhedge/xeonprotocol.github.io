@@ -62,8 +62,8 @@ function hideecosystemWelcome() {
 }
 
 function init() {
-    camera = new THREE.PerspectiveCamera(20, window.innerWidth / window.innerHeight, 1, 1000);
-    camera.position.z = 70;
+    camera = new THREE.PerspectiveCamera(30, window.innerWidth / window.innerHeight, 1, 1000);
+    camera.position.z = 95;
     controls = new THREE.OrbitControls(camera);
     controls.maxDistance = 100;
     controls.minDistance = 30;
@@ -249,9 +249,9 @@ function onMouseDown(event) {
                             ease: Quad.easeInOut,
                         });                      
                         
-                        info.innerHTML = " <span>Neon</span> Protocol,";
+                        info.innerHTML = " <span>Neon</span> Protocol";
                  
-                        description.innerHTML = "Universal ERC20 <span>Hedging</span and <span>Lending</span> ecosystem<br/><br/><div>Click on the other planets to learn more ...<div>";
+                        description.innerHTML = "Universal ERC20 <span>Hedging</span> and <span>Lending</span> ecosystem<br/><br/><div>Click on the other planets to learn more ...<div>";
                     }
                     if (planetViewed == 2 || planetViewed==3 || planetViewed==4) {
                         planetViewed = 1;
@@ -275,17 +275,18 @@ function onMouseDown(event) {
                             ease: Quad.easeInOut,
                         });
 
-                  info.innerHTML = " <span>Neon</span> Protocol,";
+                  info.innerHTML = " <span>Neon</span> Protocol";
                  
-                        description.innerHTML = "Universal ERC20 <span>Hedging</span and <span>Lending</span> ecosystem<br/><br/><div>Click on the other planets to learn more ...<div>";
+                        description.innerHTML = "Universal ERC20 <span>Hedging</span> and <span>Lending</span> ecosystem<br/><br/><div>Click on the other planets to learn more ...<div>";
                     }
                 }
                 if (currentcolor == 0x089353) {
                     if (planetViewed == 1 || planetViewed==3 || planetViewed==4) {
                         planetViewed = 2;
-                    info.innerHTML = " <span id='couleur'>Neon</span> Hedge,";
+                    info.innerHTML = " Neon <span id='couleur'>Hedge</span>,";
                  
-                                               document.getElementById('couleur').style.color="#26d7e7";
+                                               document.getElementById('couleur').style.color="#089353";
+                                               document.getElementById('couleur').style.textShadow="0 0 2px #089353, 0 0 3px #089353, 0 0 15px #089353, 0 0 15px #089353, 0 0 3px #089353, 3px 3px 0.5px #03371f";
 
                         description.innerHTML = "OTC Call Options, Put Options, Equity Swaps. Hedge any ERC20 token.<br/><br/><div>Click on the other planets to learn more ...<div>";
                      
@@ -314,11 +315,11 @@ function onMouseDown(event) {
                    if (currentcolor == 0x26D7E7) {
                     if (planetViewed == 1 || planetViewed==2 || planetViewed==4) {
                         planetViewed = 3;
-                        info.innerHTML = '<span id="couleur">Neon</span> Lend';
+                        info.innerHTML = ' Neon <span id="couleur">Lend</span>';
                       
                          
-                        description.innerHTML = "Borrow, lend using any ERC20 token as collateral.<br/><br/><div>Click on the other planets to learn more ...<div>";
-                      document.getElementById('couleur').style.color="#ffc12d";
+                        description.innerHTML = "Borrow against any ERC20 token, lend any ERC20 token as liquidity.<br/><br/><div>Click on the other planets to learn more ...<div>";
+                      document.getElementById('couleur').style.color="#26D7E7";
 
                         TweenMax.from($('#ecoContent'), 0.5, {
                             css: {
@@ -345,10 +346,12 @@ function onMouseDown(event) {
                     if (currentcolor == 0x600164) {
                     if (planetViewed == 1 || planetViewed==2 || planetViewed==3) {
                         planetViewed = 4;
-                        info.innerHTML = '<span id="couleur">Neon</span> Farm';
-                         document.getElementById('couleur').style.color="#acacac";
+                        info.innerHTML = ' Neon <span id="couleur">Farm</span>';
+                         document.getElementById('couleur').style.color="#600164";
+                         document.getElementById('couleur').style.textShadow="0 0 2px #600164, 0 0 3px #600164, 0 0 15px #600164, 0 0 15px #600164, 0 0 3px #600164, 3px 3px 0.5px #240325";
+
                   
-                        description.innerHTML = "Join pools to provide native Hedge or Lending liquidity on our ptotocol and earn rewards<br/><br/><div>Click on the other planets to learn more ...<div>";
+                        description.innerHTML = "Join pools to provide native Hedge or Lending liquidity on our ptotocol and earn yield.<br/><br/><div>Click on the other planets to learn more ...<div>";
 
                         TweenMax.from($('#ecoContent'), 0.5, {
                             css: {
@@ -377,7 +380,7 @@ function onMouseDown(event) {
     }
     console.log('Down');
 }
-document.addEventListener('mousedown', onMouseDown, false);
+document.addEventListener('mousedown', onMouseDown, true);
 
 function animate() {
     ;
