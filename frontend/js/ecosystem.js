@@ -182,10 +182,11 @@ function init() {
     scene.add(light);
     //render
     renderer = new THREE.WebGLRenderer({
-        antialias: true
+        antialias: true,
+        alpha: true
     });
     renderer.sortObjects = false;
-    renderer.setClearColor(0x131A3D, 1);
+    renderer.setClearColor(0x040115, 0.5); //canvas color and opacity
     renderer.setSize(window.innerWidth, window.innerHeight);
     stats = new Stats();
     container = document.getElementById('ecosystemContainer');
@@ -283,7 +284,7 @@ function onMouseDown(event) {
                 if (currentcolor == 0x089353) {
                     if (planetViewed == 1 || planetViewed==3 || planetViewed==4) {
                         planetViewed = 2;
-                    info.innerHTML = " Neon <span id='couleur'>Hedge</span>,";
+                    info.innerHTML = " Neon <span id='couleur'>Hedge</span>";
                  
                                                document.getElementById('couleur').style.color="#089353";
                                                document.getElementById('couleur').style.textShadow="0 0 2px #089353, 0 0 3px #089353, 0 0 15px #089353, 0 0 15px #089353, 0 0 3px #089353, 3px 3px 0.5px #03371f";
@@ -393,7 +394,7 @@ function animate() {
     }
     sun.rotation.x += 0.004;
     sun2.rotation.y += 0.004;
-    sun3.rotation.z += 0.002;
+    sun3.rotation.z += 0.004;
     earthPivot.rotation.z += 0.003;
     earthPivot2.rotation.z += 0.008;
     earthPivot3.rotation.y += 0.003;

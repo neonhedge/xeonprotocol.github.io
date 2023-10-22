@@ -2,7 +2,7 @@
 @import url('https://fonts.googleapis.com/css?family=Raleway:100,100i,200,300,400,500,600,700,800');
 
 header {
-  border-bottom: 0.5px solid #15213c !important;
+    border-bottom: 0.5px solid #15213c !important;
 }
 main {
     position: relative;
@@ -13,7 +13,7 @@ main {
     align-items: center;
     flex-direction: column;
     gap: 2rem;
-    background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.5));
+    background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 1)), url('../imgs/tgbconcept.png');
     background-size: 100%, auto;
     background-repeat: no-repeat;
     padding-block: 6rem;
@@ -83,7 +83,7 @@ main {
     letter-spacing: 1px;
 
     color: #08e7fe;
-    text-shadow: 0 0 2px #188dd6, 0 0 3px #188dd6, 0 0 15px #188dd6, 0 0 15px #188dd6, 0 0 3px #188dd6, 3px 3px 0.5px #0e567c !important;
+    text-shadow: 0 0 2px #188dd6, 0 0 3px #188dd6, 0 0 15px #188dd6, 0 0 15px #188dd6, 0 0 3px #188dd6, 3px 3px 0.5px #0e567c;
     opacity: 1;
     font-weight: 200;
     letter-spacing: 1.5px;
@@ -96,7 +96,7 @@ main {
     letter-spacing: 1px;
 
     color: #08e7fe;
-    text-shadow: 0 0 2px #188dd6, 0 0 3px #188dd6, 0 0 15px #188dd6, 0 0 15px #188dd6, 0 0 3px #188dd6, 3px 3px 0.5px #0e567c !important;
+    text-shadow: 0 0 2px #188dd6, 0 0 3px #188dd6, 0 0 15px #188dd6, 0 0 15px #188dd6, 0 0 3px #188dd6, 3px 3px 0.5px #0e567c;
 }
 #ecosystemContainer #ecoContent #ecoContentTitle div {
     font-size: 12pt;
@@ -106,17 +106,20 @@ main {
     letter-spacing: 1.5px;
     margin: 0;
     font-size: 16pt;
+    font-family: Raleway;
     font-weight: 200;
     color: white;
 }
 #ecosystemContainer #ecoContent #description {
     color: white;
     letter-spacing: 1.5px;
+    font-family: Raleway;
     font-weight: 200;
     font-size: 16pt;
 }
 #ecosystemContainer #ecoContent #description span {
     color: #08e7fe;
+    text-shadow: 0 0 2px #188dd6, 0 0 3px #188dd6, 0 0 15px #188dd6, 0 0 15px #188dd6, 0 0 3px #188dd6, 3px 3px 0.5px #0e567c;
 }
 #ecosystemContainer #ecoContent #description div {
     color: #acacac;
@@ -144,4 +147,5 @@ main {
     box-sizing: border-box;
     text-align: center;
     font-family: "Space Grotesk", sans-serif;
+    transition: 0.5s;
 }
