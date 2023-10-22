@@ -186,7 +186,7 @@ function init() {
         alpha: true
     });
     renderer.sortObjects = false;
-    renderer.setClearColor(0x040115, 0.5); //canvas color and opacity
+    renderer.setClearColor(0x040115, 0.7); //canvas color and opacity
     renderer.setSize(window.innerWidth, window.innerHeight);
     stats = new Stats();
     container = document.getElementById('ecosystemContainer');
