@@ -292,10 +292,10 @@ function onMouseDown(event) {
                 if (currentcolor == 0x089353) {
                     if (planetViewed == 1 || planetViewed==3 || planetViewed==4) {
                         planetViewed = 2;
-                    info.innerHTML = " Neon <span id='couleur'>Hedge</span>";
+                    info.innerHTML = " Neon <span id='couleur'>Hedging</span>";
                  
-                                               document.getElementById('couleur').style.color="#089353";
-                                               document.getElementById('couleur').style.textShadow="0 0 2px #089353, 0 0 3px #089353, 0 0 15px #089353, 0 0 15px #089353, 0 0 3px #089353, 3px 3px 0.5px #03371f";
+                                               document.getElementById('couleur').style.color="#2ce492";
+                                               document.getElementById('couleur').style.textShadow="0 0 2px #089556, 0 0 3px #089556, 0 0 15px #089556, 0 0 15px #089556, 0 0 3px #089556, 3px 3px 0.5px #014324";
 
                         description.innerHTML = "OTC: Call Options, Put Options, Equity Swaps. Hedge any ERC20 token.<br/><br/><div>Click on the other planets to learn more ...<div>";
                      
@@ -324,7 +324,7 @@ function onMouseDown(event) {
                    if (currentcolor == 0x1AC4D4) {
                     if (planetViewed == 1 || planetViewed==2 || planetViewed==4) {
                         planetViewed = 3;
-                        info.innerHTML = ' Neon <span id="couleur">Lend</span>';
+                        info.innerHTML = ' Neon <span id="couleur">Lending</span>';
                       
                          
                         description.innerHTML = "Borrow against any ERC20 token, lend any ERC20 token as liquidity.<br/><br/><div>Click on the other planets to learn more ...<div>";
@@ -355,9 +355,9 @@ function onMouseDown(event) {
                     if (currentcolor == 0x600164) {
                     if (planetViewed == 1 || planetViewed==2 || planetViewed==3) {
                         planetViewed = 4;
-                        info.innerHTML = ' Neon <span id="couleur">Farm</span>';
-                         document.getElementById('couleur').style.color="#600164";
-                         document.getElementById('couleur').style.textShadow="0 0 2px #600164, 0 0 3px #600164, 0 0 15px #600164, 0 0 15px #600164, 0 0 3px #600164, 3px 3px 0.5px #240325";
+                        info.innerHTML = ' Neon <span id="couleur">Farming</span>';
+                         document.getElementById('couleur').style.color="#a824d7";
+                         document.getElementById('couleur').style.textShadow="0 0 2px #650089, 0 0 3px #650089, 0 0 15px #650089, 0 0 15px #650089, 0 0 3px #650089, 3px 3px 0.5px #4a0663";
 
                   
                         description.innerHTML = "Join pools to provide native Hedging or Lending liquidity on our ptotocol and earn yield.<br/><br/><div>Click on the other planets to learn more ...<div>";
