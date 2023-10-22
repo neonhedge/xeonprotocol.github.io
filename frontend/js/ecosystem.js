@@ -288,7 +288,7 @@ function onMouseDown(event) {
                                                document.getElementById('couleur').style.color="#089353";
                                                document.getElementById('couleur').style.textShadow="0 0 2px #089353, 0 0 3px #089353, 0 0 15px #089353, 0 0 15px #089353, 0 0 3px #089353, 3px 3px 0.5px #03371f";
 
-                        description.innerHTML = "OTC Call Options, Put Options, Equity Swaps. Hedge any ERC20 token.<br/><br/><div>Click on the other planets to learn more ...<div>";
+                        description.innerHTML = "OTC: Call Options, Put Options, Equity Swaps. Hedge any ERC20 token.<br/><br/><div>Click on the other planets to learn more ...<div>";
                      
                         TweenMax.from($('#ecoContent'), 0.5, {
                             css: {
@@ -351,7 +351,7 @@ function onMouseDown(event) {
                          document.getElementById('couleur').style.textShadow="0 0 2px #600164, 0 0 3px #600164, 0 0 15px #600164, 0 0 15px #600164, 0 0 3px #600164, 3px 3px 0.5px #240325";
 
                   
-                        description.innerHTML = "Join pools to provide native Hedge or Lending liquidity on our ptotocol and earn yield.<br/><br/><div>Click on the other planets to learn more ...<div>";
+                        description.innerHTML = "Join pools to provide native Hedging or Lending liquidity on our ptotocol and earn yield.<br/><br/><div>Click on the other planets to learn more ...<div>";
 
                         TweenMax.from($('#ecoContent'), 0.5, {
                             css: {

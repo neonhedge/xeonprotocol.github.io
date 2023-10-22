@@ -1,6 +1,9 @@
 /*  NEON PROTOCOL ECOSYSTEM MODULE STYLESHEET */
 @import url('https://fonts.googleapis.com/css?family=Raleway:100,100i,200,300,400,500,600,700,800');
 
+header {
+  border-bottom: 0.5px solid #15213c !important;
+}
 main {
     position: relative;
     min-height: 50rem;
