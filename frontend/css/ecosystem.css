@@ -142,10 +142,48 @@ main {
     font-size: 16pt;
 }
 #developmentStatus {
+    margin-top:2rem;
     position: relative;
     padding:2rem 1rem;
     box-sizing: border-box;
     text-align: center;
     font-family: "Space Grotesk", sans-serif;
     transition: 0.5s;
+}
+
+.rewardsInformer {
+	padding: 5px 20px;
+	font-size: clamp(12.5px, 1vw, 13px);
+	font-weight: 100;
+	text-align: center;
+	cursor:help;
+	transition: background-color 0.3s;
+	color: #08e7fe;
+	border: 1px solid rgba(51, 153, 255, 0.15);
+	border-radius: 8px;
+/*
+	background-color: rgba(29, 163, 216, 0.2);
+	background-color: rgba(29, 129, 216, 0.2);
+*/
+	background-color: rgba(29, 129, 216, 0.15);
+	animation: hideDiv 60s forwards;
+	transition: 0.5s;
+}
+@keyframes hideDiv {
+	0% {
+	  opacity: 1;
+	  visibility: visible;
+	}
+	95% {
+		opacity: 0.95;
+	}
+	99.9% {
+	  opacity: 0;
+	  visibility: hidden;
+	}
+	100% {
+	  opacity: 0;
+	  visibility: hidden;
+	  display: none;
+	}
 }
