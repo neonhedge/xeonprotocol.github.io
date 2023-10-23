@@ -18,10 +18,11 @@ var mesh;
 var planetViewed = 0;
 var material3; // Define material3 here
 
-$(document).ready(function() {    
+document.addEventListener('DOMContentLoaded', function() {
     init();
     animate();
 });
+
 
 $(window).on('load', function() {
     TweenMax.to($('#ecosystemWelcome'), 1, {
@@ -395,6 +396,8 @@ function onMouseDown(event) {
         }
     }
     console.log('Down');
+    // Scroll to the ecosystemContainer
+    scrollToEcosystemContainer();
 }
 
 function updateCurrentMeshColor(currentcolor) {
@@ -412,6 +415,19 @@ function updateCurrentMeshColor(currentcolor) {
     });
     mesh = new THREE.Mesh(geometry3, material3);
     earthPivot3.add(mesh);
+}
+
+function scrollToEcosystemContainer() {
+    var containerEco = document.getElementById('ecosystemContainer');
+    var offset = 250; // top distance adjuster, tucks the container higher
+    var containerTop = containerEco.getBoundingClientRect().top + window.scrollY + offset;
+    var scrollDuration = 1000; 
+
+    // smooth scrolling for a nicer effect
+    window.scrollTo({
+        top: containerTop,
+        behavior: 'smooth'
+    });
 }
 
 document.addEventListener('mousedown', onMouseDown, true);

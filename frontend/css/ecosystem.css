@@ -16,7 +16,8 @@ main {
     background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.8)), url('../imgs/banner-bg.webp');
     background-size: 100%, auto;
     background-repeat: no-repeat;
-    padding-block: 6rem;
+    padding-block: 8rem 5rem;
+    box-sizing: border-box;
     overflow: hidden !important;
 
     font-family: "Space Grotesk", monospace, sans-serif;
@@ -80,20 +81,20 @@ main {
     font-size: clamp(26px, 5vw, 36px);
     font-family: 'Neon',monospace, sans-serif, "Helvetica Neue", Helvetica, "Liberation Sans" !important;
     font-weight: 500;
-    letter-spacing: 1px;
 
     color: #08e7fe;
     text-shadow: 0 0 2px #188dd6, 0 0 3px #188dd6, 0 0 15px #188dd6, 0 0 15px #188dd6, 0 0 3px #188dd6, 3px 3px 0.5px #0e567c;
     opacity: 1;
     font-weight: 200;
-    letter-spacing: 1.5px;
-    font-size: 26pt;
+    letter-spacing: 0.5vw;
+    font-size: 25pt;
+    padding-bottom: 1vw;
 }
 #ecosystemContainer #ecoContent #ecoContentTitle span {
     font-size: clamp(26px, 5vw, 36px);
     font-family: 'Neon',monospace, sans-serif, "Helvetica Neue", Helvetica, "Liberation Sans" !important;
     font-weight: 500;
-    letter-spacing: 1px;
+    letter-spacing: 0.5vw;
 
     color: #08e7fe;
     text-shadow: 0 0 2px #188dd6, 0 0 3px #188dd6, 0 0 15px #188dd6, 0 0 15px #188dd6, 0 0 3px #188dd6, 3px 3px 0.5px #0e567c;
