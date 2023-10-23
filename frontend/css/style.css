@@ -1,6 +1,7 @@
 /*--------------------------------------------------------*/
 /*	1. CSS RESET */
 /*--------------------------------------------------------*/
+
 @font-face {
 	font-family: bitwise;
 	src: url(../fonts/Bitwise-m19x.ttf);
@@ -216,7 +217,7 @@ iframe {
 }
 
 .mb-4 {
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
 }
 
 .bg-primary {
@@ -381,6 +382,7 @@ iframe {
   background: radial-gradient(rgba(4, 1, 21, 0.7) 20%, rgba(4, 1, 21, 0.95) 80%) !important; */
   background: radial-gradient(rgba(4, 1, 21, 0.95) 40%, rgba(4, 1, 21, 0.7) 80%) !important;/* shades inwards - blurry bg effect */  
   border-radius: 2rem;
+  font-family: "Nunito Sans", monospace, sans-serif;
 }
 
 .introductionHold p{
@@ -428,19 +430,19 @@ iframe {
 /*	3. FONTS */
 /*--------------------------------------------------------*/
 body {
-  font-family: "Nunito Sans", sans-serif;
+  font-family: "Space Grotesk", monospace, sans-serif;
   font-size: 1.1rem;
-  font-weight: 400;
+  font-weight: 100;
   line-height: 1.6;
   color: rgba(255, 255, 255, 0.9);
 }
 
 h1, h2, h3 {
-  font-family: "Space Grotesk", sans-serif;
+  font-family: "Space Grotesk", monospace, sans-serif;
   line-height: 1;
   color: rgba(255, 255, 255, 0.9);
   margin-bottom: 2rem;
-  font-weight: 900;
+  font-weight: 600;
 }
 
 h1 {
@@ -1233,7 +1235,6 @@ section.er404 {
     min-height: 400px;
   }
 }
-/* ecosystem design */
 .sectionH1{
   margin-block: 5vw;
   font-size: clamp(28px, 3vw, 40px) !important;

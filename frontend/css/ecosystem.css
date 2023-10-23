@@ -1,8 +1,15 @@
 /*  NEON PROTOCOL ECOSYSTEM MODULE STYLESHEET */
 @import url('https://fonts.googleapis.com/css?family=Raleway:100,100i,200,300,400,500,600,700,800');
 
+body {
+    background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.8)), url('../imgs/banner-bg.webp') !important;
+    font-family: "Space Grotesk", monospace, sans-serif !important;
+}
 header {
     border-bottom: 0.5px solid #15213c !important;
+}
+footer {
+    background: unset !important;
 }
 main {
     position: relative;
@@ -64,7 +71,9 @@ main {
 }
 #ecosystemContainer #ecosystemWelcome #universe {
     text-transform: uppercase;
-    font-weight: 800;
+    font-size: clamp(26px, 5vw, 40px);
+    font-family: Raleway,monospace, sans-serif, "Helvetica Neue", Helvetica, "Liberation Sans" !important;
+    font-weight: 100;
 }
 #ecosystemContainer #ecoContent {
     top: 50%;
@@ -76,15 +85,18 @@ main {
     margin: 0;
 }
 #ecosystemContainer #ecoContent span {
-    font-weight: 600;
+    font-weight: 200;
 }
 .ecosystemH {
     letter-spacing: 0.2vw !important;
+    font-size: clamp(26px, 5vw, 40px);
+    font-family: Raleway,monospace, sans-serif, "Helvetica Neue", Helvetica, "Liberation Sans" !important;
+    font-weight: 100;
 }
-#ecosystemContainer #ecoContent #ecoContentTitle {
-    font-size: clamp(26px, 5vw, 36px);
-    font-family: 'Neon',monospace, sans-serif, "Helvetica Neue", Helvetica, "Liberation Sans" !important;
-    font-weight: 500;
+#ecoContentTitle {
+    font-size: clamp(26px, 5vw, 35px);
+    font-family: Raleway,monospace, sans-serif, "Helvetica Neue", Helvetica, "Liberation Sans" !important;
+    font-weight: 100;
 
     color: #08e7fe;
     text-shadow: 0 0 2px #188dd6, 0 0 3px #188dd6, 0 0 15px #188dd6, 0 0 15px #188dd6, 0 0 3px #188dd6, 3px 3px 0.5px #0e567c;
@@ -94,20 +106,20 @@ main {
     font-size: 25pt;
     padding-bottom: 1vw;
 }
-#ecosystemContainer #ecoContent #ecoContentTitle span {
+#ecoContentTitle span {
     font-size: clamp(26px, 5vw, 36px);
-    font-family: 'Neon',monospace, sans-serif, "Helvetica Neue", Helvetica, "Liberation Sans" !important;
+    font-family: Raleway,monospace, sans-serif, "Helvetica Neue", Helvetica, "Liberation Sans" !important;
     font-weight: 500;
     letter-spacing: 0.5vw;
 
     color: #08e7fe;
     text-shadow: 0 0 2px #188dd6, 0 0 3px #188dd6, 0 0 15px #188dd6, 0 0 15px #188dd6, 0 0 3px #188dd6, 3px 3px 0.5px #0e567c;
 }
-#ecosystemContainer #ecoContent #ecoContentTitle div {
+#ecoContentTitle div {
     font-size: 12pt;
     display: inline-block;
 }
-#ecosystemContainer #ecoContent #subtitle {
+#ecoContent #subtitle {
     letter-spacing: 1.5px;
     margin: 0;
     font-size: 16pt;
@@ -115,27 +127,27 @@ main {
     font-weight: 200;
     color: white;
 }
-#ecosystemContainer #ecoContent #description {
+#ecoContent #description {
     color: white;
     letter-spacing: 1.5px;
     font-family: Raleway;
     font-weight: 200;
     font-size: 16pt;
 }
-#ecosystemContainer #ecoContent #description span {
+#ecoContent #description span {
     color: #08e7fe;
     text-shadow: 0 0 2px #188dd6, 0 0 3px #188dd6, 0 0 15px #188dd6, 0 0 15px #188dd6, 0 0 3px #188dd6, 3px 3px 0.5px #0e567c;
 }
-#ecosystemContainer #ecoContent #description div {
+#ecoContent #description div {
     color: #acacac;
     font-size: 10pt;
 }
-#ecosystemContainer #ecoContent #description a {
+#ecoContent #description a {
     color: white;
     line-height: 10px;
     transition: 0.3s;
 }
-#ecosystemContainer #ecoContent #description a:hover {
+#ecoContent #description a:hover {
     line-height: 11px;
     font-weight: 500;
 }
