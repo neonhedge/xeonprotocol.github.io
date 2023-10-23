@@ -25,6 +25,7 @@ main {
 #ecosystemContainer {
     position: relative;
     width: 100%;
+    overflow: hidden !important;
 }
 #ecoContent {
     position: absolute;
@@ -76,6 +77,9 @@ main {
 }
 #ecosystemContainer #ecoContent span {
     font-weight: 600;
+}
+.ecosystemH {
+    letter-spacing: 0.2vw !important;
 }
 #ecosystemContainer #ecoContent #ecoContentTitle {
     font-size: clamp(26px, 5vw, 36px);

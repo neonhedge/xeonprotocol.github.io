@@ -395,10 +395,19 @@ function onMouseDown(event) {
                 break;
         }
     }
-    console.log('Down');
-    // Scroll to the ecosystemContainer
-    scrollToEcosystemContainer();
+    console.log('Down');    
 }
+
+document.addEventListener('click', function(event) {
+    var ecosystemContainer = document.getElementById('ecosystemContainer');
+    // Check if the target element of the click event is inside the ecosystemContainer to adjust view
+    if (ecosystemContainer.contains(event.target)) {
+        scrollToEcosystemContainer();
+    } else {
+        // Click is outside the ecosystemContainer
+    }
+});
+
 
 function updateCurrentMeshColor(currentcolor) {
     // Update material3.color to match the clicked planet's color. Redundant code no option for this
@@ -430,7 +439,7 @@ function scrollToEcosystemContainer() {
     });
 }
 
-document.addEventListener('mousedown', onMouseDown, true);
+document.addEventListener('mousedown', onMouseDown, false);
 
 function animate() {
     ;
