@@ -16,6 +16,7 @@ var earthPivot;
 var earthPivot3;
 var mesh;
 var planetViewed = 0;
+var material3; // Define material3 here
 
 $(document).ready(function() {    
     init();
@@ -230,15 +231,16 @@ function onMouseDown(event) {
     
     if (intersects.length > 0) {
         currentcolor = intersects[0].object.material.color.getHex();
-        console.log('Intersected object color: ' + currentcolor);
 
         // debugging information
+        console.log('Intersected object color: ' + currentcolor);
         console.log('Intersected object: ', intersects[0].object);
         console.log('Intersected object type: ' + intersects[0].object.geometry.type);
 
         switch (intersects[0].object.geometry.type) {
             case 'IcosahedronGeometry':
                 if (currentcolor == 0x090a21) {
+                    
                     if (planetViewed == 0) {
                         hideecosystemWelcome();
                         planetViewed = 1;
@@ -284,18 +286,20 @@ function onMouseDown(event) {
                             ease: Quad.easeInOut,
                         });
 
-                  info.innerHTML = " <span>Neon</span> Protocol";
+                        info.innerHTML = " <span>Neon</span> Protocol";
                  
                         description.innerHTML = "Universal ERC20 <span>Hedging</span> and <span>Lending</span> ecosystem comprising 3 Platforms.<br/><br/><div>Click on the ecosystem planets to learn more ...<div>";
                     }
+                    updateCurrentMeshColor(0xFFFFFF);
                 }
                 if (currentcolor == 0x089353) {
+                    
                     if (planetViewed == 1 || planetViewed==3 || planetViewed==4) {
                         planetViewed = 2;
-                    info.innerHTML = " Neon <span id='couleur'>Hedging</span>";
+                        info.innerHTML = " Neon <span id='couleur'>Hedging</span>";
                  
-                                               document.getElementById('couleur').style.color="#2ce492";
-                                               document.getElementById('couleur').style.textShadow="0 0 2px #089556, 0 0 3px #089556, 0 0 15px #089556, 0 0 15px #089556, 0 0 3px #089556, 3px 3px 0.5px #014324";
+                        document.getElementById('couleur').style.color="#2ce492";
+                        document.getElementById('couleur').style.textShadow="0 0 2px #089556, 0 0 3px #089556, 0 0 15px #089556, 0 0 15px #089556, 0 0 3px #089556, 3px 3px 0.5px #014324";
 
                         description.innerHTML = "OTC: Call Options, Put Options, Equity Swaps. Hedge any ERC20 token.<br/><br/><div>Click on the other planets to learn more ...<div>";
                      
@@ -320,15 +324,16 @@ function onMouseDown(event) {
                             ease: Quad.easeInOut,
                         });
                     }
+                    updateCurrentMeshColor(0x2ce492);
                 }
-                   if (currentcolor == 0x1AC4D4) {
+                if (currentcolor == 0x1AC4D4) {
                     if (planetViewed == 1 || planetViewed==2 || planetViewed==4) {
                         planetViewed = 3;
                         info.innerHTML = ' Neon <span id="couleur">Lending</span>';
                       
                          
                         description.innerHTML = "Borrow against any ERC20 token, lend any ERC20 token as liquidity.<br/><br/><div>Click on the other planets to learn more ...<div>";
-                      document.getElementById('couleur').style.color="#26D7E7";
+                        document.getElementById('couleur').style.color="#26D7E7";
 
                         TweenMax.from($('#ecoContent'), 0.5, {
                             css: {
@@ -351,8 +356,9 @@ function onMouseDown(event) {
                             ease: Quad.easeInOut,
                         });
                     }
+                    updateCurrentMeshColor(0x26D7E7);
                 }   
-                    if (currentcolor == 0x600164) {
+                if (currentcolor == 0x600164) {
                     if (planetViewed == 1 || planetViewed==2 || planetViewed==3) {
                         planetViewed = 4;
                         info.innerHTML = ' Neon <span id="couleur">Farming</span>';
@@ -383,12 +389,31 @@ function onMouseDown(event) {
                             ease: Quad.easeInOut,
                         });
                     }
+                    updateCurrentMeshColor(0xa824d7);
                 }
                 break;
         }
     }
     console.log('Down');
 }
+
+function updateCurrentMeshColor(currentcolor) {
+    // Update material3.color to match the clicked planet's color. Redundant code no option for this
+    var radius = 16;
+    var tubeRadius = 0.03;
+    var radialSegments = 8 * 10;
+    var tubularSegments = 6 * 15;
+    var arc = Math.PI * 3;
+    var geometry3 = new THREE.TorusGeometry(radius, tubeRadius, radialSegments, tubularSegments, arc);
+    var material3 = new THREE.MeshLambertMaterial({
+        color: currentcolor,
+        emissive: currentcolor,
+        shading: THREE.FlatShading,
+    });
+    mesh = new THREE.Mesh(geometry3, material3);
+    earthPivot3.add(mesh);
+}
+
 document.addEventListener('mousedown', onMouseDown, true);
 
 function animate() {
