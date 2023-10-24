@@ -51,7 +51,7 @@ async function prepareDeposit(tokenAddress, tokenAmount) {
         // Listen for the transaction to be mined
         .on('receipt', function(receipt){
             if(receipt.status == true){//1 also matches true
-                console.log('Receipt status: '+receipt.status);console.log('Transaction hash:', receipt);
+                console.log('Approval status: '+receipt.status);console.log('Transaction hash:', receipt);
                 // Proceed to Call Deposit Function now
                 // Progress notification
                 tokenDepositSwal(tokenAddress, tokenAmount, tokenSymbol);
@@ -59,10 +59,14 @@ async function prepareDeposit(tokenAddress, tokenAmount) {
                 proceedDepositTx(tokenAddress, deposit_amountWei, tokenSymbol);
             }
             else{
-                console.log('Transaction Failed Receipt status: '+receipt.status);
+                console.log('Approval Failed Receipt status: '+receipt.status);
                 swal({title: "Failed.",type: "error",allowOutsideClick: true,confirmButtonColor: "#F27474",text: "Transaction Failed Receipt status: "+receipt.status});
             }
         })
+        .on('error', function (error) {
+            console.error('Approval error:', error);
+            swal({title: "Failed.",type: "error",allowOutsideClick: true,confirmButtonColor: "#F27474",text: "Transaction error: "+error});
+        });
     } else {
             console.log('Insufficient funds to deposit.');
     }
@@ -106,36 +110,46 @@ async function proceedDepositTx(tokenAddress, tokenAmount, tokenSymbol) {
         const functionSelector = hedgingInstance.methods.depositToken(tokenAddress, tokenAmount).encodeABI();
     
         const transactionObject = {
-            to: NEON_ADDRESS,
+            to: CONSTANTS.neonAddress,
             data: functionSelector,
-            from: walletAddress,
-            value: 0, // If needed, specify the value in Wei
+            from: walletAddress
         };
     
         const gasEstimate = await web3.eth.estimateGas(transactionObject);
         transactionObject.gas = gasEstimate;
     
-        const transactionReceipt = await web3.eth.sendTransaction(transactionObject);
-    
-        if (transactionReceipt.status) {
-            // Transaction was successful, call refreshBalances
-            refreshBalances();
-            console.log('Deposit successful.');
-        } else {
-            throw new Error('Deposit transaction failed.');
-        }
+        // Submit deposit Tx & Listen for the transaction to be mined
+        const receipt = await web3.eth.sendTransaction(transactionObject)
+        .on('receipt', function(receipt){
+            // Proceed to Call Deposit Function now
+            if(receipt.status == true){//1 also matches true
+                console.log('Deposit status: '+receipt.status);console.log('Transaction hash:', receipt);
+                // Progress notification
+                tokenDepositSwal(tokenAddress, tokenAmount, tokenSymbol);
+                // Call proceedDepositTx function
+                proceedDepositTx(tokenAddress, deposit_amountWei, tokenSymbol);
+            }
+            else{
+                console.log('Deposit Failed Receipt status: '+receipt.status);
+                swal({title: "Failed.",type: "error",allowOutsideClick: true,confirmButtonColor: "#F27474",text: "Transaction Failed Receipt status: "+receipt.status});
+            }
+        })
+        .on('error', function (error) {
+            console.error('Deposit error:', error);
+            swal({title: "Failed.",type: "error",allowOutsideClick: true,confirmButtonColor: "#F27474",text: "Transaction error: "+error});
+        });
     } catch (error) {
-      console.error('Error:', error.message);
+        console.error('Error:', error.message);
     }
-  }
+}
   
   // Dummy refresh balances on networth card & append <li> to token list
-  function refreshBalances() {
+function refreshBalances() {
     console.log('Refreshing balances...');
-  }
+}
 
   // Tx approval request notification
-  function tokenApprovalSwal(tokenAddress, amount, tokenSymbol) {
+function tokenApprovalSwal(tokenAddress, amount, tokenSymbol) {
     const privatize = `
     <div class="shl_inputshold delegate_inputshold setBeneField">
         <br>
@@ -162,10 +176,10 @@ async function proceedDepositTx(tokenAddress, tokenAmount, tokenSymbol) {
     },async function(){//on confirm click
         
     });
-  }
+}
 
   // Tx deposit request notification
-  function tokenDepositSwal(tokenAddress, amount, tokenSymbol) {
+function tokenDepositSwal(tokenAddress, amount, tokenSymbol) {
     const privatize = `
     <div class="shl_inputshold delegate_inputshold setBeneField">
         <br>
