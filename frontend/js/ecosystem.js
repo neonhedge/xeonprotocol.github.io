@@ -74,7 +74,7 @@ function init() {
     for (var i = 0; i < 500; i++) {
         // randRadius = Math.random()*30+10;
         lumiereS = new THREE.MeshPhongMaterial({
-            emissive: '#fff'
+            emissive: '#08e7fe'
         });
         sphereTab.push(new THREE.Mesh(new THREE.SphereGeometry(Math.random() * 1, 20, 20), lumiereS));
     }
@@ -196,7 +196,7 @@ function init() {
         alpha: true
     });
     renderer.sortObjects = false;
-    renderer.setClearColor(0x040115, 0.7); //canvas color and opacity
+    renderer.setClearColor(0x040115, 0.6); //canvas color and opacity
     renderer.setSize(window.innerWidth, window.innerHeight);
     stats = new Stats();
     container = document.getElementById('ecosystemContainer');
@@ -367,7 +367,7 @@ function onMouseDown(event) {
                          document.getElementById('couleur').style.textShadow="0 0 2px #650089, 0 0 3px #650089, 0 0 15px #650089, 0 0 15px #650089, 0 0 3px #650089, 3px 3px 0.5px #4a0663";
 
                   
-                        description.innerHTML = "Join pools to provide native Hedging or Lending liquidity on our ptotocol and earn yield.<br/><br/><div>Click on the other planets to learn more ...<div>";
+                        description.innerHTML = "Join pools to provide native Hedging or Lending liquidity on our protocol and earn yield. Projects can farm their own ERC20 token.<br/><br/><div>Click on the other planets to learn more ...<div>";
 
                         TweenMax.from($('#ecoContent'), 0.5, {
                             css: {
@@ -428,8 +428,8 @@ function updateCurrentMeshColor(currentcolor) {
 
 function scrollToEcosystemContainer() {
     var containerEco = document.getElementById('ecosystemContainer');
-    var offset = 250; // top distance adjuster, tucks the container higher
-    var containerTop = containerEco.getBoundingClientRect().top + window.scrollY + offset;
+    var offset = 10; // top distance adjuster, tucks the container higher
+    var containerTop = containerEco.getBoundingClientRect().top + window.scrollY - offset;
     var scrollDuration = 1000; 
 
     // smooth scrolling for a nicer effect

@@ -20,9 +20,7 @@ main {
     align-items: center;
     flex-direction: column;
     gap: 2rem;
-    background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.8)), url('../imgs/banner-bg.webp');
-    background-size: 100%, auto;
-    background-repeat: no-repeat;
+    /* background: linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.7) 80%); */
     padding-block: 8rem 5rem;
     box-sizing: border-box;
     overflow: hidden !important;
