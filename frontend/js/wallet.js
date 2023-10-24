@@ -6,6 +6,7 @@ import { initWeb3 } from './dapp-web3-utils.js';
 import { unlockedWallet, reqConnect} from './web3-walletstatus-module.js';
 import { fetchSection_Networth, fetchSection_BalanceList, fetchSection_HedgePanel, fetchSection_RewardsPanel, fetchSection_StakingPanel } from './module-wallet-section-fetchers.js';
 import { loadHedgesModule } from './module-wallet-section-hedgesList.js';
+import { prepareDeposit, refreshBalances } from './module-wallet-writer.js';
 
 /*=========================================================================
     INITIALIZE WEB3
@@ -129,4 +130,64 @@ export function setupToggleElements() {
     });
     
 }
-  
+
+/* ========================================================================
+    Write Function Code starts here
+======================================================================== */
+
+export function setupDepositModule() {
+
+    const depositButton = document.getElementById('depositButton');
+    const tokenAddressInput = document.getElementById('tokenAddress');
+    const tokenAmountInput = document.getElementById('tokenAmount');
+
+    depositButton.addEventListener('click', async () => {
+        const tokenAddress = tokenAddressInput.value.trim();
+        const tokenAmount = tokenAmountInput.value.trim();
+
+        try {
+            if (!tokenAddress || !isValidEthereumAddress(tokenAddress)) {
+                //throw new Error('Please enter a valid ERC20 token address.');
+                swal(
+                    {
+                        title: 'Invalid ERC20 address pasted...',
+                        text: 'Please enter a valid ERC20 token address.',
+                        type: 'info',
+                        html: false,
+                        dangerMode: false,
+                        confirmButtonText: 'Okay',
+                        showConfirmButton: true,
+                        showCancelButton: false,
+                        animation: 'slide-from-top',
+                    }, function () {
+                        console.log('incorrect token address...');
+                    }); 
+            }
+
+            if (isNaN(tokenAmount) || parseFloat(tokenAmount) <= 0) {
+                //throw new Error('Please enter a valid token amount greater than 0.');
+                swal(
+                    {
+                        title: 'Invalid token amount pasted...',
+                        text: 'Please enter an amount greater than 0.',
+                        type: 'info',
+                        html: false,
+                        dangerMode: false,
+                        confirmButtonText: 'Okay',
+                        showConfirmButton: true,
+                        showCancelButton: false,
+                        animation: 'slide-from-top',
+                    }, function () {
+                        console.log('invalid token amount...');
+                    }); 
+            }
+
+            // If validation passes, proceed to approval first
+            prepareDeposit(tokenAddress, tokenAmount);
+
+        } catch (error) {
+            console.error('Error:', error.message);
+        }
+    });
+
+}
