@@ -3,21 +3,22 @@ import { CONSTANTS } from './constants.js';
 
 // Initialize Web3
 function initWeb3() {
+  //const web3 = new Web3(Web3.givenProvider || "ws://localhost:8545");
   if (typeof window.ethereum == 'undefined') {
     swal({
-      title: "Hold on!",
-      type: "error",
-      confirmButtonColor: "#F27474",
-      text: "Web3 Wallet is missing, full functionality is not available."
+        title: "Hold on!",
+        type: "error",
+        confirmButtonColor: "#F27474",
+        text: "Web3 Wallet is missing, full functionality is not available."
     });
   } else if (typeof window.ethereum !== 'undefined') {
-    // Metamask on the browser, get provider
-    window.web3 = new Web3(window.ethereum);
+      // Metamask on the browser, get provider
+      window.web3 = new Web3(window.ethereum);
 
-    // Create Instances
-    window.neonInstance = new window.web3.eth.Contract(CONSTANTS.neonContractABI, CONSTANTS.neonAddress);
-    window.hedgingInstance = new window.web3.eth.Contract(CONSTANTS.hedgingContractABI, CONSTANTS.hedgingAddress);
-    window.stakingInstance = new window.web3.eth.Contract(CONSTANTS.stakingContractABI, CONSTANTS.stakingAddress);
+      // Create Instances
+      window.neonInstance = new window.web3.eth.Contract(CONSTANTS.neonContractABI, CONSTANTS.neonAddress);
+      window.hedgingInstance = new window.web3.eth.Contract(CONSTANTS.hedgingContractABI, CONSTANTS.hedgingAddress);
+      window.stakingInstance = new window.web3.eth.Contract(CONSTANTS.stakingContractABI, CONSTANTS.stakingAddress);
   }
 }
 
