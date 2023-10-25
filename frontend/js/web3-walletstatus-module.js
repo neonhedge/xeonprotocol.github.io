@@ -7,7 +7,7 @@ import { CONSTANTS } from './constants.js';
     run functions
 ==========================================================================*/
 async function unlockedWallet() {
-	const accounts = await window.web3.eth.getAccounts();
+	const accounts = await web3.eth.getAccounts();
 	if (accounts.length > 0) {
 		$('.wallets').css('display', 'none');
 		$('.walletpur').css('display', 'inline-block');
@@ -148,7 +148,7 @@ async function unlockedWallet() {
 	
 	async function currentBlock() {
 		try {
-			const block = await window.web3.eth.getBlockNumber();
+			const block = await web3.eth.getBlockNumber();
 			document.getElementById('blocknumber').innerHTML = `<a href="${CONSTANTS.etherScan}/block/${block}" target="_blank">${block}</a>`;
 			console.log('block: ', block);
 		} catch (error) {
@@ -167,7 +167,7 @@ async function unlockedWallet() {
 	async function chainCheck() {
 		try {
 			const [chainId, networkId] = await Promise.all([
-				window.web3.eth.getChainId(),
+				web3.eth.getChainId(),
 				// alt approach
 				// window.web3.eth.net.getId(),
 				Promise.resolve(CONSTANTS.network),
@@ -321,7 +321,7 @@ async function unlockedWallet() {
 		}
 	
 		try {
-			const account = await window.web3.eth.getAccounts();
+			const account = await web3.eth.getAccounts();
 			balanceOf(account);
 		} catch (error) {
 			console.log('Metamask Locked');

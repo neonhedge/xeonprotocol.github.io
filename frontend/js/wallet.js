@@ -1,12 +1,12 @@
 /*=========================================================================
     Import modules
 ==========================================================================*/
-import { isValidEthereumAddress, getUserBalancesForToken } from './constants.js';
+import { CONSTANTS, isValidEthereumAddress, getUserBalancesForToken } from './constants.js';
 import { initWeb3 } from './dapp-web3-utils.js';
 import { unlockedWallet, reqConnect} from './web3-walletstatus-module.js';
+import { prepareDeposit, refreshBalances } from './module-wallet-writer.js';
 import { fetchSection_Networth, fetchSection_BalanceList, fetchSection_HedgePanel, fetchSection_RewardsPanel, fetchSection_StakingPanel } from './module-wallet-section-fetchers.js';
 import { loadHedgesModule } from './module-wallet-section-hedgesList.js';
-import { prepareDeposit, refreshBalances } from './module-wallet-writer.js';
 
 /*=========================================================================
     INITIALIZE WEB3
@@ -14,10 +14,12 @@ import { prepareDeposit, refreshBalances } from './module-wallet-writer.js';
 initWeb3();
 
 $(document).ready(async function () {
+    
     const accounts = await web3.eth.requestAccounts();
 	const userAddress = accounts[0];
 
     const unlockState = await unlockedWallet();
+    
     if (unlockState === true) {
         const setatmIntervalAsync = (fn, ms) => {
             fn().then(() => {
@@ -55,6 +57,7 @@ $(document).ready(async function () {
         observer.observe(hedgingSection);
     } else {
         reqConnect();
+        console.log('PLEASE CONNECT YOUR WALLET');
     }
 });
 

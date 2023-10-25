@@ -1,6 +1,15 @@
-/*+++++++++++++++++++++++++++++++++++++++
-  		ERC20 BALANCES LIST DEPENDENCIES
-  ++++++++++++++++++++++++++++++++++++++*/
+import { getTokenUSDValue, getCurrentEthUsdcPriceFromUniswapV2, getTokenETHValue } from './constants.js';
+
+// Function to fetch the number of deposited tokens by a wallet
+async function getWalletTokenList(walletAddress) {
+	try {
+	  const transactedTokensArray = await hedgingInstance.methods.getUserTokenList(walletAddress).call();
+	  return transactedTokensArray;
+	} catch (error) {
+	  console.error("Error fetching deposited tokens:", error);
+	  return [];
+	}
+}
 
 // Function to update the HTML with the ERC20 token list
 async function userTokenList(walletAddress) {
@@ -134,5 +143,6 @@ async function getDepositedTokens() {
 	}
 }
 
+
 // Export the fetch functions
-export { userTokenList, cashierErc20List };
+export { getWalletTokenList, userTokenList, getTokenInfo, cashierErc20List, getDepositedTokens };

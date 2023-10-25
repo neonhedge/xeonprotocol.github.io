@@ -207,6 +207,5 @@ function tokenDepositSwal(tokenAddress, amount, tokenSymbol) {
     });
 }
   
-  
 export { prepareDeposit, refreshBalances }
   
