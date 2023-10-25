@@ -14,7 +14,11 @@ import { loadHedgesModule } from './module-wallet-section-hedgesList.js';
 initWeb3();
 
 $(document).ready(async function () {
+
+    // Ready event listeners on wallet
+    setupToggleElements();
     
+    // Proceed to fetch data for sections
     const accounts = await web3.eth.requestAccounts();
 	const userAddress = accounts[0];
 
@@ -75,6 +79,7 @@ export function setupToggleElements() {
         balancesContainer.style.maxHeight = expandHeight;
     };
     document.getElementById('expandClose').addEventListener('click', toggleBalancesContainer);
+
     // Cashier Modes
     document.addEventListener('change', function (e) {
         if (e.target && e.target.matches('input[type="checkbox"]')) {
@@ -85,7 +90,8 @@ export function setupToggleElements() {
             modeSpan.textContent = 'Deposit Mode Active';
             }
         }
-    });  
+    }); 
+
     // Hedges Panel - toggle active class on button click
     const buttons = document.querySelectorAll('.list-toggle button');
     buttons.forEach((button) => {
@@ -93,9 +99,10 @@ export function setupToggleElements() {
             buttons.forEach((button) => button.classList.remove('active'));
             button.classList.add('active');
         });
-    });  
+    }); 
+
     // Cashier Token Address paste listener
-    document.getElementById('walletAddressInput').addEventListener('paste', async (event) => {
+    document.getElementById('erc20-address').addEventListener('paste', async (event) => {
         const pastedAddress = event.clipboardData.getData('text/plain');
         const accounts = await web3.eth.requestAccounts();
         const userAddress = accounts[0];
@@ -162,7 +169,8 @@ export function setupDepositModule(formValues) {
 
     console.log(formValues);
 
-    const tokenAddress = formValues['erc20-address'] ? formValues['erc20-address'] : formValues['erc20-select'];
+    //const tokenAddress = formValues['erc20-address'] ? formValues['erc20-address'] : formValues['erc20-select'];
+    const tokenAddress = formValues['erc20-address'];
     const tokenAmount = formValues['transact-amount'];
     const checkboxValue = formValues['checkbox'];
 

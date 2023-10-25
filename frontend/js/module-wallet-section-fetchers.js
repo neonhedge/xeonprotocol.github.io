@@ -29,7 +29,7 @@ async function fetchSection_Networth(){
         const rewardsDueETH = rewardsDue[0];
         const totalCommissionDueETH = commissionDue[0]; //already formated
         const stakedTokensETH = await calculateStakedTokensValueETH(userAddress); //already formated
-        const walletTokensETH = await getTokenETHValue(CONSTANTS.tokenAddress, walletBalanceRaw); //already formated
+        const [walletTokensETH, pairedSymbol] = await getTokenETHValue(CONSTANTS.tokenAddress, walletBalanceRaw); //already formated
 
         //USD values
         const totalDepositsUSD = await getCurrentBalancesValue(userAddress); //already formated
@@ -62,8 +62,7 @@ async function fetchSection_BalanceList(){
 	const userAddress = accounts[0];
 
 	await userTokenList(userAddress);
-	await cashierErc20List(userAddress);
-
+	return;
 }
 
 // 3. Fetch Section Values - HEDGING PANEL
