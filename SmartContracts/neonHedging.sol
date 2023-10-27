@@ -219,7 +219,7 @@ contract HEDGEFUND {
     uint256 public usdcEquivWithdrawals;
     
     // core addresses
-    address private constant UNISWAP_FACTORY_ADDRESS = 0xc35DADB65012eC5796536bD9864eD8773aBc74C4;
+    address private constant UNISWAP_FACTORY_ADDRESS = 0xc35DADB65012eC5796536bD9864eD8773aBc74C4;// consider array of exchange addresses to scale ERC20 tokens
     address private constant UNISWAP_ROUTER_ADDRESS = 0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506;
     address public wethAddress;
     address public usdtAddress;

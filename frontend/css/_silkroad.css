@@ -851,16 +851,20 @@ fieldset input{
   }
   
   .assetsType {
-	border: 2px solid #089353; 
-	text-shadow: none;
-	max-width: 110px;
-	background-color: #089353;
-	border-radius: 5px;
-
 	display: flex;
 	flex-direction: column;
 	align-items: center;
   	justify-content: center;
+	text-shadow: none;
+	max-width: 110px;
+	background-color: #089353;
+	border: 2px solid #089353;
+	border-radius: 5px; 
+	
+	/* for put options 
+	background-color: #41014a;
+  	border: 2px solid #41014a;
+  */
   }
   
   /* Option Strategy Values & Graphics */
@@ -981,9 +985,7 @@ fieldset input{
 	background-color: rgba(0, 0, 0, 0.1);
 	border-radius: 1vw;
 	border: 0.5px solid #08f;
-
-	margin: unset;
-	margin-block: 5px;
+	margin-block: 8px;
   }
   
   .optionMark span {
