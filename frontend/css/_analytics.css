@@ -7,7 +7,6 @@ header {
 main{
     padding-top:150px;
     background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.8)), url('../imgs/banner-bg.webp') !important;
-    background-attachment: scroll, scroll;
     background-attachment: fixed !important;
 }
 .analytics-section{
@@ -29,7 +28,9 @@ main{
     display: inline-flex;
     flex-grow: 1;
     align-items: center;
+    font-family: "Space Grotesk", sans-serif;
     font-size: clamp(18px, 2vw, 22px);
+    font-weight: 400;
 }
 
 .section-title img {
@@ -98,24 +99,20 @@ main{
      Traffic Section 
   ====================*/
   .main-traffic-section {
-    padding:0 2rem;
+    padding-inline:2rem;
+    padding-bottom: 1.5rem;
+    box-sizing: border-box;
     color: #FFFFFF;
+    background: radial-gradient(#141247, #040115 80%) !important;
   }
   
   .traffic-section {
-    /*
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-between;
-    */
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
+    justify-content: space-evenly;
     align-content: flex-start;
     gap: 1vw;
-    column-gap: 1vw;
-    column-gap: 2vw;    
-    background: radial-gradient(#141247, #040115 80%) !important;
+    column-gap: 2vw;
   }
 
   .hedgeChart {
@@ -125,7 +122,7 @@ main{
 
   .trafficStats {
     display: flex;
-    justify-content: space-between;
+    justify-content: space-around;
     align-items: center;
     gap: 0;
     margin-block: 2vw;
@@ -822,7 +819,7 @@ hr.line {
     display: inline-flex;
     flex-basis: 90%;
     font-size: clamp(15px, 2vw, 18px);
-    text-transform: uppercase;
+    text-transform: capitalize;
     text-align: left;
     padding: 5px 9.5%;
     box-sizing: border-box;

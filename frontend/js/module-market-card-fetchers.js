@@ -1,4 +1,4 @@
-import { MyGlobals } from './_floor.js';
+import { MyGlobals } from './_silkroad.js';
 import { CONSTANTS, getUserBalancesForToken, truncateAddress, fromWeiToFixed12, fromWeiToFixed5, fromWeiToFixed8, fromWeiToFixed8_unrounded, fromWeiToFixed5_unrounded, fromWeiToFixed2_unrounded, toFixed8_unrounded } from './constants.js';
 
 async function refreshDataOnElements() {
@@ -624,4 +624,4 @@ async function noOptionsSwal(){
 	});//confirm swal close
 }
 
-export { refreshDataOnElements, loadOptions, fetchOptionCard, fetchNameSymbol, prepareTimestamp, noOptionsSwal };
+export { refreshDataOnElements, loadOptions, fetchOptionCard, fetchOptionStrip, fetchNameSymbol, prepareTimestamp, noOptionsSwal };

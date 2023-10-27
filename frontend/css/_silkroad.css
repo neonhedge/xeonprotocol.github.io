@@ -1,16 +1,15 @@
-@import url('https://fonts.googleapis.com/css2?family=Rye&display=swap');
+
+@import url('https://fonts.googleapis.com/css?family=Raleway:100,100i,200,300,400,500,600,700,800');
+
 @font-face {
 	font-family: neon;
 	src: url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/707108/neon.ttf);
 }
 
 :root {  
-	/* USED WITH EXO FONT --- Set neon color */
 	--neon-text-color: #188dd6;
 	--neon-border-color: #08f;
 }
-/*========================================*/
-
 header {
 	padding-block: unset !important;
 	padding-top: 1.2rem !important;
@@ -30,8 +29,6 @@ body{
 
 	background: #130228;
 	background: linear-gradient(200deg, #130f4e, #0d0e38, #030507 30%);
-	background-image: url(../imgs/zap.webp); /* fallback */
-	background-image: url(../imgs/zap.webp), linear-gradient(#130228, #130228); 
 }
 
 #page-title {
@@ -48,12 +45,6 @@ body{
 	z-index: 10;
 
 	padding: 5px 20px;
-	font-size: clamp(12.5px, 1vw, 13px);
-	font-weight: 100;
-	text-align: center;
-	cursor:help;
-	transition: background-color 0.3s;
-	color: #08e7fe;
 	border: 1px solid rgba(51, 153, 255, 0.15);
 	border-radius: 8px;
 /*
@@ -63,6 +54,14 @@ body{
 	background-color: rgba(29, 129, 216, 0.15);
 	animation: hideDiv 30s forwards;
 	transition: 0.5s;
+
+	font-family: Raleway, "Space Grotesk";
+	font-size: clamp(12.5px, 1vw, 13px);
+	font-weight: 200;
+	text-align: center;
+	cursor:help;
+	transition: background-color 0.3s;
+	color: #08e7fe;
 }
 @keyframes hideDiv {
 	0% {
@@ -101,10 +100,10 @@ section.sectionCenter {
 	border-bottom: 0.5px dotted #188dd6;
 }
 .clubSinnage h4{
-	font-family: 'Neon',monospace, sans-serif, Tahoma, Geneva;
+	font-family: Raleway,'Neon',monospace, sans-serif, Tahoma, Geneva;
 	font-size: clamp(22px, 3vw, 28px) !important;
 	font-weight:100;
-	letter-spacing:normal;
+	letter-spacing:1px;
 	text-transform: uppercase;
 	padding:10px;
 	margin:0px;
@@ -123,10 +122,12 @@ aside {
 	box-sizing: border-box;
 	/* border: 0.7px solid #3399ff; */
 	caret-color:transparent;
+	background-color: rgba(0, 0, 0, 0.3);
+	border-radius:1rem;
 }
 .asideNavs {
 	position: relative;
-	margin: 5px auto;
+	margin: 1vw auto;
 	width: 75%;
 }
 @media (min-width: 300px) {
@@ -436,10 +437,8 @@ color: #FED128;
 	font-family: monospace, sans-serif, "Helvetica Neue", Helvetica, Arial !important;
 	font-size: clamp(13px, 1vw, 15px) !important;
 	letter-spacing: 0;
-	font-weight: 400 !important;
-	border: 0.5px solid #363636;
+	font-weight: 200 !important;
 	border: 0.5px solid #3399ff;
-	background-color: #07041e;
 	background-color: #060921;
 }
 .streamtype .eventAct {
@@ -452,10 +451,10 @@ color: #FED128;
     height: 100%;
     padding: 0% 1% 0% 1%;
 	box-sizing: border-box;
-	color: #08e7fe;
 	color: #fff;
 	text-decoration: none;
 	font-weight:400;
+	font-weight: 100;
 	letter-spacing: 0.5px;
 	transition: all 0.3s ease-in-out;
 }
@@ -515,7 +514,7 @@ color: #FED128;
 .sitesearchhold{
 	flex-basis: 100%;
 	height: auto;
-	margin-top:25px;
+	margin-top:1rem;
 }
 #swap_searcher {
     position: relative;
@@ -532,8 +531,9 @@ color: #FED128;
     border-radius: 10px;
 	padding: 7px;
 	box-sizing: border-box;
-    font-family: Monospace, Helvetica, sans-serif, 'Lucida Grande', sans-serif;
+    font-family: "Space Grotesk", "Nunito Sans", Helvetica, sans-serif, 'Lucida Grande', sans-serif;
     font-size: clamp(12px, 1vw, 15px);
+	font-weight: 100;
     text-align: center;
     line-height: 1;
     color: rgb(117, 117, 117);
