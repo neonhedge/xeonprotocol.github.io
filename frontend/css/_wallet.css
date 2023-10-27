@@ -1,5 +1,4 @@
 @charset "utf-8";
-@import url('https://fonts.googleapis.com/css2?family=Rye&display=swap');
 @font-face {
 	font-family: neon;
 	src: url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/707108/neon.ttf);
@@ -10,18 +9,41 @@
 	--neon-border-color: #08f;
   }
 /*========================================*/
+/* Fonts */
+body {
+	font-family: "Nunito Sans", sans-serif !important;
+	font-size: 1.1rem;
+	font-weight: 100;
+	line-height: 1.6;
+	color: rgba(255, 255, 255, 0.9);
+}
+
+h1, h2, h3 {
+	font-family: "Space Grotesk", sans-serif;
+	line-height: 1;
+	color: rgba(255, 255, 255, 0.9);
+	margin-bottom: 2rem;
+	font-weight: 600;
+}
 
 body{
 	background-size:contain !important;
 	background-position: center !important;
 	background-repeat: no-repeat !important;
-
-	background: #130228;
 }
 header {
 	padding-block: unset !important;
 	padding-top: 1.2rem !important;
 	border-bottom: 0.5px solid #15213c !important;
+}
+main {
+	background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.8)), url('../imgs/banner-bg.webp') !important;
+	background-attachment: fixed !important;
+}
+section#activities {
+	background: radial-gradient(#141247, #040115 80%) !important;
+  	background: radial-gradient(#141247 20%, #040115 80%) !important;
+	background: unset !important;
 }
 #mainwindow{
 	position:relative;
@@ -63,8 +85,8 @@ header {
 	width:50%;
 	max-width: calc(50% - 20px); /* adjust the width here */
 	margin: 20px 10px;
-	padding: 10px;
 	box-sizing: border-box;
+	padding:0.8vw 0.3vw;
 
 	background: linear-gradient(40deg, #191336 0%, #141247 100%);
 	background: linear-gradient(60deg, #131145 0%, #1b1b49 100%) !important; /* mine darker */
@@ -222,6 +244,7 @@ header {
 	font-family: 'modeseven','bitwise', sans-serif, "Helvetica Neue", Helvetica, Arial !important;
 	/* text-shadow: 0 0 5px #ffd10c, 0 0 1px #fff, 0 0 12px #ffd10c, 0 0 12px #ffd10c, 0 0 1px #fff, 1px 0.5px 0.5px #000, -1px -0.5px 0.5px #000; */
 	color: #fff6d4;
+	color:#FFF;
 	white-space: nowrap;
   }
 
@@ -240,16 +263,17 @@ header {
   }
 
   .walletStatesDiv {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-around;
+
+	margin-bottom: 10px;
 	width: 100%;
 	font-size: clamp(13px, 1vw, 15px);
 	font-family: 'modeseven', 'bitwise', sans-serif, "Helvetica Neue", Helvetica, Arial !important;
 	font-weight:100;
-	margin-bottom: 10px;
+	color:#FFF;
 	text-transform: capitalize;
-
-	display: flex;
-	flex-wrap: wrap;
-	justify-content: space-around;
   }
   
   .walletStatesDiv .dot {
@@ -507,7 +531,8 @@ header {
 	display: flex;
 	font-size: clamp(13px, 1vw, 14px);
 	font-weight: 100;
-	margin-bottom: 15px;
+	padding-block: 1.5rem;
+	caret-color:transparent;
   }
   
   .input-group {
@@ -521,14 +546,16 @@ header {
   .input-group select {
 	border: none;
 	border-radius: 20px;
-	padding: 5px 7px;
+	padding: 0.5vw 1vw;
 	box-sizing: border-box;
-	font-size: clamp(13px, 1vw, 14px);
 	width: 100%;
 	margin-bottom: 5px;
 	text-transform: uppercase;
-	color: #29705a;
+	letter-spacing: 0.5px;
 	font-family: "Nunito Sans", 'monospace', sans-serif, "Helvetica Neue", Helvetica, "Liberation Sans"!important;
+	color: #08e7fe;
+  	font-size: clamp(13px, 1vw, 15px);
+	transition: 0.3s;
   }
   
   .input-group select {
@@ -569,7 +596,7 @@ header {
 
 .erc20-address-input {
 	margin-bottom: 0.5rem !important;
-  	border: 0.5px dotted #3399ff !important;
+  	border: 0.5px dashed #3399ff !important;
 
 	background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%2329705a' d='M17.016 0h-10.031c-1.078 0-1.969 0.938-1.969 2.016v19.969c0 1.078 0.891 2.016 1.969 2.016h10.031c1.078 0 1.969-0.938 1.969-2.016v-19.969c0-1.078-0.891-2.016-1.969-2.016zM12 1.969c0.563 0 0.984 0.422 0.984 0.984s-0.422 1.031-0.984 1.031-0.984-0.469-0.984-1.031 0.422-0.984 0.984-0.984zM16.5 19.5h-9v-1.5h9v1.5zM16.5 16.5h-9v-1.5h9v1.5zM16.5 13.5h-9v-1.5h9v1.5zM8.016 10.5v-1.5h7.969v1.5h-7.969zM16.5 7.5h-9v-1.5h9v1.5z'%3E%3C/path%3E%3C/svg%3E");
 	background-repeat: no-repeat;
@@ -602,8 +629,8 @@ header {
 */
 .input-group input, .transact-amount {
 	font-size: 14px;
-	font-weight: 500;
-	color: #FFF;
+	font-weight: 100;
+	color: #08e7fe;
 	background-color: #111130;
   }
 
@@ -641,7 +668,6 @@ button#transactSubmit{
 	position: relative;
 	display: flex;
 	width: 100%;
-	height: 25px;
 }
   
   /* Hide default HTML checkbox */
@@ -653,46 +679,35 @@ button#transactSubmit{
   
   /* The slider */
   .slider {
-	position: absolute;
+	position: relative;
 	cursor: pointer;
-	top: 0;
-	left: 0;
-	bottom: 0;
 	height:25px;
 	width: 68px;
 	display: inline-flex;
-	margin-left: auto;
-	margin-right: auto;
-
+	align-items: center;
 	background-color: #3399ff;
 	-webkit-transition: .4s;
 	transition: .4s;
   }
   
   .slider::before {
-	position: absolute;
+	position: relative;
+	left:5px;
 	content: "";
 	height: 18px;
 	width: 18px;
-	left: 4px;
-	top: 4px;
 	background-color: #FFF;
 	-webkit-transition: .4s;
 	transition: .4s;
   }
   
   .mode{
-	position: absolute;
-	top:0;
-	left: 20%;
-	margin-right: auto;
-	margin-left: auto;
-
+	position: relative;
+  	height: 25px;
+	left: 10%;
 	display: flex;
 	line-height: 28px;
 	text-transform: uppercase;
-	justify-content: center;
-	align-items: center;
   }
   input:checked + .slider {
 	background-color: #a1246f;
@@ -1043,6 +1058,7 @@ button#transactSubmit{
 	padding: 20px;
 	box-sizing: border-box;
 	border-radius: 10px;
+	font-family: "Space Grotesk", "Nunito Sans";
   }
   
   .section-title {
@@ -1448,6 +1464,7 @@ button#transactSubmit{
 	margin:2vw auto;
 	margin-top: 0;
 	padding: 20px;
+	font-family: "Nunito Sans", "monospace";
 	font-size: clamp(14px, 1vw, 16px);
 	cursor:help;
 	transition: background-color 0.3s;
@@ -1481,6 +1498,8 @@ button#transactSubmit{
 	gap:1vw;
 	position: relative;
 	top: 0;
+	font-family: "Nunito Sans", "Space Grotesk";
+  	font-weight: 100;
 }
 
 .sumRewards {

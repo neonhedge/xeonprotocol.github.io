@@ -85,9 +85,14 @@ export function setupToggleElements() {
         if (e.target && e.target.matches('input[type="checkbox"]')) {
             const modeSpan = document.querySelector('.mode');
             if (e.target.checked) {
-            modeSpan.textContent = 'Withdraw Mode Active';
+                modeSpan.textContent = 'Withdraw Mode Active';
+                // change styling on form
+                document.getElementById('erc20-address').style.color = '#F6F';//withdraw effect
+                document.getElementById('erc20-amount').style.color = '#F6F';
             } else {
-            modeSpan.textContent = 'Deposit Mode Active';
+                modeSpan.textContent = 'Deposit Mode Active';            
+                document.getElementById('erc20-address').style.color = ''; //reset styles
+                document.getElementById('erc20-amount').style.color = '';
             }
         }
     }); 
