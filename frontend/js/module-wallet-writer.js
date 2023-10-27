@@ -314,5 +314,5 @@ function tokenDepositSwal(tokenAddress, amount, tokenSymbol) {
     });
 }
 
-export { prepareDeposit, refreshBalances }
+export { prepareDeposit, prepareWithdrawal, proceedDepositTx, proceedWithdrawTx, refreshBalances }
   
