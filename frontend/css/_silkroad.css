@@ -15,13 +15,23 @@ header {
 	padding-top: 1.2rem !important;
 	border-bottom: 0.5px solid #15213c !important; /* darker #071432 */
 }
-
+/* ====== transparent NEON background effect - too bright fot marketplace 
+main{
+    background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.8)), url('../imgs/banner-bg.webp') !important;
+    background-attachment: fixed !important;
+}
+section.page-title {
+	background: unset !important;
+}
+section.sectionCenter {
+	background: unset !important;
+}
+/* ====== ends here */
 @media (min-width: 55em) {
 	.container {
 		padding-right:unset; /* hack on main style.css file to the menu container, in dapp only */
 	}
 }
-
 body{
 	background-size:contain !important;
 	background-position: center !important;
@@ -421,7 +431,7 @@ color: #FED128;
     right: 0;
     height: 6px;
     background: linear-gradient(to right, #060317, #800080, #060317); 
-    opacity: 0.9;
+    opacity: 0.7;
     z-index: -1; /* Place the shadow behind the div */
     border-radius: 10px;
     box-shadow: 0 0 5px rgba(0, 0, 0, 0); /* Add a 5px box shadow with a transparent color */
@@ -451,7 +461,7 @@ color: #FED128;
     height: 100%;
     padding: 0% 1% 0% 1%;
 	box-sizing: border-box;
-	color: #fff;
+	color: #F5F5F5;
 	text-decoration: none;
 	font-weight:400;
 	font-weight: 100;
@@ -802,9 +812,7 @@ fieldset input{
   .assetsTypeValue,
   .compositionValue {
 	padding:2px;
-	font-family: 'modeseven','bitwise', sans-serif, "Helvetica Neue", Helvetica, Arial !important;
 	font-family: "Space Grotesk",'modeseven','bitwise', sans-serif, "Helvetica Neue", Helvetica, Arial !important;
-	font-weight: 100;
 	font-weight: 400;
 	font-size: clamp(15px, 1vw, 17px);
 	background-color: #0f082e;
@@ -983,11 +991,10 @@ fieldset input{
 	align-items: center; /* Align text vertically center */
 	width: unset;
 	min-width: 90px;
-	letter-spacing: unset;
 	text-align: left;
 	padding-inline: 1vw 0px;
-	font-family: "Space Grotesk", "Modeseven", sans-serif !important;
-	font-family: monospace, "Space Grotesk", sans-serif !important;
+	font-family: Raleway, "monospace", "Space Grotesk", sans-serif !important;
+	font-weight: 400;
 	color: rgb(139, 149, 158);
   }
   @media (max-width: 400px) {
@@ -1146,6 +1153,7 @@ fieldset input{
     box-sizing: border-box;
 	margin-left: 2vw;
 	font-size: 10px;
+	font-weight: 100;
 }
 .blockexplorer img{
     width:18px;
