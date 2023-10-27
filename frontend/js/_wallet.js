@@ -4,7 +4,7 @@
 import { CONSTANTS, isValidEthereumAddress, getUserBalancesForToken } from './constants.js';
 import { initWeb3 } from './dapp-web3-utils.js';
 import { unlockedWallet, reqConnect} from './web3-walletstatus-module.js';
-import { prepareDeposit, refreshBalances } from './module-wallet-writer.js';
+import { prepareDeposit, prepareWithdrawal, refreshBalances } from './module-wallet-writer.js';
 import { fetchSection_Networth, fetchSection_BalanceList, fetchSection_HedgePanel, fetchSection_RewardsPanel, fetchSection_StakingPanel } from './module-wallet-section-fetchers.js';
 import { loadHedgesModule } from './module-wallet-section-hedgesList.js';
 
@@ -167,10 +167,10 @@ document.querySelector('#cashierForm').addEventListener('submit', function(event
     console.log(values);
   
     // pass to setup deposits fr prep
-    setupDepositModule(values);
+    setupCashingModule(values);
 });
 
-export function setupDepositModule(formValues) {
+export function setupCashingModule(formValues) {
 
     console.log(formValues);
 
