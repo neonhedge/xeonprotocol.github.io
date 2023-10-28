@@ -104,6 +104,7 @@ main{
     box-sizing: border-box;
     color: #FFFFFF;
     background: radial-gradient(#141247, #040115 80%) !important;
+    background: radial-gradient(rgba(20, 18, 71,0.1), rgba(4, 1, 21,0.4) 80%) !important;
   }
   
   .traffic-section {
@@ -529,13 +530,13 @@ hr.line {
   .staking-widget-rewards h4 {
     display: inline-block;
     font-size: 1.1rem;
-    font-weight: 600;
+    font-weight: 400;
     margin-bottom: 10px;
     margin-inline-start: 10px;
   }
   
   .staking-widget p, .staking-widget-rewards p {
-    font-size: 1rem;
+    font-size: 0.9rem;
     margin-bottom: 20px;
     text-align: left;
   }

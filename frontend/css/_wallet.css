@@ -787,6 +787,7 @@ button#transactSubmit{
   
 #balancesSection span {
 	color: #29705a;
+	color: #FFF;
 } 
   
 .expand-button {
@@ -1245,6 +1246,7 @@ button#transactSubmit{
 	text-align: center;
 	
 	padding-inline: 2vw !important;
+	padding-bottom: 2rem;
 	box-sizing: border-box;
 	background-color: rgba(0,0,0,0.5);
 }
@@ -1279,12 +1281,12 @@ button#transactSubmit{
 }
 
 .list-toggle button {
-	border: none;
 	color: #c4c1c1;
 	box-sizing: border-box;
 	text-align: left;
 	text-decoration: none;
 	font-size: clamp(13px, 1vw, 15px);
+	font-weight: 100;
 	border:0.5px solid #2b355d;
 	box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 	transition: all 0.3s ease;
@@ -1345,7 +1347,7 @@ button#transactSubmit{
 	box-sizing: border-box;
 	border-bottom: 0.7px dotted #354681;
 	background-color: rgba(0,0,0,0.5);
-	font-size: clamp(12px, 1vw, 13px) !important;
+	font-size: clamp(13px, 1vw, 13.5px) !important;
 }
 .hlH {
 	font-size: clamp(13px, 1vw, 15px) !important;
