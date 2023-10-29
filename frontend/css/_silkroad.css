@@ -984,7 +984,7 @@ fieldset input{
 	text-transform: unset;
 	background-color: rgba(0, 0, 0, 0.1);
 	border-radius: 1vw;
-	border: 0.5px solid #08f;
+	border: 0.5px dotted #08f;
 	margin-block: 8px;
   }
   
