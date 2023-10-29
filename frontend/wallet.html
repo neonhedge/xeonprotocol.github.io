@@ -131,7 +131,7 @@
 							</div>
 						</div>
 						<div class="form-group">
-							<input type="number" class="transact-amount" placeholder="amount">
+							<input type="number" class="transact-amount" id="erc20-amount" placeholder="amount">
 							<div id="balancesSection" class="hidden">
 								<div id="expandClose" class="expand-button">
 									<i class="fa fa-expand" aria-hidden="true"></i>
@@ -1056,94 +1056,6 @@
 					</div>
 				</div>
 			</div>
-
-			<div class="actionablePort"><!-- state changing calls: stake, vote, bornfire -->
-				<span class="actionPortLabel">State Changing</span>
-				
-				<!-- stake -->
-				<div class="actionCard">
-					<div class="actCardTop">
-						<div class="actCardTop_title">Staked <div id="dot_lsrStk" class="dot blockel"></div>&nbsp;<img src="imgs/info.png" title="stake tokens to claim rewards and to vote. In future you cant participate in fundraising without a staking profile" /></div>
-						<div class="actCardTopData"><!-- card infor -->
-							<div class="inforview">
-								<div class="mpcard_details"><span class="_lsrT">Tokens:</span><span class="_lsrTData _respValue" id="_stk_tokens">---</span></div>
-								<div class="mpcard_details"><span class="_lsrT">Duration:</span><span class="_lsrTData _respValue" id="_stk_duration">---</span></div>
-								<div class="mpcard_details"><span class="_lsrT">Expires:</span><span class="_lsrTData _respValue" id="_stk_expiry">---</span></div>
-							</div>
-						</div>
-					</div>
-					<div id="stkBody" class="actCardBody"><!-- expandable form section -->
-						<!-- place form here -->
-						<div id="stats" class="shl_header">
-							<div class="shl_delegate">
-								<div class="shl_inputshold">
-									<input aria-invalid="false" autocomplete="off" id="stake_amnt" placeholder="tokens" type="number" pattern="[0-9]*" class="shldi shl_delegate_input" >
-									<button class="shl_max"><span id="stkmax">MAX</span></button>
-								</div>
-								<button id="stake" class="shl_stake_submit"><span>Stake</span></button>
-								<span id="stakedBal"> bal---</span>
-							</div>
-							<div class="shl_add_separator"></div>
-							<div id="shl_unstake" class="shl_create">
-								<div class="shl_inputshold">
-									<input aria-invalid="false" autocomplete="off" id="unstake_amnt" placeholder="tokens" type="number" pattern="[0-9]*" class="shldi shl_create_input" >
-									<button class="shl_max"><span id="unstkmax">MAX</span></button>
-								</div>
-								<button id="unstake" class="shl_stake_submit"><span>unStake</span></button>
-							</div>
-						</div>
-					</div>
-				</div>
-				<!-- <div id="hypecard_poll" class="actionCard" rbw-include-html="https://cdn.jsdelivr.net/gh/braavos-wd/braavos-proxy@main/resources/_incl_rbw.html"></div> -->
-			</div>
-        </section>
-		<!-- static stats section -->
-		<section class="portfolioSect">
-			<div class="unactionablePort">
-				<span class="actionPortLabel">Static View</span>
-				<div class="mybankcard">
-					<div class="mbcard_title"><span class"">Token Cost</span><span class="mbcard_title"></span>&emsp;<img title="Average cost per token, in eth." src="imgs/info.png" /></div>
-					<div class="mbcard_detail mbcard_more">
-						<span id="mbcard_acpt" class="mbcard_more_span"> ---- </span>
-						<span id="mbcard_avgain" class="mbcard_more_span"> ---- </span>
-					</div>
-				</div>
-				<div class="mybankcard">
-					<div class="mbcard_title"><span class"">myWallet Tax Status</span><span class="mbcard_title"></span>&emsp;<img title="check your tax status here." src="imgs/info.png" /></div>
-					<div class="mbcard_detail mbcard_more">
-						<span id="mbcard_taxstatus_buy" class="mbcard_more_span"> ---- </span>
-						<span id="mbcard_taxstatus_sell" class="mbcard_more_span"> ---- </span>
-					</div>
-				</div>
-				<div class="mybankcard">
-					<div class="mbcard_title"><span class"">Blacklist Status</span><span class="mbcard_title"></span>&emsp;<img title="If youre blacklisted it means your wallet is a bot account. Or your wallet was involved in some crime. You cant sell or transfer them. You cant claim rewards from them either." src="imgs/info.png" /></div>
-					<div class="mbcard_detail mbcard_more">
-						<span id="mbcard_blacklisted" class="mbcard_more_span"> ---- </span>
-						<span id="mbcard_blacklistRights" class="mbcard_more_span"> ---- </span>
-					</div>
-				</div>
-				<div class="mybankcard">
-					<div class="mbcard_title"><span class"">myAssets</span><span class="mbcard_title"></span></div>
-					<div class="mbcard_detail mbcard_more">
-						<span id="mbcard_netassets" class="mbcard_more_span"> ---- </span>
-						<span id="mbcard_netassetsValue" class="mbcard_more_span"> ---- </span>
-					</div>
-				</div>
-				<div class="mybankcard">
-					<div class="mbcard_title"><span class"">netRewards Claimed</span><span class="mbcard_title"></span>&emsp;<img title="Sum of all rewards claimed to date. Wallet & from Benefactors who assigned your wallet." src="imgs/info.png" /></div>
-					<div class="mbcard_detail mbcard_more">
-						<span id="mbcard_netrewards" class="mbcard_more_span"> ---- </span>
-						<span id="mbcard_netrewardsBreakdown" class="mbcard_more_span"> ---- </span>
-					</div>
-				</div>
-				<div id="next" class="mybankcard">
-					<div class="mbcard_title"><span class"">netRewards Due</span><span class="mbcard_title"></span>&emsp;<img title="All combined rewards due from: Wallet, Donors" src="imgs/info.png" /></div>
-					<div class="mbcard_detail mbcard_more">
-						<span id="mbcard_netrewardsD" class="mbcard_more_span"> ---- </span>
-						<span id="mbcard_netrewardsDBreakdown" class="mbcard_more_span"> ---- </span>
-					</div>
-				</div>
-			</div>
 		</section>
 		<!-- call to action -->
 		<section class="cta">
@@ -1152,7 +1064,7 @@
 					<h1 data-aos="fade-right">Upcoming <span class="txt-gradient">Features</span></h1>
 					<p data-aos="fade-down" data-aos-delay="100">ERC20 Collateralized Lending.</p>
 					<p data-aos="fade-down" data-aos-delay="100">Bundled Asset Equity Swaps.</p>
-					<p data-aos="fade-down" data-aos-delay="100">Seasonal Equity Swaps.</p> <!-- seasonal better describes than directional, to imply upside swaps during bull seansons with e.g. 6 months duration and low cost -->
+					<p data-aos="fade-down" data-aos-delay="100">Fixed Term Native Hedges.</p> <!-- fixed term for instance 1-3-6-12 issued by the project (native token owner) -->
 					<p data-aos="fade-down" data-aos-delay="100">Leveraged Hedging.</p>
 					<p data-aos="fade-down" data-aos-delay="100">AI Automated Risk Management.</p>
 					<p data-aos="fade-down" data-aos-delay="100">Projects & Institutional support for: </p>
