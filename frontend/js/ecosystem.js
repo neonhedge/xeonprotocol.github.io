@@ -86,6 +86,7 @@ function init() {
     }
     //////Sun////////
     // Generate a random number between 0x42ecf5 and 0xf542b9 for the specular color
+    // Cooloest manual colors list: #592417
     var minSpecular = 0x42ecf5;
     var maxSpecular = 0xf542b9;
     var randomSpecular = Math.floor(Math.random() * (maxSpecular - minSpecular + 1)) + minSpecular;
@@ -302,7 +303,7 @@ function onMouseDown(event) {
                         document.getElementById('couleur').style.color="#2ce492";
                         document.getElementById('couleur').style.textShadow="0 0 2px #089556, 0 0 3px #089556, 0 0 15px #089556, 0 0 15px #089556, 0 0 3px #089556, 3px 3px 0.5px #014324";
 
-                        description.innerHTML = "OTC: Call Options, Put Options, Equity Swaps. Hedge any ERC20 token.<br/><br/><div>Click on the other planets to learn more ...<div>";
+                        description.innerHTML = "OTC: Call Options, Put Options, Equity Swaps. Hedge or speculate any ERC20 token.<br/><br/><div>Click on the other planets to learn more ...<div>";
                      
                         TweenMax.from($('#ecoContent'), 0.5, {
                             css: {
