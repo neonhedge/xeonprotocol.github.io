@@ -391,7 +391,7 @@ iframe {
   max-width: 600px;
   font-size: clamp(27px, 6vw, 37px);
   font-weight: 100;
-  line-height: 1.5;
+  line-height: 1.4;
   border-radius: 1.5vw;
 }
 .introductionHold small{
@@ -527,6 +527,7 @@ button, a.btn {
   /* background-color: rgba(29,78,216,.2); */
 }
 button.btn-cta, a.btn.btn-cta, .btn-dext{
+  font-family: 'Raleway', "Nunito Sans", monospace, sans-serif;;
   color: #08e7fe;
   border: 0.5px solid #3399ff;
   border-radius: 8px;
@@ -1045,9 +1046,12 @@ section.er404 {
   margin-bottom: 0;
 }
 #mission, #neon_protocol, #platform, #neon-howitworks, #hedgingTools, #uxDesign, #mediaH1, #timeline, #tokenomics {
-	font-size: clamp(26px, 5vw, 36px);
+	font-size: clamp(26px, 3vw, 36px);  
 	font-family: 'Neon',monospace, sans-serif, "Helvetica Neue", Helvetica, "Liberation Sans"!important;
 	font-weight:500;
+  font-size: clamp(32px, 3vw, 42px);  
+  font-family: 'Raleway','Neon',monospace, sans-serif, "Helvetica Neue", Helvetica, "Liberation Sans" !important;
+  font-weight: 200;
  /* color:#08e7fe; */
  letter-spacing: 1px;
 }
@@ -1248,6 +1252,24 @@ section.er404 {
 .usecase h1, .highlights h1 {
   margin-top: 20px;
 }
+.NHT, .NLT, .NFT {
+  text-transform: uppercase;
+  font-size: clamp(20px, 3vw, 25px);
+  font-family: 'Raleway',monospace, sans-serif, "Helvetica Neue", Helvetica, "Liberation Sans" !important;
+  font-weight: 100;
+}
+.NHT {
+  color: rgb(44, 228, 146);
+  text-shadow: rgb(8, 149, 86) 0px 0px 2px, rgb(8, 149, 86) 0px 0px 3px, rgb(8, 149, 86) 0px 0px 15px, rgb(8, 149, 86) 0px 0px 15px, rgb(8, 149, 86) 0px 0px 3px, rgb(1, 67, 36) 3px 3px 0.5px;
+}
+.NLT {
+  color: #08e7fe;
+  text-shadow: 0 0 2px #188dd6, 0 0 3px #188dd6, 0 0 15px #188dd6, 0 0 15px #188dd6, 0 0 3px #188dd6, 3px 3px 0.5px #0e567c;
+}
+.NFT {
+  color: rgb(168, 36, 215);
+  text-shadow: rgb(101, 0, 137) 0px 0px 2px, rgb(101, 0, 137) 0px 0px 3px, rgb(101, 0, 137) 0px 0px 15px, rgb(101, 0, 137) 0px 0px 15px, rgb(101, 0, 137) 0px 0px 3px, rgb(74, 6, 99) 3px 3px 0.5px;
+}
 .aishapeTools {
   width:100%;
   height:100%;
@@ -1308,7 +1330,7 @@ section.er404 {
 span.ecosystemToolsIntro {
   width: 100%;
   display: block;
-  text-align: justify;
+  text-align: start;
   padding-inline: 30vw;
   box-sizing: border-box;
 }
@@ -1318,8 +1340,9 @@ span.ecosystemToolsIntro {
   border: 1px solid #36ebff;
   box-shadow: 0 0 5px #fff, 0 0 3px var(--neon-border-color), 0 0 5px var(--neon-border-color), 0 0 20px var(--neon-border-color), 0 0 1px var(--neon-border-color), 2px 2px 2px #186eca !important;
   border-radius: 2vw;
-  padding: 1.2vw 3vw;
+  padding: 1.2vw 2.5vw;
   box-sizing: border-box;
+  min-width:250px;
 }
 .usecase h3 {
   margin-bottom: 1vw;
@@ -1332,11 +1355,15 @@ span.ecosystemToolsIntro {
   align-self: center;
 }
 .usecaseCont {
-  margin-top: 60px;
+  margin-top: 2.5rem;
   padding-inline: 6rem;
   column-gap: 1rem !important;
   place-content: space-around;
   box-sizing: border-box;
+  grid-template-columns: 75% 25%;
+}
+.midcaseCont {
+  grid-template-columns: 25% 75%;
 }
 .usecaseCont img {
   max-width: clamp(400px, 5vh, 600px);
@@ -1357,10 +1384,10 @@ span.ecosystemToolsIntro {
   text-shadow: 0 0 2px #7e22ce, 0 0 3px #7e22ce, 0 0 10px #7e22ce, 0 0 10px #7e22ce, 0 0 3px #188dd6, 2px 2px 0.5px #188dd6;
 }
 .optionsToolImg {
-  text-shadow: 0 0 2px #089353, 0 0 3px #089353, 0 0 10px #089353, 0 0 10px #089353, 0 0 3px #38eeff, 2px 2px 0.5px #38eeff;
+  text-shadow: 0 0 2px #188dd6, 0 0 3px #188dd6, 0 0 10px #188dd6, 0 0 10px #188dd6, 0 0 3px #38eeff, 2px 2px 0.5px #38eeff;
 }
 .loansToolImg {
-  text-shadow: 0 0 2px #188dd6, 0 0 3px #188dd6, 0 0 10px #188dd6, 0 0 10px #188dd6, 0 0 3px #38eeff, 2px 2px 0.5px #38eeff;
+  text-shadow: 0 0 2px #089353, 0 0 3px #089353, 0 0 10px #089353, 0 0 10px #089353, 0 0 3px #38eeff, 2px 2px 0.5px #38eeff;
 }
 .howitworks {
   padding-block: 3vw 1vw;
@@ -1560,29 +1587,53 @@ span.ecosystemToolsIntro {
   display: grid;
   grid-template-columns: repeat(3, 3fr);
   place-content: stretch;
+  column-gap: 1vw;
+  background-color: rgba(29, 129, 216, 0.15);
+  border-radius: 0.5vw;
+  padding: 0.5vw;
+  padding-top: 1rem;
 }
 .guideGrid {
   display: grid;
 }
 .depositGrid {
   border:0.5px dashed #39f;
+  border-radius: 1rem;
+  padding:1vw;
+  box-sizing: border-box;
+  border-block: 0.5px dashed #39f;
 }
 .vaultStorage {
   padding: 10px;
   box-sizing: border-box;
   border: 1px dashed #39f;
   border-radius: 1rem;
+  background-color: rgba(0, 0, 0, 0.4);
 }
 .titlevS {
   border: unset;
+  background: none;
 }
 .vaultStorage h3 {
+  margin-bottom: 1rem;
+  font-size: 15px;
+  font-weight: 600;
   color:#08E7FE;
 }
 .vaultStorage p {
   font-size: 13px;
-  text-align: justify;  
+  text-align: center;  
   padding-bottom: 10px;
+}
+.depositGrid p {
+  font-size: 15px;
+  text-align: center;  
+  padding-block: 10px;
+  color:#08E7FE;
+}
+.guideGrid img {
+  width: 100px;
+  margin: 0px auto;
 }
 /*==================================
     SAMPLE CARD FROM BETA
