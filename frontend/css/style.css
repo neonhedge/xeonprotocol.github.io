@@ -1406,12 +1406,12 @@ span.ecosystemToolsIntro {
   text-shadow: 0 0 2px var(--neon-border-color), 0 0 3px var(--neon-border-color), 0 0 10px var(--neon-border-color), 0 0 10px var(--neon-border-color), 0 0 3px var(--neon-border-color), 2px 2px 0.5px var(--neon-border-color);
 }
 .swapsToolImg {
-  text-shadow: 0 0 2px #7e22ce, 0 0 3px #7e22ce, 0 0 10px #7e22ce, 0 0 10px #7e22ce, 0 0 3px #188dd6, 2px 2px 0.5px #188dd6;
-}
-.optionsToolImg {
-  text-shadow: 0 0 2px #188dd6, 0 0 3px #188dd6, 0 0 10px #188dd6, 0 0 10px #188dd6, 0 0 3px #38eeff, 2px 2px 0.5px #38eeff;
+  text-shadow: 0 0 2px #7e22ce, 0 0 3px #7e22ce, 0 0 10px #7e22ce, 0 0 10px #7e22ce, 0 0 3px #7e22ce, 2px 2px 0.5px #7e22ce;
 }
 .loansToolImg {
+  text-shadow: 0 0 2px #188dd6, 0 0 3px #188dd6, 0 0 10px #188dd6, 0 0 10px #188dd6, 0 0 3px #38eeff, 2px 2px 0.5px #38eeff;
+}
+.hedgesToolImg {
   text-shadow: 0 0 2px #089353, 0 0 3px #089353, 0 0 10px #089353, 0 0 10px #089353, 0 0 3px #38eeff, 2px 2px 0.5px #38eeff;
 }
 .howitworks {
