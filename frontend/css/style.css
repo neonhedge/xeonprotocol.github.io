@@ -1558,7 +1558,7 @@ span.ecosystemToolsIntro {
 }
 
 .callOptions h2 img, .putOptions h2 img {
-  width:50px;
+  width:48px;
   align-self: center;
 }
 .callDescription {
@@ -1665,8 +1665,13 @@ span.ecosystemToolsIntro {
   color:#08E7FE;
 }
 .guideGrid img {
-  width: 100px;
+  width: 64px;
+  height:64px;
   margin: 0px auto;
+  border-radius:50%;
+  /* border: 0.5px solid rgb(8, 231, 254); */
+  padding: 2px;
+  box-sizing: border-box;
 }
 /*==================================
     SAMPLE CARD FROM BETA
