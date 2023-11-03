@@ -147,7 +147,7 @@
 			<!-- visibility separator -->
 			<h1 id="platform" class="sectionH1 neon-blue">Ecosystem Tools</h1>
 			<div class="aishapeTools" draggable="true">
-				<span class="ecosystemToolsIntro">Neon Protocol's Ecosystem comprises 3 platforms – Neon Hedge, Neon Lend and Neon Farm. Pioneering these cutting-edge OTC tools:</span>
+				<span class="ecosystemToolsIntro">Neon Protocol's Ecosystem comprises 3 platforms – <span class="NHT">Neon Hedge</span>, <span class="NLT">Neon Lend</span> & <span class="NFT">Neon Farm</span>. Pioneering these cutting-edge OTC tools:</span>
 				<div class="container grid usecaseCont">
 					<div class="usecase">
 						<h3>Equity Swaps <a>- Neon Hedge Platform</a></h3>
@@ -158,7 +158,7 @@
 					<div class="toolImage swapsToolImg mx-w-25 pulse"  data-aos="fade-down"><i class="fa fa-superpowers" aria-hidden="true"></i>	</div>
 				</div>
 
-				<div class="container grid usecaseCont">
+				<div class="container grid usecaseCont midcaseCont">
 					<!-- <img src="./imgs/neonDoge2.webp" class="mx-w-25 pulse" alt="neon shiba image" data-aos="fade-down"> -->
 					<div class="toolImage loansToolImg mx-w-25 pulse"  data-aos="fade-down"><i class="fa fa-line-chart" aria-hidden="true"></i>	</div> <!-- fa-exchange -->
 					
@@ -188,10 +188,10 @@
 		</section>
 
 		<section id="hedgetoolsSection" class="aiAnalyHold">
-			<h1 id="hedgingTools" class="sectionH1 neon-blue">Neon Hedge Tools</h1>
+			<h1 id="hedgingTools" class="sectionH1 neon-blue"><a href="./ecosystem.html" target="_blank" title="Neon Hedge Ecosystem"><img src="./imgs/neon-hedge2.webp"></a><span>Neon Hedge Tools</span></h1>
 			<div class="worksHold">
 				<div class="callOptions">
-					<h2>Call Options</h2>
+					<h2><img src="./imgs/chart-callOption-64.png"><span>Call Options</span></h2>
 					<div class="callDescription">Capo holds 100 BITCOIN tokens. He's in profit but hes doubtful the Sonic token still has legs to run. He wants to lock his bag value at current price. He writes a Call Option using his BITCOIN as underlying asset.</div>
 					<!-- Alice holds 100 VELA tokens. She's unsure if VELA will keep rising and wants to lock in her current value for 7 days. She creates a call option for 1 week to guarantee her value.-->
 					<div class="row responsivenesss">
@@ -230,7 +230,7 @@
 					</div>
 				</div>
 				<div class="putOptions">
-					<h2>Put Options</h2>
+					<h2><img src="./imgs/chart-putOption-64.png"><span>Put Options</span></h2>
 					<div class="callDescription">Saylor holds 100 BITCOIN tokens. He thinks the Sonic token still has legs to run for the next 2 weeks and he wants to earn extra from the bet. He writes a Put Option using his BITCOIN as underlying asset, expiry 2 weeks.</div>
 					<!-- Alice holds 100 VELA tokens. She's unsure if VELA will keep rising and wants to lock in her current value for 7 days. She creates a call option for 1 week to guarantee her value.-->
 					<div class="row responsivenesss">
@@ -269,7 +269,7 @@
 					</div>
 				</div>
 				<div class="putOptions">
-					<h2>Equity Swaps</h2>
+					<h2><img src="./imgs/chart-equitySwap-64.png"><span>Equity Swaps</span></h2>
 					<div class="callDescription">Mike holds Vela. Hes uncertain on price direction the coming week and wants to transfer full gains or losses on his Vela portolio to someone else for the period. He creates an Equity Swap using his Vela as underlying assets for 1 week.</div>
 					<div class="row responsivenesss">
 						<!-- ****** -->
@@ -306,56 +306,59 @@
 						<!-- ****** -->
 					</div>
 				</div>
-				<div class="putOptions guideContainer">
-					<div class="guideGrid">
-						<img src="./imgs/neonDoge1.webp" alt="writer">
-						<div class="depositGrid">
-							<span class="gridtitle">Deposit ERC20 Assets</span>
-							<p class="gridexplainer">Holder decides to move capital from his wallet to our vault to hedge it.</p>
+				<div class="putOptions">
+					<h2>How it Works</h2>
+					<div class="guideContainer">
+						<div class="guideGrid">
+							<img src="./imgs/neonDoge1.webp" alt="writer">
+							<div class="depositGrid">
+								<h4 class="gridtitle">Deposit ERC20 Assets</h4>
+								<p class="gridexplainer">Holder decides to move capital from his wallet to our vault to hedge it.</p>
+							</div>
+							<div class="depositGrid">
+								<h4 class="gridtitle">Write Hedge</h4>
+								<p class="gridexplainer">Holder writes a call/put option or equity swap using deposit as underlying asset & collateral.</p>
+							</div>
+							<div class="depositGrid">
+								<h4 class="gridtitle">Settlement</h4>
+								<p class="gridexplainer">Settlement executed on expiry only. Holder can move profits/capital back to wallet or into more deals.</p>
+							</div>
 						</div>
-						<div class="depositGrid">
-							<span class="gridtitle">Write Hedge</span>
-							<p class="gridexplainer">Holder writes a call/put option or equity swap using deposit as underlying asset & collateral.</p>
+						<div class="guideGrid">
+							<div class="vaultStorage titlevS">
+								<h4>vault token storage</h4>
+								<p>this illustrates the handling of tokens inside our vault, during the 3 stages of a OTC deal.</p>
+							</div>
+							<div class="vaultStorage">
+								<h4>userBalance mapping</h4>
+								<h3>.deposited struct</h3>
+								<p>deposit balance incremented for user in mapping. They are now in the vault to use for writing or buying hedges or withdrawal.</p>
+							</div>
+							<div class="vaultStorage">
+								<h4>userBalance mapping</h4>
+								<h3>.lockedInUse struct</h3>
+								<p>locked-in-use balance incremented for user in mapping. Tokens are now locked in a deal as collateral awaiting settlement only. </p>
+							</div>
+							<div class="vaultStorage">
+								<h4>userBalance mapping</h4>
+								<h3 class="vaultSection">.deposited struct</br>.withdrawn struct</h3>
+								<p>depending on hedge outcome, writer and taker can have their deposit incremented with payoff, or withdrawn balance incremented with loss.</p>
+							</div>
 						</div>
-						<div class="depositGrid">
-							<span class="gridtitle">Settlement</span>
-							<p class="gridexplainer">Settlement executed on expiry funds. Holder can move profits & capital back to wallet or into more deals.</p>
-						</div>
-					</div>
-					<div class="guideGrid">
-						<div class="vaultStorage titlevS">
-							<h4>vault token storage</h4>
-							<p>this illustrates the handling of tokens inside our vault, during the 3 stages of a OTC deal.</p>
-						</div>
-						<div class="vaultStorage">
-							<h4>userBalance mapping</h4>
-							<h3>.deposited struct</h3>
-							<p>deposit balance incremented for user in mapping. They are now in the vault to use for writing or buying hedges or withdrawal.</p>
-						</div>
-						<div class="vaultStorage">
-							<h4>userBalance mapping</h4>
-							<h3>.lockedInUse struct</h3>
-							<p>locked-in-use balance incremented for user in mapping. Tokens are now locked in a deal as collateral awaiting settlement only. </p>
-						</div>
-						<div class="vaultStorage">
-							<h4>userBalance mapping</h4>
-							<h3 class="vaultSection">.deposited struct</br>.withdrawn struct</h3>
-							<p>depending on hedge outcome, writer and taker can have their deposit incremented with payoff, or withdrawn balance incremented with loss.</p>
-						</div>
-					</div>
-					<div class="guideGrid">
-						<img src="./imgs/neonDoge3.webp" alt="buyer">
-						<div class="depositGrid">
-							<span class="gridtitle">Deposit ERC20 Assets</span>
-							<p class="gridexplainer">Speculator decides to move capital from his wallet to our vault to buy hedges.</p>
-						</div>
-						<div class="depositGrid">
-							<span class="gridtitle">Buy Hedge</span>
-							<p class="gridexplainer">Speculator buys a call/put option or equity swap using deposit as collateral.</p>
-						</div>
-						<div class="depositGrid">
-							<span class="gridtitle">Settlement</span>							
-							<p class="gridexplainer">Settlement executed on expiry funds. Speculator can move profits & capital back to wallet or into more deals.</p>
+						<div class="guideGrid">
+							<img src="./imgs/neonDoge3.webp" alt="buyer">
+							<div class="depositGrid">
+								<h4 class="gridtitle">Deposit ERC20 Assets</h4>
+								<p class="gridexplainer">Speculator decides to move capital from his wallet to our vault to buy hedges.</p>
+							</div>
+							<div class="depositGrid">
+								<h4 class="gridtitle">Buy Hedge</h4>
+								<p class="gridexplainer">Speculator buys a call/put option or equity swap using deposit to match cost & collateral.</p>
+							</div>
+							<div class="depositGrid">
+								<h4 class="gridtitle">Settlement</h4>							
+								<p class="gridexplainer">Settlement executed on expiry. Speculator can move profits/capital back to wallet or into more deals.</p>
+							</div>
 						</div>
 					</div>
 				</div>

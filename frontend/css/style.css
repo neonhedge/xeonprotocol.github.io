@@ -1022,6 +1022,7 @@ section.er404 {
 #missionHold {
   margin-block-end: 10vw;
 }
+
 .moonMission {
   font-size: clamp(50px, 4vw, 70px);
   text-align: center;
@@ -1031,10 +1032,12 @@ section.er404 {
   text-shadow: 3px 0 1px #188dd6, 3px 0 1px #188dd6, 0 0 1px #188dd6, 0 0 10px #38eeff, 0 0 3px #38eeff, 2px 2px 0.5px #38eeff !important;
   text-shadow: 0 0 1px #188dd6, 0 0 1px #188dd6, 0 0 1px #188dd6, 0 0 100px #188dd6, 0 0 30px #188dd6, 3px 3px 0.5px #188dd6 !important;
 }
+
 .firstMoon {
   font-size: clamp(20px, 3vw, 30px);
   margin:2vw !important;
 }
+
 .moonMission {
   -webkit-animation: move 4s infinite ease-in-out alternate;
   animation: move 4s infinite ease-in-out alternate;
@@ -1045,6 +1048,7 @@ section.er404 {
 .howitworks .moonMission {
   margin-bottom: 0;
 }
+
 #mission, #neon_protocol, #platform, #neon-howitworks, #hedgingTools, #uxDesign, #mediaH1, #timeline, #tokenomics {
 	font-size: clamp(26px, 3vw, 36px);  
 	font-family: 'Neon',monospace, sans-serif, "Helvetica Neue", Helvetica, "Liberation Sans"!important;
@@ -1055,14 +1059,33 @@ section.er404 {
  /* color:#08e7fe; */
  letter-spacing: 1px;
 }
+
+#hedgingTools {
+  display: inline-flex;
+  line-height: 1.5;
+  column-gap:1vw;
+}
+
+#hedgingTools a {
+  display: inline-flex;
+  align-content: center;
+}
+
+#hedgingTools img {
+  width:50px;
+  align-self: center;
+}
+
 .neon-blue {
   text-shadow: 0 0 2px #188dd6, 0 0 3px #188dd6, 0 0 15px #188dd6, 0 0 15px #188dd6, 0 0 3px #188dd6, 3px 3px 0.5px #0e567c !important;  
   color: #92f1fc !important;
   color: #08e7fe !important;/* darker */
 }
+
 .howitworks img {
   width: clamp(250px, 30vw, 400px) !important;
 }
+
 #trav {
   letter-spacing: 0.5vw;
 	-webkit-animation: blink 0.01s infinite alternate;
@@ -1070,6 +1093,7 @@ section.er404 {
 	-o-animation: blink 0.01s infinite alternate;
 	animation: blink 0.01s infinite alternate;
 }
+
 #glitch {
 	text-shadow: 0 0 2px #188dd6, 0 0 3px #188dd6, 0 0 15px #188dd6, 0 0 15px #188dd6, 0 0 3px #188dd6, 3px 3px 0.5px #0e567c !important;
   color: #92f1fc !important;
@@ -1079,6 +1103,7 @@ section.er404 {
 	-o-animation: fadee 7s infinite alternate;
 	animation: fadee 7s infinite alternate;
 }
+
 .neon-purple {
 	font-family: monospace, sans-serif, "Helvetica Neue", Helvetica, "Liberation Sans"!important;
 	font-size: clamp(17px, 2vw, 30px);
@@ -1284,19 +1309,19 @@ section.er404 {
 
 @keyframes morphing {
   0% {
-      border-radius: 30% 60% 70% 30% / 15% 40% 30% 20%;
+      border-radius: 30% 60% 30% 30% / 15% 40% 20% 20%;
       background: linear-gradient(45deg, #270855 0%, #040115 100%);
       background: linear-gradient(45deg, #270855 20%, #040115 80%);
   } 
   
   50% {
-      border-radius: 30% 10% 30% 20% / 50% 20% 50% 40%;
+      border-radius: 30% 10% 40% 20% / 50% 20% 30% 40%;
       background: linear-gradient(45deg, #040115 0%, #270855 100%);
       background: linear-gradient(45deg, #040115 35%, #270855 80%);
   }
   /* 0% and 100% should match for smooth fluid movement */
   100% {
-    border-radius: 30% 60% 70% 30% / 15% 40% 30% 20%;
+    border-radius: 30% 60% 30% 30% / 15% 40% 20% 20%;
     background: linear-gradient(180deg, #040115 4%, #2d0a61 100%);
     background: linear-gradient(180deg, #040115 20%, #2d0a61 100%);
   } 
@@ -1525,8 +1550,16 @@ span.ecosystemToolsIntro {
     max-width: 100%;
   }
 }
-.callOptions h1 {
-  text-transform: uppercase;
+.callOptions h2, .putOptions h2 {
+  display: inline-flex;
+  line-height: 1.5;
+  column-gap:1vw;
+  align-content: center;
+}
+
+.callOptions h2 img, .putOptions h2 img {
+  width:50px;
+  align-self: center;
 }
 .callDescription {
   width: 100%;
@@ -1608,7 +1641,7 @@ span.ecosystemToolsIntro {
   box-sizing: border-box;
   border: 1px dashed #39f;
   border-radius: 1rem;
-  background-color: rgba(0, 0, 0, 0.4);
+  background-color: rgba(0, 0, 0, 0.7);
 }
 .titlevS {
   border: unset;
