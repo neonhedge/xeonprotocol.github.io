@@ -124,8 +124,8 @@ function init() {
         shading: THREE.FlatShading
     });
     var material2 = new THREE.MeshPhongMaterial({
-        color: 0x1AC4D4,
-        emissive: 0x1AC4D4,
+        color: 0x188dd6,
+        emissive: 0x188dd6,
         shading: THREE.FlatShading
     });
     var material4 = new THREE.MeshPhongMaterial({
@@ -296,7 +296,8 @@ function onMouseDown(event) {
                 }
                 if (currentcolor == 0x089353) {
                     
-                    if (planetViewed == 1 || planetViewed==3 || planetViewed==4) {
+                    if (planetViewed == 0 || planetViewed == 1 || planetViewed==3 || planetViewed==4) {
+                        updateInformation();
                         planetViewed = 2;
                         info.innerHTML = " Neon <span id='couleur'>Hedging</span>";
                  
@@ -328,8 +329,9 @@ function onMouseDown(event) {
                     }
                     updateCurrentMeshColor(0x2ce492);
                 }
-                if (currentcolor == 0x1AC4D4) {
-                    if (planetViewed == 1 || planetViewed==2 || planetViewed==4) {
+                if (currentcolor == 0x188dd6) {
+                    if (planetViewed == 0 || planetViewed == 1 || planetViewed==2 || planetViewed==4) {
+                        updateInformation();
                         planetViewed = 3;
                         info.innerHTML = ' Neon <span id="couleur">Lending</span>';
                       
@@ -358,10 +360,11 @@ function onMouseDown(event) {
                             ease: Quad.easeInOut,
                         });
                     }
-                    updateCurrentMeshColor(0x26D7E7);
+                    updateCurrentMeshColor(0x188dd6);
                 }   
                 if (currentcolor == 0x600164) {
-                    if (planetViewed == 1 || planetViewed==2 || planetViewed==3) {
+                    if (planetViewed == 0 || planetViewed == 1 || planetViewed==2 || planetViewed==3) {
+                        updateInformation();
                         planetViewed = 4;
                         info.innerHTML = ' Neon <span id="couleur">Farming</span>';
                          document.getElementById('couleur').style.color="#a824d7";
@@ -408,6 +411,30 @@ document.addEventListener('click', function(event) {
         // Click is outside the ecosystemContainer
     }
 });
+
+function updateInformation() {
+        hideecosystemWelcome();
+        planetViewed = 1;
+        TweenMax.from($('#ecoContent'), 0.5, {
+            css: {
+                left: '-500px'
+            },
+            delay:0.5,
+            ease: Quad.easeInOut
+        });
+
+        TweenMax.from($('#border'), 0.5, {
+            css: {
+                height: '0px'
+            },
+            delay: 1,
+            ease: Quad.easeInOut,
+        });                      
+        
+        info.innerHTML = " <span>Neon</span> Protocol";
+ 
+        description.innerHTML = "Universal ERC20 <span>Hedging</span> and <span>Lending</span> ecosystem comprising 3 Platforms.<br/><br/><div>Click on the ecosystem planets to learn more ...<div>";
+}
 
 
 function updateCurrentMeshColor(currentcolor) {
