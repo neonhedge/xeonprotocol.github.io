@@ -1292,8 +1292,8 @@ section.er404 {
   text-shadow: 0 0 2px #188dd6, 0 0 3px #188dd6, 0 0 15px #188dd6, 0 0 15px #188dd6, 0 0 3px #188dd6, 3px 3px 0.5px #0e567c;
 }
 .NFT {
-  color: rgb(168, 36, 215);
-  text-shadow: rgb(101, 0, 137) 0px 0px 2px, rgb(101, 0, 137) 0px 0px 3px, rgb(101, 0, 137) 0px 0px 15px, rgb(101, 0, 137) 0px 0px 15px, rgb(101, 0, 137) 0px 0px 3px, rgb(74, 6, 99) 3px 3px 0.5px;
+  color: #a824d7;
+  text-shadow: #650089 0px 0px 2px, #650089 0px 0px 3px, #650089 0px 0px 15px, #650089 0px 0px 15px, #650089 0px 0px 3px, #4a0663 3px 3px 0.5px;
 }
 .aishapeTools {
   width:100%;
@@ -1543,6 +1543,7 @@ span.ecosystemToolsIntro {
   flex: 0 0 50%;
   max-width: 50%;
   padding: 3vw;
+  padding-top: unset;
 }
 @media (max-width: 680px){
   .callOptions, .putOptions {

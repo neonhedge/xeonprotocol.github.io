@@ -7,6 +7,7 @@ body {
 }
 header {
     border-bottom: 0.5px solid #15213c !important;
+    padding-block: 0.5rem;
 }
 footer {
     background: unset !important;
