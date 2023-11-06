@@ -1,5 +1,6 @@
 /*  NEON PROTOCOL ECOSYSTEM MODULE STYLESHEET */
 @import url('https://fonts.googleapis.com/css?family=Raleway:100,100i,200,300,400,500,600,700,800');
+@import url('https://fonts.cdnfonts.com/css/sf-mono');
 
 body {
     /*background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.8)), url('../imgs/banner-bg.webp') !important;*/
@@ -55,7 +56,7 @@ main {
 #testnetWelcome span {
     display: block;
     text-align: justify;
-    font-size: clamp(14px, 1vw, 15px);
+    font-size: clamp(13px, 1vw, 14px);
 }
 #testnetWelcome canvas {
     position: fixed;
@@ -75,22 +76,24 @@ main {
 }
 
 .rewardsInformer {
+    visibility: hidden !important;
 	padding: 5px 20px;
-	font-size: clamp(12.5px, 1vw, 13px);
-	font-weight: 100;
+	font-size: clamp(13px, 1vw, 14px);
+	font-weight: 200;
 	text-align: center;
 	cursor:help;
 	transition: background-color 0.3s;
 	color: #08e7fe;
-	border: 1px solid rgba(51, 153, 255, 0.15);
+    color: #FFF;
+	border: 1px solid rgba(51, 153, 255, 0.25);
 	border-radius: 8px;
 /*
 	background-color: rgba(29, 163, 216, 0.2);
 	background-color: rgba(29, 129, 216, 0.2);
 */
-	background-color: rgba(29, 129, 216, 0.15);
-	animation: hideDiv 60s forwards;
-	transition: 0.5s;
+	background-color: rgba(29, 129, 216, 0.25);
+	/* animation: hideDiv 60s forwards;
+	transition: 0.5s; */
 }
 @keyframes hideDiv {
 	0% {
@@ -120,13 +123,14 @@ main {
     flex-direction: column;
 }
 .aboutTestnet {
-    flex: 70;
+    flex: 50;
     background-color: #002644;
     border: 0.5px solid #3399ff;
     border-radius: 20px;
 }
 .aboutCityScape {
-    flex: 30;
+    flex: 45;
+    align-items: flex-end;
 }
 .aboutHead {
     padding:1.5rem;
@@ -135,6 +139,8 @@ main {
 .aboutHead h3 {
     color: #08e7fe;
     text-align: left;
+    font-size: 1.4rem;
+    font-weight: 400;
 }
 /*
 .aboutHead h3::after {
@@ -161,7 +167,16 @@ main {
         background-position: top right;
     }
   }
-*/  
+*/
+
+.jumpToTestnet .buttonsHold {
+    padding-block: 1rem 2rem;
+    margin-top: -10px !important;
+}
+.jumpToTestnet .buttonsHold a {
+    color: #FFF !important;
+    text-shadow: none !important;
+}
 .testnetH {
     z-index: 1;
 }
@@ -179,7 +194,7 @@ main {
     position: relative;
     top:-6.5rem;
 }
-.testnetTokens {
+.aboutTestnetHold {
     display: flex;
     overflow: hidden;
     align-items:center;
@@ -379,18 +394,14 @@ svg.cityscape {
     font-size: 20px;
     color: white;
     filter: brightness(1.2);
+    text-align: left;
+    padding: 1vw;
 }
 .code * {
     font-size: 18px;
     font-weight: normal;
     color: #b5b4b6;
     font-family: "Space Grotesk", monospace;
-}
-  
-.testnetWindow {
-    display: grid;
-    min-height: 100vh;
-    width: 100%;
 }
 
 .backG {
@@ -421,4 +432,42 @@ svg.cityscape {
     bottom: 0 !important;
     transform: perspective(100px) rotateX(60deg) !important;
     z-index: 1 !important;
+}
+
+.terminalStep h3 {
+    font-size: clamp(18px, 1vw, 22px) !important;
+    font-family: SFMono-Regular, 'Liberation Mono', Menlo, monospace;
+    font-weight: 100 !important;
+    text-transform: uppercase;
+    font-style: italic;
+    
+    color: #9963ff99;
+    text-shadow: 0 0 2px #001716, 0 0 5px #03edf933, 0 0 10px #ffff6633;
+}
+
+#testnetGrab {
+    color: #61e2ff;
+    text-shadow: 0 0 2px #001716, 0 0 5px #03edf933, 0 0 10px #ffff6633;
+}
+#testnetUse {
+    color: #00ff80;
+    text-shadow: 0 0 2px #001716, 0 0 5px #03edf933, 0 0 10px #ffff6633;
+}
+#testnetPrice {
+    color: #ffcc00;
+    text-shadow: 0 0 2px #100c0f, 0 0 3px #ffaa0099, 0 0 5px #ffaa0099, 0 0 10px #ffaa0099;  
+}
+#testnetVersion {
+    color: #fc199a;
+    text-shadow: 0 0 2px #393a33, 0 0 35px #ffffff44, 0 0 10px #fc199a, 0 0 2px #fc199a;
+}
+.testnetWindow {
+    display: grid;
+    min-height: 100vh;
+    width: 100%;
+}
+.testTokensList {
+    width: 100%;
+    min-height: 20vh;
+    border:1px solid #08e7fe;
 }
