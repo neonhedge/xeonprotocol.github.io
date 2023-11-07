@@ -3,8 +3,8 @@
 @import url('https://fonts.cdnfonts.com/css/sf-mono');
 
 body {
-    /*background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.8)), url('../imgs/banner-bg.webp') !important;*/
-    background: radial-gradient(#18142d, #040115 80%) !important;
+    background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.8)), url('../imgs/banner-bg.webp') !important;
+    /* background: radial-gradient(#18142d, #040115 80%) !important; */
     scroll-behavior: smooth;
     font-family: "Space Grotesk", monospace, sans-serif !important;
 }
@@ -125,12 +125,15 @@ main {
 .aboutTestnet {
     flex: 50;
     background-color: #002644;
+    /*
     border: 0.5px solid #3399ff;
+    border:0.5px solid #08e7fe;
+    */
     border-radius: 20px;
 }
 .aboutCityScape {
     flex: 45;
-    align-items: flex-end;
+    align-items:center;
 }
 .aboutHead {
     padding:1.5rem;
@@ -176,6 +179,8 @@ main {
 .jumpToTestnet .buttonsHold a {
     color: #FFF !important;
     text-shadow: none !important;
+    font-size: 1.1rem;
+    border: 0.5px solid #08e7fe;
 }
 .testnetH {
     z-index: 1;
@@ -198,7 +203,9 @@ main {
     display: flex;
     overflow: hidden;
     align-items:center;
-    padding-inline: 1vw;
+    padding-inline: 1rem;
+    padding-bottom: 2rem;
+    box-sizing: border-box;
 }
   
 svg.cityscape {
@@ -242,12 +249,11 @@ svg.cityscape {
 ========================================================*/
 
 .code-container {
-    resize: both;
-    overflow: hidden;
+    /* resize: both; */
     margin: auto;
     width: 100%;
-    height: 80vh;
-    min-width: 420px;
+    height: 100%;
+    min-width: 400px;
     min-height: 50vh;
     position: relative;
     --glow-margin: 20px;
@@ -257,7 +263,7 @@ svg.cityscape {
   input.sig {
     content: "attr(content)";
     position: absolute;
-    bottom: 90px;
+    bottom: 10px;
     right: 90px;
     z-index: 999;
     color: rgb(255 200 255 / 0.5);
@@ -284,16 +290,19 @@ svg.cityscape {
     );
     position: absolute;
     top: 75px;
+    top: 55px;
     left: var(--glow-margin);
     right: var(--glow-margin);
     height: 4px;
     display: block;
-    z-index: 90;
+    z-index: 9;
     opacity: 0.5;
   }
   
   .glow-container {
     position: absolute;
+    height:100%;
+    top:0;
     inset: 0;
     display: grid;
     z-index: 2;
@@ -324,9 +333,9 @@ svg.cityscape {
     --aug-tl1: 8px !important;
     --aug-round-br1: initial !important;
     --aug-br1: 8px !important;
-    margin: auto !important;
+    margin: 0px auto !important;
     width: calc(100% - var(--glow-margin) * 2) !important;
-    height: calc(100% - var(--glow-margin) * 2) !important;
+    height: 100% !important; /* calc(100% - var(--glow-margin) * 2) !important */
   }
   
   .glow-container .augs {
@@ -336,7 +345,8 @@ svg.cityscape {
   }
   
   section.augs {
-    position: absolute;
+    position: relative;
+    height:100% !important;
     inset: 0;
     margin: auto;
     padding: unset;
@@ -389,60 +399,56 @@ svg.cityscape {
   }
   
 .code {
-    position: absolute;
-    inset: 80px 10px 10px 10px;
+    position: relative;
+    padding: 60px 10px 10px 10px;
+    box-sizing: border-box;
     font-size: 20px;
     color: white;
     filter: brightness(1.2);
     text-align: left;
-    padding: 1vw;
 }
-.code * {
-    font-size: 18px;
-    font-weight: normal;
-    color: #b5b4b6;
-    font-family: "Space Grotesk", monospace;
-}
-
 .backG {
     background: repeating-linear-gradient(
         to top,
         rgba(255, 255, 255, 0.03) 0px 2px,
         transparent 2px 4px
       ),
-      linear-gradient(to bottom, #200933 75%, #3d0b43);
+    linear-gradient(to bottom, #200933 75%, #3d0b43);
 }
 .backG::after {
-    content: "" !important;
-    height: 50% !important;
-    width: 100% !important;
-    display: block !important;
-    background-image: linear-gradient(
-        90deg,
-        rgba(252, 25, 154, 0.1) 1px,
-        rgba(0, 0, 0, 0) 1px
-      ),
-      linear-gradient(0deg, rgba(252, 25, 154, 0.1) 1px, rgba(0, 0, 0, 0) 1px) !important;
-    background-position: bottom !important;
-    background-repeat: repeat !important;
-    background-size: 20px 20px !important;
-    left: -25px !important;
-    position: absolute !important;
-    pointer-events: none !important;
-    bottom: 0 !important;
-    transform: perspective(100px) rotateX(60deg) !important;
-    z-index: 1 !important;
+  content: "" !important;
+  height: 50% !important;
+  width: 100% !important;
+  display: block !important;
+  background-image: linear-gradient(
+      90deg,
+      rgba(252, 25, 154, 0.1) 1px,
+      rgba(0, 0, 0, 0) 1px
+    ),
+  linear-gradient(0deg, rgba(252, 25, 154, 0.1) 1px, rgba(0, 0, 0, 0) 1px) !important;
+  background-position: bottom !important;
+  background-repeat: repeat !important;
+  background-size: 20px 20px !important;
+  left: -25px !important;
+  position: absolute !important;
+  pointer-events: none !important;
+  bottom: 0 !important;
+  transform: perspective(100px) rotateX(60deg) !important;
+  z-index: 10 !important;
 }
-
+.terminalStep {
+  padding:1rem;
+  box-sizing: border-box;
+}
 .terminalStep h3 {
-    font-size: clamp(18px, 1vw, 22px) !important;
-    font-family: SFMono-Regular, 'Liberation Mono', Menlo, monospace;
-    font-weight: 100 !important;
-    text-transform: uppercase;
-    font-style: italic;
-    
-    color: #9963ff99;
-    text-shadow: 0 0 2px #001716, 0 0 5px #03edf933, 0 0 10px #ffff6633;
+  margin:unset;
+  padding-block:1rem;
+  font-size: clamp(18px, 1vw, 21px) !important;
+  font-family: SFMono-Regular, 'Liberation Mono', Menlo, monospace;
+  font-weight: 100 !important;
+  
+  color: #9963ff99;
+  text-shadow: 0 0 2px #001716, 0 0 5px #03edf933, 0 0 10px #ffff6633;
 }
 
 #testnetGrab {
@@ -469,5 +475,222 @@ svg.cityscape {
 .testTokensList {
     width: 100%;
     min-height: 20vh;
-    border:1px solid #08e7fe;
+    border: 0.5px solid #08e7fe;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+}
+
+/*=========================================================================
+    Tokens List
+==========================================================================*/
+.section-title img{
+	display: inline-flex;
+	width:50px;
+	height:auto;
+	margin-right: 20px;
+	margin-bottom: 2rem;
+  }
+
+  .section-title h2{
+	display: inline-flex;
+	flex-grow: 1;
+	align-items: center;
+	font-size: clamp(18px, 2vw, 22px);
+	font-weight: 400;
+  }
+.list-section {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  width: 100%;
+  padding-inline: 20px;
+  box-sizing: border-box;
+  border-radius: 10px;
+  /*
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+  background: radial-gradient(#141247, #040115 80%) !important;
+  background: radial-gradient(rgba(20, 18, 71,0.1), rgba(4, 1, 21,0.4) 80%) !important;
+  */
+}
+
+.list-header, .section-title {
+    flex-basis: 100%;
+    font-size: clamp(14px, 2vw, 15px) !important;
+    font-weight: 400;
+}
+
+.trade-list { 
+	flex-basis: 63%;
+	max-height: 500px;
+	overflow-y: auto;
+	max-width:70%;
+	border-right: 0.5px dotted #33856b;
+    list-style-type: none;
+    padding: 0;
+	padding-right:10px;
+	box-sizing: border-box;
+    margin: 0;
+}
+
+.t-i-lead {
+	max-width: 63%;
+	font-size: 1rem;
+}
+  
+.trade-list::-webkit-scrollbar {
+	width: 12px;
+  }
+  
+  .trade-list::-webkit-scrollbar-thumb {
+	background-color: #188dd6;
+  }
+  
+  .trade-list::-webkit-scrollbar-thumb:hover {
+	background-color: #1264a3;
+  }
+  
+  .trade-list::-webkit-scrollbar-track {
+	background-color: #1a1a1a;
+  }
+  
+  .trade-list::-webkit-scrollbar-track:hover {
+	background-color: #2a2a2a;
+  }
+  
+  .trade-list:hover {
+	overflow-y: auto;
+  }
+  
+  .trade-list:hover::-webkit-scrollbar-thumb {
+	background-color: #1264a3;
+  }
+  
+  .trade-list:hover::-webkit-scrollbar-track {
+	background-color: #2a2a2a;
+  }
+
+.trade-item {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    padding: 0.5vw;
+    border-bottom: 0.5px solid #2b355d;
+}
+
+.token-info, .tokenSupply {
+    flex-grow: 1;
+    overflow: hidden;
+    display: flex;
+    flex-wrap: nowrap;
+    
+    font-size: clamp(12.5px, 1vw, 14px) !important;    
+    font-weight: 200 !important;
+}
+
+.token-icon {
+    width: 24px;
+    height: 24px;
+    margin-right: 10px;
+    padding: 2px;
+    box-sizing: border-box;
+    background-repeat: no-repeat !important;
+    background-position: center center !important;
+    background-size: cover !important;
+}
+
+.token-icon img{
+    width: 24px;
+    height: 24px;
+}
+
+.token-name {
+    max-width: 120px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1;
+    font-weight:550 !important;
+}
+
+.token-symbol {
+    width: 45px;
+    text-transform: uppercase;
+    margin-right: 10px;
+}
+
+.token-address {
+    color: #999999;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 2;
+	  max-width: 370px;
+}
+
+.token-copy {
+	width:14px;
+    font-size: 14px;
+    white-space: nowrap;
+}
+
+.copy-icon {
+    font-size: 12px;
+    opacity: 0.5;
+    margin: 0 5px;
+    vertical-align: middle;
+}
+
+.tokenSupply {
+	max-width:100px;
+  min-width: 90px;
+  color: #61e2ff;
+  text-align: left;
+  margin-left: 10px;
+  text-transform: uppercase;
+}
+
+.token-pair {
+	flex-grow: 1;
+	max-width: 100px;
+  color: #FFF;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.t-i-heading {
+	color:#999999 !important;
+}
+
+.token-info > * {
+    margin-right: 10px;
+}
+
+@media only screen and (max-width: 950px) {
+	.trade-list {
+		max-width: 100%;
+		flex-basis: 100%;
+	}
+	.t-i-lead {
+		max-width: 100%;
+	}
+	.token-pair {
+		text-align: center;
+	}
+}
+@media only screen and (max-width: 450px) {
+	.token-name {
+		min-width: 70px;
+	}
+	
+	.trade-list {
+		max-width: 100%;
+		border: none;
+	}
+	.token-copy {
+		display: none;
+	 }
+
+	.token-pair {
+		text-align: center;
+	}
 }
