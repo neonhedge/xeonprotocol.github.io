@@ -49,7 +49,7 @@ main {
     font-weight: 200;
     color: white;
     letter-spacing: 1.5px;
-    font-size: 16pt;    
+    font-size: clamp(14pt, 2vw, 17pt) !important;
     text-align: center;
     transition: 0.5s;
 }
@@ -204,14 +204,14 @@ main {
     overflow: hidden;
     align-items:center;
     padding-inline: 1rem;
-    padding-bottom: 2rem;
+    padding-bottom: 3.5rem;
     box-sizing: border-box;
 }
   
 svg.cityscape {
     position: relative;
     max-height: 100%;
-    width: 450px;
+    width: 500px;
 }
   
 .HOVA-car {
@@ -251,7 +251,6 @@ svg.cityscape {
 .code-container {
     /* resize: both; */
     filter: drop-shadow(0 0 75px rgba(0, 255, 195, 0.25));
-    margin-block: 1.5rem;
     width: 100%;
     height: 100%;
     min-width: 400px;
@@ -418,7 +417,7 @@ svg.cityscape {
 }
 .backG::after {
   content: "" !important;
-  height: 50% !important;
+  height: 30% !important;
   width: 100% !important;
   display: block !important;
   background-image: linear-gradient(
@@ -430,11 +429,10 @@ svg.cityscape {
   background-position: bottom !important;
   background-repeat: repeat !important;
   background-size: 20px 20px !important;
-  left: -25px !important;
   position: absolute !important;
   pointer-events: none !important;
-  bottom: 0 !important;
-  transform: perspective(100px) rotateX(60deg) !important;
+  top: 50% !important;
+  transform: perspective(100px) rotateX(55deg) !important;
   z-index: 10 !important;
 }
 .terminalStep {
@@ -451,7 +449,10 @@ svg.cityscape {
   color: #9963ff99;
   text-shadow: 0 0 2px #001716, 0 0 5px #03edf933, 0 0 10px #ffff6633;
 }
-
+.testnetTokensCont {
+  padding-inline: 1rem;
+  box-sizing: border-box;
+}
 #testnetGrab {
     color: #61e2ff;
     text-shadow: 0 0 2px #001716, 0 0 5px #03edf933, 0 0 10px #ffff6633;
@@ -473,12 +474,39 @@ svg.cityscape {
     min-height: 100vh;
     width: 100%;
 }
-.testTokensList {
+.testTokensList, .tokenUseList {
     width: 100%;
     min-height: 20vh;
-    border: 0.5px solid #08e7fe;
     margin-bottom: 1rem;
     padding-bottom: 1rem;
+}
+.testTokensList {
+  border: 0.5px solid #08e7fe;
+}
+.tokenUseList {
+  border: 0.5px solid #00ff80;
+}
+.useCase {
+  position: relative;
+  display: flex;
+  padding: 1rem;
+  box-sizing: border-box;
+  min-height: 300px;
+}
+.useCaseDescr {
+  flex: 40%;
+  padding: 1rem;
+  box-sizing: border-box;
+  text-align: left;
+}
+.useCaseDescr h5 {
+  margin-bottom: 1rem;
+}
+.useCaseLinks {
+  flex: 60%;
+  border-radius: 20px;
+  border: 1px solid rgba(221, 51, 255, 0.15);
+  background-color: rgba(216, 149, 250, 0.2);
 }
 
 /*=========================================================================
@@ -523,14 +551,15 @@ svg.cityscape {
 .trade-list { 
 	flex-basis: 63%;
 	max-height: 500px;
-	overflow-y: auto;
 	max-width:70%;
-	border-right: 0.5px dotted #33856b;
-    list-style-type: none;
-    padding: 0;
+  min-height: 300px;
+	/* border-right: 0.5px dotted #33856b; */
+  list-style-type: none;
+  padding: 0;
 	padding-right:10px;
 	box-sizing: border-box;
-    margin: 0;
+  margin: 0;
+	overflow-y: auto;
 }
 
 .t-i-lead {
