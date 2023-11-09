@@ -976,7 +976,7 @@ button#transactSubmit{
 
 .token-info > * {
     margin-right: 10px;
-	font-size: clamp(14.5px, 1vw, 15px);
+	font-size: clamp(14.5px, 1vw, 16px);
 }
 
 @media only screen and (max-width: 950px) {
@@ -1301,14 +1301,13 @@ button#transactSubmit{
 .list-toggle button::before {
 	content: "";
 	position: absolute;
-	top: 50%;
-	left: -10px;
-	transform: translateY(-50%);
-	width: 7px;
-	height: 7px;
-	border-radius: 50%;
-	border:0.5px solid #fff;
-	background-color: #fff;
+	top: -20px;
+  	left: 50%;
+	width: 15px;
+	height: 5px;
+	border-radius: 1px;
+	border:0.5px solid #9667fd;
+	background-color: rgb(29, 22, 46);
 	transition: all 0.3s ease;
 }
 

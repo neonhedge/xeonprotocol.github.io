@@ -36,6 +36,7 @@
 
 	<!-- main page script -->
 	<script src="./js/testnet.js"></script>
+	
 	<!-- windows styling -->
 	<link rel="stylesheet" type="text/css" href="css/_menu.css">
 	
@@ -117,7 +118,7 @@
 					</div>
 				</div>
 				<div class="code-container">
-					<input class="sig" value="// Team Neon 💜">
+					<input class="sig" value=">_ Team Neon 💜">
 					<div class="glow-container">
 					  <div class="augs" data-augmented-ui></div>
 					</div>
@@ -126,79 +127,85 @@
 					  <input class="title" value="terminal">
 					  <div class="code highcontrast-dark">
 						<div class="terminalStep">
-							<h3 id="testnetGrab">Grab Testnet Tokens Here</h3>
+							<h3 id="testnetGrab">Claim Testnet Tokens</h3>
 							<div class="testTokensList">
 								<div class="list-section">
 									<li class="trade-item t-i-lead">
 										<div class="token-icon"></div>
 										<div class="token-info">
-											<div class="token-name t-i-heading">NAME</div>
+											<div class="token-name t-i-heading flex-grow">NAME</div>
 											<div class="token-symbol t-i-heading">SYMB</div>
 											<div class="token-address t-i-heading">ADDR</div>
 											<div class="token-copy"></div>
 											<div class="token-pair t-i-heading">Pair</div>
 										</div>
 										<div class="tokenSupply t-i-heading">Supply</div>
+										<div class="tokenSupply t-i-heading">cta</div>
 									</li>
 									<ul class="trade-list">
 										<li class="trade-item">
 											<div class="token-icon" style="background: url('./imgs/cosmicsettled.webp');"></div>
 											<div class="token-info">
-												<div class="token-name">Pepe</div>
+												<div class="token-name flex-grow">Pepe</div>
 												<div class="token-symbol">PEPE</div>
 												<div class="token-address">0x1234567890123456789012345678901234567890</div>
 												<div class="token-copy"><i class="far fa-copy"></i></div>
 												<div class="token-pair">WETH</div>
 											</div>
 											<div class="tokenSupply">100,200,000</div>
+											<button class="claimBtn">Claim</button>
 										</li>
 										
 										<li class="trade-item">
 											<div class="token-icon" style="background: url('./imgs/moon4.webp');"></div>
 											<div class="token-info">
-												<div class="token-name">Blockchain Bets</div>
+												<div class="token-name flex-grow">Blockchain Bets</div>
 												<div class="token-symbol">BBET</div>
 												<div class="token-address">0x1234567890123456789012345678901234567890</div>
 												<div class="token-copy"><i class="far fa-copy"></i></div>
 												<div class="token-pair">WETH</div>
 											</div>
 											<div class="tokenSupply">200,000,000</div>
+											<button class="claimBtn">Claim</button>
 										</li>
 										
 										<li class="trade-item">
 											<div class="token-icon" style="background: url('./imgs/loanprep.webp');"></div>
 											<div class="token-info">
-												<div class="token-name">Vela</div>
+												<div class="token-name flex-grow">Vela</div>
 												<div class="token-symbol">VEL</div>
 												<div class="token-address">0x1234567890123456789012345678901234567890</div>
 												<div class="token-copy"><i class="far fa-copy"></i></div>
 												<div class="token-pair">WETH</div>
 											</div>
 											<div class="tokenSupply">300,000,000</div>
+											<button class="claimBtn">Claim</button>
 										</li>
 				
 										<li class="trade-item">
 											<div class="token-icon" style="background: url('./imgs/cosmicsettled.webp');"></div>
 											<div class="token-info">
-												<div class="token-name">HarryPotterObamaSonicInu</div>
+												<div class="token-name flex-grow">HarryPotterObamaSonicInu</div>
 												<div class="token-symbol">BITCOIN</div>
 												<div class="token-address">0x1234567890123456789012345678901234567890</div>
 												<div class="token-copy"><i class="far fa-copy"></i></div>
 												<div class="token-pair">WETH</div>
 											</div>
 											<div class="tokenSupply">500,000,000</div>
+											<button class="claimBtn">Claim</button>
 										</li>
 											
 										<li class="trade-item">
 											<div class="token-icon" style="background: url('./imgs/moon4.webp');"></div>
 											<div class="token-info">
-												<div class="token-name">Banana Gun Bot</div>
+												<div class="token-name flex-grow">Banana Gun Bot</div>
 												<div class="token-symbol">BANANA</div>
 												<div class="token-address">0x1234567890123456789012345678901234567890</div>
 												<div class="token-copy"><i class="far fa-copy"></i></div>
 												<div class="token-pair">WETH</div>
 											</div>
 											<div class="tokenSupply">800,000,000</div>
+											<button class="claimBtn">Claim</button>
 										</li>
 									</ul>
 								</div>
@@ -211,32 +218,32 @@
 							<h3 id="testnetUse">Token Use Cases</h3>
 							<div class="tokenUseList">
 								<li class="useCase">
-									<div class="useCaseDescr">
+									<div class="useCaseDescr case1">
 										<h5>Deposit Tokens</h5>
 										<span>Go to the Cashier under the Wallet page to deposit tokens into the testnet Vault.</span>
 
 									</div>
 									<div class="useCaseLinks">
-
+										<img src="./imgs/screenshots/cashier-deposit.webp" alt="cashier deposit screen">
 									</div>
 								</li><li class="useCase">
-									<div class="useCaseDescr">
+									<div class="useCaseDescr case2">
 										<h5>Write Hedges</h5>
 										<span>Go to the Silkroad to Hedge the tokens you just deposited. Write a Call Option, Put Option or Equity Swaps using the tokens as underlying asset. Once listed on the Silkroad timeline, speculators can see the Hedge and Buy it OTC. The hedge will only be settled on expiry.</span>
 
 									</div>
 									<div class="useCaseLinks">
-
+										<img src="./imgs/screenshots/write-hedge.webp" alt="silkroad write hedges screen">
 									</div>
 								</li>
 								<li class="useCase">
-									<div class="useCaseDescr">
+									<div class="useCaseDescr case3">
 										<h5>Withdraw Tokens</h5>
 										<span>Go to the Cashier under the Wallet page to withdraw tokens from the testnet Vault.</span>
 
 									</div>
 									<div class="useCaseLinks">
-
+										<img src="./imgs/screenshots/cashier-withdraw.webp" alt="cashier withdraw screen">
 									</div>
 								</li>
 							</div>
