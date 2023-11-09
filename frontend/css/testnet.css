@@ -341,7 +341,7 @@ svg.cityscape {
   .glow-container .augs {
     --aug-border: initial;
     --aug-border-all: 2px;
-    --aug-border-bg: linear-gradient(to bottom left, rebeccapurple, orange);
+    --aug-border-bg: linear-gradient(to bottom left, rebeccapurple, #188dd6);
   }
   
   section.augs {
@@ -416,42 +416,42 @@ svg.cityscape {
     linear-gradient(to bottom, #200933 75%, #3d0b43);
 }
 .backG::after {
-  content: "" !important;
-  height: 30% !important;
-  width: 100% !important;
-  display: block !important;
-  background-image: linear-gradient(
-      90deg,
-      rgba(252, 25, 154, 0.1) 1px,
-      rgba(0, 0, 0, 0) 1px
-    ),
-  linear-gradient(0deg, rgba(252, 25, 154, 0.1) 1px, rgba(0, 0, 0, 0) 1px) !important;
-  background-position: bottom !important;
-  background-repeat: repeat !important;
-  background-size: 20px 20px !important;
-  position: absolute !important;
-  pointer-events: none !important;
-  top: 50% !important;
-  transform: perspective(100px) rotateX(55deg) !important;
-  z-index: 10 !important;
+    content: "" !important;
+    height: 30% !important;
+    width: 100% !important;
+    display: block !important;
+    background-image: linear-gradient(
+        90deg,
+        rgba(252, 25, 154, 0.1) 1px,
+        rgba(0, 0, 0, 0) 1px
+      ),
+    linear-gradient(0deg, rgba(252, 25, 154, 0.1) 1px, rgba(0, 0, 0, 0) 1px) !important;
+    background-position: bottom !important;
+    background-repeat: repeat !important;
+    background-size: 20px 20px !important;
+    position: absolute !important;
+    pointer-events: none !important;
+    top: 50% !important;
+    transform: perspective(100px) rotateX(55deg) !important;
+    z-index: 10 !important;
 }
 .terminalStep {
-  padding:1rem;
-  box-sizing: border-box;
+    padding:1rem;
+    box-sizing: border-box;
 }
 .terminalStep h3 {
-  margin:unset;
-  padding-block:1rem;
-  font-size: clamp(18px, 1vw, 21px) !important;
-  font-family: SFMono-Regular, 'Liberation Mono', Menlo, monospace;
-  font-weight: 100 !important;
-  
-  color: #9963ff99;
-  text-shadow: 0 0 2px #001716, 0 0 5px #03edf933, 0 0 10px #ffff6633;
+    margin:unset;
+    padding-block:1rem;
+    font-size: clamp(18px, 1vw, 21px) !important;
+    font-family: SFMono-Regular, 'Liberation Mono', Menlo, monospace;
+    font-weight: 100 !important;
+    
+    color: #9963ff99;
+    text-shadow: 0 0 2px #001716, 0 0 5px #03edf933, 0 0 10px #ffff6633;
 }
 .testnetTokensCont {
-  padding-inline: 1rem;
-  box-sizing: border-box;
+    padding-inline: 1rem;
+    box-sizing: border-box;
 }
 #testnetGrab {
     color: #61e2ff;

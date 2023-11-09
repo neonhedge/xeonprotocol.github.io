@@ -8,11 +8,11 @@
 	--neon-border-color: #08f;
 }
 body {
-	font-family: "Nunito Sans", sans-serif !important;
-	font-size: 1.1rem;
+	font-family: "Space Grotesk","Nunito Sans", sans-serif !important;
+	font-size: 1rem;
 	font-weight: 100;
 	line-height: 1.6;
-	color: rgba(255, 255, 255, 0.9);
+	color: rgba(255, 255, 255, 1);
 	background-size:contain !important;
 	background-position: center !important;
 	background-repeat: no-repeat !important;
@@ -847,7 +847,8 @@ button#transactSubmit{
 
 .t-i-lead {
 	max-width: 63%;
-	font-size: 1rem;
+	font-size: clamp(14px, 1vw, 14.5px) !important;
+	font-weight: bold !important;
 }
   
 .trade-list::-webkit-scrollbar {
@@ -888,6 +889,8 @@ button#transactSubmit{
     align-items: center;
     padding: 0.5vw;
     border-bottom: 0.5px solid #2b355d;
+	
+	font-family: Monospace,"Nunito Sans";
 }
 
 .token-info {
@@ -916,7 +919,6 @@ button#transactSubmit{
 .token-name {
     max-width: 120px;
     color: #FFF;
-    font-size: clamp(14px, 1vw, 14px);
     font-weight: bold;
     white-space: nowrap;
     overflow: hidden;
@@ -927,13 +929,11 @@ button#transactSubmit{
 .token-symbol {
     width: 45px;
     text-transform: uppercase;
-    font-size: 14px;
     color: #666;
     margin-right: 10px;
 }
 
 .token-address {
-    font-size: 14px;
     color: #999999;
     white-space: nowrap;
     overflow: hidden;
@@ -958,8 +958,7 @@ button#transactSubmit{
 .trade-amount {
 	max-width:100px;
     color: #33856b;
-    font-size: 14px;
-    font-weight: bold;
+    font-weight: 500;
     margin-left: 10px;
 }
 
@@ -967,7 +966,7 @@ button#transactSubmit{
 	flex-grow: 1;
 	max-width: 100px;
     color: #BEBEBE;
-    font-size: 14px;
+    font-size: 14.5px;
     text-align: right;
 }
 
@@ -977,6 +976,7 @@ button#transactSubmit{
 
 .token-info > * {
     margin-right: 10px;
+	font-size: clamp(14.5px, 1vw, 15px);
 }
 
 @media only screen and (max-width: 950px) {
@@ -1257,6 +1257,7 @@ button#transactSubmit{
 	overflow: hidden;
 	display: flex;
 	flex-wrap: nowrap;
+	font-weight: unset !important;
 }
 
 .hedge-list-header {
@@ -1331,6 +1332,7 @@ button#transactSubmit{
 	width:100% !important;
 	max-width: none;
 	flex-basis: auto;
+	font-family: monospace, "Nunito Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
 .hedge-item {
@@ -1341,10 +1343,10 @@ button#transactSubmit{
 	box-sizing: border-box;
 	border-bottom: 0.7px dotted #354681;
 	background-color: rgba(0,0,0,0.5);
-	font-size: clamp(13px, 1vw, 13.5px) !important;
+	font-size: clamp(14px, 1vw, 15px) !important;
 }
 .hlH {
-	font-size: clamp(13px, 1vw, 15px) !important;
+	font-size: clamp(14px, 1vw, 15px) !important;
 	color: #FFF !important;
 }
 .hedge-i-cat {
@@ -1460,8 +1462,9 @@ button#transactSubmit{
 	margin:2vw auto;
 	margin-top: 0;
 	padding: 20px;
-	font-family: "Nunito Sans", "monospace";
+	font-family: "Space Grotesk", "Nunito Sans";
 	font-size: clamp(14px, 1vw, 15px);
+	font-weight: 100;
 	cursor:help;
 	transition: background-color 0.3s;
 	color: #08e7fe;
@@ -1494,7 +1497,7 @@ button#transactSubmit{
 	gap:1vw;
 	position: relative;
 	top: 0;
-	font-family: "Nunito Sans", "Space Grotesk";
+	font-family: "Nunito Sans", "Monospace", "Space Grotesk";
   	font-weight: 100;
 }
 
@@ -1642,7 +1645,7 @@ button:disabled:hover {
 	color: #fff;
 	padding: 20px;
 	border-radius: 10px;
-	max-width: 300px;
+	max-width: 320px;
 	text-align: center;
 	margin-bottom: 20px;
   }
@@ -1702,13 +1705,13 @@ button:disabled:hover {
   .staking-widget-rewards h4 {
 	display: inline-block;
 	font-size: 1.1rem;
-	font-weight: 400;
+	font-weight: 100;
 	margin-bottom: 10px;
 	margin-inline-start: 10px;
   }
   
   .staking-widget p, .staking-widget-rewards p {
-	font-size: 0.9rem;
+	font-size: 1rem;
 	margin-bottom: 20px;
 	text-align: left;
   }
@@ -1816,7 +1819,7 @@ button:disabled:hover {
 	color: #fff;
 	padding: 20px;
 	border-radius: 10px;
-	width: 300px;
+	width: 320px;
 	text-align: center;
 	margin-bottom: 20px;
   }
