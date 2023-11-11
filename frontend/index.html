@@ -36,8 +36,6 @@
 	<script src="https://www.airtightinteractive.com/demos/js/badtvshader/lib/postprocessing/MaskPass.js"></script>
 	<script src="https://www.airtightinteractive.com/demos/js/badtvshader/js/StaticShader.js"></script>
 	<script src="https://www.airtightinteractive.com/demos/js/badtvshader/lib/shaders/RGBShiftShader.js"></script>
-	<script src="http://matt.prayam.com/private/planet3d/js/vendor/three/shaders/VerticalBlurShader.js"></script>
-	<script src="http://matt.prayam.com/private/planet3d/js/vendor/three/shaders/HorizontalBlurShader.js"></script>
 	<!-- css -->
 	<link rel="stylesheet" href="./css/fontawesome.min.css" />
 	<link rel="stylesheet" href="./css/aos.css" />
@@ -98,7 +96,7 @@
 				</div>
 				<!-- call to action text -->
 				<div class="introductionHold">
-					<h1 data-aos="zoom-out-down" id="neon_protocol" class="neon-blue"><span id="trav">Neon Pro<span id="glitch">to</span>col</span></h1>
+					<h1 data-aos="zoom-out-down" id="neon_protocol" class="neon-blue"><span id="trav">Xeon Pro<span id="glitch">to</span>col</span></h1>
 					<p data-aos="zoom-out-down" data-aos-delay="100"><!-- Building the First -->Pioneering a Universal ERC20 Hedging and Lending Ecosystem.</p>
 					<small>Advanced OTC – Equity Swaps, Call Options, Put Options, Crypto Lending.</small>
 					<!-- <small>A Real Yield and Revenue Sharing Protocol.</small> -->
@@ -155,7 +153,7 @@
 						<a>Read More ></a>
 					</div>				
 					<!-- <img src="./imgs/neonDoge4.webp" class="mx-w-25 pulse" alt="neon shiba image" data-aos="fade-down"> -->
-					<div class="toolImage hedgesToolImg mx-w-25 pulse"  data-aos="fade-down"><i class="fa fa-exchange-alt" aria-hidden="true"></i>	</div>
+					<div class="toolImage swapsToolImg mx-w-25 pulse"  data-aos="fade-down"><i class="fa fa-exchange-alt" aria-hidden="true"></i>	</div>
 				</div>
 
 				<div class="container grid usecaseCont midcaseCont">
@@ -188,7 +186,10 @@
 		</section>
 
 		<section id="hedgetoolsSection" class="aiAnalyHold">
-			<h1 id="hedgingTools" class="sectionH1 neon-blue"><a href="./ecosystem.html" target="_blank" title="Neon Hedge Ecosystem"><img src="./imgs/neon-hedge2.webp"></a><span>Neon Hedge Tools</span></h1>
+			<h1 id="hedgingTools" class="sectionH1 neon-blue">
+				<!-- <a href="./ecosystem.html" target="_blank" title="Neon Hedge Ecosystem"><img src="./imgs/neon-hedge2.webp"></a> -->
+				<span>Neon Hedge Tools</span>
+			</h1>
 			<div class="worksHold">
 				<div class="callOptions">
 					<h2><img src="./imgs/chart-callOption-64.png"><span>Call Options</span></h2>
@@ -372,44 +373,51 @@
 			</div>
 		</section>
 		<section class="aiAnalyHold">
-			<h1 id="uxDesign" class="sectionH1 neon-blue">Aesthetic UI</h1>
-			<div class="sectDescription">[june 2023]sample call option card. We're on a mission to create the most user friendly and aesthetically-soothing Dapp UX in web3, whilst delivery full functionality. Check out our timeline to get an idea of when to expect previews and the beta launch <i class="fa fa-eye" aria-hidden="true"></i></div>
-			<div class="hedgeCard statemark_ill_wish">				
-				<div class="hedgeGrid">
-					<div class="tokenLogoLeft" style="background-image:url('imgs/monkeytrain.png')"></div>
-					<div class="tokenName">
-						<div>TSUKA</div>
-						<div class="bagsize">1,660,500 BAG</div>
+			<div id="app">
+				<div id="hero">
+					<h1 id="uxDesign" class="sectionH1 neon-blue">Aesthetic UI</h1>
+					<div class="sectDescription">[june 2023]sample call option card. We're on a mission to create the most user friendly and aesthetically-soothing Dapp UX in web3, whilst delivery full functionality. Check out our timeline to get an idea of when to expect previews and the beta launch <i class="fa fa-eye" aria-hidden="true"></i></div>
+					<div class="hedgeCard statemark_ill_wish">				
+						<div class="hedgeGrid">
+							<div class="tokenLogoLeft" style="background-image:url('imgs/monkeytrain.png')"></div>
+							<div class="tokenName">
+								<div>TSUKA</div>
+								<div class="bagsize">1,660,500 BAG</div>
+							</div>
+						</div>
+						<div class="valueHold">
+							<div class="optionMarketValue flux highlightOption">10.2 ETH</div>
+							<div class="optionType flux highlightOption">CALL</div>
+						</div>
+						<div class="optionMark"><span>Strike:</span><span class="oMfigure">10.7 ETH</span></div>
+						<div class="optionMark"><span>h.Cost:</span><span class="oMfigure">0.5 ETH</span></div>
+						<div class="optionMark"><span>Expiry:</span><span class="oMfigure">4 Days</span></div>
+						<div class="optionSummary">
+							<div class="option_S_tab _activestate">
+								<span class="status-dot inprogress"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 16 16" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><circle cx="8" cy="8" r="8"></circle></svg><span style="white-space: nowrap;">Vacant</span></span>
+							</div>
+							<div class="option_S_tab actionButton buyButton">
+								Buy Option
+							</div>
+							<div class="option_S_tab _bookmarkjump">
+								<a class="view_option" href="#" target="_blank" alt="View" title="open full view">View</a>
+								<div class='option_S_tab _bookmarkjump'><img src='imgs/bookmark_.png' width='18px'/></div>
+							</div>
+						</div>
+					</div>
+					<div class="aiAnalysis" draggable="true">
+						<div class="aicontainer">
+							<div class="aishape">
+								<div class="aiHead"></div>
+								<div class="intro_cont"><div class="aiverdict">Options Card Preview</div></div>
+							</div>
+						</div>
 					</div>
 				</div>
-				<div class="valueHold">
-					<div class="optionMarketValue flux highlightOption">10.2 ETH</div>
-					<div class="optionType flux highlightOption">CALL</div>
-				</div>
-				<div class="optionMark"><span>Strike:</span><span class="oMfigure">10.7 ETH</span></div>
-				<div class="optionMark"><span>h.Cost:</span><span class="oMfigure">0.5 ETH</span></div>
-				<div class="optionMark"><span>Expiry:</span><span class="oMfigure">4 Days</span></div>
-				<div class="optionSummary">
-					<div class="option_S_tab _activestate">
-						<span class="status-dot inprogress"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 16 16" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><circle cx="8" cy="8" r="8"></circle></svg><span style="white-space: nowrap;">Vacant</span></span>
-					</div>
-					<div class="option_S_tab actionButton buyButton">
-						Buy Option
-					</div>
-					<div class="option_S_tab _bookmarkjump">
-						<a class="view_option" href="#" target="_blank" alt="View" title="open full view">View</a>
-						<div class='option_S_tab _bookmarkjump'><img src='imgs/bookmark_.png' width='18px'/></div>
-					</div>
-				</div>
-			</div>
-			<div class="aiAnalysis" draggable="true">
-				<div class="aicontainer">
-					<div class="aishape">
-						<div class="aiHead"></div>
-						  <div class="intro_cont"><div class="aiverdict">Options Card Preview</div></div>
-					</div>
-				</div>
-			</div>
+			  </div>
+			  
+			
+			
 		</section>
 
 		<section id="newsSection" class="opening hide-UI view-2D zoom-large data-close controls-close">
@@ -678,7 +686,7 @@
 	</div>
 
 
-	<!-- scrool to top button -->
+	<!-- scroll to top button -->
 	<button id="goTop" title="Scroll to top">
 		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 450"><path d="M168.5 164.2l148 146.8c4.7 4.7 4.7 12.3 0 17l-19.8 19.8c-4.7 4.7-12.3 4.7-17 0L160 229.3 40.3 347.8c-4.7 4.7-12.3 4.7-17 0L3.5 328c-4.7-4.7-4.7-12.3 0-17l148-146.8c4.7-4.7 12.3-4.7 17 0z"></path></svg>
 	</button>
@@ -687,7 +695,8 @@
 	<!-- js -->
 	<script src="./js/aos.js"></script>
 	<script src="./js/main.js" defer></script>
-	<script src="./js/galaxyblackhole.js"></script>
-	<script src="./js/neonhorizon.js"></script>
+	<script type="module" src="./js/UXpreview.js"></script>
+	<script src="./js/galaxyblackhole.js" defer></script>
+	<script src="./js/neonhorizon.js" defer></script>
 </body>
 </html>
