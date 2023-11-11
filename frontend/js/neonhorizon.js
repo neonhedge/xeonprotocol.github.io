@@ -12,9 +12,7 @@ var camera = new THREE.PerspectiveCamera(50, aspect, 0.1, 2000);
 camera.position.z = 1000;
 camera.position.y = 200;
 
-scene.add(
-  new THREE.AmbientLight(0x3399ff, 0.3)
-);
+scene.add(new THREE.AmbientLight(0x3399ff, 0.3));
 
 var light = new THREE.DirectionalLight(0x000000, 1);
 light.position.set(0, 2000, -2800);
@@ -61,9 +59,7 @@ var bgcamera = new THREE.PerspectiveCamera(50, aspect, 0.1, 20000);
 bgcamera.position.z = 20000;
 bgcamera.position.y = 0;
 
-background.add(
-  new THREE.AmbientLight(0x0878af, 2)
-);
+background.add(new THREE.AmbientLight(0x0878af, 2));
 
 var light2 = new THREE.DirectionalLight(0x356399, 10);
 light2.position.set(0, -10000, 30000);
@@ -91,24 +87,26 @@ spotLight3.target = planet.children[0];
 
 background.add(spotLight3);
 
-for (var i = 0; i < 50; i++) {
-  var particles = new THREE.Points(
-    new THREE.Geometry(),
-    new THREE.PointsMaterial({
-      size: Math.random() * 80
-    })
-  );
+// Limited number of particles
+for (var i = 0; i < 10; i++) {
+    var particles = new THREE.Points(
+        new THREE.Geometry(),
+        new THREE.PointsMaterial({
+          size: Math.random() * 40 + 10 // Adjust the size range
+        })
+    );
 
-  for (var j = 0; j < 50; j++) {
-    var vertex = new THREE.Vector3();
-    vertex.x = Math.random() * width * 100 - width * 100 / 2;
-    vertex.y = Math.random() * height * 100 - height * 100 / 2;
-    vertex.z = 0;
-    particles.geometry.vertices.push(vertex);
-    particles.material.color.setScalar(Math.random() * 0.4 + 0.2);
-  }
+    // Limited number of particles per system
+    for (var j = 0; j < 5; j++) {
+        var vertex = new THREE.Vector3();
+        vertex.x = Math.random() * width - width / 2;
+        vertex.y = Math.random() * height - height / 2;
+        vertex.z = 0;
+        particles.geometry.vertices.push(vertex);
+        particles.material.color.setScalar(Math.random() * 0.4 + 0.2);
+    }
 
-  background.add(particles);
+    background.add(particles);
 }
 
 renderer.setClearColor(0x000000, 1);
@@ -128,23 +126,23 @@ renderPass.renderToScreen = true;
 composer.addPass(renderPass);
 
 var badTVPass = new THREE.ShaderPass(THREE.BadTVShader);
-badTVPass.uniforms["distortion"].value = 1.;
-badTVPass.uniforms["distortion2"].value = 1.;
-badTVPass.uniforms["rollSpeed"].value = .1;
+badTVPass.uniforms["distortion"].value = 0.5;
+badTVPass.uniforms["distortion2"].value = 0.5;
+badTVPass.uniforms["rollSpeed"].value = 0.05;
 
 var staticPass = new THREE.ShaderPass(THREE.StaticShader);
-staticPass.uniforms["amount"].value = 0.08;
-staticPass.uniforms["size"].value = 2;
+staticPass.uniforms["amount"].value = 0.02;
+staticPass.uniforms["size"].value = 1;
 
 var filmPass = new THREE.ShaderPass(THREE.FilmShader);
-filmPass.uniforms["sCount"].value = 1600;
-filmPass.uniforms["sIntensity"].value = 0.45;
-filmPass.uniforms["nIntensity"].value = 0.2;
+filmPass.uniforms["sCount"].value = 800;
+filmPass.uniforms["sIntensity"].value = 0.2;
+filmPass.uniforms["nIntensity"].value = 0.1;
 filmPass.uniforms["grayscale"].value = 0;
 
 var rgbPass = new THREE.ShaderPass(THREE.RGBShiftShader);
-rgbPass.uniforms["angle"].value = 0 * Math.PI;
-rgbPass.uniforms["amount"].value = 0.001;
+rgbPass.uniforms["angle"].value = 0;
+rgbPass.uniforms["amount"].value = 0.0005;
 composer.addPass(rgbPass);
 
 composer.addPass(staticPass);
@@ -159,10 +157,8 @@ render();
 
 function render() {
   if (!scriptRunning) {
-    alert('render stopped')
     return; // Stop rendering if scriptRunning is false
   }
-alert('rendering')
   requestAnimationFrame(render);
   var delta = clock.getDelta();
 
@@ -170,7 +166,7 @@ alert('rendering')
   filmPass.uniforms['time'].value = delta;
   staticPass.uniforms['time'].value = delta;
 
-  terrain.position.z += 4;
+  terrain.position.z += 2; // 4 original (faster terrain speed)or any other smaller value
   planet.rotateY(-0.001)
 
   if (!(terrain.position.z % 100)) {
@@ -203,7 +199,6 @@ function handleIntersection(entries, observer) {
       if (scriptRunning) {
         // Stop rendering
         scriptRunning = false;
-        alert('welcome screen halted');
       }
     }
   });
@@ -222,7 +217,7 @@ observer.observe(container);
 /* ========================================================
     TOOLS BLOB ANIMATION HANDLED HERE
 ======================================================== */
-// Get the element you want to observe
+// Get the AI shape container
 var shapeToolsElement = document.querySelector('.aishapeTools');
 
 // Function to reset the animation rule
