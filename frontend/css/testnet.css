@@ -839,7 +839,7 @@ svg.cityscape {
   left: 2px;
 }
 .software-versions {
-  font-size: clamp(15px, 1vw, 17px);
+  font-size: clamp(16px, 1vw, 18px);
   padding: 1vw;
   position: relative;
   display: grid;
@@ -867,8 +867,41 @@ svg.cityscape {
 
 .version, .name, .portal-widget {
   text-align: center;
-  font-family: monospace, "Space Grotesk", sans-serif; /* Use the appropriate font for software versions */
+  font-size: clamp(16px, 2vw, 18px);
+  font-family: monospace, "Space Grotesk", sans-serif;
   font-weight: 400;
+  align-content: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+}
+.version h3 {
+  text-align: center;
+}
+.version span {
+  display: block !important;
+  color: #a8a8a8;
+  text-align: center !important;
+  margin-block: -1px;
+  padding-inline: 0.5rem;
+}
+.portal-widget {
+  background-color: rgba(0,0,0,0.2);
+  padding: 1vw;
+  box-sizing: border-box;
+  border-radius: 10px;
+}
+.portal-widget img {
+  margin:0 auto;
+  border-radius: 10px;
+  max-width: 450px;
+  cursor: pointer;
+}
+.portal-widget p {
+  padding-block: 1rem;
+  font-size: clamp(15px, 1vw, 15px) !important;
+  text-align: left !important;
+  color: #DDD !important;
 }
 
 /* Responsive design */
