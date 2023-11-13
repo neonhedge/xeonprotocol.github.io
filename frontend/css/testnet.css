@@ -889,7 +889,6 @@ svg.cityscape {
 
 .version, .name, .portal-widget {
   text-align: center;
-  font-size: clamp(16px, 2vw, 18px);
   font-family: monospace, "Space Grotesk", sans-serif;
   font-weight: 400;
   align-content: center;
@@ -908,7 +907,6 @@ svg.cityscape {
   padding-inline: 0.5rem;
 }
 .portal-widget {
-  background-color: rgba(0,0,0,0.2);
   padding: 1vw;
   box-sizing: border-box;
   border-radius: 10px;
