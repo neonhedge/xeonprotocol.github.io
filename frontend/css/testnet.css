@@ -3,8 +3,9 @@
 @import url('https://fonts.cdnfonts.com/css/sf-mono');
 
 body {
-    /* background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.8)), url('../imgs/banner-bg.webp') !important; */
-    background: radial-gradient(#18142d, #040115 80%) !important;
+    /* background: radial-gradient(#18142d, #040115 80%) !important; */    
+    background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.8)), url('../imgs/banner-bg.webp') !important;
+    background-attachment: fixed !important;
     scroll-behavior: smooth;
     font-family: "Space Grotesk", monospace, sans-serif !important;
 }
@@ -876,6 +877,7 @@ svg.cityscape {
 .header, .entry {
   display: grid;
   grid-template-columns: 1fr 1fr 2fr; /* First two columns take 50% each, third column takes the rest */
+  grid-template-columns: 0.8fr 1.2fr 1.5fr;
   padding: 10px;
   box-sizing: border-box;
   background: rgba(255, 255, 255, 0.5); /* Translucent background for entries */
@@ -917,10 +919,13 @@ svg.cityscape {
   max-width: 450px;
   cursor: pointer;
 }
-.portal-widget p {
+.name h3 {
+  margin-bottom: unset;
+}
+.name p {
   padding-block: 1rem;
-  font-size: clamp(15px, 1vw, 15px) !important;
-  text-align: left !important;
+  font-size: clamp(13px, 1vw, 14px) !important;
+  text-align: justify !important;
   color: #DDD !important;
 }
 
