@@ -66,6 +66,9 @@ light2.position.set(0, -10000, 30000);
 
 background.add(light2);
 
+/* DISABLED PLANET AND DEPENDENCIES
+- enable line 175 as well
+*/
 var planet = THREE.SceneUtils.createMultiMaterialObject(
   new THREE.IcosahedronGeometry(7000, 3), [
     new THREE.MeshLambertMaterial({
@@ -86,7 +89,8 @@ spotLight3.position.set(1000, 0, 10000);
 spotLight3.target = planet.children[0];
 
 background.add(spotLight3);
-
+/*
+DISABLED: particles negligible to the eye but heavy on GPU
 // Limited number of particles
 for (var i = 0; i < 10; i++) {
     var particles = new THREE.Points(
@@ -108,7 +112,7 @@ for (var i = 0; i < 10; i++) {
 
     background.add(particles);
 }
-
+*/
 renderer.setClearColor(0x000000, 1);
 renderer.autoClear = false;
 
@@ -170,7 +174,7 @@ function render() {
   staticPass.uniforms['time'].value = delta;
 
   terrain.position.z += 2.5; // 4 original (faster terrain speed)or any other smaller value
-  planet.rotateY(-0.001)
+  planet.rotateY(-0.001);
 
   if (!(terrain.position.z % 100)) {
     for (var i = 0; i < 41; i++)
