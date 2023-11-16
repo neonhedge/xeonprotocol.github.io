@@ -150,8 +150,11 @@ composer.addPass(filmPass);
 badTVPass.renderToScreen = true;
 composer.addPass(badTVPass);
 
+/*==============================================
+      LAZY LOADING THE WELCOME SCREEN HORIZON
+===============================================*/
+      
 var clock = new THREE.Clock();
-
 var scriptRunning = true;
 render();
 
@@ -166,7 +169,7 @@ function render() {
   filmPass.uniforms['time'].value = delta;
   staticPass.uniforms['time'].value = delta;
 
-  terrain.position.z += 2; // 4 original (faster terrain speed)or any other smaller value
+  terrain.position.z += 2.5; // 4 original (faster terrain speed)or any other smaller value
   planet.rotateY(-0.001)
 
   if (!(terrain.position.z % 100)) {
