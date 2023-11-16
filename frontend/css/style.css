@@ -133,8 +133,7 @@ iframe {
 /*	2. UTILITIES */
 /*--------------------------------------------------------*/
 .container {
-  max-width: 90rem;
-  max-width: 92rem;
+  max-width: 85rem;
   padding-inline: 1.2rem;
 }
 
@@ -1373,6 +1372,7 @@ span.ecosystemToolsIntro {
   margin-bottom: 1vw;
   place-content: space-between;
   display: flex;
+  font-size: 1.4rem;
 }
 .usecase h3 a {
   font-size: 0.9rem;
@@ -1400,7 +1400,7 @@ span.ecosystemToolsIntro {
   box-shadow: 0 0 5px #38127c, 0 0 3px #38127c, 0 0 5px #38127c, 0 0 100px #38127c, 0 0 1px #38127c, 1px 1px 1px #38127c !important; 
 }
 .toolImage {
-  font-size: clamp(90px, 10vw, 150px);
+  font-size: clamp(90px, 10vw, 120px);
   border-radius: 50%;
   color: #040115;
   text-shadow: 0 0 2px var(--neon-border-color), 0 0 3px var(--neon-border-color), 0 0 10px var(--neon-border-color), 0 0 10px var(--neon-border-color), 0 0 3px var(--neon-border-color), 2px 2px 0.5px var(--neon-border-color);
@@ -1493,7 +1493,7 @@ span.ecosystemToolsIntro {
   margin-bottom: 0.5vw;
 }
 .preview{
-  font-size: clamp(15px, 2vw, 16px);
+  font-size: clamp(13.5px, 1vw, 14px);
   text-align: justify;
 }
 /* Animate neon flicker */
@@ -2071,13 +2071,8 @@ span.ecosystemToolsIntro {
   padding: 0;
   font-weight: 400;
   font-family:monospace, sans-serif, "Helvetica Neue", Helvetica, Arial !important;
-  font-size: clamp(14px, 1vw, 17px);
-  line-height: 21px;
+  font-size: clamp(14px, 1vw, 15.5px);
   color:#FFF;
-}
-.Container_container__WAGEk h2{
-  font-weight: 400;
-  line-height: 21px;
 }
 .Roadmap_roadmapGrid__cKmwx {
     display: grid;
@@ -2119,26 +2114,18 @@ span.ecosystemToolsIntro {
 .Roadmap_roadmapItem__LU10a h3 {
   line-height: 50px;
   margin-bottom: 15px;
-  text-align: right;
-  text-align: justify;
-  
 }
 .Roadmap_roadmapItem__LU10a p {
   line-height: 160%;
-  text-align: right;
-  text-align: justify;
   max-width: 364px;
 }
 .Roadmap_itemTwo__2bPYf h3, .Roadmap_itemTwo__2bPYf p {
-  text-align: left;
   text-align: justify;
 }
 .Roadmap_itemFour__4VmPh h3, .Roadmap_itemFour__4VmPh p {
-  text-align: left;
   text-align: justify;
 }
 .Roadmap_itemFive__3Pcy2F h3, .Roadmap_itemFive__3Pcy2F p{
-  text-align: left;
   text-align: justify;
 }
 /* BORDER GLOW TIMELINE */
