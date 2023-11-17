@@ -1682,7 +1682,7 @@ span.ecosystemToolsIntro {
   grid-template-columns: repeat(3, 3fr);
   place-content: stretch;
   column-gap: 1vw;
-  background-color: rgba(29, 129, 216, 0.15);
+  background-color: rgba(29, 129, 216, 0.1);
   border-radius: 0.5vw;
   padding: 0.5vw;
   padding-top: 1rem;
