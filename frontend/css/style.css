@@ -267,6 +267,7 @@ iframe {
   .introductionHold {
     text-align: left;
     padding-inline: 3vw;
+    caret-color: transparent;
   }
   .introductionHold p {
     text-align: left;
@@ -376,7 +377,8 @@ iframe {
   border-radius: 2rem;
 }
 .introductionHold {
-  margin:0 !important;
+  margin: 5rem auto !important;
+  margin-bottom: 0;
   /* - shade the whole container not just the card 
   background: radial-gradient(rgba(4, 1, 21, 0.7) 20%, rgba(4, 1, 21, 0.95) 80%) !important; */
   background: radial-gradient(rgba(4, 1, 21, 0.95) 40%, rgba(4, 1, 21, 0.7) 80%) !important;/* shades inwards - blurry bg effect */  
@@ -392,6 +394,7 @@ iframe {
   font-weight: 100;
   line-height: 1.4;
   border-radius: 1.5vw;
+  caret-color: transparent;
 }
 .introductionHold small{
   box-sizing: content-box;
@@ -971,9 +974,6 @@ section.er404 {
   #slider .container h1 {
     font-size: 2.2rem;
     margin-bottom: 1.2rem;
-   /* changed with old NEON BG
-   margin-top:-2vw;
-   */
     display: block;
     text-align: left;
   }
@@ -988,9 +988,9 @@ section.er404 {
     max-width: 30rem;
   }
 }
-@media (max-height: 44.5em) {
+@media (min-width: 44.5em) {
   #slider {
-    min-height: 50rem;
+    min-height: 55rem;
   }
 }
 
@@ -1049,14 +1049,15 @@ section.er404 {
 }
 
 #mission, #neon_protocol, #platform, #neon-howitworks, #hedgingTools, #uxDesign, #mediaH1, #timeline, #tokenomicsH1 {
-	font-size: clamp(26px, 3vw, 36px);  
-	font-family: 'Neon',monospace, sans-serif, "Helvetica Neue", Helvetica, "Liberation Sans"!important;
-	font-weight:500;
-  font-size: clamp(32px, 3vw, 42px);  
-  font-family: 'Raleway','Neon',monospace, sans-serif, "Helvetica Neue", Helvetica, "Liberation Sans" !important;
-  font-weight: 200;
- /* color:#08e7fe; */
- letter-spacing: 1px;
+    font-size: clamp(26px, 3vw, 36px);  
+    font-family: 'Neon',monospace, sans-serif, "Helvetica Neue", Helvetica, "Liberation Sans"!important;
+    font-weight:500;
+    font-size: clamp(32px, 3vw, 42px);  
+    font-family: 'Raleway','Neon',monospace, sans-serif, "Helvetica Neue", Helvetica, "Liberation Sans" !important;
+    font-weight: 200;
+  /* color:#08e7fe; */
+  letter-spacing: 1px;
+  caret-color: transparent;
 }
 
 #hedgingTools {
@@ -1358,6 +1359,12 @@ span.ecosystemToolsIntro {
   padding-inline: 30vw;
   box-sizing: border-box;
 }
+@media screen and (max-width: 600px) {
+  span.ecosystemToolsIntro {
+    padding-inline: 15vw;
+    font-size: 1rem;
+  }  
+}
 .usecase {
   animation: flicker 1.5s infinite alternate;
   border: 0.5px solid #FFF;
@@ -1369,13 +1376,13 @@ span.ecosystemToolsIntro {
   min-width:250px;
 }
 .usecase h3 {
-  margin-bottom: 1vw;
+  margin-bottom: 1rem;
   place-content: space-between;
   display: flex;
-  font-size: 1.4rem;
+  font-size: clamp(1rem, 2vw, 1.4rem);
 }
 .usecase h3 a {
-  font-size: 0.9rem;
+  font-size: clamp(0.8rem, 1vw, 0.9rem);
   font-size: 400;
   align-self: center;
 }
@@ -1390,6 +1397,41 @@ span.ecosystemToolsIntro {
 .midcaseCont {
   grid-template-columns: 25% 75%;
 }
+@media screen and (max-width: 600px) {
+  .usecaseCont, .midcaseCont {
+    grid-template-columns: 100%;
+    row-gap: 1rem;
+  }
+  .usecaseCont .usecase {
+    order: 2;
+  }
+  .usecase h3 a {
+    text-align: center;
+  }
+  .usecase h3 {
+    margin-bottom: 1rem;
+  }
+  .aishapeTools {
+    width: auto;
+    margin-inline: 1rem;
+    border-radius: 20% 22% 18% 30% / 30% 18% 30% 12%;
+  }
+  
+  @keyframes morphing {
+    0% {
+      border-radius: 15% 30% 24% 24% / 20% 10% 16% 16%; 
+    } 
+      
+    50% {
+      border-radius: 20% 15% 2% 16% / 5% 20% 16% 2%; 
+    }
+  
+    100% {
+      border-radius: 15% 30% 24% 24% / 20% 10% 16% 16%;
+    } 
+  }
+  
+}
 .usecaseCont img {
   max-width: clamp(400px, 5vh, 600px);
   border: 0.5px solid var(--neon-border-color);
@@ -1400,7 +1442,7 @@ span.ecosystemToolsIntro {
   box-shadow: 0 0 5px #38127c, 0 0 3px #38127c, 0 0 5px #38127c, 0 0 100px #38127c, 0 0 1px #38127c, 1px 1px 1px #38127c !important; 
 }
 .toolImage {
-  font-size: clamp(90px, 10vw, 120px);
+  font-size: clamp(80px, 10vw, 120px);
   border-radius: 50%;
   color: #040115;
   text-shadow: 0 0 2px var(--neon-border-color), 0 0 3px var(--neon-border-color), 0 0 10px var(--neon-border-color), 0 0 10px var(--neon-border-color), 0 0 3px var(--neon-border-color), 2px 2px 0.5px var(--neon-border-color);
@@ -1428,6 +1470,12 @@ span.ecosystemToolsIntro {
 .hedgingToolsNotes {
   padding-inline: 5vw;
   text-align: justify;
+}
+.hedgingToolsNotes h3 {
+  font-size: 1.2rem;
+}
+.hedgingToolsNotes h5 {
+  font-weight: 500;
 }
 .sectDescription {
   padding-inline:3vw;
@@ -1545,27 +1593,31 @@ span.ecosystemToolsIntro {
   padding: 3vw;
   padding-top: unset;
 }
-@media (max-width: 680px){
-  .callOptions, .putOptions {
-    flex-basis: 100%;
-    max-width: 100%;
-  }
-}
 .callOptions h2, .putOptions h2 {
   display: inline-flex;
   line-height: 1.5;
   column-gap:1vw;
   align-content: center;
+  font-size: clamp(22px, 2vw, 30px);
+  font-weight: 500;
 }
-
 .callOptions h2 img, .putOptions h2 img {
   width:48px;
   align-self: center;
 }
+@media (max-width: 680px){
+  .callOptions, .putOptions {
+    flex-basis: 100%;
+    max-width: 100%;
+  }
+  .callOptions h2 img, .putOptions h2 img {
+    width:32px;
+  }
+}
 .callDescription {
   width: 100%;
   color: rgb(8, 231, 254);
-  font-size: clamp(15px, 1vw, 16px);
+  font-size: clamp(14px, 1vw, 15px);
   font-weight: 100;
   text-align: left;  
   padding: 10px;
@@ -1606,8 +1658,7 @@ span.ecosystemToolsIntro {
 }
 .heading_right {
   color: #FFF;
-  line-height: 30px;
-  font-size: clamp(14px, 1vw, 14px);
+  font-size: clamp(13px, 1vw, 14px) !important;
   padding-top: 5px;
   box-sizing: border-box;
 }
