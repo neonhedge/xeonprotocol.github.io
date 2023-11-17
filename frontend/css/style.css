@@ -1294,6 +1294,8 @@ section.er404 {
 .NFT {
   color: #a824d7;
   text-shadow: #650089 0px 0px 2px, #650089 0px 0px 3px, #650089 0px 0px 15px, #650089 0px 0px 15px, #650089 0px 0px 3px, #4a0663 3px 3px 0.5px;
+  color: #d056fc;
+  text-shadow: #9c0ad1 0px 0px 2px, #9c0ad1 0px 0px 3px, #9c0ad1 0px 0px 15px, #9c0ad1 0px 0px 15px, #9c0ad1 0px 0px 3px, #4a0663 3px 3px 0.5px;
 }
 .aishapeTools {
   width:100%;
@@ -2272,7 +2274,7 @@ span.ecosystemToolsIntro {
   text-align: justify;
   font-weight: 300;
   padding-bottom: 1rem;
-  max-width: 92rem;
+  max-width: 85rem;
   padding-inline: 1.2rem;
   display: block;
   margin-inline: auto;
@@ -2600,4 +2602,5 @@ footer .container li a:hover {
   to {
     transform: rotate(8100deg);
   }
-}/*# sourceMappingURL=style.css.map */
+}
+/*# sourceMappingURL=style.css.map */
