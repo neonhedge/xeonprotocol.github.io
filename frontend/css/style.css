@@ -1302,7 +1302,7 @@ section.er404 {
   height:100%;
   animation: morphing 16s ease-in-out infinite;
   border-radius: 50% 40% 35% 50% / 50% 35% 50% 40%;
-  background: linear-gradient(45deg, #370463 0%, #040115 100%);
+  background: linear-gradient(45deg, #0a0119 20%, #040115 490267%);
   border: 0.5px dashed #3399ff;
   padding-block: 3rem;
   box-sizing: border-box;
@@ -1312,20 +1312,17 @@ section.er404 {
 @keyframes morphing {
   0% {
       border-radius: 30% 60% 30% 30% / 15% 40% 20% 20%;
-      background: linear-gradient(45deg, #270855 0%, #040115 100%);
-      background: linear-gradient(45deg, #270855 20%, #040115 80%);
+      background: linear-gradient(45deg, #330267 30%, #0a0119 80%);
   } 
   
   50% {
       border-radius: 30% 10% 40% 20% / 50% 20% 30% 40%;
-      background: linear-gradient(45deg, #040115 0%, #270855 100%);
-      background: linear-gradient(45deg, #040115 35%, #270855 80%);
+      background: linear-gradient(45deg, #0a0119 35%, #330267 80%);
   }
   /* 0% and 100% should match for smooth fluid movement */
   100% {
     border-radius: 30% 60% 30% 30% / 15% 40% 20% 20%;
-    background: linear-gradient(180deg, #040115 4%, #2d0a61 100%);
-    background: linear-gradient(180deg, #040115 20%, #2d0a61 100%);
+    background: linear-gradient(180deg, #0a0119 30%, #4e0267 100%);
   } 
 }
 /* sophisticated blob but heavy on GPU
