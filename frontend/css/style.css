@@ -1298,11 +1298,11 @@ section.er404 {
   text-shadow: #9c0ad1 0px 0px 2px, #9c0ad1 0px 0px 3px, #9c0ad1 0px 0px 15px, #9c0ad1 0px 0px 15px, #9c0ad1 0px 0px 3px, #4a0663 3px 3px 0.5px;
 }
 .aishapeTools {
-  width:100%;
-  height:100%;
-  animation: morphing 16s ease-in-out infinite;
+  width: 100%;
+  height: 100%;
+  animation: morphing 16s linear infinite;
   border-radius: 50% 40% 35% 50% / 50% 35% 50% 40%;
-  background: linear-gradient(45deg, #0a0119 20%, #040115 490267%);
+  background: linear-gradient(45deg, #0a0119 20%, #040115 80%);
   border: 0.5px dashed #3399ff;
   padding-block: 3rem;
   box-sizing: border-box;
@@ -1311,20 +1311,25 @@ section.er404 {
 
 @keyframes morphing {
   0% {
-      border-radius: 30% 60% 30% 30% / 15% 40% 20% 20%;
-      background: linear-gradient(45deg, #330267 30%, #0a0119 80%);
-  } 
-  
-  50% {
-      border-radius: 30% 10% 40% 20% / 50% 20% 30% 40%;
-      background: linear-gradient(45deg, #0a0119 35%, #330267 80%);
+    border-radius: 30% 60% 30% 30% / 15% 40% 20% 20%;
+    background: linear-gradient(45deg, #330267 30%, #0a0119 80%);
+    transition: all 0.5s ease-in-out;
   }
-  /* 0% and 100% should match for smooth fluid movement */
+
+  50% {
+    border-radius: 30% 10% 40% 20% / 50% 20% 30% 40%;
+    background: linear-gradient(45deg, #0a0119 35%, #370170 80%);
+    transition: all 0.5s ease-in-out;
+  }
+
   100% {
     border-radius: 30% 60% 30% 30% / 15% 40% 20% 20%;
-    background: linear-gradient(180deg, #0a0119 30%, #4e0267 100%);
-  } 
+    background: linear-gradient(45deg, #330267 30%, #0a0119 80%);
+    background: linear-gradient(180deg, #0a0119, #0f0327, #0e042e, #160738, #1c073f, #1d0641, #230448, #26014c, #310160, #2f025a, #2c0253, #1e0238);
+    transition: all 0.5s ease-in-out;
+  }
 }
+
 /* sophisticated blob but heavy on GPU
 
 @keyframes morphing {
@@ -1365,14 +1370,19 @@ span.ecosystemToolsIntro {
   }  
 }
 .usecase {
+  /*
   animation: flicker 1.5s infinite alternate;
-  border: 0.5px solid #FFF;
   border: 1px solid #36ebff;
   box-shadow: 0 0 5px #fff, 0 0 3px var(--neon-border-color), 0 0 5px var(--neon-border-color), 0 0 20px var(--neon-border-color), 0 0 1px var(--neon-border-color), 2px 2px 2px #186eca !important;
+  
+  */
+  border: 0.5px dashed #36ebff;
   border-radius: 2vw;
   padding: 1.2vw 2.5vw;
   box-sizing: border-box;
-  min-width:250px;
+  min-width: 250px;
+  background: rgba(255,255,255,0.02);
+  background: rgba(0,0,0,0.2);
 }
 .usecase h3 {
   margin-bottom: 1rem;
