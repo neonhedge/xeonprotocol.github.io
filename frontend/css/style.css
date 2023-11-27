@@ -101,7 +101,7 @@ iframe {
   background: radial-gradient(#18022f, #040118 80%) !important;
   color: #08e7fe;/* darker */
   text-shadow: 0 0 2px #188dd6, 0 0 3px #188dd6, 0 0 15px #188dd6, 0 0 15px #188dd6, 0 0 3px #188dd6, 3px 3px 0.5px #0e567c !important;
-	font-family: 'Neon',monospace, sans-serif, "Helvetica Neue", Helvetica, "Liberation Sans"!important;
+	font-family: 'Raleway',monospace, sans-serif, "Helvetica Neue", Helvetica, "Liberation Sans"!important;
 }
 
 .sr-only {
@@ -1050,10 +1050,9 @@ section.er404 {
 
 #mission, #neon_protocol, #platform, #neon-howitworks, #hedgingTools, #uxDesign, #mediaH1, #timeline, #tokenomicsH1 {
     font-size: clamp(26px, 3vw, 36px);  
-    font-family: 'Neon',monospace, sans-serif, "Helvetica Neue", Helvetica, "Liberation Sans"!important;
     font-weight:500;
     font-size: clamp(32px, 3vw, 42px);  
-    font-family: 'Raleway','Neon',monospace, sans-serif, "Helvetica Neue", Helvetica, "Liberation Sans" !important;
+    font-family: 'Raleway',monospace, sans-serif, "Helvetica Neue", Helvetica, "Liberation Sans" !important;
     font-weight: 200;
   /* color:#08e7fe; */
   letter-spacing: 1px;
@@ -1370,25 +1369,21 @@ span.ecosystemToolsIntro {
   }  
 }
 .usecase {
-  /*
-  animation: flicker 1.5s infinite alternate;
-  border: 1px solid #36ebff;
-  box-shadow: 0 0 5px #fff, 0 0 3px var(--neon-border-color), 0 0 5px var(--neon-border-color), 0 0 20px var(--neon-border-color), 0 0 1px var(--neon-border-color), 2px 2px 2px #186eca !important;
-  
-  */
-  border: 0.5px dashed #36ebff;
+  border: 0.5px solid #08e7fe;
   border-radius: 2vw;
   padding: 1.2vw 2.5vw;
   box-sizing: border-box;
   min-width: 250px;
-  background: rgba(255,255,255,0.02);
   background: rgba(0,0,0,0.2);
+}
+.usecase a {
+  font-size: 14px;
 }
 .usecase h3 {
   margin-bottom: 1rem;
   place-content: space-between;
   display: flex;
-  font-size: clamp(1rem, 2vw, 1.4rem);
+  font-size: clamp(1rem, 2vw, 1.3rem);
 }
 .usecase h3 a {
   font-size: clamp(0.8rem, 1vw, 0.9rem);
@@ -1451,7 +1446,7 @@ span.ecosystemToolsIntro {
   box-shadow: 0 0 5px #38127c, 0 0 3px #38127c, 0 0 5px #38127c, 0 0 100px #38127c, 0 0 1px #38127c, 1px 1px 1px #38127c !important; 
 }
 .toolImage {
-  font-size: clamp(80px, 10vw, 120px);
+  font-size: clamp(80px, 6vw, 110px);
   border-radius: 50%;
   color: #040115;
   text-shadow: 0 0 2px var(--neon-border-color), 0 0 3px var(--neon-border-color), 0 0 10px var(--neon-border-color), 0 0 10px var(--neon-border-color), 0 0 3px var(--neon-border-color), 2px 2px 0.5px var(--neon-border-color);
@@ -1607,7 +1602,7 @@ span.ecosystemToolsIntro {
   line-height: 1.5;
   column-gap:1vw;
   align-content: center;
-  font-size: clamp(22px, 2vw, 30px);
+  font-size: clamp(18px, 2vw, 22px);
   font-weight: 500;
 }
 .callOptions h2 img, .putOptions h2 img {
@@ -1682,7 +1677,7 @@ span.ecosystemToolsIntro {
   grid-template-columns: repeat(3, 3fr);
   place-content: stretch;
   column-gap: 1vw;
-  background-color: rgba(29, 129, 216, 0.1);
+  background-color: rgba(29, 129, 216, 0.13);
   border-radius: 0.5vw;
   padding: 0.5vw;
   padding-top: 1rem;
@@ -2362,7 +2357,7 @@ footer .container {
   }
 }
 footer .container img {
-  width: 8rem;
+  width: 6rem;
 }
 footer .container i {
   font-size: 2rem;
@@ -2392,13 +2387,12 @@ footer .container li a:hover {
   position: relative;
 }
 .badgeLeft a.footermaskot{
-  position: absolute;
   position: relative;
-  left: 0;
-  right: 0;
+  padding-bottom: 1rem;
+  box-sizing: border-box;
+  display: block;
 }
 .badgeLeft p {
-  font-weight: 600;
   margin-top: -1rem;
 }
 /*--------------------------------------------------------*/
