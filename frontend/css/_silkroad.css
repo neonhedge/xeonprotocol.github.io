@@ -45,13 +45,18 @@ body{
 	margin-top:-70px;
 }
 
+section.page-title {
+	padding: 8rem 4rem 4rem;
+	box-sizing: border-box;
+}
+
 .rewardsInformer {
 	position: absolute;
 	left: 0;
 	right: 0;
 	margin-left: 20px;
 	margin-right: 20px;
-	top:-70px;
+	top:-80px;
 	z-index: 10;
 
 	padding: 5px 20px;

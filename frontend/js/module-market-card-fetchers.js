@@ -447,17 +447,18 @@ async function fetchOptionCard(optionId){
 								<div class="tl_bagsize">`+amount+` `+symbol+`</div>
 							</div>
 						</div>
+						
 						<div class="valueHold">
 							<div class="assetsValue">
 								<div class="valueTitle"></div>
-								<div class="assetsMarketValue flux highlightOption">`+marketvalue+` `+pairSymbol+`</div>
+								<div class="assetsMarketValue highlightOption">`+marketvalue+` `+pairSymbol+`</div>
 							</div>
 							<div class="assetsType">
 								<div class="typeTitle">HEDGE</div>
-								<div class="assetsTypeValue flux highlightOption">`+hedgeType+`</div>
+								<div class="assetsTypeValue highlightOption">`+hedgeType+`</div>
 							</div>
 						</div>
-
+						
 						<div class="strategyContainer">
 							<div class="optionMarksHold">
 								<div class="optionMark"><span>Strike:</span><span class="oMfigure">`+strikevalue+` `+pairSymbol+`</span></div>
