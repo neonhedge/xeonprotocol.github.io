@@ -579,19 +579,23 @@ section#activities {
 }
 
 #addressData, #walletData {
-	display: none;
-	width: 100%;
-	font-family: "Space Grotesk","Nunito Sans", sans-serif !important;
-	text-align: right;
-	font-size: 12px;
-	font-weight: 100;
-	color: #999999;
-	transition: 0.3s !important;
+    display: none;
+    width: 100%;
+    font-family: "Space Grotesk", "Nunito Sans", sans-serif !important;
+    text-align: right;
+    font-size: 12px;
+    font-weight: 100;
+    color: #999999;
+    transition: height 0.3s ease-in-out, opacity 0.3s ease-in-out !important;
+    overflow: hidden;
 }
+
 .expandedData {
-	display: block !important;	
-	transition: 0.3s !important;
+    display: block !important;
+    height: auto !important;
+    transition: height 0.3s ease-in-out, opacity 0.3s ease-in-out !important;
 }
+
 .or {
 	display: none;
 	margin: 4px auto 0;
@@ -609,7 +613,7 @@ section#activities {
 	background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%2329705a' d='M17.016 0h-10.031c-1.078 0-1.969 0.938-1.969 2.016v19.969c0 1.078 0.891 2.016 1.969 2.016h10.031c1.078 0 1.969-0.938 1.969-2.016v-19.969c0-1.078-0.891-2.016-1.969-2.016zM12 1.969c0.563 0 0.984 0.422 0.984 0.984s-0.422 1.031-0.984 1.031-0.984-0.469-0.984-1.031 0.422-0.984 0.984-0.984zM16.5 19.5h-9v-1.5h9v1.5zM16.5 16.5h-9v-1.5h9v1.5zM16.5 13.5h-9v-1.5h9v1.5zM8.016 10.5v-1.5h7.969v1.5h-7.969zM16.5 7.5h-9v-1.5h9v1.5z'%3E%3C/path%3E%3C/svg%3E");
 	background-repeat: no-repeat;
 	background-position: right 2% center;
-	background-size: auto 60%;
+	background-size: auto 50%;
 }
 
 .transact-amount::-webkit-outer-spin-button,
@@ -653,6 +657,7 @@ section#activities {
 	-webkit-transition: .4s;
 	box-shadow: 0 0 .02rem #fff, inset 0 0 .02rem #fff, 0 0 0.2rem var(--neon-border-color), inset 0 0 0.2rem var(--neon-border-color), 0 0 0.1rem var(--neon-border-color), inset 0 0 0.1rem var(--neon-border-color);
 	transition: .4s;
+	background-image: unset;
 }
 
 button#transactSubmit{
