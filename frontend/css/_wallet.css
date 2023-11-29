@@ -578,6 +578,20 @@ section#activities {
 	text-shadow: none;
 }
 
+#addressData, #walletData {
+	display: none;
+	width: 100%;
+	font-family: "Space Grotesk","Nunito Sans", sans-serif !important;
+	text-align: right;
+	font-size: 12.5px;
+	font-weight: 100;
+	color: #AAA;
+	transition: 0.3s ease;
+}
+.expandedData {
+	display: block !important;	
+	transition: 0.3s ease;
+}
 .or {
 	display: none;
 	margin: 4px auto 0;
