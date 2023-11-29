@@ -4,7 +4,7 @@
 import { CONSTANTS, isValidEthereumAddress, getUserBalancesForToken } from './constants.js';
 import { initWeb3 } from './dapp-web3-utils.js';
 import { unlockedWallet, reqConnect} from './web3-walletstatus-module.js';
-import { prepareDeposit, refreshBalances } from './module-wallet-writer.js';
+import { prepareDeposit, prepareWithdrawal, refreshBalances } from './module-wallet-writer.js';
 import { fetchSection_Networth, fetchSection_BalanceList, fetchSection_HedgePanel, fetchSection_RewardsPanel, fetchSection_StakingPanel } from './module-wallet-section-fetchers.js';
 import { loadHedgesModule } from './module-wallet-section-hedgesList.js';
 
@@ -14,7 +14,11 @@ import { loadHedgesModule } from './module-wallet-section-hedgesList.js';
 initWeb3();
 
 $(document).ready(async function () {
+
+    // Ready event listeners on wallet
+    setupToggleElements();
     
+    // Proceed to fetch data for sections
     const accounts = await web3.eth.requestAccounts();
 	const userAddress = accounts[0];
 
@@ -75,17 +79,24 @@ export function setupToggleElements() {
         balancesContainer.style.maxHeight = expandHeight;
     };
     document.getElementById('expandClose').addEventListener('click', toggleBalancesContainer);
+
     // Cashier Modes
     document.addEventListener('change', function (e) {
         if (e.target && e.target.matches('input[type="checkbox"]')) {
             const modeSpan = document.querySelector('.mode');
             if (e.target.checked) {
-            modeSpan.textContent = 'Withdraw Mode Active';
+                modeSpan.textContent = 'Withdraw Mode Active';
+                // change styling on form
+                document.getElementById('erc20-address').style.color = '#F6F';//withdraw effect
+                document.getElementById('erc20-amount').style.color = '#F6F';
             } else {
-            modeSpan.textContent = 'Deposit Mode Active';
+                modeSpan.textContent = 'Deposit Mode Active';            
+                document.getElementById('erc20-address').style.color = ''; //reset styles
+                document.getElementById('erc20-amount').style.color = '';
             }
         }
-    });  
+    }); 
+
     // Hedges Panel - toggle active class on button click
     const buttons = document.querySelectorAll('.list-toggle button');
     buttons.forEach((button) => {
@@ -93,9 +104,10 @@ export function setupToggleElements() {
             buttons.forEach((button) => button.classList.remove('active'));
             button.classList.add('active');
         });
-    });  
+    }); 
+
     // Cashier Token Address paste listener
-    document.getElementById('walletAddressInput').addEventListener('paste', async (event) => {
+    document.getElementById('erc20-address').addEventListener('paste', async (event) => {
         const pastedAddress = event.clipboardData.getData('text/plain');
         const accounts = await web3.eth.requestAccounts();
         const userAddress = accounts[0];
@@ -105,6 +117,8 @@ export function setupToggleElements() {
             return;
         }
         try {
+            // show address indicators
+
             mybalances = await getUserBalancesForToken(pastedAddress, userAddress);
             // format output
             const formatValue = (value) => {
@@ -138,59 +152,112 @@ export function setupToggleElements() {
     Write Function Code starts here
 ======================================================================== */
 
-export function setupDepositModule() {
+document.querySelector('#cashierForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+  
+    const form = event.target;
+    const formData = new FormData(form);
+  
+    // Prepare the form values
+    const values = {};
+    for (let [key, value] of formData.entries()) {
+      values[key] = value;
+    }
+    // Add the checkbox value to object
+    values['checkbox'] = form.querySelector('input[type="checkbox"]').checked;
+  
+    console.log(values);
+  
+    // pass to setup deposits fr prep
+    setupCashingModule(values);
+});
 
-    const depositButton = document.getElementById('depositButton');
-    const tokenAddressInput = document.getElementById('tokenAddress');
-    const tokenAmountInput = document.getElementById('tokenAmount');
+export function setupCashingModule(formValues) {
 
-    depositButton.addEventListener('click', async () => {
-        const tokenAddress = tokenAddressInput.value.trim();
-        const tokenAmount = tokenAmountInput.value.trim();
+    console.log(formValues);
 
-        try {
-            if (!tokenAddress || !isValidEthereumAddress(tokenAddress)) {
-                //throw new Error('Please enter a valid ERC20 token address.');
-                swal(
-                    {
-                        title: 'Invalid ERC20 address pasted...',
-                        text: 'Please enter a valid ERC20 token address.',
-                        type: 'info',
-                        html: false,
-                        dangerMode: false,
-                        confirmButtonText: 'Okay',
-                        showConfirmButton: true,
-                        showCancelButton: false,
-                        animation: 'slide-from-top',
-                    }, function () {
-                        console.log('incorrect token address...');
-                    }); 
-            }
+    //const tokenAddress = formValues['erc20-address'] ? formValues['erc20-address'] : formValues['erc20-select'];
+    const tokenAddress = formValues['erc20-address'];
+    const tokenAmount = formValues['transact-amount'];
+    const checkboxValue = formValues['checkbox'];
 
-            if (isNaN(tokenAmount) || parseFloat(tokenAmount) <= 0) {
-                //throw new Error('Please enter a valid token amount greater than 0.');
-                swal(
-                    {
-                        title: 'Invalid token amount pasted...',
-                        text: 'Please enter an amount greater than 0.',
-                        type: 'info',
-                        html: false,
-                        dangerMode: false,
-                        confirmButtonText: 'Okay',
-                        showConfirmButton: true,
-                        showCancelButton: false,
-                        animation: 'slide-from-top',
-                    }, function () {
-                        console.log('invalid token amount...');
-                    }); 
-            }
+    if (tokenAmount <= 0 || tokenAddress == '' || !isValidEthereumAddress(tokenAddress)) {
+        swal(
+            {
+                title: 'Invalid Tx Inputs...',
+                text: 'Please enter a valid token address and amount.',
+                type: 'info',
+                html: false,
+                dangerMode: false,
+                confirmButtonText: 'Okay',
+                showConfirmButton: true,
+                showCancelButton: false,
+                animation: 'slide-from-top',
+            }, function () {
+                console.log('invalid token address...');
+            });
+        return;
+    }
 
-            // If validation passes, proceed to approval first
-            prepareDeposit(tokenAddress, tokenAmount);
-
-        } catch (error) {
-            console.error('Error:', error.message);
+    try {
+        if (!tokenAddress || !isValidEthereumAddress(tokenAddress)) {
+            //throw new Error('Please enter a valid ERC20 token address.');
+            swal(
+                {
+                    title: 'Invalid ERC20 address pasted...',
+                    text: 'Please enter a valid ERC20 token address.',
+                    type: 'info',
+                    html: false,
+                    dangerMode: false,
+                    confirmButtonText: 'Okay',
+                    showConfirmButton: true,
+                    showCancelButton: false,
+                    animation: 'slide-from-top',
+                }, function () {
+                    console.log('incorrect token address...');
+                }); 
+            return;
         }
-    });
+
+        if (isNaN(tokenAmount) || parseFloat(tokenAmount) <= 0) {
+            //throw new Error('Please enter a valid token amount greater than 0.');
+            swal(
+                {
+                    title: 'Invalid token amount pasted...',
+                    text: 'Please enter an amount greater than 0.',
+                    type: 'info',
+                    html: false,
+                    dangerMode: false,
+                    confirmButtonText: 'Okay',
+                    showConfirmButton: true,
+                    showCancelButton: false,
+                    animation: 'slide-from-top',
+                }, function () {
+                    console.log('invalid token amount...');
+                });
+            return;
+        }
+
+        // If validation passes, proceed to approval first
+        if (!checkboxValue) {
+            prepareDeposit(tokenAddress, tokenAmount);
+        } else {
+            prepareWithdrawal(tokenAddress, tokenAmount);
+        }
+
+    } catch (error) {
+        console.error('Error:', error.message);
+    }
 
 }
+
+// address indicator spans
+$(document).ready(function () {
+    $('#erc20-address').on('focus', function () {
+        $('#addressData').addClass('expandedData');
+    });
+    $('.transact-amount').on('focus', function () {
+        $('#walletData').addClass('expandedData');
+    });
+});
+
