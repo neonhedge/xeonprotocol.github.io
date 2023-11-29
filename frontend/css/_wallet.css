@@ -588,6 +588,7 @@ section#activities {
     color: #999999;
     transition: height 0.3s ease-in-out, opacity 0.3s ease-in-out !important;
     overflow: hidden;
+	padding-inline: 0.6vw;
 }
 
 .expandedData {
