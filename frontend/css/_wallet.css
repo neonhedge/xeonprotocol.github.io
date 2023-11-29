@@ -583,14 +583,14 @@ section#activities {
 	width: 100%;
 	font-family: "Space Grotesk","Nunito Sans", sans-serif !important;
 	text-align: right;
-	font-size: 12.5px;
+	font-size: 12px;
 	font-weight: 100;
-	color: #AAA;
-	transition: 0.3s ease;
+	color: #999999;
+	transition: 0.3s !important;
 }
 .expandedData {
 	display: block !important;	
-	transition: 0.3s ease;
+	transition: 0.3s !important;
 }
 .or {
 	display: none;
