@@ -130,8 +130,10 @@ section#activities {
 	width: 120px;
 	padding-right: 5px;
 	font-size: clamp(13px, 1vw, 15px);
+	/*
 	font-family: 'modeseven','bitwise', sans-serif, "Helvetica Neue", Helvetica, Arial !important;
-	text-transform: uppercase;	
+	text-transform: uppercase;
+	*/
 	border-bottom: 0.5px dotted #3399ff;
   }
   
@@ -1327,6 +1329,7 @@ button#transactSubmit{
 	height: 5px;
 	border-radius: 1px;
 	border:0.5px solid #9667fd;
+	border: 0.5px solid #2b355d;
 	background-color: rgb(29, 22, 46);
 	transition: all 0.3s ease;
 }
@@ -1634,6 +1637,9 @@ hr.line {
 	color: #FFF;
 	border: 1px solid #3399ff;
 	background: linear-gradient(220deg, #39f, #110f47 80%);
+
+	padding: 1.2rem 2rem;
+	box-sizing: border-box;
 }
 button:disabled {
 	opacity: 0.6; 
@@ -1717,7 +1723,6 @@ button:disabled:hover {
   }
 
   .staking-widget h4 {
-	font-size: 1.2rem;
 	margin-bottom: 10px;
   }
   
@@ -1881,7 +1886,6 @@ button:disabled:hover {
   .farming-widget h4,
   .farming-widget-rewards h4 {
 	display: inline-block;
-	font-size: 1.2rem;
 	margin-bottom: 10px;
   }
   
@@ -1990,10 +1994,10 @@ button:disabled:hover {
   ===================*/
   .sectionLabel {
     position: relative;
-    display: inline-flex;
+    display: center;
     flex-basis: 90%;
     font-size: clamp(15px, 2vw, 18px);
-    text-align: left;
+    text-align: center;
     padding: 5px 9.5%;
     box-sizing: border-box;
     margin-block: 3%;  
