@@ -202,7 +202,7 @@ main {
 }
 .testnetIntro {
     position: relative;
-    top:-6.5rem;
+    /* top:-6.5rem; */
 }
 .aboutTestnetHold {
     display: flex;
@@ -819,6 +819,9 @@ svg.cityscape {
   --glow-margin: 20px;
   padding-block: 10rem 0;
 }
+.t-v-v {
+  padding-block: unset;
+}
 .testnet-versions-hold {
   margin-top: 20px;
   padding-block: unset;
@@ -848,6 +851,13 @@ svg.cityscape {
   transition: z-index 0.3s;
 }
 
+.glass-t-v-v {
+  z-index: -1;
+}
+.glass-t-v-v::before, .glass-t-v-v::after {
+  z-index: 0;
+}
+
 .glass-border:hover::before,
 .glass-border:hover::after {
   z-index: -1; /* Change z-index on hover */
@@ -873,6 +883,9 @@ svg.cityscape {
   background-color: rgba(149, 243, 250, 0.2);
   background-color: #002644;
   border-radius: 20px;
+}
+.glass-t-v-v .software-versions {
+  z-index: 1;
 }
 
 .header, .entry {
