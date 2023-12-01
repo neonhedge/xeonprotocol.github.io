@@ -193,13 +193,13 @@ main {
 .testnetWindow {
     z-index: 1;
     position: relative;
-    padding: 1vw;
     border-radius: 20px;
+    margin-top: 2rem;
+
+    padding: 1vw;
     border: 1px solid rgba(51, 153, 255, 0.15);
     background-color: rgba(29, 129, 216, 0.15);
     background-color: rgba(149, 243, 250, 0.2); /* hazy bg */
-    
-    margin-top: 2rem;
 }
 .testnetIntro {
     position: relative;
@@ -208,11 +208,10 @@ main {
 .aboutTestnetHold {
     position: relative;
     display: flex;
-    overflow: hidden;
+    /* overflow: hidden; */
     align-items:center;
     padding-bottom: 3.5rem;
     box-sizing: border-box;
-
     font-size: clamp(16px, 1vw, 18px);
     border-radius: 20px;
 }
@@ -314,7 +313,6 @@ main {
 
 .header, .entry {
   display: grid;
-  grid-template-columns: 1fr 1fr 2fr; /* First two columns take 50% each, third column takes the rest */
   grid-template-columns: 0.8fr 1.2fr 1.5fr;
   padding: 10px;
   box-sizing: border-box;
