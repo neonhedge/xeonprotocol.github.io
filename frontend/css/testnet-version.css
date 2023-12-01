@@ -57,7 +57,6 @@ main {
 }
 #testnetWelcome span {
     display: block;
-    text-align: justify;
     font-size: clamp(13px, 1vw, 14px);
 }
 #testnetWelcome canvas {
@@ -140,6 +139,9 @@ main {
 .aboutHead {
     padding:1.5rem;
     box-sizing: border-box;
+}
+.aboutHead span {
+    text-align: left;
 }
 .aboutHead h3 {
     color: #08e7fe;
@@ -319,6 +321,21 @@ main {
   background: rgba(255, 255, 255, 0.5); /* Translucent background for entries */
   background-color: rgba(149, 243, 250, 0.2);
 }
+
+.version-name {
+    display: grid;
+    place-content: center;
+}
+.version-detail {        
+  text-align: center;
+  font-family: monospace, "Space Grotesk", sans-serif;
+  font-weight: 400;
+  align-content: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+}
+
 .header {
   color :#08e7fe;
   font-weight: bold;
