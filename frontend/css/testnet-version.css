@@ -198,6 +198,7 @@ main {
     border: 1px solid rgba(51, 153, 255, 0.15);
     background-color: rgba(29, 129, 216, 0.15);
     background-color: rgba(149, 243, 250, 0.2); /* hazy bg */
+    
     margin-top: 2rem;
 }
 .testnetIntro {
@@ -246,7 +247,7 @@ main {
   padding-block: unset;
 }
 .testnet-versions-hold {
-  margin-top: 20px;
+  margin: 2rem auto;
   padding-block: unset;
 }
 .glass-border {
@@ -379,31 +380,8 @@ main {
 /* =================================================================
         TESTNET VERSION THEMES
 ================================================================= */
-.Tv-container {
-  position: relative;
-  width: 1200px;
-  height: 700px;
-  margin: 0 auto;
-  padding-top: 192px;
-}
 
 /* Skeleton Dance */
-.skeleton1 {
-	position: relative;
-	margin: 3vw auto;
-	padding: 3vw;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-}
-.skeleton1::before {
-	top: 2px;
-  	left: 2px;
-}
-.skeleton1::after {
-	bottom: 2px;
-	right: 2px;
-}
 
 svg {
 	fill: white;
