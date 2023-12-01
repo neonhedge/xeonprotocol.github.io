@@ -116,25 +116,12 @@ main {
 }
 
 /*================================================================
-        CITY SCAPE STYLES
+        HEAD STYLES
 =================================================================*/
-.aboutTestnet, .aboutCityScape {
-    position: relative;
-    display: inline-flex;
-    flex-direction: column;
-}
+
 .aboutTestnet {
-    flex: 50;
     background-color: #002644;
-    /*
-    border: 0.5px solid #3399ff;
-    border:0.5px solid #08e7fe;
-    */
     border-radius: 20px;
-}
-.aboutCityScape {
-    flex: 45;
-    align-items:center;
 }
 .aboutHead {
     padding:1.5rem;
@@ -149,32 +136,6 @@ main {
     font-size: 1.4rem;
     font-weight: 400;
 }
-/*
-.aboutHead h3::after {
-    content: '';
-    position: absolute;
-    width: 50%;
-    height: 40px; 
-    top: 20%; 
-    transform: translateY(-50%);
-    animation: wigglePath 10s linear infinite;
-    background-repeat: no-repeat;
-    background-size: 12px 12px;
-    background-image: radial-gradient(circle, purple 20%, transparent 50%);
-}
-  
-  @keyframes wigglePath {
-    0% {
-        background-position: top left;
-    }
-    40% {
-        background-position: bottom center;
-    }
-    100% {
-        background-position: top right;
-    }
-  }
-*/
 
 .jumpToTestnet .buttonsHold {
     padding-inline:unset;
@@ -240,15 +201,11 @@ main {
 /* ====================================================================== 
      TESTNET VERSIONS SECTION
 =======================================================================*/
-.testnet-version-container {
-  --glow-margin: 20px;
-  padding-block: 10rem 0;
-}
 .t-v-v {
   padding-block: unset;
 }
 .testnet-versions-hold {
-  margin: 2rem auto;
+  margin: 2rem;
   padding-block: unset;
 }
 .glass-border {
