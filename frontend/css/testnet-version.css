@@ -313,7 +313,7 @@ main {
 
 .header, .entry {
   display: grid;
-  grid-template-columns: 0.8fr 1.2fr 1.5fr;
+  grid-template-columns: 0.5fr 2fr 0.5fr;
   padding: 10px;
   box-sizing: border-box;
   background: rgba(255, 255, 255, 0.5); /* Translucent background for entries */
@@ -331,7 +331,6 @@ main {
   font-weight: 400;
   align-content: center;
   display: flex;
-  flex-direction: column;
   justify-content: space-evenly;
 }
 .version h3 {
