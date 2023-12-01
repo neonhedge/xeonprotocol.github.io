@@ -322,6 +322,10 @@ main {
   background-color: rgba(149, 243, 250, 0.2);
 }
 
+.entry .version {
+    place-items: center;
+}
+
 .version-name {
     display: grid;
     place-content: center;
