@@ -195,11 +195,23 @@ main {
 }
 .testnet-widget {
     display: grid;
-  position: relative;
-    padding: 1vw;
+    position: relative;
+    padding: 2vw;
     box-sizing: border-box;
     border-radius: 10px;
   }
+span#typewrite {
+    width:1.5vw;
+    padding-left:1vw;
+    display: inline;
+	animation: caret 1.2s steps(10) infinite;
+    border:unset;
+	border-bottom: .20em dotted; /* The typwriter cursor */
+}
+@keyframes caret {
+	from, to { border-color: #08e7fe }/* change from black to orange blinking */
+	100% { border-color: #000 }
+}
 /* ====================================================================== 
      TESTNET VERSIONS SECTION
 =======================================================================*/
@@ -288,6 +300,7 @@ main {
 .version-name {
     display: grid;
     place-content: center;
+    caret-color:  transparent;
 }
 .version-detail {        
   text-align: center;
@@ -305,13 +318,14 @@ main {
   background: none;
 }
 
-.version, .name, .portal-widget {
+.version, .name{
   text-align: center;
   font-family: monospace, "Space Grotesk", sans-serif;
   font-weight: 400;
   align-content: center;
   display: flex;
   justify-content: space-evenly;
+  justify-content: left;
 }
 .version h3 {
   text-align: center;
@@ -322,17 +336,6 @@ main {
   text-align: center !important;
   margin-block: -1px;
   padding-inline: 0.5rem;
-}
-.portal-widget {
-  padding: 1vw;
-  box-sizing: border-box;
-  border-radius: 10px;
-}
-.portal-widget img {
-  margin:0 auto;
-  border-radius: 10px;
-  max-width: 450px;
-  cursor: pointer;
 }
 .name h3 {
   margin-bottom: unset;
