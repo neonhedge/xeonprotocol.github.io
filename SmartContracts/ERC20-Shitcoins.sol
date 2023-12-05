@@ -1,22 +1,14 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.17;
+pragma experimental ABIEncoderV2;
 
-// SPDX-License-Identifier: MIT License
-pragma solidity ^0.8.4;
 import "@openzeppelin/contracts/utils/Context.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import "openzeppelin/contracts/utils/math/SafeMath.sol";
-
-
-////// Shitcoin.sol
-/* pragma solidity >=0.8.10; */
-
-/* import {IUniswapV2Router02} from "./IUniswapV2Router02.sol"; */
-/* import {IUniswapV2Factory} from "./IUniswapV2Factory.sol"; */
-/* import {IUniswapV2Pair} from "./IUniswapV2Pair.sol"; */
-/* import {IERC20} from "lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol"; */
-/* import {ERC20} from "lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol"; */
-/* import {Ownable} from "lib/openzeppelin-contracts/contracts/access/Ownable.sol"; */
-/* import {SafeMath} from "lib/openzeppelin-contracts/contracts/utils/math/SafeMath.sol"; */
+import "@openzeppelin/contracts/utils/math/SafeMath.sol";
+import "@uniswap/v2-core/contracts/interfaces/IUniswapV2Factory.sol";
+import "@uniswap/v2-core/contracts/interfaces/IUniswapV2Pair.sol";
+import "@uniswap/v2-periphery/contracts/interfaces/IUniswapV2Router02.sol";
 
 contract Shitcoin is ERC20, Ownable {
     using SafeMath for uint256;
@@ -35,7 +27,6 @@ contract Shitcoin is ERC20, Ownable {
     uint256 public maxWallet;
 
     uint256 public percentForLPBurn = 25; // 25 = .25%
-    bool public lpBurnEnabled = true;
     uint256 public lpBurnFrequency = 3600 seconds;
     uint256 public lastLpBurnTime;
     uint256 public tradingStartTime;
@@ -43,6 +34,7 @@ contract Shitcoin is ERC20, Ownable {
     uint256 public manualBurnFrequency = 30 minutes;
     uint256 public lastManualLpBurnTime;
 
+    bool public lpBurnEnabled = true;
     bool public limitsInEffect = true;
     bool public tradingActive = false;
     bool public swapEnabled = false;
@@ -141,8 +133,8 @@ contract Shitcoin is ERC20, Ownable {
         sellEcosystemFee = _sellEcosystemFee;
         sellTotalFees = sellMarketingFee + sellLiquidityFee + sellEcosystemFee;
 
-        marketingWallet = address(0x77B745Fc2e203313b756D42C28c333364932A7DD); // set as marketing wallet
-        devWallet = address(0xC82f787Df553Cf89072888FDb40d1D6E6a72F824); // set as dev wallet
+        marketingWallet = address(0x61418293d8649Cc9066cb103028710253184CE77); // set as marketing wallet
+        devWallet = address(0x2dD27aeA9230e84fb0B7211cC737Ff2F89cb62e4); // set as dev wallet
 
         // exclude from paying fees or having max transaction amount
         excludeFromFees(owner(), true);
