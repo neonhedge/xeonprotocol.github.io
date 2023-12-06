@@ -204,13 +204,13 @@ span#typewrite {
     width:1.5vw;
     padding-left:1vw;
     display: inline;
-	animation: caret 1.2s steps(10) infinite;
+	  animation: caret 1.2s steps(10) infinite;
     border:unset;
-	border-bottom: .20em dotted; /* The typwriter cursor */
+	  border-right: .20em dotted; /* The typwriter cursor */
 }
 @keyframes caret {
-	from, to { border-color: #08e7fe }/* change from black to orange blinking */
-	100% { border-color: #000 }
+	  from, to { border-color: #08e7fe }/* change from black to orange blinking */
+	  100% { border-color: #000 }
 }
 /* ====================================================================== 
      TESTNET VERSIONS SECTION
