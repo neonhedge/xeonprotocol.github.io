@@ -64,7 +64,7 @@ async function unlockedWallet() {
 
 			swal(
 				{
-					title: 'Switch to Sepolia Testnet...',
+					title: 'Switch to Goerli Testnet...',
 					text: 'Failed to initialize Chain and Wallet. \nClick retry button to try again.',
 					type: 'info',
 					html: false,
@@ -200,30 +200,30 @@ async function unlockedWallet() {
 			try {
 				await window.ethereum.request({
 					method: 'wallet_switchEthereumChain',
-					params: [{ chainId: '0xaa36a7' }] // Use the Sepolia testnet chain ID
+					params: [{ chainId: '0x5' }] // Use the Goerli testnet chain ID
 				});
 				// success in switch, reinitialize
-				console.log('Successfully switched to the Sepolia Testnet');
+				console.log('Successfully switched to the Goerli Testnet');
 				await initializeConnection();
 				return true;
 			} catch (error) {
 				//	error
-				console.log('Error switching to Sepolia Testnet:', error);
+				console.log('Error switching to Goerli Testnet:', error);
 				if (error.code === 4902) {
 					try {
 						await window.ethereum.request({
 							method: 'wallet_addEthereumChain',
 							params: [
 								{
-								chainId: '0xaa36a7', // using the Sepolia testnet chain ID
-								chainName: 'Sepolia Testnet',
+								chainId: '0x5', // using the Goerli testnet chain ID
+								chainName: 'Goerli Testnet',
 								nativeCurrency: {
-									name: 'SEPOLIA',
+									name: 'Goerli',
 									symbol: 'ETH',
 									decimals: 18
 								},
 								blockExplorerUrls: [CONSTANTS.etherScan],
-								rpcUrls: ['https://rpc.sepolia.io'] // using the Sepolia testnet RPC URL
+								rpcUrls: ['https://goerli.infura.io/v3/'] // using the Goerli testnet RPC URL
 								}
 							]
 						});
@@ -236,7 +236,7 @@ async function unlockedWallet() {
 						swal({
 							title: 'Failed to Switch Network',
 							type: 'info',
-							text: 'Try again to switch to the Sepolia Testnet.',
+							text: 'Try again to switch to the Goerli Testnet.',
 							showConfirmButton: true,
 							showCancelButton: true,
 							confirmButtonText: 'Switch',
@@ -255,7 +255,7 @@ async function unlockedWallet() {
 					swal({
 						title: 'Request Denied by User..',
 						type: 'info',
-						text: 'Please switch to the Sepolia Testnet.',
+						text: 'Please switch to the Goerli Testnet.',
 						showConfirmButton: true,
 						showCancelButton: true,
 						confirmButtonText: 'Switch',
