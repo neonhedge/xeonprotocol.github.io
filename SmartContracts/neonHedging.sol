@@ -245,7 +245,7 @@ contract NEONHEDGE {
     event topupRequested(address indexed party, uint256 indexed hedgeId, uint256 topupAmount, bool consent);
     event zapRequested(uint indexed hedgeId, address indexed party);
 
-    constructor() public {
+    constructor() {
         IUniswapV2Router02 router = IUniswapV2Router02(UNISWAP_ROUTER_ADDRESS);
         wethAddress = router.WETH();
         usdtAddress = 0xe802376580c10fE23F027e1E19Ed9D54d4C9311e; // USDT address on Goerli
