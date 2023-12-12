@@ -1,7 +1,12 @@
 // SPDX-License-Identifier: GPL-3.0
-pragma solidity 0.8.4;
+pragma solidity ^0.8.4;
 
-// NEON Protocol - Universal ERC20 OTC Hedging and Lending. 
+// Xeon Protocol - Universal ERC20 OTC Hedging and Lending. 
+// Testnet Version 1.0
+// Deployed on Goerli Testnet 12/12/2024
+// Goerli Support for Uniswap V2 Router was the basis
+
+// ====================Description===========================
 // Protocol accepts an ERC20 address to function as below;
 // - Deposit, Withdraw any ERC20 tokens as collateral
 // - Get underlying value for tokens in WETH, USDT AND USDC as paired currencies
@@ -66,10 +71,11 @@ import "@uniswap/v2-periphery/contracts/interfaces/IUniswapV2Router02.sol";
 contract HEDGEFUND {
 
     using SafeMath for uint256;
+    bool private locked = false;
     bool private isExecuting;
 
     modifier nonReentrant() {
-        require(!isExecuting, "Only one instance of the function at a time");
+        require(!isExecuting, "Function is currently being executed");
         isExecuting = true;
         _;
         isExecuting = false;
@@ -219,12 +225,12 @@ contract HEDGEFUND {
     uint256 public usdcEquivWithdrawals;
     
     // core addresses
-    address private constant UNISWAP_FACTORY_ADDRESS = 0xc35DADB65012eC5796536bD9864eD8773aBc74C4;// consider array of exchange addresses to scale ERC20 tokens
-    address private constant UNISWAP_ROUTER_ADDRESS = 0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506;
+    address private constant UNISWAP_FACTORY_ADDRESS = 0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f;
+    address private constant UNISWAP_ROUTER_ADDRESS = 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D;
     address public wethAddress;
     address public usdtAddress;
     address public usdcAddress;
-    address public neonAddress;
+    address public XeonAddress;
     address public owner;
 
     // events
@@ -242,9 +248,9 @@ contract HEDGEFUND {
     constructor() public {
         IUniswapV2Router02 router = IUniswapV2Router02(UNISWAP_ROUTER_ADDRESS);
         wethAddress = router.WETH();
-        usdtAddress = 0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9; // USDT address on Arb
-        usdcAddress = 0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d; // USDC address on Arb
-        neonAddress = 0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d;
+        usdtAddress = 0xe802376580c10fE23F027e1E19Ed9D54d4C9311e; // USDT address on Goerli
+        usdcAddress = 0xde637d4C445cA2aae8F782FFAc8d2971b93A4998; // USDC address on Goerli
+        XeonAddress = 0xF97Fcb2015eCd8F8063fE5DbBA98b5d8E2D9a53A; // V 1.0 deployed 12/12/2023 16:28:48
         // Variables
         feeNumerator = 5;
         feeDenominator = 1000;
@@ -311,25 +317,46 @@ contract HEDGEFUND {
         emit onWithdraw(token, amount, msg.sender);
     }
 
-    // Write Hedge: covers both call options and equity swaps. put options to be enabled in Beta V2
+    // Create Hedge: covers both call options and equity swaps. put options to be enabled in Beta V2
     // premium or buying cost paid in paired token of the underlying asset in the deal
     // no premium for swaps. swap collateral must  be equal for both parties, settle function relies on this implementation here
     // put options will have a max loss check to only accept a strike price 50% away max
-    function writeHedge(uint tool, address token, uint256 amount, uint256 cost, uint256 deadline) public nonReentrant {
+    function createHedge(uint tool, address token, uint256 amount, uint256 cost, uint256 deadline) public nonReentrant {
+        require(!locked, "Function is locked");
+        locked = true;
         require(tool <= 2 && amount > 0 && cost > 0 && deadline > block.timestamp, "Invalid option parameters");
-        require(token != address(0) && token != UNISWAP_ROUTER_ADDRESS && token != UNISWAP_FACTORY_ADDRESS && token != address(this), "Invalid token address");
-
+        uint256 withdrawable = getWithdrawableBalance(token, msg.sender);
+        require(withdrawable > 0, "Insufficient free balance");
+        require(token != address(0), "Token address cannot be zero");
+        require(token != UNISWAP_ROUTER_ADDRESS, "Token address cannot be router address");
+        require(token != UNISWAP_FACTORY_ADDRESS, "Token address cannot be factory address");
+        require(token != address(this), "Token address cannot be contract address");
+        // Assign option values directly to the struct
         hedgingOption storage newOption = hedgeMap[optionID];
+        newOption.owner = msg.sender;
+        newOption.token = token;
+        newOption.status = 1;
+        newOption.amount = amount;
         (newOption.createValue, newOption.paired) = getUnderlyingValue(token, amount);
-        newOption = hedgingOption(
-            false, false, false, msg.sender, address(0), token, address(0), 1, amount, newOption.createValue, 0, 0, cost, block.timestamp, 0, deadline, 0, tool == 0 ? HedgeType.CALL : tool == 1 ? HedgeType.PUT : HedgeType.SWAP, new uint256[](0)
-        );
+        newOption.cost = cost;
+        newOption.dt_expiry = deadline;
+        newOption.dt_created = block.timestamp;
+        if (tool == 0) {
+            newOption.hedgeType = HedgeType.CALL;
+        } else if (tool == 1) {
+            newOption.hedgeType = HedgeType.PUT;
+        } else if (tool == 2) {
+            newOption.hedgeType = HedgeType.SWAP;
+        } else {
+            revert("Invalid tool option");
+        }
 
-        userBalance storage hto = userBalanceMap[token][msg.sender];
+        // Update user balances for token in hedge
+        userBalance storage hto = userBalanceMap[token][msg.sender]; 
         hto.lockedinuse += amount;
-
+        // Update arrays
         if (newOption.hedgeType == HedgeType.SWAP) {
-            require(cost >= newOption.createValue, "Swap collateral must be equal value");
+            require(cost >= newOption.createValue, " Swap collateral must be equal value");
             myswapsHistory[msg.sender].push(optionID);
             myswapsCreated[msg.sender].push(optionID);
             equityswapsCreated.push(optionID);
@@ -340,22 +367,34 @@ contract HEDGEFUND {
             optionsCreated.push(optionID);
             tokenSwaps[token].push(optionID);
         }
-
+        // Log protocol analytics
         optionID++;
         hedgesCreatedVolume[newOption.paired].add(newOption.createValue);
 
-        if (newOption.paired == wethAddress) wethEquivUserHedged[msg.sender] += newOption.createValue;
-        if (newOption.paired == usdtAddress) usdtEquivUserHedged[msg.sender] += newOption.createValue;
-        if (newOption.paired == usdcAddress) usdcEquivUserHedged[msg.sender] += newOption.createValue;
+        // Wallet hedge volume in main paited currency only
+        if(newOption.paired == wethAddress){wethEquivUserHedged[msg.sender] += newOption.createValue;}
+        if(newOption.paired == usdtAddress){usdtEquivUserHedged[msg.sender] += newOption.createValue;}
+        if(newOption.paired == usdcAddress){usdcEquivUserHedged[msg.sender] += newOption.createValue;}
 
+        // Emit
         emit hedgeCreated(token, optionID, newOption.createValue, newOption.hedgeType, msg.sender);
+        locked = false;
     }
-    
+
+    // DRAFT - FUNCTION TO ADD/REMOVE TOKENS TO BASKET; TOKEN & AMOUNT
+    // > mapping inside hedge struct, with tokenaddress & amount, 3 slots max allowed when adding
+    // > same mapping is checked & iterated on settlement whilst deducting from totalPayOff 
+    // > only same pair tokens can be in same basket, this brings settlement efficiency when iterating as above
+    // > consider limiting the basket feature to loans only where its relevant not with hedges
+    // DRAFT - FUNCTION TO EDIT HEDGE; COST, STRIKE, DURATION ONLY BEFORE ITS TAKEN
+
     // Hedges are bought in quote/paired currency of underlying token
     // For Call and Put Options cost is premium, lockedinuse here but paid out on settlement
     // For Equity Swaps cost is equal to underlying value as 100% collateral is required. There is no premium
     // Strike value is not set here, maturity calculations left to the settlement function
     function buyHedge(uint256 _optionId) public nonReentrant {
+        require(!locked, "Function is locked");
+        locked = true;
         hedgingOption storage hedge = hedgeMap[_optionId];
         userBalance storage stk = userBalanceMap[hedge.paired][msg.sender];
         require(getWithdrawableBalance(hedge.paired, msg.sender) >= hedge.cost, "Insufficient free pair currency balance");
@@ -411,6 +450,7 @@ contract HEDGEFUND {
 
         // Emit the hedgePurchased event
         emit hedgePurchased(hedge.token, _optionId, hedge.startValue, hedge.hedgeType, msg.sender);
+        locked = false;
     }
 
     // topup Request & Accept function
@@ -481,26 +521,26 @@ contract HEDGEFUND {
         emit zapRequested(_optionId, msg.sender);
     }
     
-    //Settlement 
-    //value is calculated using 'getOptionValue' function
-    //strike value is determined by writer, thus pegging a strike price inherently. Start value is set when hedge is taken
-    //premium is cost and paid in pair currency of underlying token
-    //for swaps the cost is 100% equal value to underlying start value, this acts as collateral rather than hedge premium
-    //the payoff (difference between start and strike value) is paid in underlying or pair currency
-    //losses are immediately debited from withdrawn. for winner, profits are credited to deposited balance direct
-    //restore initials for both parties, funds are moved from lockedinuse to deposit, reverse of creating or buying
-    //fees are collected in paired tokens; if option cost was paid to owner as winning, if swap cost used as PayOff
-    //fees are collected in underlying tokens; if option and swap PayOffs were done in underlying tokens
-    //hedge fees are collected into address(this) userBalanceMap and manually distributed as dividents to a staking contract
-    //miners are the ones who settle hedges. Stake tokens to be able to mine hedges.
-    //miners can pick hedges with tokens and amounts they wish to mine & avoid accumulating mining rewards in unwanted tokens
-    //miner dust can be deposited into mining dust liquidation pools that sell the tokens at a discount & miners claim their share
-    //each wallet has to log each token interacted with for the sake of pulling all balances credited to it on settlement. This allows for net worth valuations on wallets
-    //protocol revenues are stored under userBalanceMap[address(this)] storage
-    //on revenue; protocol revenue from taxing hedges ARE moved to staking contract as staking dividents
-    //on revenue; proceeds for mining a hedge, are NOT moved to staking contract
-    //on revenue; native equity swap liquidity proceeds ARE moved to staking contract
-    //on revenue; revenue for providing native-collateral ARE transferred to staking contract
+    // Settlement 
+    // value is calculated using 'getOptionValue' function
+    // strike value is determined by writer, thus pegging a strike price inherently. Start value is set when hedge is taken
+    // Premium is cost and paid in pair currency of underlying token
+    // for swaps the cost is 100% equal value to underlying start value, this acts as collateral rather than hedge premium
+    // the payoff (difference between start and strike value) is paid in underlying or pair currency
+    // losses are immediately debited from withdrawn. for winner, profits are credited to deposited balance direct
+    // restore initials for both parties, funds are moved from lockedinuse to deposit, reverse of creating or buying
+    // fees are collected in paired tokens; if option cost was paid to owner as winning, if swap cost used as PayOff
+    // fees are collected in underlying tokens; if option and swap PayOffs were done in underlying tokens
+    // hedge fees are collected into address(this) userBalanceMap and manually distributed as dividents to a staking contract
+    // miners are the ones who settle hedges. Stake tokens to be able to mine hedges.
+    // miners can pick hedges with tokens and amounts they wish to mine & avoid accumulating mining rewards in unwanted tokens
+    // miner dust can be deposited into mining dust liquidation pools that sell the tokens at a discount & miners claim their share
+    // each wallet has to log each token interacted with for the sake of pulling all balances credited to it on settlement. This allows for net worth valuations on wallets
+    // protocol revenues are stored under userBalanceMap[address(this)] storage
+    // on revenue; protocol revenue from taxing hedges ARE moved to staking contract as staking dividents
+    // on revenue; proceeds for mining a hedge, are NOT moved to staking contract
+    // on revenue; native equity swap liquidity proceeds ARE moved to staking contract
+    // on revenue; revenue for providing native-collateral ARE transferred to staking contract
     
     struct HedgeInfo {
         uint256 underlyingValue;
@@ -544,30 +584,36 @@ contract HEDGEFUND {
             if (hedgeInfo.marketOverStart) {
                 // Taker profit in pair currency = underlying - cost - strike value
                 hedgeInfo.payOff = hedgeInfo.underlyingValue.sub(option.startValue.add(option.cost));
-                // Convert to equivalent tokens lockedInUse by owner, factor fee
-                (hedgeInfo.priceNow, ) = getUnderlyingValue(option.token, 1);
-                hedgeInfo.tokensDue = hedgeInfo.payOff.div(hedgeInfo.priceNow);
-                // Check if collateral is enough, otherwise use max balance from Owner lockedInUse
-                if (otiU.lockedinuse < hedgeInfo.tokensDue){
-                    hedgeInfo.tokensDue = otiU.lockedinuse;
-                }
-                hedgeInfo.tokenFee = calculateFee(hedgeInfo.tokensDue);
-                // Move payoff - in underlying, take full gains from owner, credit taxed payoff to taker, pocket difference
-                ttiU.deposited += hedgeInfo.tokensDue.sub(hedgeInfo.tokenFee);
-                otiU.lockedinuse -= option.amount - hedgeInfo.tokensDue;
-                otiU.withdrawn += hedgeInfo.tokensDue;
-                // Restore winners collateral
-                oti.deposited += option.cost.sub(hedgeInfo.pairedFee);
-                tti.lockedinuse -= option.cost;
-                tti.withdrawn += option.cost;
-                // Move cost - credit taxes in both, as profit is in underlying and cost is in pair
-                ccUT.deposited += (hedgeInfo.tokenFee * 85).div(100);
-                ccBT.deposited += (hedgeInfo.pairedFee * 85).div(100);
-                // Miner fee - 15% of protocol fee for settling option. Mining call options always come with 2 token fees
-                minrT.deposited += (hedgeInfo.tokenFee * 15).div(100);
-                minrB.deposited += (hedgeInfo.pairedFee * 15).div(100);
-                // Log wallet PL: 0 - owner won, 1 taker won
-                logPL(hedgeInfo.payOff - calculateFee(hedgeInfo.payOff), option.paired, option.owner, option.taker, 1);
+                // DRAFT - for bundled underlying assets, take list of all tokens in basket & iterate payment code below until payOff is zero {
+                // ..
+                // ..
+                    // Convert to equivalent tokens lockedInUse by owner, factor fee
+                    (hedgeInfo.priceNow, ) = getUnderlyingValue(option.token, 1);
+                    hedgeInfo.tokensDue = hedgeInfo.payOff.div(hedgeInfo.priceNow);
+                    // Check if collateral is enough, otherwise use max balance from Owner lockedInUse
+                    if (otiU.lockedinuse < hedgeInfo.tokensDue){
+                        hedgeInfo.tokensDue = otiU.lockedinuse;
+                    }
+                    hedgeInfo.tokenFee = calculateFee(hedgeInfo.tokensDue);
+                    // Move payoff - in underlying, take full gains from owner, credit taxed payoff to taker, pocket difference
+                    ttiU.deposited += hedgeInfo.tokensDue.sub(hedgeInfo.tokenFee);
+                    otiU.lockedinuse -= option.amount - hedgeInfo.tokensDue;
+                    otiU.withdrawn += hedgeInfo.tokensDue;
+                    // Restore winners collateral
+                    oti.deposited += option.cost.sub(hedgeInfo.pairedFee);
+                    tti.lockedinuse -= option.cost;
+                    tti.withdrawn += option.cost;
+                    // Move cost - credit taxes in both, as profit is in underlying and cost is in pair
+                    ccUT.deposited += (hedgeInfo.tokenFee * 85).div(100);
+                    ccBT.deposited += (hedgeInfo.pairedFee * 85).div(100);
+                    // Miner fee - 15% of protocol fee for settling option. Mining call options always come with 2 token fees
+                    minrT.deposited += (hedgeInfo.tokenFee * 15).div(100);
+                    minrB.deposited += (hedgeInfo.pairedFee * 15).div(100);
+                    // Log wallet PL: 0 - owner won, 1 taker won
+                    logPL(hedgeInfo.payOff - calculateFee(hedgeInfo.payOff), option.paired, option.owner, option.taker, 1);
+                //  ..
+                //  ..
+                // }
             } else {
                 // Move payoff - owner wins cost & losses nothing. 
                 oti.deposited += option.cost.sub(hedgeInfo.pairedFee);
@@ -654,7 +700,7 @@ contract HEDGEFUND {
                 if (hedgeInfo.payOff > option.cost) {
                     hedgeInfo.payOff = option.cost;
                 }
-                // Move payoff - loss of paired currency cost to taker only, owner loses nothing
+                // Move payoff - loss of paired cost to taker only, owner loses nothing
                 // 1. credit equivalent payoff in paired to owner
                 // 2. credit takers full cost back & then debit loss using withrawn instantly
                 oti.deposited += hedgeInfo.payOff.sub(hedgeInfo.pairedFee);
@@ -684,7 +730,7 @@ contract HEDGEFUND {
             equityswapsSettled[option.token].push(_optionId);
         }
         
-        // Log fees and payoff value
+        // Log fee / payoff stats
         logAnalyticsFees(option.token, hedgeInfo.tokenFee, hedgeInfo.pairedFee, hedgeInfo.tokensDue, option.cost, hedgeInfo.underlyingValue);
         
         // Catch new erc20 address so that wallet can log all underlying token balances credited to it
@@ -697,9 +743,9 @@ contract HEDGEFUND {
         emit minedHedge(_optionId, msg.sender, option.token, option.paired, hedgeInfo.tokenFee, hedgeInfo.pairedFee);
     }
 
-    // Log Protocol Revenue 
+    // Log Protocol Revenue
     // - in frontend use userBalanceMap to get raw revenue balances and populate sums
-    function logAnalyticsFees(address token, uint256 tokenFee, uint256 pairedFee, uint256 tokenProfit, uint256 pairProfit, uint256 endValue) internal {
+    function logAnalyticsFees(address token, uint256 tokenFee, uint256 pairedFee, uint256 tokenProfit, uint256 pairProfit, uint256 endValue) private {
        (address paired, ) = getPairAddressZK(token);
         protocolProfitsTokens[token].add(tokenProfit);
         protocolPairProfits[paired].add(pairProfit);
