@@ -290,10 +290,6 @@ span#typewrite {
   background-color: rgba(149, 243, 250, 0.2);
 }
 
-.entry .version {
-    place-items: center;
-}
-
 .version-name {
     display: grid;
     place-content: center;
@@ -342,6 +338,7 @@ span#typewrite {
   text-align: center !important;
   margin-block: -1px;
   padding-inline: 0.5rem;
+  padding-block: 1rem;
 }
 .name h3 {
   margin-bottom: unset;
