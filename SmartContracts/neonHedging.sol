@@ -206,6 +206,11 @@ contract NEONHEDGE {
     
     
     // global counters
+    uint public depositedTokensLength;
+    uint public optionsCreatedLength;
+    uint public equityswapsCreatedLength;
+    uint public tokenOptionsLength;
+    uint public tokenSwapsLength;
     uint public optionID;
     uint public topupRequestIDuestID;
     uint public topupRequestID;
@@ -275,6 +280,7 @@ contract NEONHEDGE {
         // protocolBalanceMap ia analytics only. userBalanceMap stores withdrawable balance
         if(protocolBalanceMap[_token].deposited == 0){
           userERC20s[address(this)].push(_token);
+          depositedTokensLength ++;
         }
         protocolBalanceMap[_token].deposited += _amount;
         
@@ -360,12 +366,16 @@ contract NEONHEDGE {
             myswapsHistory[msg.sender].push(optionID);
             myswapsCreated[msg.sender].push(optionID);
             equityswapsCreated.push(optionID);
+            optionsCreatedLength ++;
             tokenOptions[token].push(optionID);
+            tokenOptionsLength ++;
         } else {
             myoptionsHistory[msg.sender].push(optionID);
             myoptionsCreated[msg.sender].push(optionID);
             optionsCreated.push(optionID);
+            optionsCreatedLength ++;
             tokenSwaps[token].push(optionID);
+            tokenSwapsLength ++;
         }
         // Log protocol analytics
         optionID++;
@@ -877,7 +887,7 @@ contract NEONHEDGE {
     }
 
     // Token balances breakdown for wallet
-    function getuserTokenBalances (address token, address user) public view returns (uint256, uint256, uint256, uint256, uint256, address) {
+    function getUserTokenBalances (address token, address user) public view returns (uint256, uint256, uint256, uint256, uint256, address) {
       userBalance memory uto = userBalanceMap[address(token)][address(user)];
       uint256 deposited = uto.deposited;
       uint256 withdrawn = uto.withdrawn;
@@ -921,9 +931,11 @@ contract NEONHEDGE {
     function getUserOptionsHistory(address user, uint startIndex, uint limit) public view returns (uint[] memory) {
         return getSubset(myoptionsHistory[user], startIndex, limit);
     }
+    
     function getUserSwapsHistory(address user, uint startIndex, uint limit) public view returns (uint[] memory) {
         return getSubset(myswapsHistory[user], startIndex, limit);
     }
+
     function getUserOptionsCreated(address user, uint startIndex, uint limit) public view returns (uint[] memory) {
         return getSubset(myoptionsCreated[user], startIndex, limit);
     }
@@ -1009,7 +1021,7 @@ contract NEONHEDGE {
         return result;
     }
 
-    // Gas efficiency optimized by fetching length backend
+    /* deprecated 14/12/2023 during testing
     function getDepositedTokensLength() external view returns (uint) {
         return userERC20s[address(this)].length;
     }
@@ -1029,6 +1041,7 @@ contract NEONHEDGE {
     function getSwapsForTokenCount(address _token) public view returns (uint256) {
         return tokenSwaps[_token].length;
     }
+    */
 
     // Receive function to accept Ether
     receive() external payable {

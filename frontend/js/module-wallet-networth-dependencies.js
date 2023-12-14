@@ -1,13 +1,4 @@
-// Function to fetch the number of deposited tokens by a wallet
-async function getWalletTokenList(walletAddress) {
-	try {
-	  const transactedTokensArray = await hedgingInstance.methods.getUserTokenList(walletAddress).call();
-	  return transactedTokensArray;
-	} catch (error) {
-	  console.error("Error fetching deposited tokens:", error);
-	  return [];
-	}
-}
+import { getCurrentEthUsdcPriceFromUniswapV2, getWalletTokenList, getTokenUSDValue, getTokenETHValue } from "./constants.js";
   
 // Function to calculate the total USD value of all token balances
 async function getCurrentBalancesValue(walletAddress) {
@@ -31,7 +22,7 @@ async function getCurrentBalancesValue(walletAddress) {
 async function calculateStakedTokensValueETH(walletAddress) {
 	const stakedBalanceRaw = await stakingInstance.methods.getStakedBalance(walletAddress).call();
 	const stakedBalance = new BigNumber(stakedBalanceRaw).div(1e18);
-	const stakedTokensValueETH = await getTokenETHValue(CONSTANTS.wethAddress, stakedBalance);
+	const [stakedTokensValueETH, pairedSymbol] = await getTokenETHValue(CONSTANTS.wethAddress, stakedBalance);
   
 	return stakedTokensValueETH;
 }

@@ -73,7 +73,7 @@ async function setCurrent_TrafficSection() {
     // Step X: Calculate the total transaction volume in USD
     const transactionVolume = totalDepositAmountUsd.plus(totalWithdrawalAmountUsd);
 
-    const activeERC20S = await hedgingInstance.methods.getDepositedTokensLength().call();
+    const activeERC20S = await hedgingInstance.methods.depositedTokensLength().call();
 
     // Update the section with current values from protocol
     updateSectionValues_Traffic(
