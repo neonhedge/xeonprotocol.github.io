@@ -286,8 +286,8 @@ span#typewrite {
 
 .header, .entry {
   display: grid;
-  grid-template-columns: 0.5fr 2fr 0.5fr;
-  padding: 10px;
+  grid-template-columns: 0.5fr 1fr 1fr 0.5fr;
+  gap: 10px;
   box-sizing: border-box;
   background: rgba(255, 255, 255, 0.5); /* Translucent background for entries */
   background-color: rgba(149, 243, 250, 0.2);
@@ -308,8 +308,6 @@ span#typewrite {
   font-weight: 400;
   align-content: center;
   display: flex;
-  flex-direction: column;
-  justify-content: space-evenly;
 }
 
 .header {
@@ -319,13 +317,15 @@ span#typewrite {
 }
 
 .version, .name{
-  text-align: center;
+  text-align: left;
   font-family: monospace, "Space Grotesk", sans-serif;
   font-weight: 400;
-  align-content: center;
   display: flex;
-  justify-content: space-evenly;
   justify-content: left;
+}
+.name a{
+  padding-inline: 4px;
+  cursor: pointer;
 }
 .version h3 {
   text-align: center;
@@ -343,7 +343,6 @@ span#typewrite {
 .name p {
   padding-block: 1rem;
   font-size: clamp(13px, 1vw, 14px) !important;
-  text-align: justify !important;
   color: #DDD !important;
 }
 
