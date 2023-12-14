@@ -283,8 +283,8 @@ span#typewrite {
 
 .header, .entry {
   display: grid;
-  grid-template-columns: 0.5fr 1fr 1fr 0.5fr;
-  gap: 10px;
+  grid-template-columns: 0.5fr 1.5fr 1.5fr 0.5fr;
+  gap: 0.5vw;
   box-sizing: border-box;
   background: rgba(255, 255, 255, 0.5); /* Translucent background for entries */
   background-color: rgba(149, 243, 250, 0.2);
@@ -319,6 +319,9 @@ span#typewrite {
   font-family: monospace, "Space Grotesk", sans-serif;
   font-weight: 400;
   display: flex;
+  justify-content: start;
+}
+.entry > :last-child, .header > :last-child {
   justify-content: center;
 }
 .testDetail {
