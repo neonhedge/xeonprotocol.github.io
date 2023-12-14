@@ -247,9 +247,6 @@ span#typewrite {
   transition: z-index 0.3s;
 }
 
-.glass-t-v-v {
-  z-index: -1;
-}
 .glass-t-v-v::before, .glass-t-v-v::after {
   z-index: 0;
 }
@@ -308,6 +305,7 @@ span#typewrite {
   font-weight: 400;
   align-content: center;
   display: flex;
+  flex-direction: column;
 }
 
 .header {
@@ -321,11 +319,18 @@ span#typewrite {
   font-family: monospace, "Space Grotesk", sans-serif;
   font-weight: 400;
   display: flex;
-  justify-content: left;
+  justify-content: center;
+}
+.testDetail {
+  justify-content: left !important;
 }
 .name a{
   padding-inline: 4px;
-  cursor: pointer;
+  z-index: 1;
+  font-size: 10px;
+  text-decoration: underline;
+  place-items: center;
+  margin: 0 auto;
 }
 .version h3 {
   text-align: center;
