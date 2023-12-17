@@ -1,4 +1,5 @@
-import { getCurrentEthUsdcPriceFromUniswapV2, getWalletTokenList, getTokenUSDValue, getTokenETHValue } from "./constants.js";
+import { getCurrentEthUsdcPriceFromUniswapV2, getTokenUSDValue, getTokenETHValue } from "./constants.js";
+import { getWalletTokenList } from "./module-wallet-tokenlist-dependencies.js";
   
 // Function to calculate the total USD value of all token balances
 async function getCurrentBalancesValue(walletAddress) {
