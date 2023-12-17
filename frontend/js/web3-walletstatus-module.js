@@ -1,7 +1,7 @@
 /*=========================================================================
     Import modules
 ==========================================================================*/
-import { CONSTANTS } from './constants.js';
+import { CONSTANTS, commaNumbering } from './constants.js';
 
 /*=========================================================================
     run functions
@@ -109,11 +109,11 @@ async function unlockedWallet() {
 	// Other functions follow...
 	
 	async function balanceOf(account) {
-		console.log(account);
 		try {
 		const result = await neonInstance.methods.balanceOf(account).call();
 		const decimals = CONSTANTS.decimals;
 		const balance = (BigInt(result) / BigInt(10) ** BigInt(decimals)).toString();
+		const balance_toLocale = commaNumbering(balance);
 		CONSTANTS.tokenBalance = balance;
 	
 		if (result) {
@@ -122,7 +122,7 @@ async function unlockedWallet() {
 			const privatize = `${first}..${last}`;
 	
 			$('#wallet_id').empty().append(privatize);
-			$('#wallet_balance').empty().append(`${balance} NEON`);
+			$('#wallet_balance').empty().append(`${balance_toLocale} XEON`);
 			$(".dot").css({ 'background-color': 'rgb(39, 174, 96)' });
 			return balance;
 		} else {
