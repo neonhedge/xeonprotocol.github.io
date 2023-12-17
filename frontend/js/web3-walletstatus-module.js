@@ -109,10 +109,11 @@ async function unlockedWallet() {
 	// Other functions follow...
 	
 	async function balanceOf(account) {
+		console.log(account);
 		try {
 		const result = await neonInstance.methods.balanceOf(account).call();
 		const decimals = CONSTANTS.decimals;
-		const balance = (result / Math.pow(10, decimals)).toFixed(2);
+		const balance = (BigInt(result) / BigInt(10) ** BigInt(decimals)).toString();
 		CONSTANTS.tokenBalance = balance;
 	
 		if (result) {
