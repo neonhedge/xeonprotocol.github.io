@@ -322,7 +322,7 @@ async function unlockedWallet() {
 	
 		try {
 			const account = await web3.eth.getAccounts();
-			balanceOf(account);
+			balanceOf(account[0]);
 		} catch (error) {
 			console.log('Metamask Locked');
 		}
