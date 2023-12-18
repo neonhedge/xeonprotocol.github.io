@@ -18,9 +18,6 @@ contract StakingContract is Ownable {
     uint256 public totalAssignedForMining;
     uint256 public totalAssignedForLiquidity;
     uint256 public totalAssignedForCollateral;
-    uint256 public rewardsClaimed;
-    uint256 public rewardsClaimedLiquidity;
-    uint256 public rewardsClaimedCollateral;
 
     struct Staker {
         uint256 amount;
@@ -35,9 +32,6 @@ contract StakingContract is Ownable {
     mapping(address => uint256) public lastRewardBasis;
     mapping(address => uint256) public lastLiquidityRewardBasis;
     mapping(address => uint256) public lastCollateralRewardBasis;
-    mapping(address => uint256) public stakerRewardsClaimed;
-    mapping(address => uint256) public stakerLiquidityClaimed;
-    mapping(address => uint256) public stakerCollateralClaimed;
 
     event Staked(address indexed staker, uint256 amount);
     event Unstaked(address indexed staker, uint256 amount);
@@ -56,7 +50,7 @@ contract StakingContract is Ownable {
         stakingToken = IERC20(_stakingToken);
     }
 
-    function startContract() onlyOwner {
+    function startContract() external onlyOwner {
         nextUnstakeDay = block.timestamp;//3 days for people to stake and assign
     }
 
@@ -66,20 +60,17 @@ contract StakingContract is Ownable {
 
     function stake(uint256 _amount) external stakingWindow {
         require(_amount > 0, "Staked amount must be greater than zero.");
-        //require(stakers[msg.sender].amount == 0, "You can only stake once at a time.");
-        
-        //check users allowances on native token
-        require(stakingToken.allowance(msg.sender, address(this)) >= _amount, "Insufficient allowance");
+        require(stakers[msg.sender].amount == 0, "You can only stake once at a time.");
 
         stakingToken.transferFrom(msg.sender, address(this), _amount);
 
         stakers[msg.sender] = Staker({
             amount: _amount,
             stakingTime: block.timestamp,
-            lastClaimedDay: rewardDistributionDay,
-            assignedForMining: 0,
-            assignedForLiquidity: 0,
-            assignedForCollateral: 0
+            lastClaimedDay: stakers[msg.sender].lastClaimedDay,
+            assignedForMining: stakers[msg.sender].assignedForMining,
+            assignedForLiquidity: stakers[msg.sender].assignedForLiquidity,
+            assignedForCollateral: stakers[msg.sender].assignedForCollateral
         });
 
         emit Staked(msg.sender, _amount);
@@ -141,9 +132,9 @@ contract StakingContract is Ownable {
         staker.assignedForCollateral = staker.assignedForCollateral.sub(_amountFromCollateral);
 
         // Update globals
-        totalAssignedForMining = totalAssignedForMining.less(_amountFromMining);
-        totalAssignedForLiquidity = totalAssignedForLiquidity.less(_amountFromLiquidity);
-        totalAssignedForCollateral = totalAssignedForCollateral.less(_amountFromCollateral);
+        totalAssignedForMining = totalAssignedForMining.sub(_amountFromMining);
+        totalAssignedForLiquidity = totalAssignedForLiquidity.sub(_amountFromLiquidity);
+        totalAssignedForCollateral = totalAssignedForCollateral.sub(_amountFromCollateral);
 
         emit TokensUnassigned(msg.sender, _amountFromMining, _amountFromLiquidity, _amountFromCollateral);
     }
@@ -165,18 +156,19 @@ contract StakingContract is Ownable {
         ethCollateralRewardBasis = ethCollateralRewardBasis.add(msg.value);
         emit RewardsDistributed(msg.value, 3);
     }
-
+    // proposal
+    // claim only after 30 days from last stake update
+    // claim like rewards share for every token staked (not in existence)
     function claimRewards() external {
         Staker storage staker = stakers[msg.sender];
         require(staker.amount > 0, "You have no staked tokens.");
+        require(staker.stakingTime - block.timestamp > 30 * 24 * 60 * 60,"Wait 30 days from your last claim" );
         
         uint256 ethChange = ethRewardBasis - lastRewardBasis[msg.sender];
         uint256 stakerRewardShare = ethChange.mul(staker.amount).div(getTotalStaked());
 
-        staker.lastClaimedDay = rewardDistributionDay;
+        staker.lastClaimedDay = block.timestamp;
         lastRewardBasis[msg.sender] = ethRewardBasis;
-        stakerRewardsClaimed[msg.sender] = stakerRewardShare;
-        rewardsClaimed = rewardsClaimed.add(stakerRewardShare);
 
         payable(msg.sender).transfer(stakerRewardShare);
 
@@ -192,8 +184,6 @@ contract StakingContract is Ownable {
 
         staker.lastClaimedDay = block.timestamp;
         lastLiquidityRewardBasis[msg.sender] = ethLiquidityRewardBasis;
-        stakerLiquidityClaimed[msg.sender] = liquidityRewardShare;
-        rewardsClaimedLiquidity = rewardsClaimedLiquidity.add(liquidityRewardShare);
 
         payable(msg.sender).transfer(liquidityRewardShare);
 
@@ -209,47 +199,44 @@ contract StakingContract is Ownable {
 
         staker.lastClaimedDay = block.timestamp;
         lastCollateralRewardBasis[msg.sender] = ethCollateralRewardBasis;
-        stakerCollateralClaimed[msg.sender] = collateralRewardShare;
-        rewardsClaimedCollateral = rewardsClaimedCollateral.add(collateralRewardShare);
 
         payable(msg.sender).transfer(collateralRewardShare);
 
         emit RewardClaimed(msg.sender, collateralRewardShare, 3);
     }
-    /* make a rewards claimed tracking for each staker */
 
-    function getRewardsDue(address stakerAddress) external view returns (uint256) {
-        Staker storage staker = stakers[stakerAddress];
+    function getRewardsDue() external view returns (uint256) {
+        Staker storage staker = stakers[msg.sender];
 
         if (staker.amount == 0) {
             return 0;
         }
 
-        uint256 ethChange = ethRewardBasis - lastRewardBasis[stakerAddress];
+        uint256 ethChange = ethRewardBasis - lastRewardBasis[msg.sender];
         uint256 stakerRewardShare = ethChange.mul(staker.amount).div(getTotalStaked());
         return stakerRewardShare;
     }
 
-    function getLiquidityRewardsDue(address stakerAddress) external view returns (uint256) {
-        Staker storage staker = stakers[stakerAddress];
+    function getLiquidityRewardsDue() external view returns (uint256) {
+        Staker storage staker = stakers[msg.sender];
 
         if (staker.assignedForLiquidity == 0) {
             return 0;
         }
 
-        uint256 ethChange = ethLiquidityRewardBasis - lastLiquidityRewardBasis[stakerAddress];
+        uint256 ethChange = ethLiquidityRewardBasis - lastLiquidityRewardBasis[msg.sender];
         uint256 liquidityRewardShare = ethChange.mul(staker.assignedForLiquidity).div(totalAssignedForLiquidity);
         return liquidityRewardShare;
     }
 
-    function getCollateralRewardsDue(address stakerAddress) external view returns (uint256) {
-        Staker storage staker = stakers[stakerAddress];
+    function getCollateralRewardsDue() external view returns (uint256) {
+        Staker storage staker = stakers[msg.sender];
 
         if (staker.assignedForCollateral == 0) {
             return 0;
         }
 
-        uint256 ethChange = ethCollateralRewardBasis - lastCollateralRewardBasis[stakerAddress];
+        uint256 ethChange = ethCollateralRewardBasis - lastCollateralRewardBasis[msg.sender];
         uint256 collateralRewardShare = ethChange.mul(staker.assignedForCollateral).div(totalAssignedForCollateral);
         return collateralRewardShare;
     }
@@ -284,8 +271,8 @@ contract StakingContract is Ownable {
         address[] memory stakerAddresses = new address[](getTotalStakers());
         uint256 index = 0;
 
-        for (address stakerAddress in stakers) {
-            stakerAddresses[index] = stakerAddress;
+        for (uint256 i = 0; i < stakers.length; i++) {
+            stakerAddresses[index] = stakers[i];
             index++;
         }
 
@@ -295,12 +282,13 @@ contract StakingContract is Ownable {
     function getTotalStakers() internal view returns (uint256) {
         uint256 totalStakersCount = 0;
 
-        for (address stakerAddress in stakers) {
-            if (stakers[stakerAddress].amount > 0) {
+        for (uint256 i = 0; i < stakers.length; i++) {
+            if (stakers[i].amount > 0) {
                 totalStakersCount++;
             }
         }
 
         return totalStakersCount;
     }
+
 }
