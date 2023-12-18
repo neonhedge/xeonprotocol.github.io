@@ -74,8 +74,6 @@
 	width: 50%;
 	height:auto;
 	max-height:38px;
-	padding: 0.4rem 2px;
-	box-sizing:border-box;
 	cursor: pointer;
 	border-radius: 8px;
 	color: #08e7fe;
@@ -112,7 +110,7 @@
 	z-index:10;
 	display:inline-block;
 	vertical-align:middle;
-	margin: -7px -34px;/* take from button spaces */
+	margin: 0px -50%;
 }
 .chainstat {
 	position: absolute;
