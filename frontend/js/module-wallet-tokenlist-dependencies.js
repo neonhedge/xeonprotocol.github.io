@@ -1,9 +1,9 @@
-import { getTokenUSDValue, getCurrentEthUsdcPriceFromUniswapV2, getTokenETHValue } from './constants.js';
+import { getTokenUSDValue, getCurrentEthUsdcPriceFromUniswapV2, getTokenETHValue, CONSTANTS } from './constants.js';
 
 // Function to fetch the number of deposited tokens by a wallet
 async function getWalletTokenList(walletAddress) {
 	try {
-	  const transactedTokensArray = await hedgingInstance.methods.getUserTokenList(walletAddress).call();
+      const transactedTokensArray = await hedgingInstance.methods.getUserHistory(walletAddress, 0, CONSTANTS.tokenLimit).call();
 	  return transactedTokensArray;
 	} catch (error) {
 	  console.error("Error fetching deposited tokens:", error);

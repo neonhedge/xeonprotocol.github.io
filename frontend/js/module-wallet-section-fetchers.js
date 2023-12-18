@@ -13,7 +13,7 @@ async function fetchSection_Networth(){
         const walletBalanceRaw = await neonInstance.methods.balanceOf(userAddress).call();
         const stakedBalanceRaw = await stakingInstance.methods.getStakedBalance(userAddress).call();
 
-        const transactedTokensArrayList = await hedgingInstance.methods.getUserHistory(userAddress, 0, 100).call();
+        const transactedTokensArrayList = await hedgingInstance.methods.getUserHistory(userAddress, 0, CONSTANTS.tokenLimit).call();
         const transactedTokensCount = transactedTokensArrayList.length;
         
         // Human Readable
