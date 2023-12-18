@@ -18,6 +18,7 @@ contract StakingContract is Ownable {
     uint256 public totalAssignedForMining;
     uint256 public totalAssignedForLiquidity;
     uint256 public totalAssignedForCollateral;
+    address[] public stakerAddresses;
 
     struct Staker {
         uint256 amount;
@@ -267,28 +268,27 @@ contract StakingContract is Ownable {
         return totalStakedAmount.sub(totalAssignedAmount);
     }
 
-    function getStakers() internal view returns (address[] memory) {
-        address[] memory stakerAddresses = new address[](getTotalStakers());
-        uint256 index = 0;
+    function getStakers() public view returns (address[] memory) {
+        uint256 totalStakers = stakerAddresses.length;
+        address[] memory stakersWithAmount = new address[](totalStakers);
+        uint256 count = 0;
 
-        for (uint256 i = 0; i < stakers.length; i++) {
-            stakerAddresses[index] = stakers[i];
-            index++;
-        }
-
-        return stakerAddresses;
-    }
-
-    function getTotalStakers() internal view returns (uint256) {
-        uint256 totalStakersCount = 0;
-
-        for (uint256 i = 0; i < stakers.length; i++) {
-            if (stakers[i].amount > 0) {
-                totalStakersCount++;
+        for (uint256 i = 0; i < totalStakers; i++) {
+            address stakerAddress = stakerAddresses[i];
+            if (stakers[stakerAddress].amount > 0) {
+                stakersWithAmount[count] = stakerAddress;
+                count++;
             }
         }
 
-        return totalStakersCount;
+        // Resize the array to remove unused slots
+        assembly {
+            mstore(stakersWithAmount, count)
+        }
+
+        return stakersWithAmount;
     }
+
+
 
 }
