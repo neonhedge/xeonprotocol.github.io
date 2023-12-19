@@ -4,7 +4,7 @@ chainID: '',
   etherScan: "https://goerli.etherscan.io", // https://goerli.etherscan.io // https://bscscan.com/
   decimals: 18,
   neonAddress: '0xF97Fcb2015eCd8F8063fE5DbBA98b5d8E2D9a53A',
-  hedgingAddress: '0xb119dD4491c0Bf8Aa341917538735162eab50e64',
+  hedgingAddress: '0x25Ff82722Ec76C36DBbF5d579B638489ac6836c0',
   stakingAddress: '0x823e7aF9DA8b205F89c00024c4a9825Ef8ed9bb8',
   wethAddress: '0xb4fbf271143f4fbf7b91a5ded31805e42b2208d6',
   usdtAddress: '0xe802376580c10fE23F027e1E19Ed9D54d4C9311e',
