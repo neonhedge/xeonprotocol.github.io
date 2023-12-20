@@ -3156,6 +3156,7 @@
 							<div class="aboutHead">
 								<h3><i class="fa fa-bell-o" aria-hidden="true"></i> Testnet Details</h3>
 								<span>Protocol booting, bringing the protocol to life for the first time. This is Unit Testing. It will be split between backend and frontend. The goal is to ensure smart contract modules individual functionality. Falling into two main categories: state-based and interaction-based testing. State-based unit testing involves verifying that the system produces correct results or that its resulting state is accurate. On the other hand, interaction-based unit testing involves checking whether certain methods are invoked correctly. All test logs for this version are recorded below.</span>
+								<span>Goal of this testnet version is to depracate functions and fix issues in previous version. Get the basic functions about deposits and withdrawal balances working. Then attempt to do the same for the paired currencies: WETH, USDT, USDC.</span>
 							</div>
 						</div>
 					</div>
@@ -3405,30 +3406,16 @@
 							</div>
 							<div class="entry"> <!-- test activity -->
 								<div class="version">
-									<span>15.12.2023</span>
+									<span>20.12.2023</span>
 								</div>
 								<div class="name testDetail">						
 									<p>protocolBalanceMap function call</p>
 								</div>
 								<div class="name">
 									<p>Remix Call, returned:    0:
-										uint256: deposited 200000000000000000000000
+										uint256: deposited 500000000000000000000000
 										1:
-										uint256: withdrawn 0</p>
-								</div>
-								<div class="name">						
-									<p class="unresolved">Unresolved: </br>(1) incorrect</p>
-								</div>
-							</div>
-							<div class="entry"> <!-- test activity -->
-								<div class="version">
-									<span>18.12.2023</span>
-								</div>
-								<div class="name testDetail">						
-									<p>wallet balance script running</p>
-								</div>
-								<div class="name">
-									<p>intergration of the wallet balance module and scripts to fetch XEON wallet balance for user</p>
+										uint256: withdrawn 35000000000000000000000</p>
 								</div>
 								<div class="name">						
 									<p>Passed</p>
@@ -3436,13 +3423,13 @@
 							</div>
 							<div class="entry"> <!-- test activity -->
 								<div class="version">
-									<span>18.12.2023</span>
+									<span>20.12.2023</span>
 								</div>
 								<div class="name testDetail">						
-									<p>Staking Smart Contract Deployed on Goerli. Accepts test XEON tokens. Module necessary for wallet page modules to function. </p>
+									<p>WETH 0.0001 token approval to Vault...</p>
 								</div>
 								<div class="name">
-									<a href="https://goerli.etherscan.io/tx/0x0a4915a1e5a873249c5e39ada0bcbd3e7e0e83810cb93d2734d3c14df24eb6f5" target="_blank">
+									<a href="https://goerli.etherscan.io/tx/0x7a3900582b5fa796029181de3afa77b84165a5fbba7cf69c89995806a7489f4b" target="_blank">
 										<p>Tx</p>
 									</a>
 								</div>
@@ -3452,10 +3439,26 @@
 							</div>
 							<div class="entry"> <!-- test activity -->
 								<div class="version">
-									<span>19.12.2023</span>
+									<span>20.12.2023</span>
 								</div>
 								<div class="name testDetail">						
-									<p>Wallet Page - Token list script load</p>
+									<p>WETH 0.0001 token deposit to Vault...</p>
+								</div>
+								<div class="name">
+									<a href="https://goerli.etherscan.io/tx/0x7a3900582b5fa796029181de3afa77b84165a5fbba7cf69c89995806a7489f4b" target="_blank">
+										<p>Tx</p>
+									</a>
+								</div>
+								<div class="name">						
+									<p class="unresolved">Unresolved: WETH support incorrect</p>
+								</div>
+							</div>
+							<div class="entry"> <!-- test activity -->
+								<div class="version">
+									<span>20.12.2023</span>
+								</div>
+								<div class="name testDetail">						
+									<p>WETH deposit failed.</p>
 								</div>
 								<div class="name">
 									<p>attempt to populate the cashier section starts with fetching the ERC20s history array for the wallet connected. Outcome: (1) reverting</p>
@@ -3466,13 +3469,13 @@
 							</div>
 							<div class="entry"> <!-- test activity -->
 								<div class="version">
-									<span>19.12.2023</span>
+									<span>20.12.2023</span>
 								</div>
 								<div class="name testDetail">						
-									<p>suggestion: Testnet Neon Hedge Vault V1.0 depracation</p>
+									<p>suggestion: Testnet Neon Hedge Vault V1.1 depracation</p>
 								</div>
 								<div class="name">
-									<p>resolve all issues in testnet V1.0 above. deploy new Neon Hedge vault smart contract. Launch Testnet V1.1 </p>
+									<p>resolve all issues in testnet V1.1 above. deploy new Neon Hedge vault smart contract. Launch Testnet V1.2. </p>
 								</div>
 								<div class="name">						
 									<p class="unresolved">Unresolved</p>
