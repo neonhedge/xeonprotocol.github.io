@@ -2,8 +2,8 @@
 pragma solidity ^0.8.4;
 
 // Xeon Protocol - Universal ERC20 OTC Hedging and Lending. 
-// Testnet Version 1.1
-// Deployed on Goerli Testnet 19/12/2024
+// Testnet Version 1.5
+// Deployed on Goerli Testnet 25/12/2024
 // Goerli Support for Uniswap V2 Router was the basis
 
 // ====================Description===========================
@@ -42,6 +42,7 @@ pragma solidity ^0.8.4;
 // - fetch hedges array; created, taken, settled
 
 // Third Party Key Dependencies
+// 0. WETH9 contract interface
 // 1. getReserves - Uniswap
 // 2. getPair - Uniswap
 // 3. getPairAddressZK - Custom
@@ -67,11 +68,15 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@uniswap/v2-core/contracts/interfaces/IUniswapV2Factory.sol";
 import "@uniswap/v2-core/contracts/interfaces/IUniswapV2Pair.sol";
 import "@uniswap/v2-periphery/contracts/interfaces/IUniswapV2Router02.sol";
+// minimal interface for the WETH9 contract
+interface IWETH9 {
+    function transfer(address dst, uint wad) external returns (bool);
+    function transferFrom(address src, address dst, uint wad) external returns (bool);
+}
 
 contract NEONHEDGE {
 
     using SafeMath for uint256;
-    bool private locked = false;
     bool private isExecuting;
 
     modifier nonReentrant() {
@@ -204,7 +209,6 @@ contract NEONHEDGE {
     uint[] private optionsTaken;
     uint[] private equityswapsTaken;
     
-    
     // global counters
     uint public depositedTokensLength;
     uint public optionsCreatedLength;
@@ -212,7 +216,6 @@ contract NEONHEDGE {
     uint public tokenOptionsLength;
     uint public tokenSwapsLength;
     uint public optionID;
-    uint public topupRequestIDuestID;
     uint public topupRequestID;
     
     // fee variables
@@ -253,7 +256,7 @@ contract NEONHEDGE {
     constructor() {
         IUniswapV2Router02 router = IUniswapV2Router02(UNISWAP_ROUTER_ADDRESS);
         wethAddress = router.WETH();
-        usdtAddress = 0xe802376580c10fE23F027e1E19Ed9D54d4C9311e; // USDT address on Goerli
+        usdtAddress = 0xC2C527C0CACF457746Bd31B2a698Fe89de2b6d49; // USDT address on Goerli
         usdcAddress = 0xde637d4C445cA2aae8F782FFAc8d2971b93A4998; // USDC address on Goerli
         XeonAddress = 0xF97Fcb2015eCd8F8063fE5DbBA98b5d8E2D9a53A; // V 1.0 deployed 12/12/2023 16:28:48
         // Variables
@@ -262,82 +265,99 @@ contract NEONHEDGE {
         owner = msg.sender;
     }
 
-    function depositToken(address _token, uint256 _amount) public {
-        require(_amount > 0, "Your attempting to transfer 0 tokens");
-        
-        // Deposit token to contract
-        uint256 allowance = IERC20(_token).allowance(msg.sender, address(this));
-        require(allowance >= _amount, "You need to set a higher allowance");
-        require(IERC20(_token).transferFrom(msg.sender, address(this), _amount), "Transfer failed");
-        
+    function depositToken(address _token, uint256 _amount) public nonReentrant {
+        require(_amount > 0, "You're attempting to transfer 0 tokens");
+        // Deposit WETH , stables or ERC20
+        if (_token == wethAddress) {
+            require(IWETH9(wethAddress).transferFrom(msg.sender, address(this), _amount), "Transfer failed");
+            wethEquivDeposits += _amount;
+        } else {
+            // Allowance check and transfer for non-WETH tokens
+            uint256 allowance = IERC20(_token).allowance(msg.sender, address(this));
+            require(allowance >= _amount, "You need to set a higher allowance");
+            require(IERC20(_token).transferFrom(msg.sender, address(this), _amount), "Transfer failed");
+
+            // Log main pair equivalents
+            if (_token != usdtAddress && _token != usdcAddress) {
+                (uint256 marketValue, address paired) = getUnderlyingValue(_token, _amount);
+                if (paired == wethAddress) wethEquivDeposits += marketValue;
+                else if (paired == usdtAddress) usdtEquivDeposits += marketValue;
+                else if (paired == usdcAddress) usdcEquivDeposits += marketValue;
+            }
+            // Log stables
+            if (_token == usdtAddress) usdtEquivDeposits += _amount;
+            else if (_token == usdcAddress) usdcEquivDeposits += _amount;
+        }
+
         // Log user balance & tokens
         userBalance storage uto = userBalanceMap[_token][msg.sender];
-        if(uto.deposited == 0){
-          userERC20s[msg.sender].push(_token);
+        if (uto.deposited == 0) {
+            userERC20s[msg.sender].push(_token);
         }
-        uto.deposited = uto.deposited.add(_amount);
+        uto.deposited += _amount;
+
         // Log new token address
-        // protocolBalanceMap ia analytics only. userBalanceMap stores withdrawable balance
-        if(protocolBalanceMap[_token].deposited == 0){
-          userERC20s[address(this)].push(_token);
-          depositedTokensLength ++;
+        // protocolBalanceMap is analytics only. userBalanceMap stores withdrawable balance
+        if (protocolBalanceMap[_token].deposited == 0) {
+            userERC20s[address(this)].push(_token);
+            depositedTokensLength++;
         }
         protocolBalanceMap[_token].deposited += _amount;
-        
-        // Log main pair equivalents
-        (uint256 marketValue, address paired) = getUnderlyingValue(_token, _amount);
-        if(paired == wethAddress){wethEquivDeposits += marketValue;}
-        if(paired == usdtAddress){usdtEquivDeposits += marketValue;}
-        if(paired == usdcAddress){usdcEquivDeposits += marketValue;}
-        
+
         // Emit deposit event
         emit onDeposit(_token, _amount, msg.sender);
     }
 
-    function withdrawToken(address token, uint256 amount) public {
-        userBalance storage uto = userBalanceMap[token][msg.sender];
-        uint256 withdrawable = getWithdrawableBalance(token, msg.sender);
+    function withdrawToken(address token, uint256 amount) public nonReentrant {
+        // Read user balances into local variables
+        (, , , uint256 withdrawable, , ) = getUserTokenBalances(token, msg.sender);
+
         require(amount <= withdrawable && amount > 0, "You have Insufficient available balance");
         require(msg.sender != address(this), "Not allowed");
 
         // Tax withdrawals on pair only; WETH, USDT, USDC. 1/10 of settle tax
         uint256 tokenFee;
-        if(token == wethAddress || token == usdtAddress || token == usdcAddress) {
-            tokenFee = calculateFee(amount) / 10;
+        if (token == wethAddress || token == usdtAddress || token == usdcAddress) {
+            tokenFee = calculateFee(amount).div(10);
+            protocolCashierFees[token] += tokenFee;
+            userBalanceMap[token][address(this)].deposited += tokenFee;
         }
-        if(tokenFee > 0) {
-            protocolCashierFees[token].add(tokenFee);
-            userBalanceMap[token][address(this)].deposited.add(tokenFee);
-        }
+
         // Withdraw
-        uto.withdrawn = uto.withdrawn.add(amount);
-        require(IERC20(token).transfer(msg.sender, amount - tokenFee), "Transfer failed");
-        // Log withdraw
+        userBalanceMap[token][msg.sender].withdrawn += amount;
+
+        if (token == wethAddress) {
+            require(IWETH9(wethAddress).transfer(msg.sender, amount.sub(tokenFee)), "Transfer failed");
+        } else {
+            require(IERC20(token).transfer(msg.sender, amount.sub(tokenFee)), "Transfer failed");
+        }
+
+        // Log withdrawal
         protocolBalanceMap[token].withdrawn += amount;
+
         // Log main paired value equivalents
-        (uint256 marketValue, address paired) = getUnderlyingValue(token, amount);
-        if(paired == wethAddress){wethEquivWithdrawals += marketValue;}
-        if(paired == usdtAddress){usdtEquivWithdrawals += marketValue;}
-        if(paired == usdcAddress){usdcEquivWithdrawals += marketValue;}
+        if (token == wethAddress) {
+            wethEquivWithdrawals += amount;
+        } else if (token != wethAddress && token != usdtAddress && token != usdcAddress) {
+            (uint256 marketValue, address paired) = getUnderlyingValue(token, amount);
+            if (paired == wethAddress) wethEquivWithdrawals += marketValue;
+            else if (paired == usdtAddress) usdtEquivWithdrawals += marketValue;
+            else if (paired == usdcAddress) usdcEquivWithdrawals += marketValue;
+        }
 
         // Emit withdrawal event
         emit onWithdraw(token, amount, msg.sender);
     }
+
 
     // Create Hedge: covers both call options and equity swaps. put options to be enabled in Beta V2
     // premium or buying cost paid in paired token of the underlying asset in the deal
     // no premium for swaps. swap collateral must  be equal for both parties, settle function relies on this implementation here
     // put options will have a max loss check to only accept a strike price 50% away max
     function createHedge(uint tool, address token, uint256 amount, uint256 cost, uint256 deadline) public nonReentrant {
-        require(!locked, "Function is locked");
-        locked = true;
         require(tool <= 2 && amount > 0 && cost > 0 && deadline > block.timestamp, "Invalid option parameters");
-        uint256 withdrawable = getWithdrawableBalance(token, msg.sender);
-        require(withdrawable > 0, "Insufficient free balance");
-        require(token != address(0), "Token address cannot be zero");
-        require(token != UNISWAP_ROUTER_ADDRESS, "Token address cannot be router address");
-        require(token != UNISWAP_FACTORY_ADDRESS, "Token address cannot be factory address");
-        require(token != address(this), "Token address cannot be contract address");
+        (, , , uint256 withdrawable, , ) = getUserTokenBalances(token, msg.sender);
+        require(withdrawable > 0, "Insufficient balance");
 
         // Assign option values directly to the struct
         hedgingOption storage newOption = hedgeMap[optionID];
@@ -358,9 +378,11 @@ contract NEONHEDGE {
         } else {
             revert("Invalid tool option");
         }
+
         // Update user balances for token in hedge
         userBalance storage hto = userBalanceMap[token][msg.sender]; 
-        hto.lockedinuse += amount;
+        hto.lockedinuse.add(amount);
+        
         // Update arrays
         if (newOption.hedgeType == HedgeType.SWAP) {
             require(cost >= newOption.createValue, "Swap collateral must be equal value");
@@ -378,6 +400,7 @@ contract NEONHEDGE {
             tokenSwaps[token].push(optionID);
             tokenSwapsLength ++;
         }
+
         // Log protocol analytics
         optionID++;
         hedgesCreatedVolume[newOption.paired].add(newOption.createValue);
@@ -389,7 +412,6 @@ contract NEONHEDGE {
 
         // Emit
         emit hedgeCreated(token, optionID, newOption.createValue, newOption.hedgeType, msg.sender);
-        locked = false;
     }
 
     // Hedges are bought in quote/paired currency of underlying token
@@ -397,64 +419,71 @@ contract NEONHEDGE {
     // For Equity Swaps cost is equal to underlying value as 100% collateral is required. There is no premium
     // Strike value is not set here, maturity calculations left to the settlement function
     function buyHedge(uint256 _optionId) public nonReentrant {
-        require(!locked, "Function is locked");
-        locked = true;
         hedgingOption storage hedge = hedgeMap[_optionId];
         userBalance storage stk = userBalanceMap[hedge.paired][msg.sender];
-        require(getWithdrawableBalance(hedge.paired, msg.sender) >= hedge.cost, "Insufficient free pair currency balance");
-        require(_optionId < optionID && msg.sender != hedge.owner, "Invalid option ID | Owner cant buy");
-       
-        // Calculate, check and update start value based on the hedge type
-        (hedge.startValue, ) = getUnderlyingValue(hedge.token, hedge.amount);
-        if (hedge.hedgeType == HedgeType.SWAP) {
-            hedge.startValue += hedge.cost;
-        }
+
+        require(_optionId < optionID && msg.sender != hedge.owner, "Invalid option ID | Owner can't buy");
+        (, , , uint256 withdrawable, , ) = getUserTokenBalances(hedge.paired, msg.sender);
+        require(withdrawable >= hedge.cost, "Insufficient free pair currency balance");
+
+        // Calculate, check, and update start value based on the hedge type
+        (hedge.startValue, ) = (hedge.hedgeType == HedgeType.SWAP)
+            ? getUnderlyingValue(hedge.token, hedge.amount + hedge.cost)
+            : getUnderlyingValue(hedge.token, hedge.amount);
+
         require(hedge.startValue > 0, "Math error whilst getting price");
+
         stk.lockedinuse = stk.lockedinuse.add(hedge.cost);
         hedge.dt_started = block.timestamp;
         hedge.taker = msg.sender;
         hedge.status = 2;
+
         // Store updated structs
         userBalanceMap[hedge.paired][msg.sender] = stk;
         hedgeMap[_optionId] = hedge;
+
         // Update arrays and takes count
         if (hedge.hedgeType == HedgeType.SWAP) {
             myswapsHistory[msg.sender].push(_optionId);
             equityswapsTaken.push(_optionId);
             myswapsTaken[msg.sender].push(_optionId);
-        } else if(hedge.hedgeType == HedgeType.CALL) {
+        } else if (hedge.hedgeType == HedgeType.CALL) {
             myoptionsHistory[msg.sender].push(_optionId);
             optionsTaken.push(_optionId);
-            myoptionsTaken[msg.sender].push(_optionId);            
+            myoptionsTaken[msg.sender].push(_optionId);
         }
+
         // Log options for token
-         if(hedge.hedgeType == HedgeType.CALL || hedge.hedgeType == HedgeType.PUT) {
-            optionsBought[hedge.token].push(_optionId);            
+        if (hedge.hedgeType == HedgeType.CALL || hedge.hedgeType == HedgeType.PUT) {
+            optionsBought[hedge.token].push(_optionId);
         }
-        if(hedge.hedgeType == HedgeType.SWAP) {
+
+        if (hedge.hedgeType == HedgeType.SWAP) {
             equityswapsBought[hedge.token].push(_optionId);
         }
 
         // Log pair tokens involved in protocol revenue
-        if(hedgesTakenVolume[hedge.paired] == 0){
+        if (hedgesTakenVolume[hedge.paired] == 0) {
             pairedERC20s[address(this)].push(hedge.paired);
         }
+
         // Protocol Revenue Trackers
-        hedgesTakenVolume[hedge.paired].add(hedge.startValue);
-        hedgesCostVolume[hedge.paired].add(hedge.cost);
+        hedgesTakenVolume[hedge.paired] += hedge.startValue;
+        hedgesCostVolume[hedge.paired] += hedge.cost;
+
         if (hedge.hedgeType == HedgeType.SWAP) {
-            swapsVolume[hedge.paired].add(hedge.startValue);
-        } else if(hedge.hedgeType == HedgeType.CALL) {
-            optionsVolume[hedge.paired].add(hedge.startValue);
+            swapsVolume[hedge.paired] += hedge.startValue;
+        } else if (hedge.hedgeType == HedgeType.CALL) {
+            optionsVolume[hedge.paired] += hedge.startValue;
         }
+
         // Wallet hedge volume analytics in main paired currency only
-        if(hedge.paired == wethAddress){wethEquivUserCosts[msg.sender] += hedge.startValue;}
-        if(hedge.paired == usdtAddress){usdtEquivUserCosts[msg.sender] += hedge.startValue;}
-        if(hedge.paired == usdcAddress){usdcEquivUserCosts[msg.sender] += hedge.startValue;}
+        if (hedge.paired == wethAddress) { wethEquivUserCosts[msg.sender] += hedge.startValue; }
+        if (hedge.paired == usdtAddress) { usdtEquivUserCosts[msg.sender] += hedge.startValue; }
+        if (hedge.paired == usdcAddress) { usdcEquivUserCosts[msg.sender] += hedge.startValue; }
 
         // Emit the hedgePurchased event
         emit hedgePurchased(hedge.token, _optionId, hedge.startValue, hedge.hedgeType, msg.sender);
-        locked = false;
     }
 
     // topup Request & Accept function
@@ -474,24 +503,20 @@ contract NEONHEDGE {
             requestAccept = true;
             topupMap[topupRequestID].state = 1;
         }
+
+        address tokenToUse = (msg.sender == hedge.owner) ? hedge.token : hedge.paired;
+        // Topup tokens
+        (, , , uint256 withdrawable, , ) = getUserTokenBalances(tokenToUse, msg.sender);
+        require(withdrawable >= amount, "Insufficient token balance");
+        // Update lockedinuse
+        userBalance storage bal = userBalanceMap[tokenToUse][msg.sender];
+        bal.lockedinuse = bal.lockedinuse.add(hedge.cost);
+        userBalanceMap[tokenToUse][msg.sender] = bal;
+        // Update hedge amount/cost
         if (msg.sender == hedge.owner) {
-            //topup underlying tokens
-            require(getWithdrawableBalance(hedge.token, msg.sender) >= amount, "Insufficient token balance");
-            //update lockedinuse
-            userBalance storage bal = userBalanceMap[hedge.token][msg.sender];
-            bal.lockedinuse = bal.lockedinuse.add(hedge.cost);
-            userBalanceMap[hedge.token][msg.sender] = bal;
-            //update hedge amount
             hedge.amount += amount;
             topupMap[topupRequestID].amountWriter += amount;
         } else {
-            //topup paired tokens
-            require(getWithdrawableBalance(hedge.paired, msg.sender) >= amount, "Insufficient pair balance");
-            //update lockedinuse
-            userBalance storage bal = userBalanceMap[hedge.paired][msg.sender];
-            bal.lockedinuse = bal.lockedinuse.add(hedge.cost);
-            userBalanceMap[hedge.paired][msg.sender] = bal;
-            //update hedge cost
             hedge.cost += amount;
             topupMap[topupRequestID].amountTaker += amount;
         }
@@ -746,11 +771,11 @@ contract NEONHEDGE {
     // - in frontend use userBalanceMap to get raw revenue balances and populate sums
     function logAnalyticsFees(address token, uint256 tokenFee, uint256 pairedFee, uint256 tokenProfit, uint256 pairProfit, uint256 endValue) internal {
        (address paired, ) = getPairAddressZK(token);
-        protocolProfitsTokens[token].add(tokenProfit);
-        protocolPairProfits[paired].add(pairProfit);
-        protocolFeesTokens[token].add(tokenFee);
-        protocolPairedFees[paired].add(pairedFee);
-        settledVolume[paired].add(endValue);
+        protocolProfitsTokens[token] += tokenProfit;
+        protocolPairProfits[paired] += pairProfit;
+        protocolFeesTokens[token] += tokenFee;
+        protocolPairedFees[paired] += pairedFee;
+        settledVolume[paired] += endValue;
     }
 
     // Log User PL in paired value
@@ -840,10 +865,10 @@ contract NEONHEDGE {
         uint256 tokenValue;
         if (_tokenAddress == pair.token0()) {
             tokenValue = (_tokenAmount * pairInfo.reserve1 * pairInfo.token0Decimals) / (pairInfo.reserve0 * pairInfo.token1Decimals);
-            return (tokenValue, pairInfo.pairAddress);
+            return (tokenValue, pairInfo.pairedCurrency);
         } else if (_tokenAddress == pair.token1()) {
             tokenValue = (_tokenAmount * pairInfo.reserve0 * pairInfo.token1Decimals) / (pairInfo.reserve1 * pairInfo.token0Decimals);
-            return (tokenValue, pairInfo.pairAddress);
+            return (tokenValue, pairInfo.pairedCurrency);
         } else {
             revert("Invalid token address");
         }
@@ -865,29 +890,20 @@ contract NEONHEDGE {
           revert("TokenValue: token is not paired with WETH, USDT, or USDC");
       }
     }
-    
-    // Withdrawable token balance for wallet
-    function getWithdrawableBalance(address token, address user) public view returns (uint256) {
-      userBalance memory uto = userBalanceMap[token][address(user)];
-      uint256 withdrawable = 0;
-      withdrawable = withdrawable.add(uto.deposited).sub(uto.withdrawn).sub(uto.lockedinuse);
-      return withdrawable;
-    }
 
     // Token balances breakdown for wallet
-    function getUserTokenBalances (address token, address user) public view returns (uint256, uint256, uint256, uint256, uint256, address) {
+    function getUserTokenBalances (address token, address user) public view returns (uint256 deposited, uint256 withdrawn, uint256 lockedinuse, uint256 withdrawable, uint256 withdrawableValue, address paired) {
       userBalance memory uto = userBalanceMap[address(token)][address(user)];
-      uint256 deposited = uto.deposited;
-      uint256 withdrawn = uto.withdrawn;
-      uint256 lockedinuse = uto.lockedinuse;
-      uint256 withdrawableBalance = (uto.deposited).sub(uto.withdrawn).sub(uto.lockedinuse);
-      uint256 withdrawableValue; address paired;
+      deposited = uto.deposited;
+      withdrawn = uto.withdrawn;
+      lockedinuse = uto.lockedinuse;
+      withdrawable = (uto.deposited).sub(uto.withdrawn).sub(uto.lockedinuse);
       if(token != wethAddress && token != usdtAddress && token != usdcAddress ){
-        (withdrawableValue, paired) = getUnderlyingValue(token, withdrawableBalance);
+        (withdrawableValue, paired) = getUnderlyingValue(token, withdrawable);
       }else{
-        (withdrawableValue, paired) = (withdrawableBalance, address(0));
+        (withdrawableValue, paired) = (withdrawable, address(0));
       }
-      return (deposited, withdrawn, lockedinuse, withdrawableBalance, withdrawableValue, paired);
+      return (deposited, withdrawn, lockedinuse, withdrawable, withdrawableValue, paired);
     }
     
     // Internal function to retrieve a subset of an array based on startIndex and limit
