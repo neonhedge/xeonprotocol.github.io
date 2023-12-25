@@ -52,7 +52,7 @@ switch (pairedCurrency) {
 // Function to get token USD value
 async function getTokenUSDValue(underlyingTokenAddr, balance) {
 try {
-  const underlyingValue = await hedgingInstance.methods.getUnderlyingValue(underlyingTokenAddr, balance).call();
+  const underlyingValue = await getTokenETHValue(underlyingTokenAddr, balance)
   const ethUsdPrice = await getCurrentEthUsdcPriceFromUniswapV2();
   const usdValue = convertToUSD(underlyingValue[0], underlyingValue[1], ethUsdPrice);
   return usdValue;
@@ -61,17 +61,21 @@ try {
   return 0;
 }
 }
-// Function to get token ETH value
+// Function to get token paired currency value
 async function getTokenETHValue(underlyingTokenAddr, balance) {
   try {
       // Fetch decimals for the underlying token
       const tokenDecimals = await getTokenDecimals(underlyingTokenAddr);
 
-      // Convert balance to BigInt based on underlying token decimals
-  const bigIntBalance = new BigNumber(balance).div(new BigNumber(10).pow(tokenDecimals));
-      const result = await hedgingInstance.methods.getUnderlyingValue(underlyingTokenAddr, bigIntBalance.toString()).call();
+      const bigIntBalance = new BigNumber(balance).times(new BigNumber(10).pow(tokenDecimals));
+
+  // Convert bigIntBalance to uint256
+  const input_balance = bigIntBalance.integerValue(BigNumber.ROUND_FLOOR).toString(10);
+
+      const result = await hedgingInstance.methods.getUnderlyingValue(underlyingTokenAddr, input_balance).call();
       const underlyingValue = result[0];
       const pairedAddress = result[1];
+      const pairedAddressDecimal = await getTokenDecimals(pairedAddress);
 
       if (!result) {
           console.error("Invalid result:", result);
@@ -84,12 +88,10 @@ async function getTokenETHValue(underlyingTokenAddr, balance) {
       } else if (pairedAddress === '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48') {
           pairSymbol = 'USDC';
       } else if (pairedAddress === CONSTANTS.wethAddress) {
-          pairSymbol = 'ETH';
+          pairSymbol = 'WETH';
       }
 
-      const convertedValue = web3.utils.fromWei(underlyingValue, 'ether') / 10 ** tokenDecimals;
-
-      console.log('underlyingValue:', convertedValue, 'pairedAddress:', pairedAddress, 'pairedSymbol:', pairSymbol, 'pairDecimal:', tokenDecimals);
+      const convertedValue = web3.utils.fromWei(underlyingValue, 'ether') / 10 ** pairedAddressDecimal;
       return [convertedValue, pairSymbol];
   } catch (error) {
       console.error("Error getting token ETH value:", error);
@@ -125,7 +127,6 @@ const erc20ABI = [
 ];
 
 const pairedContract = new web3.eth.Contract(erc20ABI, tokenAddress);
-alert(tokenAddress)
 const pairedSymbol = await pairedContract.methods.symbol().call();
 const pairDecimals = await pairedContract.methods.decimals().call();
   return Number(pairDecimals);

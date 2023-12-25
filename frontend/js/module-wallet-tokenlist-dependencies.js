@@ -17,7 +17,9 @@ async function userTokenList(walletAddress) {
     const tokenAddresses = await getWalletTokenList(walletAddress);
 
     for (const tokenAddress of tokenAddresses) {
-        const [deposited, withdrawn, , ,] = await hedgingInstance.methods.getuserTokenBalances(tokenAddress, walletAddress).call();
+        const result = await hedgingInstance.methods.getUserTokenBalances(tokenAddress, walletAddress).call();
+        const deposited = result[0];
+        const withdrawn = result[1];
         const ethUsdPrice = await getCurrentEthUsdcPriceFromUniswapV2();
 
         // Convert deposited and withdrawn balances to BigNumber and handle 1e18 format
