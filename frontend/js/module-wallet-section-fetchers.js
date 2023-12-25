@@ -17,8 +17,8 @@ async function fetchSection_Networth(){
         const transactedTokensCount = transactedTokensArrayList.length;
         
         // Human Readable
-        const walletBalance = new BigNumber(walletBalanceRaw).div(10 ** CONSTANTS.decimals);
-        const stakedBalance = new BigNumber(stakedBalanceRaw).div(10 ** CONSTANTS.decimals);
+        const walletBalance = (BigInt(walletBalanceRaw) / BigInt(10) ** BigInt(CONSTANTS.decimals)).toString();
+		const stakedBalance = (BigInt(stakedBalanceRaw) / BigInt(10) ** BigInt(CONSTANTS.decimals)).toString();
 
         // ETH USD price
         const ethUsdcPrice = await getCurrentEthUsdcPriceFromUniswapV2();
@@ -29,7 +29,7 @@ async function fetchSection_Networth(){
         const rewardsDueETH = rewardsDue[0];
         const totalCommissionDueETH = commissionDue[0]; //already formated
         const stakedTokensETH = await calculateStakedTokensValueETH(userAddress); //already formated
-        const [walletTokensETH, pairedSymbol] = await getTokenETHValue(CONSTANTS.tokenAddress, walletBalanceRaw); //already formated
+        const [walletTokensETH, pairedSymbol] = await getTokenETHValue(CONSTANTS.neonAddress, walletBalanceRaw); //already formated
 
         //USD values
         const totalDepositsUSD = await getCurrentBalancesValue(userAddress); //already formated

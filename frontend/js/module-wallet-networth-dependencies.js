@@ -1,4 +1,4 @@
-import { getCurrentEthUsdcPriceFromUniswapV2, getTokenUSDValue, getTokenETHValue } from "./constants.js";
+import { CONSTANTS, getCurrentEthUsdcPriceFromUniswapV2, getTokenUSDValue, getTokenETHValue } from "./constants.js";
 import { getWalletTokenList } from "./module-wallet-tokenlist-dependencies.js";
   
 // Function to calculate the total USD value of all token balances
@@ -22,8 +22,7 @@ async function getCurrentBalancesValue(walletAddress) {
 // Function to calculate staked tokens value
 async function calculateStakedTokensValueETH(walletAddress) {
 	const stakedBalanceRaw = await stakingInstance.methods.getStakedBalance(walletAddress).call();
-	const stakedBalance = new BigNumber(stakedBalanceRaw).div(1e18);
-	const [stakedTokensValueETH, pairedSymbol] = await getTokenETHValue(CONSTANTS.wethAddress, stakedBalance);
+	const [stakedTokensValueETH, pairedSymbol] = await getTokenETHValue(CONSTANTS.wethAddress, stakedBalanceRaw);
   
 	return stakedTokensValueETH;
 }
