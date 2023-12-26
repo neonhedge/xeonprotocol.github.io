@@ -62,7 +62,7 @@ try {
     const usdValue = convertToUSD(balance, CONSTANTS.wethAddress, ethUsdPrice);
     return usdValue;
   } else {
-    const underlyingValue = await getTokenETHValue(underlyingTokenAddr, balance);
+    const underlyingValue = await getTokenETHValue(underlyingTokenAddr, balanceRaw);
     const balanceNumber = underlyingValue[0];
     const pairSymbol = underlyingValue[1];
     

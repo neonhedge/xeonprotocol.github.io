@@ -11,9 +11,9 @@ async function getCurrentBalancesValue(walletAddress) {
         const withdrawn = result[1];
         const ethUsdPrice = await getCurrentEthUsdcPriceFromUniswapV2();
         // Wei input for getTokenUSDValue
-        const currentBalance = deposited.minus(withdrawn);
+        const currentBalance = deposited - withdrawn;
         // Get the USD value for the token balance
-		alert(underlyingTokenAddr+" "+currentBalance+" "+ethUsdPrice+" -- from array: "+transactedTokensArray);
+		console.log("underlyingTokenAddr "+underlyingTokenAddr+", balance "+currentBalance+", ethusd "+ethUsdPrice+" -- from array: "+transactedTokensArray);
         const usdValue = await getTokenUSDValue(underlyingTokenAddr, currentBalance);
 		// Ensure totalUSDValue is initialized properly
         totalUSDValue += usdValue;
