@@ -6,7 +6,7 @@ chainID: '',
   neonAddress: '0xF97Fcb2015eCd8F8063fE5DbBA98b5d8E2D9a53A',
   hedgingAddress: '0xb7F933DB6e3C9f47C1F59cd67863CAadbE5475D6',
   stakingAddress: '0x823e7aF9DA8b205F89c00024c4a9825Ef8ed9bb8',
-  wethAddress: '0xb4fbf271143f4fbf7b91a5ded31805e42b2208d6',
+  wethAddress: '0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6',
   usdtAddress: '0xC2C527C0CACF457746Bd31B2a698Fe89de2b6d49',
   usdcAddress: '0xde637d4C445cA2aae8F782FFAc8d2971b93A4998',
   UniswapUSDCETH_LP: '',
@@ -20,7 +20,8 @@ tokenLimit: 100,
 
 // CoinGecko API price call function
 async function getCurrentEthUsdcPriceFromUniswapV2() {
-  const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd&include_market_cap=false&include_24hr_vol=false&include_24hr_change=false&include_last_updated_at=false'); // Replace with the actual API endpoint for fetching the price
+
+  const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd&include_market_cap=false&include_24hr_vol=false&include_24hr_change=false&include_last_updated_at=false'); 
   const data = await response.json();
   const ethUsdcPrice = data.ethereum.usd;  
   return ethUsdcPrice;
@@ -40,7 +41,7 @@ return address.slice(0, 6) + '...' + address.slice(-4);
 // Function to Convert to USD value based on pair
 // accepts Number
 function convertToUSD(value, pairedCurrency, ethUsdPrice) {
-alert(value + " based on " + pairedCurrency + " " + ethUsdPrice);
+console.log('outputUSD ' + value + ", worthOf " + pairedCurrency + ", @ ethusd: " + ethUsdPrice);
 switch (pairedCurrency) {
   case CONSTANTS.wethAddress:
   return value * ethUsdPrice;
@@ -69,14 +70,15 @@ try {
     // reverse engineer pair address needed for USD conversion
     let pairedAddress;
     if (pairSymbol === 'USDT') {
-      pairedAddress = '0xdac17f958d2ee523a2206206994597c13d831ec7';
+      pairedAddress = CONSTANTS.usdtAddress;
     } else if (pairSymbol === 'USDC') {
-      pairedAddress = '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48';
+      pairedAddress = CONSTANTS.usdcAddress;
     } else if (pairSymbol === 'WETH') {
       pairedAddress = CONSTANTS.wethAddress;
     }
     // accepts Number not wei & BigNumber
     const usdValue = convertToUSD(balanceNumber, pairedAddress, ethUsdPrice);
+    console.log('for: '+balanceNumber);
     return usdValue;
   }
 } catch (error) {
@@ -92,10 +94,10 @@ async function getTokenETHValue(underlyingTokenAddr, bigIntBalanceInput) {
   try {
       // Convert balance to string
       const input_balance = bigIntBalanceInput.toString();
-      console.log('input: ' + input_balance + ' token: ' + underlyingTokenAddr + ' bal: ' + bigIntBalanceInput);
+      console.log('>input: ' + input_balance + ' token: ' + underlyingTokenAddr + ' bal: ' + bigIntBalanceInput);
 
       const result = await hedgingInstance.methods.getUnderlyingValue(underlyingTokenAddr, input_balance).call();
-      console.log('output ' + result[0] + ', ' + result[1]);
+      console.log('<output ' + result[0] + ', ' + result[1]);
       const underlyingValue = result[0];
       const pairedAddress = result[1];
 

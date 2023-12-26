@@ -18,15 +18,12 @@ async function userTokenList(walletAddress) {
 
     for (const tokenAddress of tokenAddresses) {
         const result = await hedgingInstance.methods.getUserTokenBalances(tokenAddress, walletAddress).call();
-        const deposited = result[0];
-        const withdrawn = result[1];
+        const depositedBalance = result[0];
+        const withdrawnBalance = result[1];
         const ethUsdPrice = await getCurrentEthUsdcPriceFromUniswapV2();
 
         // Convert deposited and withdrawn balances to BigNumber and handle 1e18 format
-        const depositedBalance = new BigNumber(deposited).div(new BigNumber(10).pow(18));
-        const withdrawnBalance = new BigNumber(withdrawn).div(new BigNumber(10).pow(18));
-        const currentBalance = depositedBalance.minus(withdrawnBalance);
-
+        const currentBalance = depositedBalance - withdrawnBalance;
         const tokenInfo = await getTokenInfo(tokenAddress, currentBalance);
 
         if (tokenInfo) {
@@ -88,15 +85,15 @@ async function getTokenInfo(tokenAddress, balance) {
             tokenContract.methods.symbol().call(),
             tokenContract.methods.decimals().call(),
         ]);
-        // Convert the balance to a BigNumber and handle 1e18 format
-        const tokenBalance = new BigNumber(balance).div(new BigNumber(10).pow(tokenDecimals));
-        // Fetch the USD value of the token balance
-        const usdValue = await getTokenUSDValue(tokenAddress, balance);
+        
+        // Fetch the USD value of the token balance: accepts wei & BigNumber
+        const input_balance = balance.toString();
+        const usdValue = await getTokenUSDValue(tokenAddress, input_balance);
         const tokenInfo = {
             name: tokenName,
             symbol: tokenSymbol,
             address: tokenAddress,
-            amount: tokenBalance.toFormat(),
+            amount: balance.toFormat(),
             valueInUSD: usdValue,
         };
 
