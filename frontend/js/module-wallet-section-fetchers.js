@@ -26,14 +26,13 @@ async function fetchSection_Networth(){
         // ETH values
         const rewardsDue = await calculateRewardsDue(userAddress);
         const commissionDue = await calculateCommissionDueETH(userAddress);
-        const rewardsDueETH = rewardsDue[0];
         const totalCommissionDueETH = commissionDue[0]; //already formated
         const stakedTokensETH = await calculateStakedTokensValueETH(userAddress); //already formated
         const [walletTokensETH, pairedSymbol] = await getTokenETHValue(CONSTANTS.neonAddress, walletBalanceRaw); //already formated
 
         //USD values
         const totalDepositsUSD = await getCurrentBalancesValue(userAddress); //already formated
-        const totalRewardsDueUSD = rewardsDue[1]; //already formated
+        const totalRewardsDueUSD = rewardsDue * ethUsdcPrice; //already formated
         const totalCommissionDueUSD = commissionDue[0] * ethUsdcPrice; //already formated
         const stakedTokensUSD = stakedTokensETH * ethUsdcPrice;
         const walletTokensUSD = walletTokensETH * ethUsdcPrice;
