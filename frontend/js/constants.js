@@ -38,7 +38,9 @@ return address.slice(0, 6) + '...' + address.slice(-4);
 }
 
 // Function to Convert to USD value based on pair
+// accepts Number
 function convertToUSD(value, pairedCurrency, ethUsdPrice) {
+alert(value + " based on " + pairedCurrency + " " + ethUsdPrice);
 switch (pairedCurrency) {
   case CONSTANTS.wethAddress:
   return value * ethUsdPrice;
@@ -50,37 +52,61 @@ switch (pairedCurrency) {
 }
 }
 // Function to get token USD value
-async function getTokenUSDValue(underlyingTokenAddr, balance) {
+// accepts wei & BigNumber
+// outputs Number
+async function getTokenUSDValue(underlyingTokenAddr, balanceRaw) {	
+const ethUsdPrice = await getCurrentEthUsdcPriceFromUniswapV2();
 try {
-  const underlyingValue = await getTokenETHValue(underlyingTokenAddr, balance)
-  const ethUsdPrice = await getCurrentEthUsdcPriceFromUniswapV2();
-  const usdValue = convertToUSD(underlyingValue[0], underlyingValue[1], ethUsdPrice);
-  return usdValue;
+  if (underlyingTokenAddr === CONSTANTS.wethAddress) {
+    const balance = new BigNumber(balanceRaw).div(new BigNumber(10).pow(18));
+    const usdValue = convertToUSD(balance, CONSTANTS.wethAddress, ethUsdPrice);
+    return usdValue;
+  } else {
+    const underlyingValue = await getTokenETHValue(underlyingTokenAddr, balance);
+    const balanceNumber = underlyingValue[0];
+    const pairSymbol = underlyingValue[1];
+    
+    // reverse engineer pair address needed for USD conversion
+    let pairedAddress;
+    if (pairSymbol === 'USDT') {
+      pairedAddress = '0xdac17f958d2ee523a2206206994597c13d831ec7';
+    } else if (pairSymbol === 'USDC') {
+      pairedAddress = '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48';
+    } else if (pairSymbol === 'WETH') {
+      pairedAddress = CONSTANTS.wethAddress;
+    }
+    // accepts Number not wei & BigNumber
+    const usdValue = convertToUSD(balanceNumber, pairedAddress, ethUsdPrice);
+    return usdValue;
+  }
 } catch (error) {
   console.error("Error getting token USD value:", error);
   return 0;
 }
 }
 // Function to get token paired currency value
-async function getTokenETHValue(underlyingTokenAddr, balance) {
+// accepts wei & BigNumber of all decimals; XEON, USDT, USDC, WETH
+// outputs Number ready to display
+// Rename to getUnderlyingValue
+async function getTokenETHValue(underlyingTokenAddr, bigIntBalanceInput) {
   try {
-      // Fetch decimals for the underlying token
-      const tokenDecimals = await getTokenDecimals(underlyingTokenAddr);
-
-      const bigIntBalance = new BigNumber(balance).times(new BigNumber(10).pow(tokenDecimals));
-
-  // Convert bigIntBalance to uint256
-  const input_balance = bigIntBalance.integerValue(BigNumber.ROUND_FLOOR).toString(10);
+      // Convert balance to string
+      const input_balance = bigIntBalanceInput.toString();
+      console.log('input: ' + input_balance + ' token: ' + underlyingTokenAddr + ' bal: ' + bigIntBalanceInput);
 
       const result = await hedgingInstance.methods.getUnderlyingValue(underlyingTokenAddr, input_balance).call();
+      console.log('output ' + result[0] + ', ' + result[1]);
       const underlyingValue = result[0];
       const pairedAddress = result[1];
-      const pairedAddressDecimal = await getTokenDecimals(pairedAddress);
 
       if (!result) {
           console.error("Invalid result:", result);
           return [new BigNumber(0), ''];
       }
+      // convert from BigNumber to Number
+      const pairedAddressDecimal = await getTokenDecimals(pairedAddress);
+      const balance = web3.utils.fromWei(underlyingValue, 'ether') / 10 ** pairedAddressDecimal;
+      const trueValue = Number(balance);
 
       let pairSymbol;
       if (pairedAddress === '0xdac17f958d2ee523a2206206994597c13d831ec7') {
@@ -91,8 +117,7 @@ async function getTokenETHValue(underlyingTokenAddr, balance) {
           pairSymbol = 'WETH';
       }
 
-      const convertedValue = web3.utils.fromWei(underlyingValue, 'ether') / 10 ** pairedAddressDecimal;
-      return [convertedValue, pairSymbol];
+      return [trueValue, pairSymbol];
   } catch (error) {
       console.error("Error getting token ETH value:", error);
       return [new BigNumber(0), ''];
