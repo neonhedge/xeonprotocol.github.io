@@ -86,6 +86,10 @@ async function getTokenInfo(tokenAddress, balance) {
             tokenContract.methods.decimals().call(),
         ]);
         
+        // convert from BigNumber to Number
+        const balance = web3.utils.fromWei(balance, 'ether') / 10 ** tokenDecimals;
+        const trueValue = Number(balance);
+
         // Fetch the USD value of the token balance: accepts wei & BigNumber
         const input_balance = balance.toString();
         const usdValue = await getTokenUSDValue(tokenAddress, input_balance);
@@ -93,10 +97,9 @@ async function getTokenInfo(tokenAddress, balance) {
             name: tokenName,
             symbol: tokenSymbol,
             address: tokenAddress,
-            amount: balance.toFormat(),
+            amount: trueValue,
             valueInUSD: usdValue,
         };
-
         return tokenInfo;
     } catch (error) {
         console.error("Error getting token information:", error);
