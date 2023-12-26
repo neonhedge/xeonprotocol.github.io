@@ -4,19 +4,19 @@ import { getWalletTokenList } from "./module-wallet-tokenlist-dependencies.js";
 // Function to calculate the total USD value of all token balances
 async function getCurrentBalancesValue(walletAddress) {
     const transactedTokensArray = await getWalletTokenList(walletAddress);
-    let totalUSDValue = new BigNumber(0); // Initialize as a BigNumber
+    let totalUSDValue; // Initialize as Number
     for (const underlyingTokenAddr of transactedTokensArray) {
         const result = await hedgingInstance.methods.getUserTokenBalances(underlyingTokenAddr, walletAddress).call();
         const deposited = result[0];
         const withdrawn = result[1];
         const ethUsdPrice = await getCurrentEthUsdcPriceFromUniswapV2();
-        // Convert deposited and withdrawn balances to BigNumber and handle 1e18 format
-        const depositedBalance = new BigNumber(deposited).div(new BigNumber(10).pow(18));
-        const withdrawnBalance = new BigNumber(withdrawn).div(new BigNumber(10).pow(18));
-        const currentBalance = depositedBalance.minus(withdrawnBalance);
+        // Wei input for getTokenUSDValue
+        const currentBalance = deposited.minus(withdrawn);
         // Get the USD value for the token balance
-        const usdValue = await getTokenUSDValue(underlyingTokenAddr, currentBalance, ethUsdPrice);
-        totalUSDValue = totalUSDValue.plus(usdValue);
+		alert(underlyingTokenAddr+" "+currentBalance+" "+ethUsdPrice+" -- from array: "+transactedTokensArray);
+        const usdValue = await getTokenUSDValue(underlyingTokenAddr, currentBalance);
+		// Ensure totalUSDValue is initialized properly
+        totalUSDValue += usdValue;
     }
     return totalUSDValue;
 }
@@ -46,7 +46,7 @@ async function calculateCommissionDueETH(walletAddress) {
 	const collateralRewardsDue = await stakingInstance.methods.getCollateralRewardsDue().call({ from: walletAddress });
 	const liquidityRewardsDueETH = new BigNumber(liquidityRewardsDue).div(1e18);
 	const collateralRewardsDueETH = new BigNumber(collateralRewardsDue).div(1e18);
-	const commissionDueETH = liquidityRewardsDueETH.plus(collateralRewardsDueETH);
+	const commissionDueETH = liquidityRewardsDueETH + collateralRewardsDueETH;
   
 	return [commissionDueETH, liquidityRewardsDueETH, collateralRewardsDueETH];
 }
