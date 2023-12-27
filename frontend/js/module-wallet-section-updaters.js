@@ -43,6 +43,12 @@ function updateSectionValues_Networth(
         document.getElementById("netCommissionUSD").textContent = formatStringDecimal(totalCommissionDueUSD);
         document.getElementById("walletBalanceUSD").textContent = formatStringDecimal(walletBalanceUSD);
         document.getElementById("tokensCount").textContent = Number(transactedTokensCount);
+
+        // Remove the 'is-loading' class after loading
+        const nwTextValues = document.querySelectorAll('.nw-text-value, .volume-count');
+        nwTextValues.forEach(element => {
+            element.classList.remove('is-loading');
+        });
     } catch (error) {
         console.error("Error Updating Net Worth section data:", error);
     }

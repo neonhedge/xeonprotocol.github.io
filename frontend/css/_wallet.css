@@ -1094,7 +1094,6 @@ button#transactSubmit{
 
   .section-title h2{
 	display: inline-flex;
-	flex-grow: 1;
 	align-items: center;
 	font-size: clamp(18px, 2vw, 22px);
 	font-weight: 400;
@@ -1105,7 +1104,7 @@ button#transactSubmit{
 	height: min-content;
 	place-self: center;
 	margin-bottom: 2rem;
-	margin-left: 1rem;
+	margin-left: 25%;
 	color: #888;
 	gap: 1vw;
   }
@@ -2029,3 +2028,22 @@ button:disabled:hover {
   text-align:center;
   z-index:150;
 }
+/* IS-LOADING EFFECT */
+.is-loading {
+    background: #0e0d31;
+    background: linear-gradient(120deg, #0e0d31 8%, #1e96d5 18%, #0e0d31 33%); /* alt: #044d74, #fbf9f1 */
+    background-size: 200% 100%;
+    -webkit-animation: 1.5s shine linear infinite;
+    animation: 1.5s shine linear infinite;
+}
+@-webkit-keyframes shine {
+	to {
+	  background-position-x: -200%;
+	}
+  }
+  
+  @keyframes shine {
+	to {
+	  background-position-x: -200%;
+	}
+  }
