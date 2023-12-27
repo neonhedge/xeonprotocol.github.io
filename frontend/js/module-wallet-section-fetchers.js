@@ -28,7 +28,7 @@ async function fetchSection_Networth(){
         const commissionDue = await calculateCommissionDueETH(userAddress);
         const totalCommissionDueETH = commissionDue[0]; //already formated
         const stakedTokensETH = await calculateStakedTokensValueETH(userAddress); //already formated
-        const [walletTokensETH, pairedSymbol] = await getTokenETHValue(CONSTANTS.neonAddress, walletBalanceRaw); //already formated
+        const [walletTokensETH, pairedSymbol] = await getTokenETHValue(CONSTANTS.neonAddress, walletBalanceRaw); //input in wei, output already formated
 
         //USD values
         const totalDepositsUSD = await getCurrentBalancesValue(userAddress); //already formated
@@ -38,6 +38,8 @@ async function fetchSection_Networth(){
         const walletTokensUSD = walletTokensETH * ethUsdcPrice;
         const netWorthUSD = walletTokensUSD + stakedTokensUSD + totalCommissionDueUSD + totalRewardsDueUSD + totalDepositsUSD;	
 
+		console.log("totalDepositsUSD: " + totalDepositsUSD + ", stakedTokensUSD: " + stakedTokensUSD + ", walletTokensUSD: " + walletTokensUSD + ", totalRewardsDueUSD: " + totalRewardsDueUSD + ", totalCommissionDueUSD " + totalCommissionDueUSD + ", netWorthUSD " + netWorthUSD);
+
         updateSectionValues_Networth(
             userAddress,
             walletBalance,
@@ -46,6 +48,7 @@ async function fetchSection_Networth(){
             totalRewardsDueUSD,
             totalCommissionDueETH,
             totalCommissionDueUSD,
+			walletTokensUSD,
             transactedTokensCount,
             netWorthUSD
         );

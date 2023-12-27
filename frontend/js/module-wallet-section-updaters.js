@@ -7,6 +7,7 @@ function updateSectionValues_Networth(
     totalRewardsDueUSD,
     totalCommissionDueETH,
     totalCommissionDueUSD,
+    walletBalanceUSD,
     transactedTokensCount,
     netWorthUSD
     ) {
@@ -25,8 +26,8 @@ function updateSectionValues_Networth(
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2,
             };
-            return number.toLocaleString('en-US', options);
-        };
+            return '$' + number.toLocaleString('en-US', options);
+        };          
 
         var first = userAddress.substring(0, 5);//get first chars
         var last = userAddress.slice(userAddress.length - 3);//get last chars
@@ -40,7 +41,8 @@ function updateSectionValues_Networth(
         document.getElementById("netDepositsUSD").textContent = formatStringDecimal(totalDepositsUSD);
         document.getElementById("netRewardsUSD").textContent = formatStringDecimal(totalRewardsDueUSD);
         document.getElementById("netCommissionUSD").textContent = formatStringDecimal(totalCommissionDueUSD);
-        document.getElementById("tokensCount").textContent = formatValue(transactedTokensCount);
+        document.getElementById("walletBalanceUSD").textContent = formatStringDecimal(walletBalanceUSD);
+        document.getElementById("tokensCount").textContent = Number(transactedTokensCount);
     } catch (error) {
         console.error("Error Updating Net Worth section data:", error);
     }
