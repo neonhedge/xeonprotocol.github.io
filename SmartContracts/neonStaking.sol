@@ -9,7 +9,6 @@ contract StakingContract is Ownable {
     using SafeMath for uint256;
 
     IERC20 public stakingToken;
-    uint256 public stakingDuration = 30 days;
     uint256 public poolExpiry; // The day when the staking pool expires and opens transacts for 3 days
     uint256 public nextUnstakeDay; // The day when stakers can unstake again.
     uint256 public ethRewardBasis;
@@ -33,6 +32,9 @@ contract StakingContract is Ownable {
     mapping(address => uint256) public lastRewardBasis;
     mapping(address => uint256) public lastLiquidityRewardBasis;
     mapping(address => uint256) public lastCollateralRewardBasis;
+    mapping(address => uint256) public claimedRewardsStaking;
+    mapping(address => uint256) public claimedRewardsCollateral;
+    mapping(address => uint256) public claimedRewardsLiquidity;
 
     event Staked(address indexed staker, uint256 amount);
     event Unstaked(address indexed staker, uint256 amount);
@@ -46,9 +48,9 @@ contract StakingContract is Ownable {
         _;
     }
 
-    constructor(address _stakingToken) {
-        require(_stakingToken != address(0), "Invalid token address.");
-        stakingToken = IERC20(_stakingToken);
+    constructor(address XeonToken) {
+        require(XeonToken != address(0), "Invalid token address.");
+        stakingToken = IERC20(XeonToken);
     }
 
     function startContract() external onlyOwner {
@@ -79,7 +81,7 @@ contract StakingContract is Ownable {
 
     function unstake() external stakingWindow {
         Staker storage staker = stakers[msg.sender];
-        require(staker.stakingTime - block.timestamp > 30 * 24 * 60 * 60,"Wait 30 days from your last stake action" );
+        require(staker.stakingTime - block.timestamp > 3 * 24 * 60 * 60,"Wait 30 days from your last stake action" );
         require(staker.amount > 0, "You have no staked tokens.");
 
         uint256 amountToUnstake = staker.amount.sub(staker.assignedForMining).sub(staker.assignedForLiquidity).sub(staker.assignedForCollateral);
@@ -164,13 +166,14 @@ contract StakingContract is Ownable {
     function claimRewards() external {
         Staker storage staker = stakers[msg.sender];
         require(staker.amount > 0, "You have no staked tokens.");
-        require(staker.stakingTime - block.timestamp > 30 * 24 * 60 * 60,"Wait 30 days from your last claim" );
+        require(staker.stakingTime - block.timestamp > 3 * 24 * 60 * 60,"Wait 30 days from your last claim" );
         
         uint256 ethChange = ethRewardBasis - lastRewardBasis[msg.sender];
         uint256 stakerRewardShare = ethChange.mul(staker.amount).div(getTotalStaked());
 
         staker.lastClaimedDay = block.timestamp;
         lastRewardBasis[msg.sender] = ethRewardBasis;
+        claimedRewardsStaking[msg.sender] += stakerRewardShare;
 
         payable(msg.sender).transfer(stakerRewardShare);
 
@@ -186,6 +189,7 @@ contract StakingContract is Ownable {
 
         staker.lastClaimedDay = block.timestamp;
         lastLiquidityRewardBasis[msg.sender] = ethLiquidityRewardBasis;
+        claimedRewardsLiquidity[msg.sender] += liquidityRewardShare;
 
         payable(msg.sender).transfer(liquidityRewardShare);
 
@@ -201,6 +205,7 @@ contract StakingContract is Ownable {
 
         staker.lastClaimedDay = block.timestamp;
         lastCollateralRewardBasis[msg.sender] = ethCollateralRewardBasis;
+        claimedRewardsCollateral[msg.sender] += collateralRewardShare;
 
         payable(msg.sender).transfer(collateralRewardShare);
 
@@ -251,11 +256,11 @@ contract StakingContract is Ownable {
         return (staker.assignedForMining, staker.assignedForLiquidity, staker.assignedForCollateral, unassignedAmount);
     }
 
-    function getStakedBalance(address stakerAddress) external view returns (uint256) {
+    function getStakedBalance(address stakerAddress) public view returns (uint256) {
         return stakers[stakerAddress].amount;
     }
 
-    function getTotalStaked() internal view returns (uint256) {
+    function getTotalStaked() public view returns (uint256) {
         return stakingToken.balanceOf(address(this));
     }
 

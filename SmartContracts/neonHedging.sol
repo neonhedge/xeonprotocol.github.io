@@ -167,8 +167,6 @@ contract NEONHEDGE {
     mapping(address => uint[]) private equityswapsSettled;
 
     // mapping of all hedges for user by Id
-    mapping(address => uint[]) public myoptionsHistory;
-    mapping(address => uint[]) public myswapsHistory;
     mapping(address => uint[]) public myoptionsCreated;
     mapping(address => uint[]) public myoptionsTaken;
     mapping(address => uint[]) public myswapsCreated;
@@ -192,12 +190,8 @@ contract NEONHEDGE {
 
     // more volume mappings
     mapping(address => uint256) public protocolCashierFees;
-    mapping(address => uint256) public wethEquivUserHedged;
-    mapping(address => uint256) public usdtEquivUserHedged;
-    mapping(address => uint256) public usdcEquivUserHedged;
-    mapping(address => uint256) public wethEquivUserCosts;
-    mapping(address => uint256) public usdtEquivUserCosts;
-    mapping(address => uint256) public usdcEquivUserCosts;    
+    mapping(address => mapping(address => uint256)) public equivUserHedged;
+    mapping(address => mapping(address => uint256)) public equivUserCosts;   
 
     // mapping bookmarks of each user
     mapping(address => mapping(uint256 => bool)) public bookmarks;
@@ -213,8 +207,6 @@ contract NEONHEDGE {
     uint public depositedTokensLength;
     uint public optionsCreatedLength;
     uint public equityswapsCreatedLength;
-    uint public tokenOptionsLength;
-    uint public tokenSwapsLength;
     uint public optionID;
     uint public topupRequestID;
     
@@ -265,7 +257,7 @@ contract NEONHEDGE {
         owner = msg.sender;
     }
 
-    function depositToken(address _token, uint256 _amount) public nonReentrant {
+    function depositToken(address _token, uint256 _amount) external nonReentrant {
         require(_amount > 0, "You're attempting to transfer 0 tokens");
         // Deposit WETH , stables or ERC20
         if (_token == wethAddress) {
@@ -308,7 +300,7 @@ contract NEONHEDGE {
         emit onDeposit(_token, _amount, msg.sender);
     }
 
-    function withdrawToken(address token, uint256 amount) public nonReentrant {
+    function withdrawToken(address token, uint256 amount) external nonReentrant {
         // Read user balances into local variables
         (, , , uint256 withdrawable, , ) = getUserTokenBalances(token, msg.sender);
 
@@ -349,12 +341,11 @@ contract NEONHEDGE {
         emit onWithdraw(token, amount, msg.sender);
     }
 
-
     // Create Hedge: covers both call options and equity swaps. put options to be enabled in Beta V2
     // premium or buying cost paid in paired token of the underlying asset in the deal
     // no premium for swaps. swap collateral must  be equal for both parties, settle function relies on this implementation here
     // put options will have a max loss check to only accept a strike price 50% away max
-    function createHedge(uint tool, address token, uint256 amount, uint256 cost, uint256 deadline) public nonReentrant {
+    function createHedge(uint tool, address token, uint256 amount, uint256 cost, uint256 deadline) external nonReentrant {
         require(tool <= 2 && amount > 0 && cost > 0 && deadline > block.timestamp, "Invalid option parameters");
         (, , , uint256 withdrawable, , ) = getUserTokenBalances(token, msg.sender);
         require(withdrawable > 0, "Insufficient balance");
@@ -386,30 +377,22 @@ contract NEONHEDGE {
         // Update arrays
         if (newOption.hedgeType == HedgeType.SWAP) {
             require(cost >= newOption.createValue, "Swap collateral must be equal value");
-            myswapsHistory[msg.sender].push(optionID);
             myswapsCreated[msg.sender].push(optionID);
             equityswapsCreated.push(optionID);
             optionsCreatedLength ++;
             tokenOptions[token].push(optionID);
-            tokenOptionsLength ++;
         } else {
-            myoptionsHistory[msg.sender].push(optionID);
             myoptionsCreated[msg.sender].push(optionID);
             optionsCreated.push(optionID);
             optionsCreatedLength ++;
             tokenSwaps[token].push(optionID);
-            tokenSwapsLength ++;
         }
 
         // Log protocol analytics
         optionID++;
         hedgesCreatedVolume[newOption.paired].add(newOption.createValue);
-
-        // Wallet hedge volume in main paited currency only
-        if(newOption.paired == wethAddress){wethEquivUserHedged[msg.sender] += newOption.createValue;}
-        if(newOption.paired == usdtAddress){usdtEquivUserHedged[msg.sender] += newOption.createValue;}
-        if(newOption.paired == usdcAddress){usdcEquivUserHedged[msg.sender] += newOption.createValue;}
-
+        // Wallet hedge volume in main paired currency
+        updateEquivUserHedged(token, newOption.paired, newOption.createValue);
         // Emit
         emit hedgeCreated(token, optionID, newOption.createValue, newOption.hedgeType, msg.sender);
     }
@@ -418,7 +401,7 @@ contract NEONHEDGE {
     // For Call and Put Options cost is premium, lockedinuse here but paid out on settlement
     // For Equity Swaps cost is equal to underlying value as 100% collateral is required. There is no premium
     // Strike value is not set here, maturity calculations left to the settlement function
-    function buyHedge(uint256 _optionId) public nonReentrant {
+    function buyHedge(uint256 _optionId) external nonReentrant {
         hedgingOption storage hedge = hedgeMap[_optionId];
         userBalance storage stk = userBalanceMap[hedge.paired][msg.sender];
 
@@ -444,11 +427,9 @@ contract NEONHEDGE {
 
         // Update arrays and takes count
         if (hedge.hedgeType == HedgeType.SWAP) {
-            myswapsHistory[msg.sender].push(_optionId);
             equityswapsTaken.push(_optionId);
             myswapsTaken[msg.sender].push(_optionId);
         } else if (hedge.hedgeType == HedgeType.CALL) {
-            myoptionsHistory[msg.sender].push(_optionId);
             optionsTaken.push(_optionId);
             myoptionsTaken[msg.sender].push(_optionId);
         }
@@ -477,10 +458,8 @@ contract NEONHEDGE {
             optionsVolume[hedge.paired] += hedge.startValue;
         }
 
-        // Wallet hedge volume analytics in main paired currency only
-        if (hedge.paired == wethAddress) { wethEquivUserCosts[msg.sender] += hedge.startValue; }
-        if (hedge.paired == usdtAddress) { usdtEquivUserCosts[msg.sender] += hedge.startValue; }
-        if (hedge.paired == usdcAddress) { usdcEquivUserCosts[msg.sender] += hedge.startValue; }
+        // Wallet buy volume in main paired currency
+        updateEquivUserCosts(hedge.token, hedge.paired, hedge.startValue);
 
         // Emit the hedgePurchased event
         emit hedgePurchased(hedge.token, _optionId, hedge.startValue, hedge.hedgeType, msg.sender);
@@ -490,7 +469,7 @@ contract NEONHEDGE {
     // any party can initiate & accepter only matches amount
     // Action is request (false) or accept (true)
     // Request amount can be incremented if not accepted yet
-    function topupHedge(uint _optionId, uint256 amount, bool action) public nonReentrant {
+    function topupHedge(uint _optionId, uint256 amount, bool action) external nonReentrant {
         hedgingOption storage hedge = hedgeMap[_optionId];
         require(msg.sender == hedge.owner || msg.sender == hedge.taker, "Invalid party to request");
         require(topupMap[topupRequestID].state == 0, "Request already accepted");
@@ -523,7 +502,7 @@ contract NEONHEDGE {
         emit topupRequested(msg.sender, _optionId, amount, requestAccept);
     }
 
-    function rejectTopupRequest(uint _optionId, uint _requestID) public {
+    function rejectTopupRequest(uint _optionId, uint _requestID) external {
         hedgingOption storage hedge = hedgeMap[_optionId];
         require(msg.sender == hedge.owner || msg.sender == hedge.taker, "Invalid party to reject");
         require(topupMap[_requestID].state == 0, "Request already accepted or rejected");
@@ -531,7 +510,7 @@ contract NEONHEDGE {
         topupMap[_requestID].state = 2;
     }
 
-    function cancelTopupRequest(uint _optionId, uint _requestID) public {
+    function cancelTopupRequest(uint _optionId, uint _requestID) external {
         require(topupMap[_requestID].amountTaker == 0, "Request already accepted");
         require(hedgeMap[_optionId].owner == msg.sender, "Only owner can cancel");
         hedgingOption storage hedge = hedgeMap[_optionId];
@@ -539,7 +518,7 @@ contract NEONHEDGE {
         topupMap[_requestID].state = 2;
     }
 
-    function zapRequest(uint _optionId) public {  
+    function zapRequest(uint _optionId) external {  
         hedgingOption storage hedge = hedgeMap[_optionId];    
         require(msg.sender == hedge.owner || msg.sender == hedge.taker, "Invalid party to request");
         require(hedge.dt_started > block.timestamp, "Hedge not taken yet");
@@ -789,8 +768,34 @@ contract NEONHEDGE {
         }
     }
 
+    // Underlying value equivalent logging
+    function updateEquivUserHedged(address token, address paired, uint256 createValue) internal {
+        if (token == wethAddress || paired == wethAddress) {
+            equivUserHedged[msg.sender][wethAddress] += createValue;
+        }
+        if (token == usdtAddress || paired == usdtAddress) {
+            equivUserHedged[msg.sender][usdtAddress] += createValue;
+        }
+        if (token == usdcAddress || paired == usdcAddress) {
+            equivUserHedged[msg.sender][usdcAddress] += createValue;
+        }
+    }
+
+    // Underlying cost equivalent logging
+    function updateEquivUserCosts(address token, address paired, uint256 createValue) internal {
+        if (token == wethAddress || paired == wethAddress) {
+            equivUserCosts[msg.sender][wethAddress] += createValue;
+        }
+        if (token == usdtAddress || paired == usdtAddress) {
+            equivUserCosts[msg.sender][usdtAddress] += createValue;
+        }
+        if (token == usdcAddress || paired == usdcAddress) {
+            equivUserCosts[msg.sender][usdcAddress] += createValue;
+        }
+    }
+
     // Fees
-    function updateFee(uint256 numerator, uint256 denominator) onlyOwner public {
+    function updateFee(uint256 numerator, uint256 denominator) onlyOwner external {
       feeNumerator = numerator;
       feeDenominator = denominator;
     }
@@ -804,7 +809,7 @@ contract NEONHEDGE {
     }
 
     // Toggle hedge bookmark using ID
-    function bookmarkHedge(uint256 _optionId) public {
+    function bookmarkHedge(uint256 _optionId) external {
         bool bookmarked = bookmarks[msg.sender][_optionId];
         bookmarks[msg.sender][_optionId] = !bookmarked;
         emit bookmarkToggle(msg.sender, _optionId, !bookmarked);
@@ -876,40 +881,43 @@ contract NEONHEDGE {
 
     // Zero Knowledge pair address generator
     function getPairAddressZK(address tokenAddress) public view returns (address pairAddress, address pairedCurrency) {
-      IUniswapV2Factory factory = IUniswapV2Factory(UNISWAP_FACTORY_ADDRESS);
-      address wethPairAddress = factory.getPair(tokenAddress, wethAddress);
-      address usdtPairAddress = factory.getPair(tokenAddress, usdtAddress);
-      address usdcPairAddress = factory.getPair(tokenAddress, usdcAddress);
-      if (wethPairAddress != address(0)) {
-          return (wethPairAddress, wethAddress);
-      } else if (usdtPairAddress != address(0)) {
-          return (usdtPairAddress, usdtAddress);
-      } else if (usdcPairAddress != address(0)) {
-          return (usdcPairAddress, usdcAddress);
-      } else {
-          revert("TokenValue: token is not paired with WETH, USDT, or USDC");
-      }
+        IUniswapV2Factory factory = IUniswapV2Factory(UNISWAP_FACTORY_ADDRESS);
+        address wethPairAddress = factory.getPair(tokenAddress, wethAddress);
+        address usdtPairAddress = factory.getPair(tokenAddress, usdtAddress);
+        address usdcPairAddress = factory.getPair(tokenAddress, usdcAddress);
+        if (wethPairAddress != address(0)) {
+            return (wethPairAddress, wethAddress);
+        } else if (usdtPairAddress != address(0)) {
+            return (usdtPairAddress, usdtAddress);
+        } else if (usdcPairAddress != address(0)) {
+            return (usdcPairAddress, usdcAddress);
+        } else {
+            revert("TokenValue: token is not paired with WETH, USDT, or USDC");
+        }
     }
 
     // Token balances breakdown for wallet
     function getUserTokenBalances (address token, address user) public view returns (uint256 deposited, uint256 withdrawn, uint256 lockedinuse, uint256 withdrawable, uint256 withdrawableValue, address paired) {
-      userBalance memory uto = userBalanceMap[address(token)][address(user)];
-      deposited = uto.deposited;
-      withdrawn = uto.withdrawn;
-      lockedinuse = uto.lockedinuse;
-      withdrawable = (uto.deposited).sub(uto.withdrawn).sub(uto.lockedinuse);
-      if(token != wethAddress && token != usdtAddress && token != usdcAddress ){
-        (withdrawableValue, paired) = getUnderlyingValue(token, withdrawable);
-      }else{
-        (withdrawableValue, paired) = (withdrawable, address(0));
-      }
-      return (deposited, withdrawn, lockedinuse, withdrawable, withdrawableValue, paired);
+        userBalance memory uto = userBalanceMap[address(token)][address(user)];
+        deposited = uto.deposited;
+        withdrawn = uto.withdrawn;
+        lockedinuse = uto.lockedinuse;
+        withdrawable = (uto.deposited).sub(uto.withdrawn).sub(uto.lockedinuse);
+        if(token != wethAddress && token != usdtAddress && token != usdcAddress ){
+            (withdrawableValue, paired) = getUnderlyingValue(token, withdrawable);
+        }else{
+            (withdrawableValue, paired) = (withdrawable, address(0));
+        }
+        return (deposited, withdrawn, lockedinuse, withdrawable, withdrawableValue, paired);
     }
     
     // Internal function to retrieve a subset of an array based on startIndex and limit
     function getSubset(uint[] storage fullArray, uint startIndex, uint limit) internal view returns (uint[] memory) {
         uint length = fullArray.length;
-        require(startIndex < length, "Invalid start index");
+        require(startIndex <= length, "Invalid start index");
+        if (length == 0) {
+            return new uint[](0); //return empty array
+        }
         uint actualLimit = (length - startIndex < limit) ? length - startIndex : limit;
         uint[] memory subset = new uint[](actualLimit);
         for (uint i = 0; i < actualLimit; i++) {
@@ -926,7 +934,10 @@ contract NEONHEDGE {
     function getUserHistory(address user, uint startIndex, uint limit) public view returns (address[] memory) {
         address[] storage tokens = userERC20s[user];
         uint length = tokens.length;
-        require(startIndex < length, "Invalid start index");
+        require(startIndex <= length, "Invalid start index");
+        if (length == 0) {
+            return new address[](0); //return empty array
+        }
         uint actualLimit = length - startIndex < limit ? length - startIndex : limit;
         address[] memory result = new address[](actualLimit);
         for (uint i = startIndex; i < startIndex + actualLimit; i++) {
@@ -939,15 +950,7 @@ contract NEONHEDGE {
         return result;
     }
 
-    // Function to retrieve a subset of options or swaps created/taken by a user
-    function getUserOptionsHistory(address user, uint startIndex, uint limit) public view returns (uint[] memory) {
-        return getSubset(myoptionsHistory[user], startIndex, limit);
-    }
-    
-    function getUserSwapsHistory(address user, uint startIndex, uint limit) public view returns (uint[] memory) {
-        return getSubset(myswapsHistory[user], startIndex, limit);
-    }
-
+    // Functions to retrieve a subset of options or swaps created/taken by a user
     function getUserOptionsCreated(address user, uint startIndex, uint limit) public view returns (uint[] memory) {
         return getSubset(myoptionsCreated[user], startIndex, limit);
     }
@@ -962,6 +965,18 @@ contract NEONHEDGE {
 
     function getUserSwapsTaken(address user, uint startIndex, uint limit) public view returns (uint[] memory) {
         return getSubset(myswapsTaken[user], startIndex, limit);
+    }
+
+    // Functions to retrieve volume for user
+    function getEquivUserHedged(address user, address token) external view returns (uint256) {
+        return equivUserHedged[user][token];
+    }
+    function getEquivUserCosts(address user, address token) external view returns (uint256) {
+        return equivUserCosts[user][token];
+    }
+    // Functions to retrieve PL for user
+    function getEquivUserPL(address user, address pairedCurrency) external view returns (uint256 P, uint256 L) {
+        return (userPLMap[pairedCurrency][user].profits, userPLMap[pairedCurrency][user].losses);
     }
 
     // Helper function to retrieve a subset of options or swaps created/taken by all users
