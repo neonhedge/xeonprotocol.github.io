@@ -47,6 +47,7 @@ async function userTokenList(walletAddress) {
 
 // Function to calculate ERC20 token information
 async function getTokenInfo(tokenAddress, balance) {
+    let balanceRaw = balance;
 	const ERC20_ABI = [
 		{
 		  constant: true,
@@ -85,14 +86,12 @@ async function getTokenInfo(tokenAddress, balance) {
             tokenContract.methods.symbol().call(),
             tokenContract.methods.decimals().call(),
         ]);
-        
-        // convert from BigNumber to Number
-        const balance = web3.utils.fromWei(balance, 'ether') / 10 ** tokenDecimals;
+        // Format from BigNumber to human readable
+        const balance = new BigNumber(balanceRaw).div(new BigNumber(10).pow(tokenDecimals));
         const trueValue = Number(balance);
 
         // Fetch the USD value of the token balance: accepts wei & BigNumber
-        const input_balance = balance.toString();
-        const usdValue = await getTokenUSDValue(tokenAddress, input_balance);
+        const usdValue = await getTokenUSDValue(tokenAddress, balanceRaw);
         const tokenInfo = {
             name: tokenName,
             symbol: tokenSymbol,
@@ -106,6 +105,7 @@ async function getTokenInfo(tokenAddress, balance) {
         return null;
     }
 }
+
 
 // Function to update the HTML with the ERC20 token list
 async function cashierErc20List(walletAddress) {
