@@ -15,54 +15,54 @@ initWeb3();
 
 $(document).ready(async function () {
 
-    // Ready event listeners on wallet
+    // Ready event listeners on the wallet
     setupToggleElements();
     
     // Proceed to fetch data for sections
     const accounts = await web3.eth.requestAccounts();
-	const userAddress = accounts[0];
+    const userAddress = accounts[0];
 
     const unlockState = await unlockedWallet();
-    
-    if (unlockState === true) {
-        const setatmIntervalAsync = (fn, ms) => {
-            fn().then(() => {
-                setTimeout(() => setatmIntervalAsync(fn, ms), ms);
-            });
-        };
-        // Load sections automatically & periodically
-        const callPageTries = async () => {
+
+    const checkAndCallPageTries = async () => {
+        if (unlockState === true) {
             const asyncFunctions = [fetchSection_Networth, fetchSection_BalanceList, fetchSection_HedgePanel, fetchSection_RewardsPanel, fetchSection_StakingPanel];
             for (const func of asyncFunctions) {
-                await func();
+                func();
             }
-        };
+        } else {
+            reqConnect();
+            console.log('PLEASE CONNECT YOUR WALLET');
+        }
+    };
 
-        setatmIntervalAsync(async () => {
-            await callPageTries();
-        }, 30000);
+    const setatmIntervalAsync = (fn, ms) => {
+        fn().then(() => {
+            setTimeout(() => setatmIntervalAsync(fn, ms), ms);
+        });
+    };
 
-        // Load more sections manually not automatically & periodically
-        // Create an IntersectionObserver to load hedges when #hedgingSection is in view
-        const loadHedgesSection = async (entries) => {
-            const accounts = await web3.eth.requestAccounts();
-            const userAddress = accounts[0];
-            for (const entry of entries) {
-                if (entry.isIntersecting) {
-                    // Call the loadHedgesModule function
-                    await loadHedgesModule(userAddress);
-                    // Remove the observer once the section has been loaded
-                    observer.unobserve(entry.target);
-                }
+    // Load sections automatically & periodically
+    setatmIntervalAsync(async () => {
+        await checkAndCallPageTries();
+    }, 45000);
+
+    // Load more sections manually not automatically & periodically
+    // Create an IntersectionObserver to load hedges when #hedgingSection is in view
+    const loadHedgesSection = async (entries) => {
+        for (const entry of entries) {
+            if (entry.isIntersecting) {
+                // Call the loadHedgesModule function
+                await loadHedgesModule(userAddress);
+                // Remove the observer once the section has been loaded
+                observer.unobserve(entry.target);
             }
-        };
-        const hedgingSection = document.getElementById('hedgingSection');
-        const observer = new IntersectionObserver(loadHedgesSection, { root: null, threshold: 0.1 }); //{ root: null, threshold: 0.1 } specifies that the observer is relative to the viewport (root: null) and will trigger the callback function when at least 10% of the target element (hedgingSection) is visible
-        observer.observe(hedgingSection);
-    } else {
-        reqConnect();
-        console.log('PLEASE CONNECT YOUR WALLET');
-    }
+        }
+    };
+
+    const hedgingSection = document.getElementById('hedgingSection');
+    const observer = new IntersectionObserver(loadHedgesSection, { root: null, threshold: 0.1 });
+    observer.observe(hedgingSection);
 });
 
 
@@ -117,6 +117,8 @@ export function setupToggleElements() {
             return;
         }
         try {
+            // show address indicators
+
             mybalances = await getUserBalancesForToken(pastedAddress, userAddress);
             // format output
             const formatValue = (value) => {
@@ -248,3 +250,14 @@ export function setupCashingModule(formValues) {
     }
 
 }
+
+// address indicator spans
+$(document).ready(function () {
+    $('#erc20-address').on('focus', function () {
+        $('#addressData').addClass('expandedData');
+    });
+    $('.transact-amount').on('focus', function () {
+        $('#walletData').addClass('expandedData');
+    });
+});
+

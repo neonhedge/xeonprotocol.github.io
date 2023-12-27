@@ -21,7 +21,7 @@ async function fetchSection_Networth(){
 		const stakedBalance = (BigInt(stakedBalanceRaw) / BigInt(10) ** BigInt(CONSTANTS.decimals)).toString();
 
         // ETH USD price
-        const ethUsdcPrice = await getCurrentEthUsdcPriceFromUniswapV2();
+        const ethUsdcPrice = getCurrentEthUsdcPriceFromUniswapV2();
 
         // ETH values
         const rewardsDue = await calculateRewardsDue(userAddress);
@@ -74,7 +74,7 @@ async function fetchSection_HedgePanel(){
 	const accounts = await web3.eth.requestAccounts();
 	const userAddress = accounts[0];
 	// Fetch arrays
-	const userOptionsCreated = await hedgingInstance.methods.myoptionsCreated(userAddress).call();
+	const userOptionsCreated = await hedgingInstance.methods.getUserOptionsCreated(userAddress, 0, CONSTANTS.tokenLimit).call();
 	const userSwapsCreated = await hedgingInstance.methods.myswapsCreated(userAddress).call();
 	const userOptionsTaken = await hedgingInstance.methods.myoptionsTaken(userAddress).call();
 	const userSwapsTaken = await hedgingInstance.methods.myswapsTaken(userAddress).call();
@@ -91,7 +91,7 @@ async function fetchSection_HedgePanel(){
 	const userLossUSDT = await hedgingInstance.methods.getUserLosses(CONSTANTS.usdtAddress, userAddress).call();
 	const userLossUSDC = await hedgingInstance.methods.getUserLosses(CONSTANTS.usdcAddress, userAddress).call();
 	// Fetch ETH to USD conversion rate
-	const ethUsdPrice = await getCurrentEthUsdcPriceFromUniswapV2();
+	const ethUsdPrice = getCurrentEthUsdcPriceFromUniswapV2();
 
 	// Step 1: Convert lengths
 	const userOptionsCreatedCount = userOptionsCreated.length;
@@ -161,7 +161,7 @@ async function fetchSection_RewardsPanel(){
 	const userColRewardsClaimed = await stakingInstance.methods.stakerCollateralClaimed(userAddress).call();
 	
 	// Fetch ETH to USD conversion rate
-	const ethUsdPrice = await getCurrentEthUsdcPriceFromUniswapV2();
+	const ethUsdPrice = getCurrentEthUsdcPriceFromUniswapV2();
 
 	// Step 1: Convert amounts
 	const wethDecimals = 18; const usdtDecimals = 6; const usdcDecimals = 6;
@@ -218,8 +218,9 @@ async function fetchSection_StakingPanel(){
 	
 	const walletBalanceRaw = await neonInstance.methods.balanceOf(userAddress).call();
 	const stakedBalanceRaw = await stakingInstance.methods.getStakedBalance(userAddress).call();
-	const depositedBalanceRaw = await hedgingInstance.methods.getuserTokenBalances(CONSTANTS.neonAddress, userAddress).call();
-	const [deposited, withdrawn] = depositedBalanceRaw;
+	const depositedBalanceRaw = await hedgingInstance.methods.getUserTokenBalances(CONSTANTS.neonAddress, userAddress).call();
+	const deposited = depositedBalanceRaw.deposited;
+	const withdrawn = depositedBalanceRaw.withdrawn;
 	// Staked versus Supply
 	const totalStakedRaw = await stakingInstance.methods.getTotalStaked().call();
 	const circulatingSupplyRaw = await tokenInst.circulatingSupply(); 
@@ -233,10 +234,13 @@ async function fetchSection_StakingPanel(){
 	const claimedRewardsColl = await stakingInstance.methods.rewardsClaimedCollateral(userAddress).call();
 	// My pool assignments
 	const assignmentsRaw = await stakingInstance.methods.getAssignedAndUnassignedAmounts(userAddress).call();
-	const [assignedMiningRaw, assignedLiquidityRaw, assignedCollateralRaw, unassignedRaw] = assignmentsRaw;
+	const assignedMiningRaw = assignmentsRaw.assignedForMining;
+	const assignedLiquidityRaw = assignmentsRaw.assignedForLiquidity;
+	const assignedCollateralRaw = assignmentsRaw.assignedForCollateral;
+	const unassignedRaw = assignmentsRaw.unassigned;
 	
 	// Fetch ETH to USD conversion rate
-	const ethUsdPrice = await getCurrentEthUsdcPriceFromUniswapV2();
+	const ethUsdPrice = getCurrentEthUsdcPriceFromUniswapV2();
 	const tokenUsdPrice = await getTokenUSDValue();
 
 	// Step 1: Convert amounts
