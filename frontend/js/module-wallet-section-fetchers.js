@@ -229,9 +229,9 @@ async function fetchSection_StakingPanel(){
 	const distributedRewardsLiqu = await stakingInstance.methods.ethLiquidityRewardBasis().call();
 	const distributedRewardsColl = await stakingInstance.methods.ethCollateralRewardBasis().call();
 	// Claimed ETH rewards to staking contract
-	const claimedRewards = await stakingInstance.methods.rewardsClaimed().call(userAddress);
-	const claimedRewardsLiqu = await stakingInstance.methods.rewardsClaimedLiquidity(userAddress).call();
-	const claimedRewardsColl = await stakingInstance.methods.rewardsClaimedCollateral(userAddress).call();
+	const claimedRewards = await stakingInstance.methods.claimedRewardsStaking().call(userAddress);
+	const claimedRewardsLiqu = await stakingInstance.methods.claimedRewardsLiquidity(userAddress).call();
+	const claimedRewardsColl = await stakingInstance.methods.claimedRewardsCollateral(userAddress).call();
 	// My pool assignments
 	const assignmentsRaw = await stakingInstance.methods.getAssignedAndUnassignedAmounts(userAddress).call();
 	const assignedMiningRaw = assignmentsRaw.assignedForMining;
