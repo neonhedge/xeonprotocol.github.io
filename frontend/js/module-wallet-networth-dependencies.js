@@ -4,18 +4,18 @@ import { getWalletTokenList } from "./module-wallet-tokenlist-dependencies.js";
 // Function to calculate the total USD value of all token balances
 async function getCurrentBalancesValue(walletAddress) {
     const transactedTokensArray = await getWalletTokenList(walletAddress);
-    let totalUSDValue;
+    let totalUSDValue = 0;
     for (const underlyingTokenAddr of transactedTokensArray) {
         const result = await hedgingInstance.methods.getUserTokenBalances(underlyingTokenAddr, walletAddress).call();
         const deposited = result[0];
         const withdrawn = result[1];
-        const ethUsdPrice = await getCurrentEthUsdcPriceFromUniswapV2();
+        const ethUsdPrice = getCurrentEthUsdcPriceFromUniswapV2();
         // Wei input for getTokenUSDValue
         const currentBalance = deposited - withdrawn;
         // Get the USD value for the token balance
-		console.log("underlyingTokenAddr "+underlyingTokenAddr+", balance "+currentBalance+", ethusd "+ethUsdPrice+" -- from array: "+transactedTokensArray);
-        const usdValue = await getTokenUSDValue(underlyingTokenAddr, currentBalance);
+		const usdValue = await getTokenUSDValue(underlyingTokenAddr, currentBalance);
         totalUSDValue += usdValue;
+		console.log("underlying "+underlyingTokenAddr+", balance "+currentBalance+", usd "+usdValue+", total "+totalUSDValue+", ethusd "+ethUsdPrice+" -- from array: "+transactedTokensArray);
     }
     return totalUSDValue;
 }

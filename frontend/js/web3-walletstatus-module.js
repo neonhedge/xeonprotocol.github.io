@@ -320,6 +320,14 @@ async function unlockedWallet() {
 		} catch (error) {
 			console.log(error);
 		}
+
+		try {			
+			const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd&include_market_cap=false&include_24hr_vol=false&include_24hr_change=false&include_last_updated_at=false'); 
+			const data = await response.json();
+			CONSTANTS.ethUsdcPrice = data.ethereum.usd; 
+		} catch (error) {
+			console.log(error);
+		}
 	
 		try {
 			const account = await web3.eth.getAccounts();

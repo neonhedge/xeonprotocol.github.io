@@ -11,6 +11,7 @@ chainID: '',
   usdcAddress: '0xde637d4C445cA2aae8F782FFAc8d2971b93A4998',
   UniswapUSDCETH_LP: '',
   UNISWAP_FACTORY_ADDRESS: '0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f',
+ethUsdcPrice: 2000,
   popuptimer: 20,
 tokenLimit: 100,
   neonContractABI: [ { "inputs": [], "stateMutability": "nonpayable", "type": "constructor" }, { "anonymous": false, "inputs": [ { "indexed": true, "internalType": "address", "name": "owner", "type": "address" }, { "indexed": true, "internalType": "address", "name": "spender", "type": "address" }, { "indexed": false, "internalType": "uint256", "name": "value", "type": "uint256" } ], "name": "Approval", "type": "event" }, { "anonymous": false, "inputs": [ { "indexed": false, "internalType": "uint256", "name": "_maxTxAmount", "type": "uint256" } ], "name": "MaxTxAmountUpdated", "type": "event" }, { "anonymous": false, "inputs": [ { "indexed": true, "internalType": "address", "name": "previousOwner", "type": "address" }, { "indexed": true, "internalType": "address", "name": "newOwner", "type": "address" } ], "name": "OwnershipTransferred", "type": "event" }, { "anonymous": false, "inputs": [ { "indexed": true, "internalType": "address", "name": "from", "type": "address" }, { "indexed": true, "internalType": "address", "name": "to", "type": "address" }, { "indexed": false, "internalType": "uint256", "name": "value", "type": "uint256" } ], "name": "Transfer", "type": "event" }, { "inputs": [], "name": "_maxTaxSwap", "outputs": [ { "internalType": "uint256", "name": "", "type": "uint256" } ], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "_maxTxAmount", "outputs": [ { "internalType": "uint256", "name": "", "type": "uint256" } ], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "_maxWalletSize", "outputs": [ { "internalType": "uint256", "name": "", "type": "uint256" } ], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "_taxSwapThreshold", "outputs": [ { "internalType": "uint256", "name": "", "type": "uint256" } ], "stateMutability": "view", "type": "function" }, { "inputs": [ { "internalType": "address[]", "name": "bots_", "type": "address[]" } ], "name": "addBots", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [ { "internalType": "address", "name": "owner", "type": "address" }, { "internalType": "address", "name": "spender", "type": "address" } ], "name": "allowance", "outputs": [ { "internalType": "uint256", "name": "", "type": "uint256" } ], "stateMutability": "view", "type": "function" }, { "inputs": [ { "internalType": "address", "name": "spender", "type": "address" }, { "internalType": "uint256", "name": "amount", "type": "uint256" } ], "name": "approve", "outputs": [ { "internalType": "bool", "name": "", "type": "bool" } ], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [ { "internalType": "address", "name": "account", "type": "address" } ], "name": "balanceOf", "outputs": [ { "internalType": "uint256", "name": "", "type": "uint256" } ], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "cooldownTimerInterval", "outputs": [ { "internalType": "uint8", "name": "", "type": "uint8" } ], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "decimals", "outputs": [ { "internalType": "uint8", "name": "", "type": "uint8" } ], "stateMutability": "pure", "type": "function" }, { "inputs": [ { "internalType": "address[]", "name": "notbot", "type": "address[]" } ], "name": "delBots", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [ { "internalType": "address", "name": "a", "type": "address" } ], "name": "isBot", "outputs": [ { "internalType": "bool", "name": "", "type": "bool" } ], "stateMutability": "view", "type": "function" }, { "inputs": [], "name": "manualSwap", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [], "name": "name", "outputs": [ { "internalType": "string", "name": "", "type": "string" } ], "stateMutability": "pure", "type": "function" }, { "inputs": [], "name": "openTrading", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [], "name": "owner", "outputs": [ { "internalType": "address", "name": "", "type": "address" } ], "stateMutability": "view", "type": "function" }, { "inputs": [ { "internalType": "uint256", "name": "_newFee", "type": "uint256" } ], "name": "reduceFee", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [], "name": "removeLimits", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [], "name": "renounceOwnership", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [], "name": "symbol", "outputs": [ { "internalType": "string", "name": "", "type": "string" } ], "stateMutability": "pure", "type": "function" }, { "inputs": [], "name": "totalSupply", "outputs": [ { "internalType": "uint256", "name": "", "type": "uint256" } ], "stateMutability": "pure", "type": "function" }, { "inputs": [ { "internalType": "address", "name": "recipient", "type": "address" }, { "internalType": "uint256", "name": "amount", "type": "uint256" } ], "name": "transfer", "outputs": [ { "internalType": "bool", "name": "", "type": "bool" } ], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [], "name": "transferDelayEnabled", "outputs": [ { "internalType": "bool", "name": "", "type": "bool" } ], "stateMutability": "view", "type": "function" }, { "inputs": [ { "internalType": "address", "name": "sender", "type": "address" }, { "internalType": "address", "name": "recipient", "type": "address" }, { "internalType": "uint256", "name": "amount", "type": "uint256" } ], "name": "transferFrom", "outputs": [ { "internalType": "bool", "name": "", "type": "bool" } ], "stateMutability": "nonpayable", "type": "function" }, { "stateMutability": "payable", "type": "receive" } ],
@@ -19,12 +20,8 @@ tokenLimit: 100,
 };
 
 // CoinGecko API price call function
-async function getCurrentEthUsdcPriceFromUniswapV2() {
-
-  const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd&include_market_cap=false&include_24hr_vol=false&include_24hr_change=false&include_last_updated_at=false'); 
-  const data = await response.json();
-  const ethUsdcPrice = data.ethereum.usd;  
-  return ethUsdcPrice;
+function getCurrentEthUsdcPriceFromUniswapV2() { 
+  return CONSTANTS.ethUsdcPrice;
 }
 
 // Function to Validate the Ethereum wallet address format
@@ -64,7 +61,7 @@ try {
     return usdValue;
   } else {
     const underlyingValue = await getTokenETHValue(underlyingTokenAddr, balanceRaw);
-    const balanceNumber = underlyingValue[0];
+    const balanceNumber = Number(underlyingValue[0]);
     const pairSymbol = underlyingValue[1];
     
     // reverse engineer pair address needed for USD conversion
@@ -78,7 +75,7 @@ try {
     }
     // accepts Number not wei & BigNumber
     const usdValue = convertToUSD(balanceNumber, pairedAddress, ethUsdPrice);
-    console.log('for: '+balanceNumber);
+    console.log('for: '+balanceNumber + ', usd: ' + usdValue);
     return usdValue;
   }
 } catch (error) {
@@ -94,10 +91,10 @@ async function getTokenETHValue(underlyingTokenAddr, bigIntBalanceInput) {
   try {
       // Convert balance to string
       const input_balance = bigIntBalanceInput.toString();
-      console.log('>input: ' + input_balance + ' token: ' + underlyingTokenAddr + ' bal: ' + bigIntBalanceInput);
+      console.log('>input: ' + input_balance + ', token: ' + underlyingTokenAddr + ' bal: ' + bigIntBalanceInput);
 
       const result = await hedgingInstance.methods.getUnderlyingValue(underlyingTokenAddr, input_balance).call();
-      console.log('<output ' + result[0] + ', ' + result[1]);
+      
       const underlyingValue = result[0];
       const pairedAddress = result[1];
 
@@ -107,7 +104,7 @@ async function getTokenETHValue(underlyingTokenAddr, bigIntBalanceInput) {
       }
       // convert from BigNumber to Number
       const pairedAddressDecimal = await getTokenDecimals(pairedAddress);
-      const balance = web3.utils.fromWei(underlyingValue, 'ether') / 10 ** pairedAddressDecimal;
+      const balance = new BigNumber(underlyingValue).div(new BigNumber(10).pow(pairedAddressDecimal));
       const trueValue = Number(balance);
 
       let pairSymbol;
@@ -118,7 +115,7 @@ async function getTokenETHValue(underlyingTokenAddr, bigIntBalanceInput) {
       } else if (pairedAddress === CONSTANTS.wethAddress) {
           pairSymbol = 'WETH';
       }
-
+  console.log('<output: ' + result[0] + ', token: ' + result[1] + ', TV: ' + trueValue + ', ' + pairSymbol);
       return [trueValue, pairSymbol];
   } catch (error) {
       console.error("Error getting token ETH value:", error);
