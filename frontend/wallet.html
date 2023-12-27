@@ -39,6 +39,7 @@
 	<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
 	<script type="module" src="js/_wallet.js"></script>
 	<script type="application/javascript" src="js/sweetalert/sweetalert.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/bignumber.js/9.0.0/bignumber.min.js"></script>
 </head>
 
 <body>
@@ -180,8 +181,8 @@
 								<span id="netCommissionUSD" class="nw-text-value">$1,800.00</span>
 							</div>
 							<div class="nw-text">
-								<span class="nw-text-title"><i class="fa fa-info-circle" aria-hidden="true"  title="value of NEON tokens under wallet address"></i>NEONs</span>
-								<span id="tokensCount" class="nw-text-value">$707.01</span>
+								<span class="nw-text-title"><i class="fa fa-info-circle" aria-hidden="true"  title="value of XEON tokens in wallet"></i>XEON</span>
+								<span id="walletBalanceUSD" class="nw-text-value">$707.01</span>
 							</div>
 						</div>
 
@@ -242,6 +243,7 @@
 					<div class="section-title list-header">
 						<img src="./imgs/playful.webp" alt="Neon">
 					  	<h2>Token Balances</h2>
+						<div class="tokenHistory"><span>History:</span><span id="tokensCount"></span></div>
 					</div>
 					<li class="trade-item t-i-lead">
 						<div class="token-icon"></div>

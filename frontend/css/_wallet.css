@@ -1081,7 +1081,7 @@ button#transactSubmit{
     color: #fff;
     display: flex;
     flex-wrap: wrap;
-    justify-content: center;
+    justify-content: flex-start;
 }
   
   .section-title img{
@@ -1098,6 +1098,16 @@ button#transactSubmit{
 	align-items: center;
 	font-size: clamp(18px, 2vw, 22px);
 	font-weight: 400;
+  }
+
+  .tokenHistory {
+	display: inline-flex;
+	height: min-content;
+	place-self: center;
+	margin-bottom: 2rem;
+	margin-left: 1rem;
+	color: #888;
+	gap: 1vw;
   }
 
   .data-cards {
