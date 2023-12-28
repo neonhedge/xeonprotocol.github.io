@@ -2,6 +2,7 @@ import { CONSTANTS, getCurrentEthUsdcPriceFromUniswapV2, getTokenETHValue, getTo
 import { updateSectionValues_Networth, updateSectionValues_Hedges, updateSectionValues_Rewards, updateSectionValues_Staking } from './module-wallet-section-updaters.js';
 import { getCurrentBalancesValue, calculateStakedTokensValueETH, calculateRewardsDue, calculateCommissionDueETH } from './module-wallet-networth-dependencies.js';
 import { userTokenList, cashierErc20List } from './module-wallet-tokenlist-dependencies.js';
+import { getUserH, getUserHedgeVolumeedgeVolume } from './module-wallet-hedgePanel-dependencies.js';
 
 // 1. Fetch Section Values - Net Worth
 //-----------------------------------------
@@ -75,15 +76,19 @@ async function fetchSection_HedgePanel(){
 	const userAddress = accounts[0];
 	// Fetch arrays
 	const userOptionsCreated = await hedgingInstance.methods.getUserOptionsCreated(userAddress, 0, CONSTANTS.tokenLimit).call();
-	const userSwapsCreated = await hedgingInstance.methods.myswapsCreated(userAddress).call();
-	const userOptionsTaken = await hedgingInstance.methods.myoptionsTaken(userAddress).call();
-	const userSwapsTaken = await hedgingInstance.methods.myswapsTaken(userAddress).call();
-	const userOptionsHistory = await hedgingInstance.methods.myoptionsHistory(userAddress).call();
-	const userSwapsHistory = await hedgingInstance.methods.myswapsHistory(userAddress).call();
+	const userSwapsCreated = await hedgingInstance.methods.getUserSwapsCreated(userAddress, 0, CONSTANTS.tokenLimit).call();
+	const userOptionsTaken = await hedgingInstance.methods.getUserOptionsTaken(userAddress, 0, CONSTANTS.tokenLimit).call();
+	const userSwapsTaken = await hedgingInstance.methods.getUserSwapsTaken(userAddress, 0, CONSTANTS.tokenLimit).call();
+	const userOptionsHistory = await hedgingInstance.methods.getUserOptionsHistory(userAddress, 0, CONSTANTS.tokenLimit).call();
+	const userSwapsHistory = await hedgingInstance.methods.getUserSwapsHistory(userAddress, 0, CONSTANTS.tokenLimit).call();
 	// Fetch volume
-	const userWrite = await hedgingInstance.methods.getuserWriteVolume(userAddress).call();
-	const userTake = await hedgingInstance.methods.getuserTakeVolume(userAddress).call();
+	// ----- manually fetch these: get hedges created + taken IDs, then compile createValue & startValue volumes from each ID
+	const userHedgeVolume = await getUserHedgeVolume(userAddress);
+	console.log(userHedgeVolume);
+	
 	// Fetch profits and losses: WETH, USDT, USDC support only for now
+	// ----- manually fetch these: get myswapsTaken + myoptionsTaken arrays, then get profits and losses for each hedge ID
+	// ----- add a P & L storage in hedge struct, in it a mapping of partyAddress & amount
 	const userProfitWETH = await hedgingInstance.methods.getUserProfits(CONSTANTS.wethAddress, userAddress).call();
 	const userProfitUSDT = await hedgingInstance.methods.getUserProfits(CONSTANTS.usdtAddress, userAddress).call();
 	const userProfitUSDC = await hedgingInstance.methods.getUserProfits(CONSTANTS.usdcAddress, userAddress).call();

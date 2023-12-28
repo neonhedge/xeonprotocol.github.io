@@ -53,7 +53,7 @@ switch (pairedCurrency) {
 // accepts wei & BigNumber
 // outputs Number
 async function getTokenUSDValue(underlyingTokenAddr, balanceRaw) {	
-const ethUsdPrice = await getCurrentEthUsdcPriceFromUniswapV2();
+const ethUsdPrice = getCurrentEthUsdcPriceFromUniswapV2();
 try {
   if (underlyingTokenAddr === CONSTANTS.wethAddress) {
     const balance = new BigNumber(balanceRaw).div(new BigNumber(10).pow(18));
@@ -268,5 +268,5 @@ function commaNumbering(number){
   return Number(number).toLocaleString();
 }; 
 
-export { CONSTANTS, getCurrentEthUsdcPriceFromUniswapV2, isValidEthereumAddress, truncateAddress, convertToUSD, getTokenUSDValue, getTokenETHValue, getUserBalancesForToken, getPairToken, getSymbol };
+export { CONSTANTS, getCurrentEthUsdcPriceFromUniswapV2, isValidEthereumAddress, truncateAddress, convertToUSD, getTokenUSDValue, getTokenETHValue, getUserBalancesForToken, getPairToken, getSymbol, getTokenDecimals };
 export { commaNumbering, fromWeiToFixed12, fromWeiToFixed5, fromWeiToFixed8, fromWeiToFixed8_unrounded, fromWeiToFixed5_unrounded, fromWeiToFixed2_unrounded, toFixed8_unrounded };
