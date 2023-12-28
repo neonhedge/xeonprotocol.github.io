@@ -69,7 +69,7 @@ async function getUserHedgeVolume(user) {
 }
 
 async function getUserProfitLoss(user) {
-    const pairedCurrencies = ['YOUR_WETH_ADDRESS', 'YOUR_USDT_ADDRESS', 'YOUR_USDC_ADDRESS'];
+    const pairedCurrencies = [CONSTANTS.wethAddress, CONSTANTS.usdtAddress, CONSTANTS.usdcAddress];
 
     // Initialize variables 
     let profitsWETH = 0;
@@ -83,16 +83,16 @@ async function getUserProfitLoss(user) {
     // Fetch profits and losses for each paired currency
     for (const pairedCurrency of pairedCurrencies) {
         const [profits, losses] = await hedgingInstance.getEquivUserPL(user, pairedCurrency);
-        const decimals = pairedCurrency === 'YOUR_WETH_ADDRESS' ? 18 : 6;
+        const decimals = pairedCurrency === CONSTANTS.wethAddress ? 18 : 6;
 
         // Update the variables based on the paired currency
-        if (pairedCurrency === 'YOUR_WETH_ADDRESS') {
+        if (pairedCurrency === CONSTANTS.wethAddress) {
             profitsWETH = convertBigIntToHumanReadable(profits);
             lossesWETH = convertBigIntToHumanReadable(losses);
-        } else if (pairedCurrency === 'YOUR_USDT_ADDRESS') {
+        } else if (pairedCurrency === CONSTANTS.usdtAddress) {
             profitsUSDT = convertBigIntToHumanReadable(profits);
             lossesUSDT = convertBigIntToHumanReadable(losses);
-        } else if (pairedCurrency === 'YOUR_USDC_ADDRESS') {
+        } else if (pairedCurrency === CONSTANTS.usdcAddress) {
             profitsUSDC = convertBigIntToHumanReadable(profits);
             lossesUSDC = convertBigIntToHumanReadable(losses);
         }
