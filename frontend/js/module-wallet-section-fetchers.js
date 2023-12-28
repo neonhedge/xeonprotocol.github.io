@@ -2,7 +2,7 @@ import { CONSTANTS, getCurrentEthUsdcPriceFromUniswapV2, getTokenETHValue, getTo
 import { updateSectionValues_Networth, updateSectionValues_Hedges, updateSectionValues_Rewards, updateSectionValues_Staking } from './module-wallet-section-updaters.js';
 import { getCurrentBalancesValue, calculateStakedTokensValueETH, calculateRewardsDue, calculateCommissionDueETH } from './module-wallet-networth-dependencies.js';
 import { userTokenList, cashierErc20List } from './module-wallet-tokenlist-dependencies.js';
-import { getUserH, getUserHedgeVolumeedgeVolume } from './module-wallet-hedgePanel-dependencies.js';
+import { getUserHedgeVolume, getUserProfitLoss } from './module-wallet-hedgePanel-dependencies.js';
 
 // 1. Fetch Section Values - Net Worth
 //-----------------------------------------
@@ -82,19 +82,13 @@ async function fetchSection_HedgePanel(){
 	const userOptionsHistory = await hedgingInstance.methods.getUserOptionsHistory(userAddress, 0, CONSTANTS.tokenLimit).call();
 	const userSwapsHistory = await hedgingInstance.methods.getUserSwapsHistory(userAddress, 0, CONSTANTS.tokenLimit).call();
 	// Fetch volume
-	// ----- manually fetch these: get hedges created + taken IDs, then compile createValue & startValue volumes from each ID
+	// Manually fetch these: get hedges created + taken IDs, then compile createValue & startValue volumes from each ID
 	const userHedgeVolume = await getUserHedgeVolume(userAddress);
 	console.log(userHedgeVolume);
-	
+
 	// Fetch profits and losses: WETH, USDT, USDC support only for now
-	// ----- manually fetch these: get myswapsTaken + myoptionsTaken arrays, then get profits and losses for each hedge ID
-	// ----- add a P & L storage in hedge struct, in it a mapping of partyAddress & amount
-	const userProfitWETH = await hedgingInstance.methods.getUserProfits(CONSTANTS.wethAddress, userAddress).call();
-	const userProfitUSDT = await hedgingInstance.methods.getUserProfits(CONSTANTS.usdtAddress, userAddress).call();
-	const userProfitUSDC = await hedgingInstance.methods.getUserProfits(CONSTANTS.usdcAddress, userAddress).call();
-	const userLossWETH = await hedgingInstance.methods.getUserLosses(CONSTANTS.wethAddress, userAddress).call();
-	const userLossUSDT = await hedgingInstance.methods.getUserLosses(CONSTANTS.usdtAddress, userAddress).call();
-	const userLossUSDC = await hedgingInstance.methods.getUserLosses(CONSTANTS.usdcAddress, userAddress).call();
+	const userProfitLoss = await getUserProfitLoss(userAddress);
+
 	// Fetch ETH to USD conversion rate
 	const ethUsdPrice = getCurrentEthUsdcPriceFromUniswapV2();
 

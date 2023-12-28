@@ -31,14 +31,6 @@ async function getUserHedgeVolume(user) {
         // Start values based on creator or taker
         const valueToUse = isUserCreator ? hedgeDetails.startValue : hedgeDetails.cost;
 
-        // Convert BigInt to human-readable using respective token decimals
-        const convertBigIntToHumanReadable = (value, decimals) => {
-            const bigValue = ethers.BigNumber.from(value);
-            const divisor = ethers.BigNumber.from(10).pow(decimals);
-            const result = bigValue.div(divisor).toNumber();
-            return result;
-        };
-
         // Sum values based on paired address
         if (pairedAddress === CONSTANTS.wethAddress) {
             if (isUserCreator) {
@@ -76,5 +68,53 @@ async function getUserHedgeVolume(user) {
     };
 }
 
+async function getUserProfitLoss(user) {
+    const pairedCurrencies = ['YOUR_WETH_ADDRESS', 'YOUR_USDT_ADDRESS', 'YOUR_USDC_ADDRESS'];
 
-export { getUserHedgeVolume };
+    // Initialize variables 
+    let profitsWETH = 0;
+    let profitsUSDT = 0;
+    let profitsUSDC = 0;
+
+    let lossesWETH = 0;
+    let lossesUSDT = 0;
+    let lossesUSDC = 0;
+
+    // Fetch profits and losses for each paired currency
+    for (const pairedCurrency of pairedCurrencies) {
+        const [profits, losses] = await hedgingInstance.getEquivUserPL(user, pairedCurrency);
+        const decimals = pairedCurrency === 'YOUR_WETH_ADDRESS' ? 18 : 6;
+
+        // Update the variables based on the paired currency
+        if (pairedCurrency === 'YOUR_WETH_ADDRESS') {
+            profitsWETH = convertBigIntToHumanReadable(profits);
+            lossesWETH = convertBigIntToHumanReadable(losses);
+        } else if (pairedCurrency === 'YOUR_USDT_ADDRESS') {
+            profitsUSDT = convertBigIntToHumanReadable(profits);
+            lossesUSDT = convertBigIntToHumanReadable(losses);
+        } else if (pairedCurrency === 'YOUR_USDC_ADDRESS') {
+            profitsUSDC = convertBigIntToHumanReadable(profits);
+            lossesUSDC = convertBigIntToHumanReadable(losses);
+        }
+    }
+
+    // Return the profits and losses for each paired currency
+    return {
+        profitsWETH,
+        profitsUSDT,
+        profitsUSDC,
+        lossesWETH,
+        lossesUSDT,
+        lossesUSDC,
+    };
+}
+
+
+function convertBigIntToHumanReadable = (value) => {
+    const bigValue = ethers.BigNumber.from(value);
+    const divisor = ethers.BigNumber.from(10).pow(decimals);
+    const result = bigValue.div(divisor).toNumber();
+    return result;
+};
+
+export { getUserHedgeVolume, getUserProfitLoss };
