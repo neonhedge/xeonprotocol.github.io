@@ -87,14 +87,14 @@ async function getUserProfitLoss(user) {
 
         // Update the variables based on the paired currency
         if (pairedCurrency === CONSTANTS.wethAddress) {
-            profitsWETH = convertBigIntToHumanReadable(profits);
-            lossesWETH = convertBigIntToHumanReadable(losses);
+            profitsWETH = convertBigIntToHumanReadable(profits, decimals);
+            lossesWETH = convertBigIntToHumanReadable(losses, decimals);
         } else if (pairedCurrency === CONSTANTS.usdtAddress) {
-            profitsUSDT = convertBigIntToHumanReadable(profits);
-            lossesUSDT = convertBigIntToHumanReadable(losses);
+            profitsUSDT = convertBigIntToHumanReadable(profits, decimals);
+            lossesUSDT = convertBigIntToHumanReadable(losses, decimals);
         } else if (pairedCurrency === CONSTANTS.usdcAddress) {
-            profitsUSDC = convertBigIntToHumanReadable(profits);
-            lossesUSDC = convertBigIntToHumanReadable(losses);
+            profitsUSDC = convertBigIntToHumanReadable(profits, decimals);
+            lossesUSDC = convertBigIntToHumanReadable(losses, decimals);
         }
     }
 
@@ -110,11 +110,11 @@ async function getUserProfitLoss(user) {
 }
 
 
-function convertBigIntToHumanReadable = (value) => {
+function convertBigIntToHumanReadable(value, decimals) {
     const bigValue = ethers.BigNumber.from(value);
     const divisor = ethers.BigNumber.from(10).pow(decimals);
     const result = bigValue.div(divisor).toNumber();
     return result;
-};
+}
 
 export { getUserHedgeVolume, getUserProfitLoss };

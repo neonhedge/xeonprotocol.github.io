@@ -88,6 +88,7 @@ async function fetchSection_HedgePanel(){
 
 	// Fetch profits and losses: WETH, USDT, USDC support only for now
 	const userProfitLoss = await getUserProfitLoss(userAddress);
+	console.log(userProfitLoss)
 
 	// Fetch ETH to USD conversion rate
 	const ethUsdPrice = getCurrentEthUsdcPriceFromUniswapV2();
@@ -105,33 +106,30 @@ async function fetchSection_HedgePanel(){
 	const userSwapsHistoryCount = userSwapsHistory.length;
 	
 	// Step 2: Convert amounts
-	const wethDecimals = 18; const usdtDecimals = 6; const usdcDecimals = 6;
+	const userCreateVolumeWETH = Number(userHedgeVolume[0]);
+	const userCreateVolumeUSDT = Number(userHedgeVolume[1]);
+	const userCreateVolumeUSDC = Number(userHedgeVolume[2]);
+	const userBuyVolumeWETH = Number(userHedgeVolume[3]);
+	const userBuyVolumeUSDT = Number(userHedgeVolume[4]);
+	const userBuyVolumeUSDC = Number(userHedgeVolume[5]);
 
-	const userWriteEth = new BigNumber(userWrite[0]).div(10 ** wethDecimals);
-	const userWriteUsdt = new BigNumber(userWrite[1]).div(10 ** usdtDecimals);
-	const userWriteUsdc = new BigNumber(userWrite[2]).div(10 ** usdcDecimals);
-	const totalWriteTWETH = userWriteEth + (userWriteUsdt / ethUsdPrice) + (userWriteUsdc / ethUsdPrice);	
-	
-	const userTakeEth = new BigNumber(userTake[0]).div(10 ** wethDecimals);
-	const userTakeUsdt = new BigNumber(userTake[1]).div(10 ** usdtDecimals);
-	const userTakeUsdc = new BigNumber(userTake[2]).div(10 ** usdcDecimals);
-	const totalTakeTWETH = userTakeEth + (userTakeUsdt / ethUsdPrice) + (userTakeUsdc / ethUsdPrice);
+	const userProfitWETH = Number(userProfitLoss[0]);
+	const userProfitUSDT = Number(userProfitLoss[1]);
+	const userProfitUSDC = Number(userProfitLoss[2]);
+	const userLossWETH = Number(userProfitLoss[3]);
+	const userLossUSDT = Number(userProfitLoss[4]);
+	const userLossUSDC = Number(userProfitLoss[5]);
 
-	const userProfitEth = new BigNumber(userProfitWETH).div(10 ** wethDecimals);
-	const userProfitUsdt = new BigNumber(userProfitUSDT).div(10 ** usdtDecimals);
-	const userProfitUsdc = new BigNumber(userProfitUSDC).div(10 ** usdcDecimals);
-	const totalProfitTWETH = userProfitEth + (userProfitUsdt / ethUsdPrice) + (userProfitUsdc / ethUsdPrice);
-
-	const userLossEth = new BigNumber(userLossWETH).div(10 ** wethDecimals);
-	const userLossUsdt = new BigNumber(userLossUSDT).div(10 ** usdtDecimals);
-	const userLossUsdc = new BigNumber(userLossUSDC).div(10 ** usdcDecimals);
-	const totalLossTWETH = userLossEth + (userLossUsdt / ethUsdPrice) + (userLossUsdc / ethUsdPrice);
+	const totalCreatedWETH = userCreateVolumeWETH + (userCreateVolumeUSDT / ethUsdPrice) + (userCreateVolumeUSDC / ethUsdPrice);
+	const totalCreateTWETH = userBuyVolumeWETH + (userBuyVolumeUSDT / ethUsdPrice) + (userBuyVolumeUSDC / ethUsdPrice);
+	const totalProfitTWETH = userProfitWETH + (userProfitUSDT / ethUsdPrice) + (userProfitUSDC / ethUsdPrice);
+	const totalLossTWETH = userLossWETH + (userLossUSDT / ethUsdPrice) + (userLossUSDC / ethUsdPrice);
 
 	updateSectionValues_Hedges(
 		userHedgesCreated,
 		userHedgesTaken,
-		totalWriteTWETH,
-		totalTakeTWETH,
+		totalCreatedWETH,
+		totalCreateTWETH,
 		userOptionsHistoryCount,
 		userSwapsHistoryCount,
 		totalProfitTWETH,
