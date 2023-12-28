@@ -391,8 +391,6 @@ contract NEONHEDGE {
         // Log protocol analytics
         optionID++;
         hedgesCreatedVolume[newOption.paired].add(newOption.createValue);
-        // Wallet hedge volume in main paired currency
-        updateEquivUserHedged(token, newOption.paired, newOption.createValue);
         // Emit
         emit hedgeCreated(token, optionID, newOption.createValue, newOption.hedgeType, msg.sender);
     }
@@ -457,10 +455,6 @@ contract NEONHEDGE {
         } else if (hedge.hedgeType == HedgeType.CALL) {
             optionsVolume[hedge.paired] += hedge.startValue;
         }
-
-        // Wallet buy volume in main paired currency
-        updateEquivUserCosts(hedge.token, hedge.paired, hedge.startValue);
-
         // Emit the hedgePurchased event
         emit hedgePurchased(hedge.token, _optionId, hedge.startValue, hedge.hedgeType, msg.sender);
     }
@@ -768,6 +762,7 @@ contract NEONHEDGE {
         }
     }
 
+    /* equivUserHedged DEPRACATED 28/12/2023
     // Underlying value equivalent logging
     function updateEquivUserHedged(address token, address paired, uint256 createValue) internal {
         if (token == wethAddress || paired == wethAddress) {
@@ -793,7 +788,7 @@ contract NEONHEDGE {
             equivUserCosts[msg.sender][usdcAddress] += createValue;
         }
     }
-
+    */
     // Fees
     function updateFee(uint256 numerator, uint256 denominator) onlyOwner external {
       feeNumerator = numerator;
@@ -966,7 +961,7 @@ contract NEONHEDGE {
     function getUserSwapsTaken(address user, uint startIndex, uint limit) public view returns (uint[] memory) {
         return getSubset(myswapsTaken[user], startIndex, limit);
     }
-
+    /* depracated 28/12/2023
     // Functions to retrieve volume for user
     function getEquivUserHedged(address user, address token) external view returns (uint256) {
         return equivUserHedged[user][token];
@@ -974,8 +969,9 @@ contract NEONHEDGE {
     function getEquivUserCosts(address user, address token) external view returns (uint256) {
         return equivUserCosts[user][token];
     }
+    */
     // Functions to retrieve PL for user
-    function getEquivUserPL(address user, address pairedCurrency) external view returns (uint256 P, uint256 L) {
+    function getEquivUserPL(address user, address pairedCurrency) external view returns (uint256 profits, uint256 losses) {
         return (userPLMap[pairedCurrency][user].profits, userPLMap[pairedCurrency][user].losses);
     }
 
