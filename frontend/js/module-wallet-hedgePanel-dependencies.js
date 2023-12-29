@@ -1,11 +1,11 @@
-import { CONSTANTS } from "./constants.js";
+import { CONSTANTS, fromBigIntNumberToDecimal } from "./constants.js";
 
 async function getUserHedgeVolume(user) {
     // Fetch arrays
-    const optionsCreated = await hedgingInstance.getUserOptionsCreated(user, 0, 100);
-    const swapsCreated = await hedgingInstance.getUserSwapsCreated(user, 0, 100);
-    const optionsTaken = await hedgingInstance.getUserOptionsTaken(user, 0, 100);
-    const swapsTaken = await hedgingInstance.getUserSwapsTaken(user, 0, 100);
+    const optionsCreated = await hedgingInstance.methods.getUserOptionsCreated(user, 0, 100).call();
+    const swapsCreated = await hedgingInstance.methods.getUserSwapsCreated(user, 0, 100).call();
+    const optionsTaken = await hedgingInstance.methods.getUserOptionsTaken(user, 0, 100).call();
+    const swapsTaken = await hedgingInstance.methods.getUserSwapsTaken(user, 0, 100).call();
 
     // Combine arrays into one final array
     const finalArray = [...optionsCreated, ...swapsCreated, ...optionsTaken, ...swapsTaken];
@@ -21,7 +21,7 @@ async function getUserHedgeVolume(user) {
 
     // Fetch details for each hedge and calculate sums
     for (const hedgeId of finalArray) {
-        const hedgeDetails = await hedgingInstance.getHedgeDetails(hedgeId);
+        const hedgeDetails = await hedgingInstance.methods.getHedgeDetails(hedgeId).call;
 
         // Check if creator or taker
         const isUserCreator = hedgeDetails.owner === user;
@@ -34,21 +34,21 @@ async function getUserHedgeVolume(user) {
         // Sum values based on paired address
         if (pairedAddress === CONSTANTS.wethAddress) {
             if (isUserCreator) {
-                startValueSumWETH += convertBigIntToHumanReadable(valueToUse, 18); 
+                startValueSumWETH += fromBigIntNumberToDecimal(valueToUse, 18); 
             } else if (isUserTaker) {
-                costSumWETH += convertBigIntToHumanReadable(valueToUse, 18); 
+                costSumWETH += fromBigIntNumberToDecimal(valueToUse, 18); 
             }
         } else if (pairedAddress === CONSTANTS.usdtAddress) {
             if (isUserCreator) {
-                startValueSumUSDT += convertBigIntToHumanReadable(valueToUse, 6); 
+                startValueSumUSDT += fromBigIntNumberToDecimal(valueToUse, 6); 
             } else if (isUserTaker) {
-                costSumUSDT += convertBigIntToHumanReadable(valueToUse, 6); 
+                costSumUSDT += fromBigIntNumberToDecimal(valueToUse, 6); 
             }
         } else if (pairedAddress === CONSTANTS.usdcAddress) {
             if (isUserCreator) {
-                startValueSumUSDC += convertBigIntToHumanReadable(valueToUse, 6); 
+                startValueSumUSDC += fromBigIntNumberToDecimal(valueToUse, 6); 
             } else if (isUserTaker) {
-                costSumUSDC += convertBigIntToHumanReadable(valueToUse, 6); 
+                costSumUSDC += fromBigIntNumberToDecimal(valueToUse, 6); 
             }
         }
     }
@@ -82,19 +82,19 @@ async function getUserProfitLoss(user) {
 
     // Fetch profits and losses for each paired currency
     for (const pairedCurrency of pairedCurrencies) {
-        const [profits, losses] = await hedgingInstance.getEquivUserPL(user, pairedCurrency);
+        const { profits, losses } = await hedgingInstance.methods.getEquivUserPL(user, pairedCurrency).call();
         const decimals = pairedCurrency === CONSTANTS.wethAddress ? 18 : 6;
 
         // Update the variables based on the paired currency
         if (pairedCurrency === CONSTANTS.wethAddress) {
-            profitsWETH = convertBigIntToHumanReadable(profits, decimals);
-            lossesWETH = convertBigIntToHumanReadable(losses, decimals);
+            profitsWETH = fromBigIntNumberToDecimal(profits, decimals);
+            lossesWETH = fromBigIntNumberToDecimal(losses, decimals);
         } else if (pairedCurrency === CONSTANTS.usdtAddress) {
-            profitsUSDT = convertBigIntToHumanReadable(profits, decimals);
-            lossesUSDT = convertBigIntToHumanReadable(losses, decimals);
+            profitsUSDT = fromBigIntNumberToDecimal(profits, decimals);
+            lossesUSDT = fromBigIntNumberToDecimal(losses, decimals);
         } else if (pairedCurrency === CONSTANTS.usdcAddress) {
-            profitsUSDC = convertBigIntToHumanReadable(profits, decimals);
-            lossesUSDC = convertBigIntToHumanReadable(losses, decimals);
+            profitsUSDC = fromBigIntNumberToDecimal(profits, decimals);
+            lossesUSDC = fromBigIntNumberToDecimal(losses, decimals);
         }
     }
 
@@ -107,14 +107,6 @@ async function getUserProfitLoss(user) {
         lossesUSDT,
         lossesUSDC,
     };
-}
-
-
-function convertBigIntToHumanReadable(value, decimals) {
-    const bigValue = ethers.BigNumber.from(value);
-    const divisor = ethers.BigNumber.from(10).pow(decimals);
-    const result = bigValue.div(divisor).toNumber();
-    return result;
 }
 
 export { getUserHedgeVolume, getUserProfitLoss };

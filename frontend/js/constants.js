@@ -6,6 +6,7 @@ chainID: '',
   neonAddress: '0xF97Fcb2015eCd8F8063fE5DbBA98b5d8E2D9a53A',
   hedgingAddress: '0x85298306cf7E4562d355Bed07C49E550D0A8Dc1c',
   stakingAddress: '0x95F737BC4ebf0f010c643f99db048aCe864909fd',
+burnAddress: '0x000000000000000000000000000000000000dEaD',
   wethAddress: '0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6',
   usdtAddress: '0xC2C527C0CACF457746Bd31B2a698Fe89de2b6d49',
   usdcAddress: '0xde637d4C445cA2aae8F782FFAc8d2971b93A4998',
@@ -50,7 +51,7 @@ switch (pairedCurrency) {
 }
 }
 // Function to get token USD value
-// accepts wei & BigNumber
+// accepts bigInt & BigNumber
 // outputs Number
 async function getTokenUSDValue(underlyingTokenAddr, balanceRaw) {	
 const ethUsdPrice = getCurrentEthUsdcPriceFromUniswapV2();
@@ -75,7 +76,7 @@ try {
     }
     // accepts Number not wei & BigNumber
     const usdValue = convertToUSD(balanceNumber, pairedAddress, ethUsdPrice);
-    console.log('for: '+balanceNumber + ', usd: ' + usdValue);
+    console.log('converted to: '+balanceNumber + ', usd: ' + usdValue);
     return usdValue;
   }
 } catch (error) {
@@ -263,10 +264,15 @@ function fromWeiToFixed5(amount){
   var ethFriendly = parsed_eth.toFixed(5);
   return ethFriendly;
 }
+function fromBigIntNumberToDecimal(number, decimals) {
+  const BigIntNumber = BigInt(number);
+  const BigIntDecimals = BigInt(decimals);
+      return (BigIntNumber / BigInt(10) ** BigIntDecimals).toString();
+}
 
 function commaNumbering(number){
   return Number(number).toLocaleString();
 }; 
 
 export { CONSTANTS, getCurrentEthUsdcPriceFromUniswapV2, isValidEthereumAddress, truncateAddress, convertToUSD, getTokenUSDValue, getTokenETHValue, getUserBalancesForToken, getPairToken, getSymbol, getTokenDecimals };
-export { commaNumbering, fromWeiToFixed12, fromWeiToFixed5, fromWeiToFixed8, fromWeiToFixed8_unrounded, fromWeiToFixed5_unrounded, fromWeiToFixed2_unrounded, toFixed8_unrounded };
+export { fromBigIntNumberToDecimal, commaNumbering, fromWeiToFixed12, fromWeiToFixed5, fromWeiToFixed8, fromWeiToFixed8_unrounded, fromWeiToFixed5_unrounded, fromWeiToFixed2_unrounded, toFixed8_unrounded };
