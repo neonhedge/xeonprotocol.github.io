@@ -1,4 +1,4 @@
-import { CONSTANTS, getCurrentEthUsdcPriceFromUniswapV2, getTokenETHValue, getTokenUSDValue } from './constants.js';
+import { CONSTANTS, fromBigIntNumberToDecimal, getCurrentEthUsdcPriceFromUniswapV2, getTokenETHValue, getTokenUSDValue } from './constants.js';
 import { updateSectionValues_Networth, updateSectionValues_Hedges, updateSectionValues_Rewards, updateSectionValues_Staking } from './module-wallet-section-updaters.js';
 import { getCurrentBalancesValue, calculateStakedTokensValueETH, calculateRewardsDue, calculateCommissionDueETH } from './module-wallet-networth-dependencies.js';
 import { userTokenList, cashierErc20List } from './module-wallet-tokenlist-dependencies.js';
@@ -18,8 +18,9 @@ async function fetchSection_Networth(){
         const transactedTokensCount = transactedTokensArrayList.length;
         
         // Human Readable
-        const walletBalance = (BigInt(walletBalanceRaw) / BigInt(10) ** BigInt(CONSTANTS.decimals)).toString();
-		const stakedBalance = (BigInt(stakedBalanceRaw) / BigInt(10) ** BigInt(CONSTANTS.decimals)).toString();
+		
+        const walletBalance = fromBigIntNumberToDecimal(walletBalanceRaw, CONSTANTS.decimals);
+		const stakedBalance = fromBigIntNumberToDecimal(stakedBalanceRaw, CONSTANTS.decimals);
 
         // ETH USD price
         const ethUsdcPrice = getCurrentEthUsdcPriceFromUniswapV2();
@@ -82,11 +83,9 @@ async function fetchSection_HedgePanel(){
 	// Fetch volume
 	// Manually fetch these: get hedges created + taken IDs, then compile createValue & startValue volumes from each ID
 	const userHedgeVolume = await getUserHedgeVolume(userAddress);
-	console.log(userHedgeVolume);
 
 	// Fetch profits and losses: WETH, USDT, USDC support only for now
 	const userProfitLoss = await getUserProfitLoss(userAddress);
-	console.log(userProfitLoss)
 
 	// Fetch ETH to USD conversion rate
 	const ethUsdPrice = getCurrentEthUsdcPriceFromUniswapV2();
@@ -162,14 +161,14 @@ async function fetchSection_RewardsPanel(){
 	const wethDecimals = 18; const usdtDecimals = 6; const usdcDecimals = 6;
 
 	// Step 2: Convert eth values
-	const userRewardsDueEth = new BigNumber(userRewardsDue).div(10 ** wethDecimals);
-	const userLiqRewardsDueEth = new BigNumber(userLiqRewardsDue).div(10 ** wethDecimals);
-	const userColRewardsDueEth = new BigNumber(userColRewardsDue).div(10 ** wethDecimals);
+	const userRewardsDueEth = fromBigIntNumberToDecimal(userRewardsDue, wethDecimals);
+	const userLiqRewardsDueEth = fromBigIntNumberToDecimal(userLiqRewardsDue, wethDecimals);
+	const userColRewardsDueEth = fromBigIntNumberToDecimal(userColRewardsDue, wethDecimals);
 	const totalRewardsDueWETH = userRewardsDueEth + userLiqRewardsDueEth + userColRewardsDueEth;
 
-	const userRewardsClaimedEth = new BigNumber(userRewardsClaimed).div(10 ** wethDecimals);
-	const userLiqRewardsClaimedEth = new BigNumber(userLiqRewardsClaimed).div(10 ** wethDecimals);
-	const userColRewardsClaimedEth = new BigNumber(userColRewardsClaimed).div(10 ** wethDecimals);
+	const userRewardsClaimedEth = fromBigIntNumberToDecimal(userRewardsClaimed, wethDecimals);
+	const userLiqRewardsClaimedEth = fromBigIntNumberToDecimal(userLiqRewardsClaimed, wethDecimals);
+	const userColRewardsClaimedEth = fromBigIntNumberToDecimal(userColRewardsClaimed, wethDecimals);
 	const totalRewardsClaimedWETH = userRewardsClaimedEth + userLiqRewardsClaimedEth + userColRewardsClaimedEth;
 
 	// Step 3: Convert usdt values
@@ -218,13 +217,15 @@ async function fetchSection_StakingPanel(){
 	const withdrawn = depositedBalanceRaw.withdrawn;
 	// Staked versus Supply
 	const totalStakedRaw = await stakingInstance.methods.getTotalStaked().call();
-	const circulatingSupplyRaw = await neonInstance.methods.circulatingSupply(); 
+	const totalSupply = await neonInstance.methods.totalSupply().call();
+	const burntBalance = await neonInstance.methods.balanceOf(CONSTANTS.burnAddress).call();
+	const circulatingSupplyRaw = totalSupply - burntBalance;
 	// Distrubuted ETH rewards to staking contract
 	const distributedRewards = await stakingInstance.methods.ethRewardBasis().call();
 	const distributedRewardsLiqu = await stakingInstance.methods.ethLiquidityRewardBasis().call();
 	const distributedRewardsColl = await stakingInstance.methods.ethCollateralRewardBasis().call();
 	// Claimed ETH rewards to staking contract
-	const claimedRewards = await stakingInstance.methods.claimedRewardsStaking().call(userAddress);
+	const claimedRewards = await stakingInstance.methods.claimedRewardsStaking(userAddress).call();
 	const claimedRewardsLiqu = await stakingInstance.methods.claimedRewardsLiquidity(userAddress).call();
 	const claimedRewardsColl = await stakingInstance.methods.claimedRewardsCollateral(userAddress).call();
 	// My pool assignments
@@ -238,33 +239,35 @@ async function fetchSection_StakingPanel(){
 	const wethDecimals = 18; const usdtDecimals = 6; const usdcDecimals = 6;
 	
 	// Step 2: Convert normal values
-	const walletBalance = new BigNumber(walletBalanceRaw).div(10 ** CONSTANTS.decimals);
-	const stakedBalance = new BigNumber(stakedBalanceRaw).div(10 ** CONSTANTS.decimals);
-	const depositedBalance = new BigNumber(deposited).div(10 ** CONSTANTS.decimals);
-	const withdrawnBalance = new BigNumber(withdrawn).div(10 ** CONSTANTS.decimals);
+	const walletBalance = fromBigIntNumberToDecimal(walletBalanceRaw, CONSTANTS.decimals);
+	const stakedBalance = fromBigIntNumberToDecimal(stakedBalanceRaw, CONSTANTS.decimals);
+	const depositedBalance = fromBigIntNumberToDecimal(deposited, CONSTANTS.decimals);
+	const withdrawnBalance = fromBigIntNumberToDecimal(withdrawn, CONSTANTS.decimals);
 	const totalHoldings = walletBalance + stakedBalance + (depositedBalance - withdrawnBalance);
 
-	const totalStaked = new BigNumber(totalStakedRaw).div(10 ** CONSTANTS.decimals);
-	const circulatingSupply = new BigNumber(circulatingSupplyRaw).div(10 ** CONSTANTS.decimals);
+	const totalStaked = fromBigIntNumberToDecimal(totalStakedRaw, CONSTANTS.decimals);
+	const circulatingSupply = fromBigIntNumberToDecimal(circulatingSupplyRaw, CONSTANTS.decimals);
 
-	const distributedRewardsEth = new BigNumber(distributedRewards).div(10 ** wethDecimals);
-	const distributedRewardsLiquEth = new BigNumber(distributedRewardsLiqu).div(10 ** wethDecimals);
-	const distributedRewardsCollEth = new BigNumber(distributedRewardsColl).div(10 ** wethDecimals);
+	const distributedRewardsEth = fromBigIntNumberToDecimal(distributedRewards, wethDecimals);
+	const distributedRewardsLiquEth = fromBigIntNumberToDecimal(distributedRewardsLiqu, wethDecimals);
+	const distributedRewardsCollEth = fromBigIntNumberToDecimal(distributedRewardsColl, wethDecimals);
 	const distributedRewardsTotalEth = distributedRewardsEth + distributedRewardsLiquEth + distributedRewardsCollEth;
 	
-	const claimedRewardsEth = new BigNumber(claimedRewards).div(10 ** wethDecimals);
-	const claimedRewardsLiquEth = new BigNumber(claimedRewardsLiqu).div(10 ** wethDecimals);
-	const claimedRewardsCollEth = new BigNumber(claimedRewardsColl).div(10 ** wethDecimals);
+	const claimedRewardsEth = fromBigIntNumberToDecimal(claimedRewards, wethDecimals);
+	const claimedRewardsLiquEth = fromBigIntNumberToDecimal(claimedRewardsLiqu, wethDecimals);
+	const claimedRewardsCollEth = fromBigIntNumberToDecimal(claimedRewardsColl, wethDecimals);
 	const claimedRewardsTotalEth = distributedRewardsEth + distributedRewardsLiquEth + distributedRewardsCollEth;
 
-	const assignedMining = new BigNumber(assignedMiningRaw).div(10 ** CONSTANTS.decimals);
-	const assignedLiquidity = new BigNumber(assignedLiquidityRaw).div(10 ** CONSTANTS.decimals);
-	const assignedCollateral = new BigNumber(assignedCollateralRaw).div(10 ** CONSTANTS.decimals);
-	const unassigned = new BigNumber(unassignedRaw).div(10 ** CONSTANTS.decimals);
+	const assignedMining = fromBigIntNumberToDecimal(assignedMiningRaw, CONSTANTS.decimals);
+	const assignedLiquidity = fromBigIntNumberToDecimal(assignedLiquidityRaw, CONSTANTS.decimals);
+	const assignedCollateral = fromBigIntNumberToDecimal(assignedCollateralRaw, CONSTANTS.decimals);
+	const unassigned = fromBigIntNumberToDecimal(unassignedRaw, CONSTANTS.decimals);
 	const totalAssigned = assignedMining + assignedLiquidity + assignedCollateral;
 
 	// Step 3: Convert usdt values
 	const xeonAddress = CONSTANTS.neonAddress;
+	const ethUsdPrice = getCurrentEthUsdcPriceFromUniswapV2();
+
 	const walletBalanceUSDT = getTokenUSDValue(xeonAddress, walletBalance);
 	const stakedBalanceUSDT = getTokenUSDValue(xeonAddress, stakedBalance);
 	const depositedBalanceUSDT = getTokenUSDValue(xeonAddress, depositedBalance);
@@ -284,10 +287,10 @@ async function fetchSection_StakingPanel(){
 	const claimedRewardsColUSDT = claimedRewardsCollEth * ethUsdPrice;	
 	const claimedRewardsTotalUSDT = claimedRewardsTotalEth * ethUsdPrice;
 
-	const assignedMiningUSDT = assignedMining * tokenUsdPrice;
-	const assignedLiquidityUSDT = assignedLiquidity * tokenUsdPrice;
-	const assignedCollateralUSDT = assignedCollateral * tokenUsdPrice;
-	const unassignedUSDT = unassigned * tokenUsdPrice;
+	const assignedMiningUSDT = getTokenUSDValue(xeonAddress, assignedMining);
+	const assignedLiquidityUSDT = getTokenUSDValue(xeonAddress, assignedLiquidity);
+	const assignedCollateralUSDT = getTokenUSDValue(xeonAddress, assignedCollateral);
+	const unassignedUSDT = getTokenUSDValue(xeonAddress, unassigned);
 	const totalAssignedUSDT = assignedMiningUSDT + assignedLiquidityUSDT + assignedCollateralUSDT;
 
 	updateSectionValues_Staking(

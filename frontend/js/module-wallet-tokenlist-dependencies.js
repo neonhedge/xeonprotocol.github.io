@@ -13,23 +13,23 @@ async function getWalletTokenList(walletAddress) {
 
 // Function to update the HTML with the ERC20 token list
 async function userTokenList(walletAddress) {
-    const tokenListContainer = document.querySelector('.trade-list'); // Get the container for the token list
+    const tokenListContainer = $('.trade-list');
+    tokenListContainer.empty();
     const tokenAddresses = await getWalletTokenList(walletAddress);
 
     for (const tokenAddress of tokenAddresses) {
         const result = await hedgingInstance.methods.getUserTokenBalances(tokenAddress, walletAddress).call();
         const depositedBalance = result[0];
         const withdrawnBalance = result[1];
-        const ethUsdPrice = await getCurrentEthUsdcPriceFromUniswapV2();
 
         // Convert deposited and withdrawn balances to BigNumber and handle 1e18 format
         const currentBalance = depositedBalance - withdrawnBalance;
         const tokenInfo = await getTokenInfo(tokenAddress, currentBalance);
 
         if (tokenInfo) {
-            const listItem = document.createElement('li');
-            listItem.classList.add('trade-item');
-            listItem.innerHTML = `
+            const listItem = $('<li></li>'); // Use jQuery to create a new list item
+            listItem.addClass('trade-item');
+            listItem.html(`
                 <div class="token-icon" style="background: url('./imgs/${tokenInfo.symbol.toLowerCase()}.webp');"></div>
                 <div class="token-info">
                     <div class="token-name">${tokenInfo.name}</div>
@@ -39,8 +39,9 @@ async function userTokenList(walletAddress) {
                     <div class="token-tamount">${tokenInfo.amount}</div>
                 </div>
                 <div class="trade-amount">$${tokenInfo.valueInUSD}</div>
-            `;
-            tokenListContainer.appendChild(listItem);
+            `);
+            tokenListContainer.append(listItem); // Use jQuery's append method
+            console.log("deposits info:", tokenInfo);
         }
     }
 }
@@ -113,7 +114,7 @@ async function cashierErc20List(walletAddress) {
     selectElement.innerHTML = '<option value="">Select token...</option>'; // Reset select option
     try {
         const depositedTokens = await getDepositedTokens();
-        //const ethUsdPrice = await getCurrentEthUsdcPriceFromUniswapV2();
+        //const ethUsdPrice = getCurrentEthUsdcPriceFromUniswapV2();
         // Fetch token information for each deposited token and add them as options
         for (const tokenAddress of depositedTokens) {
             const [deposited, withdrawn, , ,] = await hedgingInstance.methods.getuserTokenBalances(tokenAddress, walletAddress).call();
