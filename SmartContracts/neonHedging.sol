@@ -2,9 +2,9 @@
 pragma solidity ^0.8.4;
 
 // Xeon Protocol - Universal ERC20 OTC Hedging and Lending. 
-// Testnet Version 1.5
-// Deployed on Goerli Testnet 25/12/2024
-// Goerli Support for Uniswap V2 Router was the basis
+// Testnet Version 1.6
+// Deployed on Goerli Testnet 29/12/2024
+// Goerli testnet on the basis of Uniswap V2 Router support
 
 // ====================Description===========================
 // Protocol accepts an ERC20 address to function as below;
