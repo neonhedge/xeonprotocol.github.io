@@ -79,8 +79,6 @@ async function fetchSection_HedgePanel(){
 	const userSwapsCreated = await hedgingInstance.methods.getUserSwapsCreated(userAddress, 0, CONSTANTS.tokenLimit).call();
 	const userOptionsTaken = await hedgingInstance.methods.getUserOptionsTaken(userAddress, 0, CONSTANTS.tokenLimit).call();
 	const userSwapsTaken = await hedgingInstance.methods.getUserSwapsTaken(userAddress, 0, CONSTANTS.tokenLimit).call();
-	const userOptionsHistory = await hedgingInstance.methods.getUserOptionsHistory(userAddress, 0, CONSTANTS.tokenLimit).call();
-	const userSwapsHistory = await hedgingInstance.methods.getUserSwapsHistory(userAddress, 0, CONSTANTS.tokenLimit).call();
 	// Fetch volume
 	// Manually fetch these: get hedges created + taken IDs, then compile createValue & startValue volumes from each ID
 	const userHedgeVolume = await getUserHedgeVolume(userAddress);
@@ -102,8 +100,8 @@ async function fetchSection_HedgePanel(){
 	const userSwapsTakenCount = userSwapsTaken.length;
 	const userHedgesTaken = userOptionsTakenCount + userSwapsTakenCount;
 	
-	const userOptionsHistoryCount = userOptionsHistory.length;
-	const userSwapsHistoryCount = userSwapsHistory.length;
+	const userOptionsHistoryCount = userOptionsCreated.length + userOptionsTaken.length;
+	const userSwapsHistoryCount = userSwapsCreated.length + userSwapsTaken.length;
 	
 	// Step 2: Convert amounts
 	const userCreateVolumeWETH = Number(userHedgeVolume[0]);
@@ -153,9 +151,9 @@ async function fetchSection_RewardsPanel(){
 	// ~ mining rewards are not automatically loaded to wallet page as they need to be populated from past events
 	
 	// Fetch rewards claimed
-	const userRewardsClaimed = await stakingInstance.methods.stakerRewardsClaimed(userAddress).call();
-	const userLiqRewardsClaimed = await stakingInstance.methods.stakerLiquidityClaimed(userAddress).call();
-	const userColRewardsClaimed = await stakingInstance.methods.stakerCollateralClaimed(userAddress).call();
+	const userRewardsClaimed = await stakingInstance.methods.claimedRewardsStaking(userAddress).call();
+	const userLiqRewardsClaimed = await stakingInstance.methods.claimedRewardsLiquidity(userAddress).call();
+	const userColRewardsClaimed = await stakingInstance.methods.claimedRewardsCollateral(userAddress).call();
 	
 	// Fetch ETH to USD conversion rate
 	const ethUsdPrice = getCurrentEthUsdcPriceFromUniswapV2();
@@ -220,7 +218,7 @@ async function fetchSection_StakingPanel(){
 	const withdrawn = depositedBalanceRaw.withdrawn;
 	// Staked versus Supply
 	const totalStakedRaw = await stakingInstance.methods.getTotalStaked().call();
-	const circulatingSupplyRaw = await tokenInst.circulatingSupply(); 
+	const circulatingSupplyRaw = await neonInstance.methods.circulatingSupply(); 
 	// Distrubuted ETH rewards to staking contract
 	const distributedRewards = await stakingInstance.methods.ethRewardBasis().call();
 	const distributedRewardsLiqu = await stakingInstance.methods.ethLiquidityRewardBasis().call();
@@ -235,10 +233,6 @@ async function fetchSection_StakingPanel(){
 	const assignedLiquidityRaw = assignmentsRaw.assignedForLiquidity;
 	const assignedCollateralRaw = assignmentsRaw.assignedForCollateral;
 	const unassignedRaw = assignmentsRaw.unassigned;
-	
-	// Fetch ETH to USD conversion rate
-	const ethUsdPrice = getCurrentEthUsdcPriceFromUniswapV2();
-	const tokenUsdPrice = await getTokenUSDValue();
 
 	// Step 1: Convert amounts
 	const wethDecimals = 18; const usdtDecimals = 6; const usdcDecimals = 6;
@@ -270,14 +264,15 @@ async function fetchSection_StakingPanel(){
 	const totalAssigned = assignedMining + assignedLiquidity + assignedCollateral;
 
 	// Step 3: Convert usdt values
-	const walletBalanceUSDT = walletBalance * getTokenUSDValue;
-	const stakedBalanceUSDT = stakedBalance * getTokenUSDValue;
-	const depositedBalanceUSDT = depositedBalance * getTokenUSDValue;
-	const withdrawnBalanceUSDT = withdrawnBalance * getTokenUSDValue;
-	const totalHoldingsUSDT = totalHoldings * getTokenUSDValue;
+	const xeonAddress = CONSTANTS.neonAddress;
+	const walletBalanceUSDT = getTokenUSDValue(xeonAddress, walletBalance);
+	const stakedBalanceUSDT = getTokenUSDValue(xeonAddress, stakedBalance);
+	const depositedBalanceUSDT = getTokenUSDValue(xeonAddress, depositedBalance);
+	const withdrawnBalanceUSDT = getTokenUSDValue(xeonAddress, withdrawnBalance);
+	const totalHoldingsUSDT = getTokenUSDValue(xeonAddress, totalHoldings);
 
-	const totalStakedUSDT = totalStaked * getTokenUSDValue;
-	const circulatingSupplyUSDT = circulatingSupply * getTokenUSDValue;
+	const totalStakedUSDT = getTokenUSDValue(xeonAddress, totalStaked);
+	const circulatingSupplyUSDT = getTokenUSDValue(xeonAddress, circulatingSupply);
 
 	const distributedRewardsUSDT = distributedRewardsEth * ethUsdPrice;
 	const distributedRewardsLiqUSDT = distributedRewardsLiquEth * ethUsdPrice;	
