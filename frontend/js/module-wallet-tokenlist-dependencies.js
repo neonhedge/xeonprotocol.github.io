@@ -17,6 +17,24 @@ async function userTokenList(walletAddress) {
     tokenListContainer.empty();
     const tokenAddresses = await getWalletTokenList(walletAddress);
 
+    // Formatter for displaying the token value
+    const formatValue = (value) => {
+        return `$${value.toFixed(2)}`;
+    };
+
+    const formatString = (number) => {
+        return number.toLocaleString();
+    };
+
+    const formatStringDecimal = (number) => {
+        const options = {
+            style: 'decimal',
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+        };
+        return '$' + number.toLocaleString('en-US', options);
+    };  
+
     for (const tokenAddress of tokenAddresses) {
         const result = await hedgingInstance.methods.getUserTokenBalances(tokenAddress, walletAddress).call();
         const depositedBalance = result[0];
@@ -38,7 +56,7 @@ async function userTokenList(walletAddress) {
                     <div class="token-copy"><i class="far fa-copy"></i></div>
                     <div class="token-tamount">${tokenInfo.amount}</div>
                 </div>
-                <div class="trade-amount">$${tokenInfo.valueInUSD}</div>
+                <div class="trade-amount">${formatValue(tokenInfo.valueInUSD)}</div>
             `);
             tokenListContainer.append(listItem); // Use jQuery's append method
             console.log("deposits info:", tokenInfo);
@@ -77,7 +95,7 @@ async function getTokenInfo(tokenAddress, balance) {
 		  stateMutability: "view",
 		  type: "function",
 		},
-	];	  
+	];
 	  
     try {
         // Fetch token name, symbol, and decimals from the ERC20 contract
