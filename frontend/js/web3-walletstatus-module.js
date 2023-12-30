@@ -290,7 +290,7 @@ async function unlockedWallet() {
 			return true;
 		  }
 		} catch (error) {
-		  if (error.code === 4001) {
+		  if (error.code === 4001) { // 4001 indicates that the user rejected the request
 			console.log('Permissions needed to continue.');
 			swal({
 			  title: '',
@@ -308,8 +308,8 @@ async function unlockedWallet() {
 			  console.log('permissions retry...');
 			  reqConnect();
 			});
-		  } else {
-			console.log(error);
+		  } else if (error.code === -32002) { // -32002 indicates that the user has not made a request yet
+			console.log('Already requested permissions.');
 		  }
 		}
 		return false;
