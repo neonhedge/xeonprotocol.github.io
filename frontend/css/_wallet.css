@@ -947,6 +947,10 @@ button#transactSubmit{
     font-weight: 400;
 }
 
+#hedges-trade-list {
+	position: relative;
+	min-height: 50dvh;
+}
 .trade-list { 
 	flex-basis: 63%;
 	max-height: 500px;
@@ -959,6 +963,28 @@ button#transactSubmit{
 	box-sizing: border-box;
     margin: 0;
 }
+
+.no-hedges-message {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	padding:4vw;
+	box-sizing: border-box;
+	
+	text-align: center;
+	font-family: "Space Grotesk", "Monospace", sans-serif;
+	font-size: clamp(14px, 1vw, 15px);
+	font-weight: 100;
+	cursor: help;
+	transition: background-color 0.3s;
+	color: transparent;
+	background-clip: text;
+	text-fill-color: transparent;
+	border: 0.5px solid rgba(51, 153, 255, 0.5);
+	border-radius: 8px;
+	background-image: linear-gradient(to right, #08e7fe, #d6188a);
+}  
 
 .t-i-lead {
 	max-width: 63%;

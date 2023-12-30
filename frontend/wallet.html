@@ -140,16 +140,16 @@
 									<i class="fa fa-expand" aria-hidden="true"></i>
 								</div>
 								<div class="balgrid">
-								<strong>Deposited:</strong> <span class="cashier-text-value is-loading" id="depositedBalance">0</span>
+								<strong>Deposited:</strong> <span class="cashier-text-value is-loading-bal" id="depositedBalance">0</span>
 								</div>
 								<div class="balgrid">
-								<strong>Withdrawn:</strong> <span class="cashier-text-value is-loading" id="withdrawnBalance">0</span>
+								<strong>Withdrawn:</strong> <span class="cashier-text-value is-loading-bal" id="withdrawnBalance">0</span>
 								</div>
 								<div class="balgrid">
-								<strong>Locked:</strong> <span class="cashier-text-value is-loading" id="lockedInUseBalance">0</span>
+								<strong>Locked:</strong> <span class="cashier-text-value is-loading-bal" id="lockedInUseBalance">0</span>
 								</div>
 								<div class="balgrid">
-								<strong>Withdrawable:</strong> <span class="cashier-text-value is-loading" id="withdrawableBalance">0</span>
+								<strong>Withdrawable:</strong> <span class="cashier-text-value is-loading-bal" id="withdrawableBalance">0</span>
 								</div>
 							</div>
 						</div>
@@ -158,7 +158,11 @@
 				</div>
 
 				<div class="nw-rectangle">
-					<!-- Add your cool neon background image here -->
+					<!-- cool neon edge here -->
+					<span class="nEdge"></span>
+					<span class="nEdge"></span>
+					<span class="nEdge"></span>
+					<span class="nEdge"></span>
 					<div class="userFundsCont">
 
 						<div class="nw-right">
@@ -256,7 +260,7 @@
 						</div>
 						<div class="trade-amount t-i-heading">VALUE</div>
 					</li>
-					<ul class="trade-list">
+					<ul id="token-list" class="trade-list">
 						<li class="trade-item">
 							<div class="token-icon" style="background: url('./imgs/cosmicsettled.webp');"></div>
 							<div class="token-info">
@@ -569,7 +573,7 @@
 							</div>
 							<div class="hedge-i-cat">BTN</div>
 						</li>
-						<ul class="trade-list hedges-trade-list">
+						<ul id="hedges-trade-list" class="trade-list hedges-trade-list">
 							<li class="hedge-item">
 								<div class="hedge-type hedge-i-cat hedgeType">CALL</div>
 								<div class="token-info">
