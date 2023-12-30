@@ -83,12 +83,12 @@ async function unlockedWallet() {
 	}
 
 	async function handleAccountChange(wallets) {
-		console.log("Wallet connected:", wallets);
     	let wallet = wallets[0];
 		wallet = wallets.length ? wallets[0] : null;
 		if (wallets.length === 0) {
 			console.log("Please connect to MetaMask.");
 		} else if (wallets[0] !== window.currentAccount) {
+			console.log("Wallet connected:", wallets);
 			window.currentAccount = wallets[0];
 			await initializeConnection();
 		}

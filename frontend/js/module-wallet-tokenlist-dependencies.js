@@ -13,8 +13,12 @@ async function getWalletTokenList(walletAddress) {
 
 // Function to update the HTML with the ERC20 token list
 async function userTokenList(walletAddress) {
-    const tokenListContainer = $('.trade-list');
+
+    const tokenListContainer = $('#token-list');
     tokenListContainer.empty();
+    // Show animation
+    tokenListContainer.append('<i class="loading"></i>');
+    // Fetch the token list
     const tokenAddresses = await getWalletTokenList(walletAddress);
 
     // Formatter for displaying the token value
@@ -62,6 +66,9 @@ async function userTokenList(walletAddress) {
             console.log("deposits info:", tokenInfo);
         }
     }
+
+    // Hide the loading animation
+    tokenListContainer.find('.loading').remove();
 }
 
 // Function to calculate ERC20 token information

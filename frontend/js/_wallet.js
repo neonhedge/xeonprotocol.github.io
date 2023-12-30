@@ -13,39 +13,40 @@ import { loadHedgesModule } from './module-wallet-section-hedgesList.js';
 ==========================================================================*/
 initWeb3();
 
+// Start making calls to Dapp modules
+export const checkAndCallPageTries = async () => {
+    const asyncFunctions = [fetchSection_Networth, fetchSection_BalanceList, fetchSection_HedgePanel, fetchSection_RewardsPanel, fetchSection_StakingPanel];
+    for (const func of asyncFunctions) {
+        func();
+    }
+};
+
 $(document).ready(async function () {
 
     // Ready event listeners on the wallet
     setupToggleElements();
-    
-    // Proceed to fetch data for sections
-    const accounts = await web3.eth.requestAccounts();
-    const userAddress = accounts[0];
 
+    let userAddress = '';
     const unlockState = await unlockedWallet();
 
-    const checkAndCallPageTries = async () => {
-        if (unlockState === true) {
-            const asyncFunctions = [fetchSection_Networth, fetchSection_BalanceList, fetchSection_HedgePanel, fetchSection_RewardsPanel, fetchSection_StakingPanel];
-            for (const func of asyncFunctions) {
-                func();
-            }
-        } else {
-            reqConnect();
-            console.log('PLEASE CONNECT YOUR WALLET');
-        }
-    };
+    if (unlockState === true) {
+        const accounts = await web3.eth.requestAccounts();
+        userAddress = accounts[0];
+        // Load sections automatically & periodically
+        setatmIntervalAsync(async () => {
+            await checkAndCallPageTries();
+        }, 45000);
+    } else {
+        
+        console.log('Requesting Wallet Connection...');
+        reqConnect();
+    }
 
     const setatmIntervalAsync = (fn, ms) => {
         fn().then(() => {
             setTimeout(() => setatmIntervalAsync(fn, ms), ms);
         });
     };
-
-    // Load sections automatically & periodically
-    setatmIntervalAsync(async () => {
-        await checkAndCallPageTries();
-    }, 45000);
 
     // Load more sections manually not automatically & periodically
     // Create an IntersectionObserver to load hedges when #hedgingSection is in view
@@ -260,4 +261,3 @@ $(document).ready(function () {
         $('#walletData').addClass('expandedData');
     });
 });
-
