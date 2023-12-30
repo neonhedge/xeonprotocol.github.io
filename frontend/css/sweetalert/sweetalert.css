@@ -1086,7 +1086,6 @@ body.stop-scrolling {
   border: 2px solid rgba(255, 255, 255, 0.2) !important; /* Border with translucency */
   backdrop-filter: blur(10px) !important; /* Apply a blur effect to create a frosted glass border */
   z-index: -1 !important; /* Place the pseudo-elements above the content */
-  transition: z-index 0.3s !important;
 }
 .sweet-alert::after {
   bottom: 2px !important;

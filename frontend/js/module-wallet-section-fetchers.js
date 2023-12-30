@@ -103,22 +103,22 @@ async function fetchSection_HedgePanel(){
 	const userSwapsHistoryCount = userSwapsCreated.length + userSwapsTaken.length;
 	
 	// Step 2: Convert amounts
-	const userCreateVolumeWETH = Number(userHedgeVolume[0]);
-	const userCreateVolumeUSDT = Number(userHedgeVolume[1]);
-	const userCreateVolumeUSDC = Number(userHedgeVolume[2]);
-	const userBuyVolumeWETH = Number(userHedgeVolume[3]);
-	const userBuyVolumeUSDT = Number(userHedgeVolume[4]);
-	const userBuyVolumeUSDC = Number(userHedgeVolume[5]);
+	const userCreateVolumeWETH = Number(userHedgeVolume.costSumUSDC);
+	const userCreateVolumeUSDT = Number(userHedgeVolume.costSumUSDT);
+	const userCreateVolumeUSDC = Number(userHedgeVolume.costSumUSDC);
+	const userBuyVolumeWETH = Number(userHedgeVolume.startValueSumWETH);
+	const userBuyVolumeUSDT = Number(userHedgeVolume.startValueSumUSDT);
+	const userBuyVolumeUSDC = Number(userHedgeVolume.startValueSumUSDC);
 
-	const userProfitWETH = Number(userProfitLoss[0]);
-	const userProfitUSDT = Number(userProfitLoss[1]);
-	const userProfitUSDC = Number(userProfitLoss[2]);
-	const userLossWETH = Number(userProfitLoss[3]);
-	const userLossUSDT = Number(userProfitLoss[4]);
-	const userLossUSDC = Number(userProfitLoss[5]);
+	const userProfitWETH = Number(userProfitLoss.profitsWETH);
+	const userProfitUSDT = Number(userProfitLoss.profitsUSDT);
+	const userProfitUSDC = Number(userProfitLoss.profitsUSDC);
+	const userLossWETH = Number(userProfitLoss.lossesWETH);
+	const userLossUSDT = Number(userProfitLoss.lossesUSDT);
+	const userLossUSDC = Number(userProfitLoss.lossesUSDC);
 
 	const totalCreatedWETH = userCreateVolumeWETH + (userCreateVolumeUSDT / ethUsdPrice) + (userCreateVolumeUSDC / ethUsdPrice);
-	const totalCreateTWETH = userBuyVolumeWETH + (userBuyVolumeUSDT / ethUsdPrice) + (userBuyVolumeUSDC / ethUsdPrice);
+	const totalTakenWETH = userBuyVolumeWETH + (userBuyVolumeUSDT / ethUsdPrice) + (userBuyVolumeUSDC / ethUsdPrice);
 	const totalProfitTWETH = userProfitWETH + (userProfitUSDT / ethUsdPrice) + (userProfitUSDC / ethUsdPrice);
 	const totalLossTWETH = userLossWETH + (userLossUSDT / ethUsdPrice) + (userLossUSDC / ethUsdPrice);
 
@@ -126,7 +126,7 @@ async function fetchSection_HedgePanel(){
 		userHedgesCreated,
 		userHedgesTaken,
 		totalCreatedWETH,
-		totalCreateTWETH,
+		totalTakenWETH,
 		userOptionsHistoryCount,
 		userSwapsHistoryCount,
 		totalProfitTWETH,

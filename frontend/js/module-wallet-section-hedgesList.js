@@ -12,7 +12,7 @@ export async function loadHedgesModule(userAddress) {
 
   async function fetchDataAndPopulateList() {
     let data;
-
+    console.log('fethcing hedges for wallet: ', userAddress)
     switch (dataType) {
       case 'Options Created':
         data = await hedgingInstance.methods.getUserOptionsCreated(userAddress, startIndex, limit).call();
