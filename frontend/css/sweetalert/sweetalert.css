@@ -218,6 +218,15 @@ body.stop-scrolling {
   margin: 13px 5px 0 5px;
   cursor: pointer; 
 }
+.sweet-alert button:hover {
+  background: #03e9f4 !important;
+  color: #050801;
+  box-shadow: 0 0 5px rgb(0, 136, 255),
+              0 0 25px rgb(0, 136, 255),
+              0 0 5px rgb(0, 136, 255),
+              0 0 0 rgb(0, 136, 255) !important;
+  -webkit-box-reflect: below 1px linear-gradient(transparent, #0005) !important;
+}
 .sweet-alert button:focus {
   outline: none;
   box-shadow: 0 0 2px rgba(128, 179, 235, 0.5), inset 0 0 0 1px rgba(0, 0, 0, 0.05); 
@@ -255,9 +264,11 @@ body.stop-scrolling {
 .sweet-alert button::-moz-focus-inner {
   border: 0; 
 }
+/*
 .sweet-alert[data-has-cancel-button=false] button {
   box-shadow: none !important; 
 }
+*/
 .sweet-alert[data-has-confirm-button=false][data-has-cancel-button=false] {
   padding-bottom: 40px; 
 }

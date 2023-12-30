@@ -2,6 +2,7 @@
     Import modules
 ==========================================================================*/
 import { CONSTANTS, commaNumbering } from './constants.js';
+import { checkAndCallPageTries } from './_wallet.js'
 
 /*=========================================================================
     run functions
@@ -82,7 +83,7 @@ async function unlockedWallet() {
 	}
 
 	async function handleAccountChange(wallets) {
-		console.log("Account changed:", wallets);
+		console.log("Wallet connected:", wallets);
     	let wallet = wallets[0];
 		wallet = wallets.length ? wallets[0] : null;
 		if (wallets.length === 0) {
@@ -128,7 +129,7 @@ async function unlockedWallet() {
 		} else {
 			console.log(result);
 			swal({
-			title: 'Failed.',
+			title: 'Failed to compute.',
 			type: 'error',
 			allowOutsideClick: true,
 			confirmButtonColor: '#F27474',
@@ -138,11 +139,11 @@ async function unlockedWallet() {
 		} catch (error) {
 		console.log(error);
 		swal({
-			title: 'Failed.',
+			title: 'Neon Hedge Disconnected.',
 			type: 'error',
 			allowOutsideClick: true,
 			confirmButtonColor: '#F27474',
-			text: `Issue: ${error.message}`,
+			text: `> Wallet Locked. \nPlease Unlock Wallet.`,
 		});
 		}
 	}
@@ -334,6 +335,12 @@ async function unlockedWallet() {
 			balanceOf(account[0]);
 		} catch (error) {
 			console.log('Metamask Locked');
+		}
+
+		try { 
+			await checkAndCallPageTries();
+		} catch (error) {
+			console.log(error);
 		}
 	}
 	

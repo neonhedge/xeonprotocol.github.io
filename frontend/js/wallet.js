@@ -13,56 +13,56 @@ import { loadHedgesModule } from './module-wallet-section-hedgesList.js';
 ==========================================================================*/
 initWeb3();
 
+// Start making calls to Dapp modules
+export const checkAndCallPageTries = async () => {
+    const asyncFunctions = [fetchSection_Networth, fetchSection_BalanceList, fetchSection_HedgePanel, fetchSection_RewardsPanel, fetchSection_StakingPanel];
+    for (const func of asyncFunctions) {
+        func();
+    }
+};
+
 $(document).ready(async function () {
 
-    // Ready event listeners on wallet
+    // Ready event listeners on the wallet
     setupToggleElements();
-    
-    // Proceed to fetch data for sections
-    const accounts = await web3.eth.requestAccounts();
-	const userAddress = accounts[0];
 
+    let userAddress = '';
     const unlockState = await unlockedWallet();
-    
+
     if (unlockState === true) {
-        const setatmIntervalAsync = (fn, ms) => {
-            fn().then(() => {
-                setTimeout(() => setatmIntervalAsync(fn, ms), ms);
-            });
-        };
+        const accounts = await web3.eth.requestAccounts();
+        userAddress = accounts[0];
         // Load sections automatically & periodically
-        const callPageTries = async () => {
-            const asyncFunctions = [fetchSection_Networth, fetchSection_BalanceList, fetchSection_HedgePanel, fetchSection_RewardsPanel, fetchSection_StakingPanel];
-            for (const func of asyncFunctions) {
-                await func();
-            }
-        };
-
         setatmIntervalAsync(async () => {
-            await callPageTries();
-        }, 30000);
-
-        // Load more sections manually not automatically & periodically
-        // Create an IntersectionObserver to load hedges when #hedgingSection is in view
-        const loadHedgesSection = async (entries) => {
-            const accounts = await web3.eth.requestAccounts();
-            const userAddress = accounts[0];
-            for (const entry of entries) {
-                if (entry.isIntersecting) {
-                    // Call the loadHedgesModule function
-                    await loadHedgesModule(userAddress);
-                    // Remove the observer once the section has been loaded
-                    observer.unobserve(entry.target);
-                }
-            }
-        };
-        const hedgingSection = document.getElementById('hedgingSection');
-        const observer = new IntersectionObserver(loadHedgesSection, { root: null, threshold: 0.1 }); //{ root: null, threshold: 0.1 } specifies that the observer is relative to the viewport (root: null) and will trigger the callback function when at least 10% of the target element (hedgingSection) is visible
-        observer.observe(hedgingSection);
+            await checkAndCallPageTries();
+        }, 45000);
     } else {
         reqConnect();
         console.log('PLEASE CONNECT YOUR WALLET');
     }
+
+    const setatmIntervalAsync = (fn, ms) => {
+        fn().then(() => {
+            setTimeout(() => setatmIntervalAsync(fn, ms), ms);
+        });
+    };
+
+    // Load more sections manually not automatically & periodically
+    // Create an IntersectionObserver to load hedges when #hedgingSection is in view
+    const loadHedgesSection = async (entries) => {
+        for (const entry of entries) {
+            if (entry.isIntersecting) {
+                // Call the loadHedgesModule function
+                await loadHedgesModule(userAddress);
+                // Remove the observer once the section has been loaded
+                observer.unobserve(entry.target);
+            }
+        }
+    };
+
+    const hedgingSection = document.getElementById('hedgingSection');
+    const observer = new IntersectionObserver(loadHedgesSection, { root: null, threshold: 0.1 });
+    observer.observe(hedgingSection);
 });
 
 
@@ -260,4 +260,3 @@ $(document).ready(function () {
         $('#walletData').addClass('expandedData');
     });
 });
-
