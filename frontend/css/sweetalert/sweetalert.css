@@ -201,10 +201,6 @@ body.stop-scrolling {
 }
 .sweet-alert button {
   background-color: #050c1c !important;
-  background: linear-gradient(220deg, #188dd6, #050c1c 90%);
-  border:0.5px solid #a6a6a6;
-  color: #ddd;
-
   border: 1px solid #3399ff;
   background: linear-gradient(220deg, #39f, #110f47 80%);
   color:#FFF;
@@ -224,7 +220,7 @@ body.stop-scrolling {
   backdrop-filter: blur(10px) !important; /* Apply a blur effect to create a frosted glass border */
   color: #FFF;
   box-shadow: 0 0 5px #0e84bb,
-              0 0 25px #0e84bb,
+              0 0 25px #011017,
               0 0 5px #0583ad,
               0 0 0 #0583ad !important;
               
@@ -1066,11 +1062,10 @@ body.stop-scrolling {
   } 
 }
  /* EXTRA THEMES */
- .sweet-alert {
+.sweet-alert {
   padding: 10px !important;
   box-sizing: border-box !important;
-  background: rgba(255, 255, 255, 0.05) !important; 
-  display: block !important;
+  background: rgba(255, 255, 255, 0.05) !important;
   border-radius: 10px !important;
   overflow: visible !important;
 }
@@ -1086,6 +1081,7 @@ body.stop-scrolling {
   border: 2px solid rgba(255, 255, 255, 0.2) !important; /* Border with translucency */
   backdrop-filter: blur(10px) !important; /* Apply a blur effect to create a frosted glass border */
   z-index: -1 !important; /* Place the pseudo-elements above the content */
+  transition: z-index 0.3s !important;
 }
 .sweet-alert::after {
   bottom: 2px !important;
