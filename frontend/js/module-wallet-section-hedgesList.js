@@ -1,4 +1,4 @@
-export function loadHedgesModule(userAddress) {
+export async function loadHedgesModule(userAddress) {
   let startIndex = 0;
   const limit = 50;
   let dataType = 'Options Created';
@@ -20,17 +20,14 @@ export function loadHedgesModule(userAddress) {
       case 'Options Taken':
         data = await hedgingInstance.methods.getUserOptionsTaken(userAddress, startIndex, limit).call();
         break;
-      case 'Options Bookmarks':
-        data = await hedgingInstance.methods.getUserOptionsTaken(userAddress, startIndex, limit).call();
-        break;
       case 'Swaps Created':
-        data = await hedgingInstance.methods.getUserOptionsTaken(userAddress, startIndex, limit).call();
+        data = await hedgingInstance.methods.getUserSwapsTaken(userAddress, startIndex, limit).call();
         break;
       case 'Swaps Taken':
-        data = await hedgingInstance.methods.getUserOptionsTaken(userAddress, startIndex, limit).call();
+        data = await hedgingInstance.methods.getUserSwapsTaken(userAddress, startIndex, limit).call();
         break;
-      case 'Swaps Bookmarks':
-        data = await hedgingInstance.methods.getUserOptionsTaken(userAddress, startIndex, limit).call();
+      case 'My Bookmarks':
+        data = await hedgingInstance.methods.getmyBookmarks(userAddress).call();
         break;
       // Handle other cases
       default:
@@ -41,12 +38,14 @@ export function loadHedgesModule(userAddress) {
 
     // For works better than foreach inside async function
     for (const item of data) {
+      const result = await getHedgeDetails(item); 
+
       const listItem = document.createElement('li');
       listItem.classList.add('hedge-item');
 
       const hedgeType = document.createElement('div');
       hedgeType.classList.add('hedge-type', 'hedge-i-cat');
-      hedgeType.textContent = item.hedgeType;
+      hedgeType.textContent = result.hedgeType;
       listItem.appendChild(hedgeType);
 
       const tokenInfo = document.createElement('div');
@@ -54,17 +53,18 @@ export function loadHedgesModule(userAddress) {
 
       const hedgeSymbol = document.createElement('div');
       hedgeSymbol.classList.add('hedge-symbol', 'hedge-i-cat');
-      hedgeSymbol.textContent = item.hedgeSymbol;
+      hedgeSymbol.textContent = result.hedgeSymbol;
       tokenInfo.appendChild(hedgeSymbol);
 
       const hedgeValue = document.createElement('div');
       hedgeValue.classList.add('hedge-value', 'hedge-i-cat');
-      hedgeValue.textContent = item.hedgeValue; 
+      hedgeValue.textContent = result.hedgeValue; 
       tokenInfo.appendChild(hedgeValue);
 
       const tokenAddress = document.createElement('div');
       tokenAddress.classList.add('token-address');
-      tokenAddress.textContent = item.tokenAddress; 
+      let truncatedAddr = tokenAddress.substring(0, 6) + '...' + tokenAddress.slice(-3);
+      tokenAddress.textContent = truncatedAddr; 
       tokenInfo.appendChild(tokenAddress);
 
       listItem.appendChild(tokenInfo);
@@ -101,6 +101,18 @@ export function loadHedgesModule(userAddress) {
     });
   });
 
+  // Limits the execution of the callback to once every specified delay
+  function throttle(callback, delay) {
+    let lastTime = 0;
+    return function () {
+      const currentTime = new Date();
+      if (currentTime - lastTime >= delay) {
+        callback.apply(null, arguments);
+        lastTime = currentTime;
+      }
+    };
+  }
+
   // Attach scroll event listener to the window using throttling
   window.addEventListener('scroll', throttle(() => {
     const scrollPosition = window.scrollY;
@@ -110,5 +122,5 @@ export function loadHedgesModule(userAddress) {
     if (scrollPosition + windowHeight >= listHeight) {
       loadMoreButton.click();
     }
-  }, 300)); // Adjust the delay (in milliseconds) for better responsiveness in future
+  }, 300)); // Adjust delay (in milliseconds) for responsiveness
 }

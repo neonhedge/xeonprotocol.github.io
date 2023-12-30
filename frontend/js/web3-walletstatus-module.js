@@ -282,35 +282,36 @@ async function unlockedWallet() {
 	
 	async function reqConnect() {
 		try {
-		  const permissions = await web3.eth.requestAccounts();
-		  
-		  if (permissions.length > 0) {
-			console.log(`eth_accounts permission successfully requested!`);
-			await initializeConnection();
-			return true;
-		  }
+			const permissions = await web3.eth.requestAccounts();
+			
+			if (permissions.length > 0) {
+				console.log(`eth_accounts permission successfully requested!`);
+				await initializeConnection();
+				return true;
+			}
 		} catch (error) {
-		  if (error.code === 4001) { // 4001 indicates that the user rejected the request
-			console.log('Permissions needed to continue.');
-			swal({
-			  title: '',
-			  text: 'Permissions needed here..',
-			  type: 'info',
-			  html: false,
-			  dangerMode: false,
-			  confirmButtonText: 'try again',
-			  cancelButtonText: 'cancel',
-			  showConfirmButton: true,
-			  showCancelButton: true,
-			  timer: 4000,
-			  animation: 'slide-from-top',
-			}, function () {
-			  console.log('permissions retry...');
-			  reqConnect();
-			});
-		  } else if (error.code === -32002) { // -32002 indicates that the user has not made a request yet
-			console.log('Already requested permissions.');
-		  }
+			console.log('connection error code: '+error.code)
+			if (error.code === 4001) { // 4001 indicates that the user rejected the request
+				console.log('Permissions needed to continue.');
+				swal({
+				title: '',
+				text: 'Permissions needed here..',
+				type: 'info',
+				html: false,
+				dangerMode: false,
+				confirmButtonText: 'try again',
+				cancelButtonText: 'cancel',
+				showConfirmButton: true,
+				showCancelButton: true,
+				timer: 4000,
+				animation: 'slide-from-top',
+				}, function () {
+					console.log('permissions retry...');
+					reqConnect();
+				});
+			} else if (error.code === 100) { // 100 indicates that the user has not made a request yet
+				console.log('Already requested permissions.');
+			}
 		}
 		return false;
 	}	  

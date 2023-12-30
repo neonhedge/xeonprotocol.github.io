@@ -87,8 +87,92 @@ section#activities {
 	vertical-align: middle;
 	border-radius: 10px;
 	box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+	transition: all 0.6s ease-in-out;
+  }
+  
+  .nw-rectangle:hover {
+	transform: scale(1.1);
   }
 
+  .nw-rectangle .nEdge {
+	position: absolute;
+	display: block;
+	animation-play-state: paused; /* Initially paused */
+  }
+  
+  .nw-rectangle:hover .nEdge:nth-child(1) {
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 0.5px;
+    background: linear-gradient(90deg,transparent,#188dd6);
+    animation: animate1 2s linear infinite;
+}
+@keyframes animate1{
+    0%{
+        left: -100%;
+    }
+    50%,100%{
+        left: 100%;
+    }
+}
+  
+  .nw-rectangle:hover .nEdge:nth-child(2) {
+    top: -100%;
+    right: 0;
+    width: 0.5px;
+    height: 100%;
+    background: linear-gradient(180deg,transparent,#188dd6);
+    animation: animate2 2s linear infinite;
+    animation-delay: 0.25s;
+}
+@keyframes animate2{
+    0%{
+        top: -100%;
+    }
+    50%,100%{
+        top: 100%;
+    }
+}
+  
+  .nw-rectangle:hover .nEdge:nth-child(3) {
+    bottom: 0;
+    right: 0;
+    width: 100%;
+    height: 0.5px;
+    background: linear-gradient(270deg,transparent,#188dd6);
+    animation: animate3 2s linear infinite;
+    animation-delay: 0.50s;
+}
+@keyframes animate3{
+	0%{
+		right: -100%;
+	}
+	50%,100%{
+		right: 100%;
+	}
+}
+  
+  .nw-rectangle:hover .nEdge:nth-child(4) {
+    bottom: -100%;
+    left: 0;
+    width: 0.5px;
+    height: 100%;
+    background: linear-gradient(360deg,transparent,#3399ff);
+    animation: animate4 2s linear infinite;
+    animation-delay: 0.75s;
+}
+@keyframes animate4{
+    0%{
+        bottom: -100%;
+    }
+    50%,100%{
+        bottom: 100%;
+    }
+}
+  
+/* NET WORTH DESIGN ELEMENTS */
+  
   .networthH2{
 	flex-basis: 100%;
   }
@@ -156,8 +240,9 @@ section#activities {
   }
 
   #netWorthUSD {
-	font-size: clamp(18px, 1vw, 20px) !important;
 	width: auto !important;
+	min-width: 115px;
+	height:47px;
 	border-radius: 15px;
 	background-color: #172164;
 	background-color: rgba(0,0,0,0.35);
@@ -166,6 +251,8 @@ section#activities {
 	border: 0.5px solid #3399ff !important;
 	/* box-shadow: 0 0 2px #188dd6, 0 0 2px #188dd6, 0 0 2px #188dd6, 0 0 2px #38eeff, 0 0 2px #38eeff, 2px 2px 0.5px #38eeff !important; */
 	/* box-shadow: 0 0 .05rem #38eeff, inset 0 0 .05rem #38eeff, 0 0 0.352rem #188dd6, inset 0 0 0.25rem #188dd6, 0 0 0.16rem #188dd6, inset 0 0 0.16rem #188dd6; */
+	text-align: center;
+	font-size: clamp(18px, 1vw, 20px) !important;
   }
 
   .fa-info-circle{
@@ -182,6 +269,7 @@ section#activities {
   .nw-text-value {
 	display: inline-block;
 	width: 120px;
+	height:25px;
 	text-align: left;
 	font-size: clamp(13px, 1vw, 15px);
 	font-family: 'modeseven','bitwise', sans-serif, "Helvetica Neue", Helvetica, Arial !important;
@@ -453,7 +541,7 @@ section#activities {
   }
   
   .volume-count {
-	flex-grow: 1;
+	min-width:115px;
 	display: flex;
 	align-items: center;
 	justify-content: right !important;
@@ -506,8 +594,13 @@ section#activities {
 	background: linear-gradient(60deg, #131145 0%, #1b1b49 100%) !important; /* mine darker */
 
 	border-radius: 10px;
-	box-shadow: 0px 4px 4px #0c092d; 
+	box-shadow: 0px 4px 4px #0c092d;
+	transition: all 0.6s ease-in-out;
   }
+  
+  .walletTransact:hover {
+	transform: scale(1.1);
+  }  
 
   .depositwithdrawH2, .networthH2{
 	font-family: 'modeseven','bitwise', sans-serif, "Helvetica Neue", Helvetica, Arial !important;
@@ -989,7 +1082,7 @@ button#transactSubmit{
 	max-width: 100px;
     color: #BEBEBE;
     font-size: 14.5px;
-    text-align: right;
+    text-align: center;
 }
 
 .t-i-heading {
@@ -2040,10 +2133,59 @@ button:disabled:hover {
 	to {
 	  background-position-x: -200%;
 	}
-  }
-  
-  @keyframes shine {
+}
+
+@keyframes shine {
 	to {
-	  background-position-x: -200%;
+		background-position-x: -200%;
 	}
+}
+
+/* General Loading Animation on Pages */
+@keyframes loading {
+	0% {
+	  transform-origin: 100% 100%;
+	  transform: rotate(0deg);
+	}
+	100% {
+	  transform-origin: 100% 100%;
+	  transform: rotate(360deg);
+	}
+}
+  .loading {
+	position: relative;
+	display: block;
+	z-index: 13;
+	margin: 5vw auto;
+	width: 100px;
+	height: 100px;
+	border: 5px solid transparent;
+	border-radius: 50%;
+	background-color: transparent;
+  }
+  .loading:before {
+	position: absolute;
+	display: block;
+	content: '';
+	z-index: 12;
+	top: 4px;
+	left: 4px;
+	width: 82px;
+	height: 82px;
+	border-radius: 50%;
+	background-color: #120528;
+  }
+  .loading:after {
+	position: absolute;
+	display: block;
+	top: 0;
+	content: '';
+	z-index: 11;
+	top: 0px;
+	left: 0px;
+	width: 45px;
+	height: 45px;
+	border-radius: 200px 0 0 0;
+	background: linear-gradient(45deg, rgba(0, 0, 0, 0) 0%, #459ad7 50%, #459ad7 100%);
+	animation: loading 0.9s linear infinite;
   }

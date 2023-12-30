@@ -62,13 +62,15 @@ async function userTokenList(walletAddress) {
                 </div>
                 <div class="trade-amount">${formatValue(tokenInfo.valueInUSD)}</div>
             `);
-            tokenListContainer.append(listItem); // Use jQuery's append method
+            // Hide the loading animation
+            tokenListContainer.find('.loading').remove();
+            // Jquery append output
+            tokenListContainer.append(listItem); 
             console.log("deposits info:", tokenInfo);
         }
     }
 
-    // Hide the loading animation
-    tokenListContainer.find('.loading').remove();
+    
 }
 
 // Function to calculate ERC20 token information
