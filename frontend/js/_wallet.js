@@ -170,33 +170,36 @@ export function setupToggleElements() {
     });
 
     // Cashier Amount paste listener
-    document.getElementById('erc20-amount').addEventListener('paste', async (event) => {
-        const pastedAmount = event.clipboardData.getData('text/plain');
-
+    document.getElementById('erc20-amount').addEventListener('input', async (event) => {
+        const tokenAddress = document.getElementById('erc20-address').value.trim();
+        const tokenAmount = event.target.value.trim();
+    
         if (isNaN(tokenAmount) || parseFloat(tokenAmount) <= 0) {
             alert('Please enter a valid amount.');
             return;
         }
+        if (!isValidEthereumAddress(tokenAddress)) {
+            alert('Please enter a valid ERC20 token address.');
+            return;
+        }
+    alert(tokenAddress)
         const accounts = await web3.eth.requestAccounts();
         const userAddress = accounts[0];
-        let mybalances = {};
+    
         try {
-            // fetch balance for erco token address provided using erc20 balance ABI 
+            // Fetch balance for ERC20 token address provided using ERC20 balance ABI 
             const erc20ABI = [
                 { constant: true, inputs: [], name: 'balanceOf', outputs: [{ name: '', type: 'uint256' }], type: 'function' },
                 { constant: true, inputs: [], name: 'decimals', outputs: [{ name: '', type: 'uint8' }], type: 'function' },
             ];
-            
+    
             const pairedContract = new web3.eth.Contract(erc20ABI, tokenAddress);
             const [walletBalance, pairDecimals] = await Promise.all([
-                pairedContract.methods.balanceOf().call(userAddress),
+                pairedContract.methods.balanceOf(userAddress).call(),
                 pairedContract.methods.decimals().call()
             ]);
-
-            // format output
-            const formatString = (number) => {
-                return number.toLocaleString();
-            };    
+    
+            // Format output
             const formatStringDecimal = (number) => {
                 const options = {
                     style: 'decimal',
@@ -205,17 +208,20 @@ export function setupToggleElements() {
                 };
                 return number.toLocaleString('en-US', options);
             };
+    
             // Display balances in the HTML form
             const balance = fromBigIntNumberToDecimal(walletBalance, pairDecimals);
             const displayBalance = formatStringDecimal(balance);
             const walletDataSpan = document.getElementById("walletData");
-            // replace 0,00 with balance. escape the stars with \
+    
+            // Replace 0,00 with balance. Escape the stars with \
             walletDataSpan.innerHTML = walletDataSpan.innerHTML.replace(/0,00/g, displayBalance);
-            
+    
         } catch (error) {
             console.error("Error processing wallet address:", error);
         }
     });
+    
     
 }
 
@@ -333,12 +339,15 @@ $(document).ready(function () {
 });
 
 // Copy text to clipboard
-document.addEventListener('DOMContentLoaded', function () {
-    const copyIcons = document.querySelectorAll('.copy-icon');
+document.addEventListener('click', function (event) {
+    const copyIcon = event.target.closest('.copy-icon');
 
-    copyIcons.forEach(copyIcon => {
-        copyIcon.addEventListener('click', function () {
-            const textToCopy = this.previousElementSibling.innerText;
+    if (copyIcon) {
+        const nearestParent = copyIcon.closest('.token-info');
+        const textToCopyElement = nearestParent.querySelector('.text-to-copy');
+
+        if (textToCopyElement) {
+            const textToCopy = textToCopyElement.innerText.trim();
 
             // Create a temporary input element
             const tempInput = document.createElement('textarea');
@@ -351,8 +360,23 @@ document.addEventListener('DOMContentLoaded', function () {
 
             // Remove the temporary input element
             document.body.removeChild(tempInput);
-            alert('Text copied!');
-        });
-    });
+
+            swal ({
+                title: 'Copied!',
+                text: 'Address copied to clipboard.',
+                type: 'success',
+                html: false,
+                dangerMode: false,
+                confirmButtonText: 'Okay',
+                showConfirmButton: true,
+                showCancelButton: false,
+                animation: 'slide-from-top',
+            })
+        } else {
+            console.error('No text-to-copy element found.');
+        }
+    }
 });
+
+
 

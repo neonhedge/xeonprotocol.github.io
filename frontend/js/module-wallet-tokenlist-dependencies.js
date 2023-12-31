@@ -52,12 +52,12 @@ async function userTokenList(walletAddress) {
             const listItem = $('<li></li>'); // Use jQuery to create a new list item
             listItem.addClass('trade-item');
             listItem.html(`
-                <div class="token-icon" style="background: url('./imgs/${tokenInfo.symbol.toLowerCase()}.webp');"></div>
+                <div class="token-icon" style="background: url('./imgs/tokens/${tokenInfo.symbol.toLowerCase()}.webp');"></div>
                 <div class="token-info">
                     <div class="token-name">${tokenInfo.name}</div>
                     <div class="token-symbol">${tokenInfo.symbol}</div>
-                    <div class="token-address">${tokenInfo.address}</div>
-                    <div class="token-copy"><i class="far fa-copy"></i></div>
+                    <div class="token-address text-to-copy">${tokenInfo.address}</div>
+                    <div class="token-copy"><i class="copy-icon far fa-copy"></i></div>
                     <div class="token-tamount">${tokenInfo.amount}</div>
                 </div>
                 <div class="trade-amount">${formatValue(tokenInfo.valueInUSD)}</div>
@@ -74,47 +74,24 @@ async function userTokenList(walletAddress) {
 }
 
 // Function to calculate ERC20 token information
-async function getTokenInfo(tokenAddress, balance) {
-    let balanceRaw = balance;
-	const ERC20_ABI = [
-		{
-		  constant: true,
-		  inputs: [],
-		  name: "name",
-		  outputs: [{ name: "", type: "string" }],
-		  payable: false,
-		  stateMutability: "view",
-		  type: "function",
-		},
-		{
-		  constant: true,
-		  inputs: [],
-		  name: "symbol",
-		  outputs: [{ name: "", type: "string" }],
-		  payable: false,
-		  stateMutability: "view",
-		  type: "function",
-		},
-		{
-		  constant: true,
-		  inputs: [],
-		  name: "decimals",
-		  outputs: [{ name: "", type: "uint8" }],
-		  payable: false,
-		  stateMutability: "view",
-		  type: "function",
-		},
+async function getTokenInfo(tokenAddress, balanceRaw) {
+    const erc20ABI = [
+		{ constant: true, inputs: [], name: 'name', outputs: [{ name: '', type: 'string' }], type: 'function' },
+		{ constant: true, inputs: [], name: 'symbol', outputs: [{ name: '', type: 'string' }], type: 'function' },
+		{ constant: true, inputs: [], name: 'decimals', outputs: [{ name: '', type: 'uint8' }], type: 'function' },
 	];
-	  
     try {
         // Fetch token name, symbol, and decimals from the ERC20 contract
-        const tokenContract = new web3.eth.Contract(ERC20_ABI, tokenAddress);
+        const tokenContract = new web3.eth.Contract(erc20ABI, tokenAddress);
         const [tokenName, tokenSymbol, tokenDecimals] = await Promise.all([
             tokenContract.methods.name().call(),
             tokenContract.methods.symbol().call(),
             tokenContract.methods.decimals().call(),
         ]);
-        // Format from BigNumber to human readable
+
+        alert('tokenName: ' + tokenName + ', tokenSymbol: ' + tokenSymbol + ', tokenDecimals: ' + tokenDecimals + ', balanceRaw: ' + balanceRaw);
+
+        // Format from BigNumber to human-readable
         const balance = new BigNumber(balanceRaw).div(new BigNumber(10).pow(tokenDecimals));
         const trueValue = Number(balance);
 
@@ -133,6 +110,7 @@ async function getTokenInfo(tokenAddress, balance) {
         return null;
     }
 }
+
 
 
 // Function to update the HTML with the ERC20 token list

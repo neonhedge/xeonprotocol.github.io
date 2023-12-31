@@ -133,33 +133,17 @@ async function getTokenETHValue(underlyingTokenAddr, bigIntBalanceInput) {
 async function getTokenDecimals(tokenAddress) {
   // standard ERC20 ABI
 const erc20ABI = [
-  {
-    constant: true,
-    inputs: [],
-    name: 'name',
-    outputs: [{ name: '', type: 'string' }],
-    type: 'function',
-  },
-  {
-    constant: true,
-    inputs: [],
-    name: 'symbol',
-    outputs: [{ name: '', type: 'string' }],
-    type: 'function',
-  },
-  {
-    constant: true,
-    inputs: [],
-    name: 'decimals',
-    outputs: [{ name: '', type: 'uint8' }],
-    type: 'function',
-  },
+  { constant: true, inputs: [], name: 'name', outputs: [{ name: '', type: 'string' }], type: 'function' },
+  { constant: true, inputs: [], name: 'symbol', outputs: [{ name: '', type: 'string' }], type: 'function' },
+  { constant: true, inputs: [], name: 'decimals', outputs: [{ name: '', type: 'uint8' }], type: 'function' },
 ];
 
 const pairedContract = new web3.eth.Contract(erc20ABI, tokenAddress);
-const pairedSymbol = await pairedContract.methods.symbol().call();
-const pairDecimals = await pairedContract.methods.decimals().call();
-  return Number(pairDecimals);
+const [pairedSymbol, pairDecimals] = await Promise.all([
+  pairedContract.methods.symbol().call(),
+  pairedContract.methods.decimals().call()
+]);
+return Number(pairDecimals);	
 }
 
 
