@@ -165,8 +165,17 @@ const pairDecimals = await pairedContract.methods.decimals().call();
 
 // Function to fetch user's token balances
 async function getUserBalancesForToken(tokenAddress, userAddress) {
+console.log('getUserBalancesForToken: ' + tokenAddress + ', ' + userAddress);
   try {
-      const [deposited, withdrawn, lockedInUse, withdrawable, withdrawableValue, pairedAddress] = await hedgingInstance.methods.getUserTokenBalances(tokenAddress, userAddress).call();
+      const userBalances = await hedgingInstance.methods.getUserTokenBalances(tokenAddress, userAddress).call();
+  const deposited = userBalances[0];
+  const withdrawn = userBalances[1];
+  const lockedInUse = userBalances[2];
+  const withdrawable = userBalances[3];
+  const withdrawableValue = userBalances[4];
+  const pairedAddress = userBalances[5];
+
+  console.log('deposited: ' + deposited + ', withdrawn: ' + withdrawn + ', lockedInUse: ' + lockedInUse + ', withdrawable: ' + withdrawable + ', withdrawableValue: ' + withdrawableValue + ', paired: ' + pairedAddress);
 
   // Use pair to convert to correct decimals
   
@@ -188,7 +197,7 @@ async function getUserBalancesForToken(tokenAddress, userAddress) {
       
       return {
           deposited: 0,
-          withdrawing: 0,
+          withdrawn: 0,
           lockedInUse: 0,
           withdrawableBalance: 0,
           withdrawableValue: 0

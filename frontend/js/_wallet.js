@@ -7,6 +7,7 @@ import { unlockedWallet, reqConnect} from './web3-walletstatus-module.js';
 import { prepareDeposit, prepareWithdrawal, refreshBalances } from './module-wallet-writer.js';
 import { fetchSection_Networth, fetchSection_BalanceList, fetchSection_HedgePanel, fetchSection_RewardsPanel, fetchSection_StakingPanel } from './module-wallet-section-fetchers.js';
 import { loadHedgesModule } from './module-wallet-section-hedgesList.js';
+import { getTokenInfo } from './module-wallet-tokenlist-dependencies.js';
 
 /*=========================================================================
     INITIALIZE WEB3
@@ -119,14 +120,19 @@ export function setupToggleElements() {
         const pastedAddress = event.clipboardData.getData('text/plain');
         const accounts = await web3.eth.requestAccounts();
         const userAddress = accounts[0];
-        const mybalances = {};
+        let mybalances = {};
         if (!isValidEthereumAddress(pastedAddress)) {
             alert('Please enter a valid Ethereum wallet address.');
             return;
         }
         try {
             // show address indicators
-
+            const tokenInfo = await getTokenInfo(pastedAddress);
+            const tokenSymbol = tokenInfo.symbol;
+            const addressDataSpan = document.getElementById("addressData");
+            // replace **** with name. escape the stars with \
+            addressDataSpan.innerHTML = addressDataSpan.innerHTML.replace(/\*\*\*\*/g, tokenSymbol);
+            // get balances
             mybalances = await getUserBalancesForToken(pastedAddress, userAddress);
             // format output
             const formatValue = (value) => {
@@ -145,9 +151,66 @@ export function setupToggleElements() {
             };
             // Display balances in the HTML form
             document.getElementById('depositedBalance').textContent = formatStringDecimal(mybalances.deposited);
-            document.getElementById('withdrawnBalance').textContent = formatStringDecimal(mybalances.withdrwan);
+            document.getElementById('withdrawnBalance').textContent = formatStringDecimal(mybalances.withdrawn);
             document.getElementById('lockedInUseBalance').textContent = formatStringDecimal(mybalances.lockedInUse);
             document.getElementById('withdrawableBalance').textContent = formatStringDecimal(mybalances.withdrawableBalance);
+
+            // Check if the container is already expanded
+            const balancesContainer = document.getElementById('balancesSection');
+            const isExpanded = balancesContainer.classList.contains('expanded');
+            if (!isExpanded) {
+                // If not expanded, toggle to expand
+                balancesContainer.classList.add('expanded');
+                const expandHeight = balancesContainer.scrollHeight + 'px';
+                balancesContainer.style.maxHeight = expandHeight;
+            }            
+        } catch (error) {
+            console.error("Error processing wallet address:", error);
+        }
+    });
+
+    // Cashier Amount paste listener
+    document.getElementById('erc20-amount').addEventListener('paste', async (event) => {
+        const pastedAmount = event.clipboardData.getData('text/plain');
+
+        if (isNaN(tokenAmount) || parseFloat(tokenAmount) <= 0) {
+            alert('Please enter a valid amount.');
+            return;
+        }
+        const accounts = await web3.eth.requestAccounts();
+        const userAddress = accounts[0];
+        let mybalances = {};
+        try {
+            // fetch balance for erco token address provided using erc20 balance ABI 
+            const erc20ABI = [
+                { constant: true, inputs: [], name: 'balanceOf', outputs: [{ name: '', type: 'uint256' }], type: 'function' },
+                { constant: true, inputs: [], name: 'decimals', outputs: [{ name: '', type: 'uint8' }], type: 'function' },
+            ];
+            
+            const pairedContract = new web3.eth.Contract(erc20ABI, tokenAddress);
+            const [walletBalance, pairDecimals] = await Promise.all([
+                pairedContract.methods.balanceOf().call(userAddress),
+                pairedContract.methods.decimals().call()
+            ]);
+
+            // format output
+            const formatString = (number) => {
+                return number.toLocaleString();
+            };    
+            const formatStringDecimal = (number) => {
+                const options = {
+                    style: 'decimal',
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                };
+                return number.toLocaleString('en-US', options);
+            };
+            // Display balances in the HTML form
+            const balance = fromBigIntNumberToDecimal(walletBalance, pairDecimals);
+            const displayBalance = formatStringDecimal(balance);
+            const walletDataSpan = document.getElementById("walletData");
+            // replace 0,00 with balance. escape the stars with \
+            walletDataSpan.innerHTML = walletDataSpan.innerHTML.replace(/0,00/g, displayBalance);
             
         } catch (error) {
             console.error("Error processing wallet address:", error);
@@ -264,7 +327,32 @@ $(document).ready(function () {
     $('#erc20-address').on('focus', function () {
         $('#addressData').addClass('expandedData');
     });
-    $('.transact-amount').on('focus', function () {
+    $('#erc20-amount').on('focus', function () {
         $('#walletData').addClass('expandedData');
     });
 });
+
+// Copy text to clipboard
+document.addEventListener('DOMContentLoaded', function () {
+    const copyIcons = document.querySelectorAll('.copy-icon');
+
+    copyIcons.forEach(copyIcon => {
+        copyIcon.addEventListener('click', function () {
+            const textToCopy = this.previousElementSibling.innerText;
+
+            // Create a temporary input element
+            const tempInput = document.createElement('textarea');
+            tempInput.value = textToCopy;
+            document.body.appendChild(tempInput);
+
+            // Select and copy the text
+            tempInput.select();
+            document.execCommand('copy');
+
+            // Remove the temporary input element
+            document.body.removeChild(tempInput);
+            alert('Text copied!');
+        });
+    });
+});
+
