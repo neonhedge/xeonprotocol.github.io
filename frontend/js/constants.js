@@ -267,7 +267,7 @@ function fromWeiToFixed5(amount){
 function fromBigIntNumberToDecimal(number, decimals) {
   const BigIntNumber = BigInt(number);
   const BigIntDecimals = BigInt(decimals);
-      return (BigIntNumber / BigInt(10) ** BigIntDecimals).toString();
+      return Number(BigIntNumber / BigInt(10) ** BigIntDecimals);
 }
 
 function commaNumbering(number){

@@ -15,7 +15,7 @@ initWeb3();
 
 // Start making calls to Dapp modules
 export const checkAndCallPageTries = async () => {
-    const asyncFunctions = [fetchSection_Networth, fetchSection_BalanceList, fetchSection_HedgePanel, fetchSection_RewardsPanel, fetchSection_StakingPanel];
+    const asyncFunctions = [fetchSection_Networth, fetchSection_BalanceList, fetchSection_HedgePanel, fetchHedgeList, fetchSection_RewardsPanel, fetchSection_StakingPanel];
     for (const func of asyncFunctions) {
         func();
     }
@@ -37,18 +37,25 @@ $(document).ready(async function () {
     if (unlockState === true) {
         const accounts = await web3.eth.requestAccounts();
         userAddress = accounts[0];
+        
         // Load sections automatically & periodically
         setatmIntervalAsync(async () => {
             await checkAndCallPageTries();
         }, 45000);
+
     } else {
         console.log('Requesting Wallet Connection...');
         reqConnect();
     }
+});
+
+export async function fetchHedgeList() {
+    // Wallet connect has to PASS first, so account is available, refresh to avoid empty section
+    const accounts = await web3.eth.requestAccounts();
+    const userAddress = accounts[0];
 
     // Load more sections manually not automatically & periodically
-    // Create an IntersectionObserver to load hedges when #hedgingSection is in view
-    
+    // Create an IntersectionObserver to load hedges when #hedgingSection is in view    
     const loadHedgesSection = async (entries) => {
         for (const entry of entries) {
             if (entry.isIntersecting) {
@@ -59,15 +66,12 @@ $(document).ready(async function () {
             }
         }
     };
-    // Wallet connect has to PASS first, so account is available, refresh to avoid empty section
-    const accounts = await web3.eth.requestAccounts();
-    userAddress = accounts[0];
+    
     // Now, Load the hedges section
     const hedgingSection = document.getElementById('hedgingSection');
     const observer = new IntersectionObserver(loadHedgesSection, { root: null, threshold: 0.1 });
     observer.observe(hedgingSection);
-    
-});
+}
 
 
 /*=========================================================================
