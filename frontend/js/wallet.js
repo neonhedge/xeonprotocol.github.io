@@ -1,7 +1,7 @@
 /*=========================================================================
     Import modules
 ==========================================================================*/
-import { CONSTANTS, isValidEthereumAddress, getUserBalancesForToken, getSymbol } from './constants.js';
+import { CONSTANTS, isValidEthereumAddress, getUserBalancesForToken, getSymbol, fromBigIntNumberToDecimal } from './constants.js';
 import { initWeb3 } from './dapp-web3-utils.js';
 import { unlockedWallet, reqConnect} from './web3-walletstatus-module.js';
 import { prepareDeposit, prepareWithdrawal, refreshBalances } from './module-wallet-writer.js';
@@ -180,22 +180,22 @@ export function setupToggleElements() {
             alert('Please enter a valid ERC20 token address.');
             return;
         }
-    alert(tokenAddress)
+        
         const accounts = await web3.eth.requestAccounts();
         const userAddress = accounts[0];
     
         try {
             // Fetch balance for ERC20 token address provided using ERC20 balance ABI 
             const erc20ABI = [
-                { constant: true, inputs: [], name: 'balanceOf', outputs: [{ name: '', type: 'uint256' }], type: 'function' },
-                { constant: true, inputs: [], name: 'decimals', outputs: [{ name: '', type: 'uint8' }], type: 'function' },
-            ];
-    
+                { inputs: [{ internalType: 'address', name: 'account', type: 'address' }], name: 'balanceOf', outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }], stateMutability: 'view', type: 'function' },
+                { inputs: [], name: 'decimals', outputs: [{ internalType: 'uint8', name: '', type: 'uint8' }], stateMutability: 'pure', type: 'function' },
+            ];            
+   
             const pairedContract = new web3.eth.Contract(erc20ABI, tokenAddress);
             const [walletBalance, pairDecimals] = await Promise.all([
                 pairedContract.methods.balanceOf(userAddress).call(),
-                pairedContract.methods.decimals().call()
-            ]);
+                pairedContract.methods.decimals().call(),
+            ]);            
     
             // Format output
             const formatStringDecimal = (number) => {
@@ -365,10 +365,11 @@ document.addEventListener('click', function (event) {
                 type: 'success',
                 html: false,
                 dangerMode: false,
-                confirmButtonText: 'Okay',
-                showConfirmButton: true,
+                showConfirmButton: false,
                 showCancelButton: false,
                 animation: 'slide-from-top',
+                allowOutsideClick: true,
+                timer: 2000
             })
         } else {
             console.error('No text-to-copy element found.');
