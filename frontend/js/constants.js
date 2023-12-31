@@ -107,6 +107,11 @@ async function getTokenETHValue(underlyingTokenAddr, bigIntBalanceInput) {
       const pairedAddressDecimal = await getTokenDecimals(pairedAddress);
       const balance = new BigNumber(underlyingValue).div(new BigNumber(10).pow(pairedAddressDecimal));
       const trueValue = Number(balance);
+  /* troubleshoot why this approach isnt working for ERC20 tokens:
+  // convert from BigNumber to Number
+      const pairedAddressDecimal = await getTokenDecimals(pairedAddress);
+      const trueValue = fromBigIntNumberToDecimal(underlyingValue, pairedAddressDecimal);
+  */
 
       let pairSymbol;
       if (pairedAddress === '0xdac17f958d2ee523a2206206994597c13d831ec7') {
@@ -161,11 +166,15 @@ const pairDecimals = await pairedContract.methods.decimals().call();
 // Function to fetch user's token balances
 async function getUserBalancesForToken(tokenAddress, userAddress) {
   try {
-      const [deposited, withdrawn, lockedInUse, withdrawable, withdrawableValue, paired] = await hedgingInstance.methods.getuserTokenBalances(tokenAddress, userAddress).call();
-      const depositedBalance = web3.utils.fromWei(deposited);
-      const withdrawnBalance = web3.utils.fromWei(withdrawn);
-      const lockedInUseBalance = web3.utils.fromWei(lockedInUse);
-      const withdrawableBalanceEth = web3.utils.fromWei(withdrawable); 
+      const [deposited, withdrawn, lockedInUse, withdrawable, withdrawableValue, pairedAddress] = await hedgingInstance.methods.getUserTokenBalances(tokenAddress, userAddress).call();
+
+  // Use pair to convert to correct decimals
+  
+      const pairedAddressDecimal = await getTokenDecimals(pairedAddress);
+      const depositedBalance = fromBigIntNumberToDecimal(deposited, pairedAddressDecimal);
+      const withdrawnBalance = fromBigIntNumberToDecimal(withdrawn, pairedAddressDecimal);
+      const lockedInUseBalance = fromBigIntNumberToDecimal(lockedInUse, pairedAddressDecimal);
+      const withdrawableBalanceEth = fromBigIntNumberToDecimal(withdrawable, pairedAddressDecimal);
          
       return {
           deposited: depositedBalance,
