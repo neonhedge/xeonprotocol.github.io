@@ -89,8 +89,6 @@ async function getTokenInfo(tokenAddress, balanceRaw) {
             tokenContract.methods.decimals().call(),
         ]);
 
-        alert('tokenName: ' + tokenName + ', tokenSymbol: ' + tokenSymbol + ', tokenDecimals: ' + tokenDecimals + ', balanceRaw: ' + balanceRaw);
-
         // Format from BigNumber to human-readable
         const balance = new BigNumber(balanceRaw).div(new BigNumber(10).pow(tokenDecimals));
         const trueValue = Number(balance);
