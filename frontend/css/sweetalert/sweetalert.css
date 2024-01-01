@@ -376,7 +376,7 @@ body.stop-scrolling {
   position: absolute;
   width: 20px;
   height: 40px;
-  background: white;
+  background: transparent;
   -webkit-transform: rotate(45deg);
   transform: rotate(45deg); 
 }
@@ -416,7 +416,7 @@ body.stop-scrolling {
 .sweet-alert .sa-icon.sa-success .sa-fix {
     width: 5px;
     height: 40px;
-    background-color: #FFF;
+    background-color: transparent;
     position: absolute;
     left: 18px;
     top: 0px;

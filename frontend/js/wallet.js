@@ -92,18 +92,38 @@ export function setupToggleElements() {
     document.addEventListener('change', function (e) {
         if (e.target && e.target.matches('input[type="checkbox"]')) {
             const modeSpan = document.querySelector('.mode');
+            const submitButton = document.getElementById('transactSubmit');
+    
             if (e.target.checked) {
+                // Withdraw mode
                 modeSpan.textContent = 'Withdraw Mode Active';
-                // change styling on form
-                document.getElementById('erc20-address').style.color = '#F6F';//withdraw effect
+                submitButton.textContent = 'Withdraw';
+    
+                // Change styling for withdrawal mode
+                submitButton.style.backgroundColor = '#F6F';
+                submitButton.style.color = '#FFF';
+                submitButton.style.border = '1px solid #F6F';
+    
+                // Other styling changes if needed
+                document.getElementById('erc20-address').style.color = '#F6F';
                 document.getElementById('erc20-amount').style.color = '#F6F';
             } else {
-                modeSpan.textContent = 'Deposit Mode Active';            
-                document.getElementById('erc20-address').style.color = ''; //reset styles
+                // Deposit mode
+                modeSpan.textContent = 'Deposit Mode Active';
+                submitButton.textContent = 'Deposit';
+    
+                // Change styling for deposit mode
+                submitButton.style.backgroundColor = '#1f92ce';
+                submitButton.style.color = '#FFF';
+                submitButton.style.border = '1px solid #1f92ce';
+    
+                // Reset other styles for deposit mode
+                document.getElementById('erc20-address').style.color = '';
                 document.getElementById('erc20-amount').style.color = '';
             }
         }
-    }); 
+    });
+       
 
     // Hedges Panel - toggle active class on button click
     const buttons = document.querySelectorAll('.list-toggle button');
@@ -367,9 +387,9 @@ document.addEventListener('click', function (event) {
                 dangerMode: false,
                 showConfirmButton: false,
                 showCancelButton: false,
-                animation: 'slide-from-top',
+                animation: "Pop",
                 allowOutsideClick: true,
-                timer: 2000
+                timer: 2000,
             })
         } else {
             console.error('No text-to-copy element found.');

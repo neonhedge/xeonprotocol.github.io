@@ -74,7 +74,7 @@ async function unlockedWallet() {
 					cancelButtonText: 'cancel',
 					showConfirmButton: true,
 					showCancelButton: true,
-					animation: 'slide-from-top',
+					animation: 'Pop',
 				}, function () {
 					console.log('initialize retry...');
 					switchNetwork();
@@ -133,6 +133,7 @@ async function unlockedWallet() {
 			type: 'error',
 			allowOutsideClick: true,
 			confirmButtonColor: '#F27474',
+			animation: 'Pop',
 			text: 'Issue: Something went wrong.',
 			});
 		}
@@ -143,6 +144,7 @@ async function unlockedWallet() {
 			type: 'error',
 			allowOutsideClick: true,
 			confirmButtonColor: '#F27474',
+			animation: 'Pop',
 			text: `> Wallet Locked. \nPlease Unlock Wallet.`,
 		});
 		}
@@ -243,7 +245,7 @@ async function unlockedWallet() {
 							showCancelButton: true,
 							confirmButtonText: 'Switch',
 							cancelButtonText: 'Cancel',
-							animation: 'slide-from-top',
+							animation: 'Pop',
 							}, function () {
 								console.log('initialize retry...');
 								switchNetwork();
@@ -262,7 +264,7 @@ async function unlockedWallet() {
 						showCancelButton: true,
 						confirmButtonText: 'Switch',
 						cancelButtonText: 'Cancel',
-						animation: 'slide-from-top',
+						animation: 'Pop',
 						}, function () {
 							console.log('initialize retry...');
 							switchNetwork();
@@ -275,6 +277,7 @@ async function unlockedWallet() {
 			title: 'Web3 Provider Missing!',
 			type: 'error',
 			confirmButtonColor: '#F27474',
+			animation: 'Pop',
 			text: 'MetaMask is not installed. Please consider installing it: https://metamask.io/download.html',
 		  });
 		}
@@ -304,7 +307,7 @@ async function unlockedWallet() {
 				showConfirmButton: true,
 				showCancelButton: true,
 				timer: 4000,
-				animation: 'slide-from-top',
+				animation: 'Pop',
 				}, function () {
 					console.log('permissions retry...');
 					reqConnect();
