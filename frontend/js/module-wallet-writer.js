@@ -1,11 +1,201 @@
 /*=========================================================================
     Import modules
 ==========================================================================*/
-import { CONSTANTS } from './constants.js';
+import { CONSTANTS, fromBigIntNumberToDecimal } from './constants.js';
 
 /*======================================================
     WRITE FUNCTION CALLS for the wallet module
 ======================================================*/
+async function allowanceCheck(tokenAmount, tokenAddress){
+    // ERC20 ABI & contract instance
+    [
+        {"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"spender","type":"address"}],"name":"allowance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+        {"constant":true,"inputs":[],"name":"decimals","outputs":[{"name":"","type":"uint8"}],"type":"function"},
+        {"constant":true,"inputs":[],"name":"symbol","outputs":[{"name":"","type":"string"}],"type":"function"}
+    ]    
+    const erc20Contract = new web3.eth.Contract(erc20ABI, tokenAddress); 
+
+    try {
+        const [allowanceResult, decimalsResult, symbolResult] = await Promise.all([
+            erc20Contract.methods.allowance(walletAddress, vaultAddress).call(),
+            erc20Contract.methods.decimals().call(),
+            erc20Contract.methods.symbol().call()
+        ]);
+
+        // Convert the allowance to decimal
+        const allowanceDecimal = fromBigIntNumberToDecimal(allowanceResult, decimalsResult);
+
+        // Compare allowance with the input amount
+        if (parseFloat(allowanceDecimal) >= parseFloat(tokenAmount)) {
+            console.log('Allowance is sufficient for the transaction.');
+            console.log(`Decimals: ${decimalsResult}, Symbol: ${symbolResult}`);
+        } else {
+            console.log('Insufficient allowance for the transaction.');
+        }
+    } catch (error) {
+        console.error('Error checking allowance and amount:', error);
+    }
+    return {
+        allowance: allowanceDecimal,
+        symbol: symbolResult
+    };
+}
+async function approvalInterface(tokenAmount, tokenAddress){
+
+    // Check token allowance from wallet to Vault
+    const { allowance, tokenSymbol } = await allowanceCheck(tokenAmount, tokenAddress);
+
+    let transactionMessage = '';
+    let proceedButtonText = 'checking ...';
+    if (allowance < tokenAmount) {
+        // prepare approved info panel for swal below
+        transactionMessage = `
+        <div class="approvalRequired">  
+            <span class="approvalStatus">Approval Required</span>
+            <div class="approvalInfo">
+                <p>
+                    <span class="approvalInfoValue">${tokenAmount}</span>
+                    <span class="approvalInfoTitle"> ${tokenSymbol} <a href="https://etherscan.io/token/${tokenAddress}" target="_blank"><i class="fa fa-external-link"></i></a> </span>
+                </p>
+                <p>
+                    <span class="approvalInfoValue">${walletAddressTrunc} <a href="https://etherscan.io/address/${walletAddress}" target="_blank"><i class="fa fa-external-link"></i></a> </span>                    
+                    <span class="approvalTo">To:</span>
+                    <span class="approvalInfoValue">${vaultAddressTrunc} <a href="https://etherscan.io/address/${vaultAddress}" target="_blank"><i class="fa fa-external-link"></i></a></span>  
+                </p>
+            </div>
+
+            <div class="explainer">
+                <span> 
+                    <i class="fa fa-info-circle"></i>
+                    Token approval is required before depositing to Vault. Click approve below to Sign the Approval Transaction with your wallet.
+                </span>
+            </div>
+        </div> `;
+        proceedButtonText = 'Approve';
+    } else if(allowance >= tokenAmount) {
+        transactionMessage = `
+        <div class="approvalRequired">  
+            <span class="approvalStatus">Proceed to Deposit</span>
+            <div class="approvalInfo">
+                <p>
+                    <span class="approvalInfoValue">${tokenAmount}</span>
+                    <span class="approvalInfoTitle"> ${tokenSymbol} <a href="https://etherscan.io/token/${tokenAddress}" target="_blank"><i class="fa fa-external-link"></i></a> </span>
+                </p>
+                <p>
+                    <span class="approvalTo">Deposit To Vault:</span>
+                    <span class="approvalInfoValue">${vaultAddressTrunc} <a href="https://etherscan.io/address/${vaultAddress}" target="_blank"><i class="fa fa-external-link"></i></a></span>  
+                </p>
+            </div>
+
+            <div class="explainer">
+                <span> 
+                    <i class="fa fa-info-circle"></i>
+                    Click deposit below, your wallet will be prompted to Sign the Deposit Transaction. 
+                </span>
+            </div>
+        </div> `;
+        proceedButtonText = 'Deposit';
+    }
+
+    // if inssuficient balance inform user
+    if (walletBalance < tokenAmount) {
+        transactionMessage = `
+        <div class="approvalRequired">  
+            <span class="approvalStatus">Insufficient Balance</span>
+            <div class="approvalInfo">
+                <p> 
+                    <span class="approvalInfoValue">${walletBalance}</span>
+                    <span class="approvalInfoTitle"> ${tokenSymbol} <a href="https://etherscan.io/token/${tokenAddress}" target="_blank"><i class="fa fa-external-link"></i></a> </span>
+                </p>
+                <p>
+                    <span class="approvalTo">Required:</span>
+                    <span class="approvalInfoValue">${tokenAmount}</span>
+                    <span class="approvalInfoTitle"> ${tokenSymbol} <a href="https://etherscan.io/token/${tokenAddress}" target="_blank"><i class="fa fa-external-link"></i></a> </span>
+                </p>
+            </div>`;
+    }
+
+    // Prepare addresses
+    const walletAddress = accounts[0];
+    const walletAddressTrunc = walletAddress.slice(0, 6) + '...' + walletAddress.slice(-4);
+    const vaultAddress = CONSTANTS.vaultAddress;
+    const vaultAddressTrunc = vaultAddress.slice(0, 6) + '...' + vaultAddress.slice(-4);
+    // Prepare deposit states
+    let approvalRequired = false;
+    let depositRequired = false;
+    let approved = false;
+    if (allowance < tokenAmount && walletBalance >= tokenAmount) {
+        approvalRequired = true;
+    }
+    if (allowance >= tokenAmount && walletBalance >= tokenAmount) {
+        depositRequired = true;
+        approved = true;
+    }
+    swal({
+            title: "Depositing to Vault",
+            text: transactionMessage,
+            html: true,
+            showCancelButton: true,
+            confirmButtonColor: "#04C86C",
+            confirmButtonText: proceedButtonText,
+            cancelButtonText: "Cancel",
+            closeOnConfirm: false,
+            closeOnCancel: true
+            },
+             // Callback on proceed click
+            function () {
+                // Check if wallet has enough balance
+                if (!approved && !depositRequired) {
+                    $('.confirm').prop("disabled", true);
+                }else{
+                    $('.confirm').prop("disabled", false);
+
+                    // Check which function call is required
+                    let operationTitle = 'Processing Transaction';
+                    if (approvalRequired) {
+                        operationTitle = 'Approving Tokens to Vault';
+                    } else if (depositRequired) {
+                        operationTitle = 'Depositing Tokens to Vault';
+                    }
+
+                    var inputf = '<span class="initiatingmeta">initiating, please wait...</br>(<span id="liveconfirms">0</span> / 24 block confirmations)</span>';
+                    // Show transacting swal message
+                    swal({
+                            title: operationTitle,
+                            text: inputf,
+                            html: true,
+                            showCancelButton: false,
+                            showConfirmButton: false,
+                            confirmButtonText: "processing...",
+                            confirmButtonColor: "#4CAF50",
+                            closeOnConfirm: false,
+                            animation: "slide-from-top",
+                            showLoaderOnConfirm: true
+                    });
+                    
+                    // Submit Transaction to Vault
+                    if (approvalRequired) {
+                        vaultApprove();
+                    } else if (depositRequired) {
+                        vaultDeposit();
+                    }                            
+                }//close else            
+            } // callback
+    );//close swal
+    
+    //////////////////////////////////////////////////////////////
+    //now that the form is displayed try initialize new elements
+    /////////////////////////////////////////////////////////////
+    //alert('1ST FORM revealed');
+    $('.confirm').prop("disabled", true);	//DISABLE CONFRIM BUTTON ON LOAD BEFORE ANY CLICK	 
+    
+    // DETECT CLICK ON FORM SELECT RADIO BUTTON
+    $(".stakelabel").click(function () {
+        $('.confirm').prop("disabled", false);
+    })
+        
+                                
+}//function close
 
 async function prepareDeposit(tokenAddress, tokenAmount) {
     // Retrieve wallet connected
