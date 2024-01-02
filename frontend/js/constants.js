@@ -146,6 +146,26 @@ const [pairedSymbol, pairDecimals] = await Promise.all([
 return Number(pairDecimals);	
 }
 
+async function getTokenDecimalAndSymbol(tokenAddress) {
+// ERC20 ABI
+  const erc20ABI = [
+      {"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"spender","type":"address"}],"name":"allowance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+      {"constant":true,"inputs":[],"name":"decimals","outputs":[{"name":"","type":"uint8"}],"type":"function"},
+      {"constant":true,"inputs":[],"name":"symbol","outputs":[{"name":"","type":"string"}],"type":"function"}
+  ]    
+  const erc20Contract = new web3.eth.Contract(erc20ABI, tokenAddress); 
+
+  try {
+      const [decimalsResult, symbolResult] = await Promise.all([
+          erc20Contract.methods.decimals().call(),
+          erc20Contract.methods.symbol().call()
+      ]);
+  } catch (error) {
+      console.log(error);
+  }
+  return [Number(decimalsResult), symbolResult];
+}
+
 
 // Function to fetch user's token balances
 async function getUserBalancesForToken(tokenAddress, userAddress) {
@@ -270,6 +290,12 @@ function fromBigIntNumberToDecimal(number, decimals) {
   const BigIntNumber = BigInt(number);
   const BigIntDecimals = BigInt(decimals);
       return Number(BigIntNumber / BigInt(10) ** BigIntDecimals);
+}
+
+function fromDecimalToBigInt(number, decimals) {
+  const BigIntNumber = BigInt(number);
+  const BigIntDecimals = BigInt(decimals);
+  return BigIntNumber * BigInt(10) ** BigIntDecimals;
 }
 
 function commaNumbering(number){
