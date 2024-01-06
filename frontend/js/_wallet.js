@@ -1,7 +1,7 @@
 /*=========================================================================
     Import modules
 ==========================================================================*/
-import { CONSTANTS, isValidEthereumAddress, getUserBalancesForToken, getSymbol, fromBigIntNumberToDecimal } from './constants.js';
+import { CONSTANTS, getAccounts, isValidEthereumAddress, getUserBalancesForToken, getSymbol, fromBigIntNumberToDecimal } from './constants.js';
 import { initializeConnection, unlockedWallet, reqConnect} from './web3-walletstatus-module.js';
 import { approvalDepositInterface, withdrawInterface } from './module-wallet-writer.js';
 import { fetchSection_Networth, fetchSection_BalanceList, fetchSection_HedgePanel, fetchSection_RewardsPanel, fetchSection_StakingPanel } from './module-wallet-section-fetchers.js';
@@ -58,7 +58,7 @@ $(document).ready(async function () {
 
 export async function fetchHedgeList() {
     // Wallet connect has to PASS first, so account is available, refresh to avoid empty section
-    const accounts = await web3.eth.requestAccounts();
+    const accounts = await getAccounts();
     const userAddress = accounts[0];
 
     // Load more sections manually not automatically & periodically
@@ -208,7 +208,7 @@ export function setupToggleElements() {
             return;
         }
         
-        const accounts = await web3.eth.requestAccounts();
+        const accounts = await getAccounts();
         const userAddress = accounts[0];
     
         try {
@@ -218,10 +218,11 @@ export function setupToggleElements() {
                 { inputs: [], name: 'decimals', outputs: [{ internalType: 'uint8', name: '', type: 'uint8' }], stateMutability: 'pure', type: 'function' },
             ];            
    
-            const pairedContract = new web3.eth.Contract(erc20ABI, tokenAddress);
+            const pairedContract = new ethers.Contract(tokenAddress, erc20ABI, window.provider);
+
             const [walletBalance, pairDecimals] = await Promise.all([
-                pairedContract.methods.balanceOf(userAddress).call(),
-                pairedContract.methods.decimals().call(),
+                pairedContract.balanceOf(userAddress).call(),
+                pairedContract.decimals().call(),
             ]);            
     
             // Format output

@@ -1,7 +1,7 @@
 const CONSTANTS = {
   network: '0xaa36a7', // goerli 0x5 // bsc: 0x56
 chainID: 11155111, // hex
-  etherScan: "https://goerli.etherscan.io", // https://goerli.etherscan.io // https://bscscan.com/
+  etherScan: "https://sepolia.etherscan.io", // https://goerli.etherscan.io // https://bscscan.com/
   decimals: 18,
   neonAddress: '0xB12254d9a3E4d564d9EccE70A23f4bA7392C5916',
   hedgingAddress: '0xeddb90cba6CBFD0b498CA532fd15F5f39C8529Ea',
@@ -217,7 +217,7 @@ async function getPairToken(optionId) {
 
 async function getAccounts() {
 const accounts = await provider.listAccounts();
-return;
+return accounts;
 }
 
 async function getSymbol(tokenAddress) {
