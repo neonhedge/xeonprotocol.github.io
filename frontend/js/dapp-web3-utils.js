@@ -3,11 +3,11 @@ import { CONSTANTS } from './constants.js';
 
 // Initialize Web3
 async function initWeb3() {
+
   let signer = null;
   let provider;
 
   if (window.ethereum == null) {
-
     // If MetaMask is not installed, we use the default provider,
     // which is backed by a variety of third-party services (such
     // as INFURA). They do not have private keys installed,
@@ -20,9 +20,7 @@ async function initWeb3() {
         confirmButtonColor: "#F27474",
         text: "Web3 Wallet is missing, full functionality is not available."
     });
-
   } else {
-
     // Connect to the MetaMask EIP-1193 object. This is a standard
     // protocol that allows Ethers access to make all read-only
     // requests through MetaMask.
@@ -34,8 +32,11 @@ async function initWeb3() {
     // that MetaMask manages for the user.
     signer = await provider.getSigner();
   }
+
+  // Announce authority
   window.signer = signer;
   window.provider = provider;
+
   // Create a contract; connected to a Provider, so it may
   // only access read-only methods (like view and pure)
   window.neonInstance = new ethers.Contract(CONSTANTS.neonAddress, CONSTANTS.neonContractABI, window.provider);
@@ -44,11 +45,16 @@ async function initWeb3() {
 
   // check decimals to verify instances
   const accounts = await provider.listAccounts();
-  const balance = await neonInstance.balanceOf(accounts[0]);
-  console.log(balance);
-  const decimals = await neonInstance.decimals();
-  console.log(decimals)
 
+  if (accounts.length > 0) {
+    const balance = await neonInstance.balanceOf(accounts[0]);
+    console.log(balance);
+
+    const decimals = await neonInstance.decimals();
+    console.log(decimals);
+  } else {
+    console.error("No accounts available. Unable to fetch balance and decimals.");
+  }
   
 }
 
