@@ -1,4 +1,4 @@
-import { CONSTANTS, fromBigIntNumberToDecimal, getCurrentEthUsdcPriceFromUniswapV2, getTokenETHValue, getTokenUSDValue } from './constants.js';
+import { CONSTANTS, getAccounts, fromBigIntNumberToDecimal, getCurrentEthUsdcPriceFromUniswapV2, getTokenETHValue, getTokenUSDValue } from './constants.js';
 import { updateSectionValues_Networth, updateSectionValues_Hedges, updateSectionValues_Rewards, updateSectionValues_Staking } from './module-wallet-section-updaters.js';
 import { getCurrentBalancesValue, calculateStakedTokensValueETH, calculateRewardsDue, calculateCommissionDueETH } from './module-wallet-networth-dependencies.js';
 import { userTokenList, cashierErc20List } from './module-wallet-tokenlist-dependencies.js';
@@ -8,13 +8,13 @@ import { getUserHedgeVolume, getUserProfitLoss } from './module-wallet-hedgePane
 //-----------------------------------------
 async function fetchSection_Networth(){
     try {
-        const accounts = await web3.eth.requestAccounts();
+		const accounts = await getAccounts();
         const userAddress = accounts[0];
         
-        const walletBalanceRaw = await neonInstance.methods.balanceOf(userAddress).call();
-        const stakedBalanceRaw = await stakingInstance.methods.getStakedBalance(userAddress).call();
+        const walletBalanceRaw = await neonInstance.balanceOf(userAddress).call();
+        const stakedBalanceRaw = await stakingInstance.getStakedBalance(userAddress).call();
 
-        const transactedTokensArrayList = await hedgingInstance.methods.getUserHistory(userAddress, 0, CONSTANTS.tokenLimit).call();
+        const transactedTokensArrayList = await hedgingInstance.getUserHistory(userAddress, 0, CONSTANTS.tokenLimit).call();
         const transactedTokensCount = transactedTokensArrayList.length;
         
         // Human Readable
@@ -62,7 +62,7 @@ async function fetchSection_Networth(){
 // 2. Fetch Section Values - ERC20 DEPOSIT BALANCES LIST
 //---------------------------------------------------
 async function fetchSection_BalanceList(){
-	const accounts = await web3.eth.requestAccounts();
+	const accounts = await getAccounts();
 	const userAddress = accounts[0];
 
 	await userTokenList(userAddress);
@@ -73,13 +73,13 @@ async function fetchSection_BalanceList(){
 //----------------------------------------------------
 async function fetchSection_HedgePanel(){
 
-	const accounts = await web3.eth.requestAccounts();
-	const userAddress = accounts[0];
+	const accounts = await getAccounts();
+    const userAddress = accounts[0];
 	// Fetch arrays
-	const userOptionsCreated = await hedgingInstance.methods.getUserOptionsCreated(userAddress, 0, CONSTANTS.tokenLimit).call();
-	const userSwapsCreated = await hedgingInstance.methods.getUserSwapsCreated(userAddress, 0, CONSTANTS.tokenLimit).call();
-	const userOptionsTaken = await hedgingInstance.methods.getUserOptionsTaken(userAddress, 0, CONSTANTS.tokenLimit).call();
-	const userSwapsTaken = await hedgingInstance.methods.getUserSwapsTaken(userAddress, 0, CONSTANTS.tokenLimit).call();
+	const userOptionsCreated = await hedgingInstance.getUserOptionsCreated(userAddress, 0, CONSTANTS.tokenLimit).call();
+	const userSwapsCreated = await hedgingInstance.getUserSwapsCreated(userAddress, 0, CONSTANTS.tokenLimit).call();
+	const userOptionsTaken = await hedgingInstance.getUserOptionsTaken(userAddress, 0, CONSTANTS.tokenLimit).call();
+	const userSwapsTaken = await hedgingInstance.getUserSwapsTaken(userAddress, 0, CONSTANTS.tokenLimit).call();
 	// Fetch volume
 	// Manually fetch these: get hedges created + taken IDs, then compile createValue & startValue volumes from each ID
 	const userHedgeVolume = await getUserHedgeVolume(userAddress);
@@ -139,20 +139,20 @@ async function fetchSection_HedgePanel(){
 //----------------------------------------------------
 async function fetchSection_RewardsPanel(){
 	
-	const accounts = await web3.eth.requestAccounts();
-	const userAddress = accounts[0];
+	const accounts = await getAccounts();
+    const userAddress = accounts[0];
 	// Fetch rewards due
-	const userRewardsDue = await stakingInstance.methods.getRewardsDue(userAddress).call();
-	const userLiqRewardsDue = await stakingInstance.methods.getLiquidityRewardsDue(userAddress).call();
-	const userColRewardsDue = await stakingInstance.methods.getCollateralRewardsDue(userAddress).call();
+	const userRewardsDue = await stakingInstance.getRewardsDue(userAddress).call();
+	const userLiqRewardsDue = await stakingInstance.getLiquidityRewardsDue(userAddress).call();
+	const userColRewardsDue = await stakingInstance.getCollateralRewardsDue(userAddress).call();
 	// ~ mining rewards are automatically credited to miner on every hedge settlement.
 	// ~ mining rewards are accumulated in the token addresses of underlying & pair, endless erc20 fee types
 	// ~ mining rewards are not automatically loaded to wallet page as they need to be populated from past events
 	
 	// Fetch rewards claimed
-	const userRewardsClaimed = await stakingInstance.methods.claimedRewardsStaking(userAddress).call();
-	const userLiqRewardsClaimed = await stakingInstance.methods.claimedRewardsLiquidity(userAddress).call();
-	const userColRewardsClaimed = await stakingInstance.methods.claimedRewardsCollateral(userAddress).call();
+	const userRewardsClaimed = await stakingInstance.claimedRewardsStaking(userAddress).call();
+	const userLiqRewardsClaimed = await stakingInstance.claimedRewardsLiquidity(userAddress).call();
+	const userColRewardsClaimed = await stakingInstance.claimedRewardsCollateral(userAddress).call();
 	
 	// Fetch ETH to USD conversion rate
 	const ethUsdPrice = getCurrentEthUsdcPriceFromUniswapV2();
@@ -207,29 +207,29 @@ async function fetchSection_RewardsPanel(){
 //----------------------------------------------------
 async function fetchSection_StakingPanel(){
 	
-	const accounts = await web3.eth.requestAccounts();
-	const userAddress = accounts[0];
+	const accounts = await getAccounts();
+    const userAddress = accounts[0];
 	
-	const walletBalanceRaw = await neonInstance.methods.balanceOf(userAddress).call();
-	const stakedBalanceRaw = await stakingInstance.methods.getStakedBalance(userAddress).call();
-	const depositedBalanceRaw = await hedgingInstance.methods.getUserTokenBalances(CONSTANTS.neonAddress, userAddress).call();
+	const walletBalanceRaw = await neonInstance.balanceOf(userAddress).call();
+	const stakedBalanceRaw = await stakingInstance.getStakedBalance(userAddress).call();
+	const depositedBalanceRaw = await hedgingInstance.getUserTokenBalances(CONSTANTS.neonAddress, userAddress).call();
 	const deposited = depositedBalanceRaw.deposited;
 	const withdrawn = depositedBalanceRaw.withdrawn;
 	// Staked versus Supply
-	const totalStakedRaw = await stakingInstance.methods.getTotalStaked().call();
-	const totalSupply = await neonInstance.methods.totalSupply().call();
-	const burntBalance = await neonInstance.methods.balanceOf(CONSTANTS.burnAddress).call();
+	const totalStakedRaw = await stakingInstance.getTotalStaked().call();
+	const totalSupply = await neonInstance.totalSupply().call();
+	const burntBalance = await neonInstance.balanceOf(CONSTANTS.burnAddress).call();
 	const circulatingSupplyRaw = totalSupply - burntBalance;
 	// Distrubuted ETH rewards to staking contract
-	const distributedRewards = await stakingInstance.methods.ethRewardBasis().call();
-	const distributedRewardsLiqu = await stakingInstance.methods.ethLiquidityRewardBasis().call();
-	const distributedRewardsColl = await stakingInstance.methods.ethCollateralRewardBasis().call();
+	const distributedRewards = await stakingInstance.ethRewardBasis().call();
+	const distributedRewardsLiqu = await stakingInstance.ethLiquidityRewardBasis().call();
+	const distributedRewardsColl = await stakingInstance.ethCollateralRewardBasis().call();
 	// Claimed ETH rewards to staking contract
-	const claimedRewards = await stakingInstance.methods.claimedRewardsStaking(userAddress).call();
-	const claimedRewardsLiqu = await stakingInstance.methods.claimedRewardsLiquidity(userAddress).call();
-	const claimedRewardsColl = await stakingInstance.methods.claimedRewardsCollateral(userAddress).call();
+	const claimedRewards = await stakingInstance.claimedRewardsStaking(userAddress).call();
+	const claimedRewardsLiqu = await stakingInstance.claimedRewardsLiquidity(userAddress).call();
+	const claimedRewardsColl = await stakingInstance.claimedRewardsCollateral(userAddress).call();
 	// My pool assignments
-	const assignmentsRaw = await stakingInstance.methods.getAssignedAndUnassignedAmounts(userAddress).call();
+	const assignmentsRaw = await stakingInstance.getAssignedAndUnassignedAmounts(userAddress).call();
 	const assignedMiningRaw = assignmentsRaw.assignedForMining;
 	const assignedLiquidityRaw = assignmentsRaw.assignedForLiquidity;
 	const assignedCollateralRaw = assignmentsRaw.assignedForCollateral;
