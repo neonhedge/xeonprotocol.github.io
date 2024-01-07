@@ -208,9 +208,8 @@ async function approvalDepositInterface(tokenAmount, tokenAddress) {
     let allowanceRequired = allowance < tokenAmount && walletBalance >= tokenAmount;
     let depositRequired = allowance >= tokenAmount && walletBalance >= tokenAmount;
     let approved = allowance >= tokenAmount && walletBalance >= tokenAmount;
-
     swal({
-        title: "Depositing to Vault",
+        title: "Vault Deposit",
         text: transactionMessage,
         html: true,
         showCancelButton: true,
@@ -261,7 +260,7 @@ async function approvalDepositInterface(tokenAmount, tokenAddress) {
         // Slide in approval success
         $("#depositRequired").fadeIn("slow");
        // Proceed button text
-       $('.confirm').html('Deposit...');
+       $('.confirm').html('Deposit');
     }
     // if insufficient balance inform user
     if (walletBalance < tokenAmount) {
@@ -354,20 +353,20 @@ async function vaultDeposit(tokenAddress, tokenAmount) {
         const walletAddress = accounts[0];
         const vaultAddress = CONSTANTS.hedgingAddress;
 
-        const [symbol, decimals] = await getSymbolAndDecimals(tokenAddress);
+        const [decimals, symbol] = await getTokenDecimalAndSymbol(tokenAddress);
         const depositAmountWei = fromDecimalToBigInt(tokenAmount, decimals);
 
         // Prepare Tx
-        const hedgingInstance = new ethers.Contract(vaultAddress, hedgingAbi, window.provider);
-        const transaction = await hedgingInstance.depositToken(tokenAddress, depositAmountWei);
+        const transaction = await hedgingInstance.connect(signer).depositToken(tokenAddress, depositAmountWei);
 
         // Wait for the transaction to be mined
         const receipt = await transaction.wait();
 
         if (receipt.status === 1) {
             // Call functions on success
-            tokenDepositedMessage();
-            console.log('Deposit successful.');
+            tokenDepositedMessage(receipt.transactionHash);
+            console.log('Deposit successful...');
+            console.log('Transaction Hash: '+ receipt.transactionHash);
         } else {
             // Transaction failed
             console.log('Deposit failed. Receipt status: ' + receipt.status);
@@ -390,15 +389,37 @@ function tokenDepositingMessage() {
     $('.confirm').prop("disabled", true);
 }
 
-function tokenDepositedMessage() {
-
+function tokenDepositedMessage(transactionHash) {
     // Slide out approval in progress
     $(".interfaceWindow").hide();
     // Slide in approval success
     $("#depositSuccess").fadeIn("slow");
+    // Wait for 3 seconds
+    setTimeout(function() {
+        // Enable confirm button again
+        $('.confirm').prop("disabled", true);
 
-    // Enable confirm button again
-    $('.confirm').prop("disabled", false);
+        const transactionMessage = `
+        <div class="interfaceWindow">  
+            <div class="approvalInfo">
+                <p>
+                    <span class="txInfoHead txInfoSymbol"> view transaction... <a href="https://sepolia.etherscan.io/tx/${transactionHash}" target="_blank"><i class="fa fa-external-link"></i></a> </span>
+                </p>
+            </div>
+        </div>`;
+
+        swal({
+            title: "Vault Deposit Successful",
+            type: "success",
+            text: transactionMessage,
+            html: true,
+            showCancelButton: false,
+            confirmButtonColor: "#04C86C",
+            confirmButtonText: "Wow!",
+            cancelButtonText: "Cancel",
+            closeOnConfirm: true
+        });
+    }, 3000); 
 }
 
 function tokenWithdrawingMessage() {
