@@ -53,16 +53,18 @@ function convertToUSD(value, pairedCurrency, ethUsdPrice) {
 // Function to get token USD value
 // accepts Decimal Number
 // outputs BigInt
-async function getTokenUSDValue(underlyingTokenAddr, balanceRaw) {
-balanceRaw = Number(balanceRaw);
+async function getTokenUSDValue(underlyingTokenAddr, balance) {
+balance = balance.toString();
   const ethUsdPrice = getCurrentEthUsdcPriceFromUniswapV2();
   try {
       if (underlyingTokenAddr === CONSTANTS.wethAddress) {
-          const balance = fromBigIntNumberToDecimal(balanceRaw, 18);
           const usdValue = convertToUSD(balance, CONSTANTS.wethAddress, ethUsdPrice);
           return usdValue;
       } else {
-          const underlyingValue = await getTokenETHValue(underlyingTokenAddr, balanceRaw);
+    // Convert to BigInt
+    const addressDecimal = await getTokenDecimals(underlyingTokenAddr);
+    const balanceBigInt = fromDecimalToBigInt(balance, addressDecimal)
+          const underlyingValue = await getTokenETHValue(underlyingTokenAddr, balanceBigInt);
           const balanceNumber = Number(underlyingValue[0]);
           const pairSymbol = underlyingValue[1];
 
@@ -87,8 +89,8 @@ balanceRaw = Number(balanceRaw);
 }
 
 // Function to get token paired currency value
-// accepts wei & BigNumber of all decimals; XEON, USDT, USDC, WETH
-// outputs Number ready to display
+// accepts BigNumber 
+// outputs Decimal Number
 // Rename to getUnderlyingValue
 async function getTokenETHValue(underlyingTokenAddr, bigIntBalanceInput) {
 

@@ -58,11 +58,11 @@ async function userTokenList(walletAddress) {
 
     for (const tokenAddress of tokenAddresses) {
         const result = await hedgingInstance.getUserTokenBalances(tokenAddress, walletAddress);
-        const depositedBalance = result[0];
-        const withdrawnBalance = result[1];
+        const depositedBalance = ethers.BigNumber.from(result[0]);
+        const withdrawnBalance = ethers.BigNumber.from(result[1]);
 
         // Convert deposited and withdrawn balances to BigNumber and handle 1e18 format
-        const currentBalance = depositedBalance - withdrawnBalance;
+        const currentBalance = depositedBalance .sub(withdrawnBalance);
         const tokenInfo = await getTokenInfo(tokenAddress, currentBalance);
 
         if (tokenInfo) {
@@ -89,7 +89,7 @@ async function userTokenList(walletAddress) {
 }
 
 // Function to calculate ERC20 token information
-async function getTokenInfo(tokenAddress, balanceRaw) {
+async function getTokenInfo(tokenAddress, balanceBN) {
     const erc20ABI = [
 		{ constant: true, inputs: [], name: 'name', outputs: [{ name: '', type: 'string' }], type: 'function' },
 		{ constant: true, inputs: [], name: 'symbol', outputs: [{ name: '', type: 'string' }], type: 'function' },
@@ -99,13 +99,16 @@ async function getTokenInfo(tokenAddress, balanceRaw) {
         // Fetch token name, symbol, and decimals from the ERC20 contract
 		const tokenContract = new ethers.Contract(tokenAddress, erc20ABI, window.provider);
         const [tokenName, tokenSymbol, tokenDecimals] = await Promise.all([
-            tokenContract.name().call(),
-            tokenContract.symbol().call(),
-            tokenContract.decimals().call(),
+            tokenContract.name(),
+            tokenContract.symbol(),
+            tokenContract.decimals(),
         ]);
 
-        // Format from BigNumber to human-readable
-        const trueValue = fromBigIntNumberToDecimal(balanceRaw, tokenDecimals);
+        // Format from BigNumber to human-readable: accepts bigNumber only
+        // Fetch decimal value after
+        const balanceBig = ethers.BigNumber.from(balanceBN);
+        console.log(balanceBig+'eeeeeeeeeeee:    '+balanceBN);
+        const trueValue = fromBigIntNumberToDecimal(balanceBig, tokenDecimals);
 
         // Fetch the USD value of the token balance: accepts decimal
         const usdValue = await getTokenUSDValue(tokenAddress, trueValue);

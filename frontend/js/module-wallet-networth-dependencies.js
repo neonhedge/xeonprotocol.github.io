@@ -1,4 +1,4 @@
-import { CONSTANTS, getCurrentEthUsdcPriceFromUniswapV2, getTokenUSDValue, getTokenETHValue, fromBigIntNumberToDecimal } from "./constants.js";
+import { CONSTANTS, getCurrentEthUsdcPriceFromUniswapV2, getTokenUSDValue, getTokenETHValue, fromBigIntNumberToDecimal, getTokenDecimals } from "./constants.js";
 import { getWalletTokenList } from "./module-wallet-tokenlist-dependencies.js";
   
 // Function to calculate the total USD value of all token balances
@@ -7,13 +7,17 @@ async function getCurrentBalancesValue(walletAddress) {
     let totalUSDValue = 0;
     for (const underlyingTokenAddr of transactedTokensArray) {
         const result = await hedgingInstance.getUserTokenBalances(underlyingTokenAddr, walletAddress);
-        const deposited = result[0];
-        const withdrawn = result[1];
+        const deposited = ethers.BigNumber.from(result[0]);
+        const withdrawn = ethers.BigNumber.from(result[1]);
+        // Safe way to math BigInts coz of overflow issues
+        const currentBalance = deposited.sub(withdrawn);
+        // ETHUSD price        
         const ethUsdPrice = getCurrentEthUsdcPriceFromUniswapV2();
-        // Wei input for getTokenUSDValue
-        const currentBalance = deposited - withdrawn;
         // Get the USD value for the token balance
-		const usdValue = await getTokenUSDValue(underlyingTokenAddr, currentBalance);
+        // Convert from BigNumber to Number
+        const pairedAddressDecimal = await getTokenDecimals(underlyingTokenAddr);
+        const balance = fromBigIntNumberToDecimal(currentBalance, pairedAddressDecimal);
+		const usdValue = await getTokenUSDValue(underlyingTokenAddr, balance);
         totalUSDValue += usdValue;
 		console.log("underlying "+underlyingTokenAddr+", balance "+currentBalance+", usd "+usdValue+", total "+totalUSDValue+", ethusd "+ethUsdPrice+" -- from array: "+transactedTokensArray);
     }
