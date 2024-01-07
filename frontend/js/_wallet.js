@@ -42,7 +42,7 @@ $(document).ready(async function () {
     const unlockState = await unlockedWallet();
 
     if (unlockState === true) {
-        const accounts = await provider.listAccounts();
+        const accounts = await getAccounts();
         userAddress = accounts[0];
         
         // Load sections automatically & periodically
@@ -144,8 +144,8 @@ export function setupToggleElements() {
     // Cashier Token Address paste listener
     document.getElementById('erc20-address').addEventListener('paste', async (event) => {
         const pastedAddress = event.clipboardData.getData('text/plain');
-        const accounts = await web3.eth.requestAccounts();
-        const userAddress = accounts[0];
+        const accounts = await getAccounts();
+        const userAddress = accounts[0]; 
         let mybalances = {};
         if (!isValidEthereumAddress(pastedAddress)) {
             alert('Please enter a valid Ethereum wallet address.');
@@ -188,7 +188,7 @@ export function setupToggleElements() {
                 balancesContainer.classList.add('expanded');
                 const expandHeight = balancesContainer.scrollHeight + 'px';
                 balancesContainer.style.maxHeight = expandHeight;
-            }            
+            }
         } catch (error) {
             console.error("Error processing wallet address:", error);
         }
@@ -221,8 +221,8 @@ export function setupToggleElements() {
             const pairedContract = new ethers.Contract(tokenAddress, erc20ABI, window.provider);
 
             const [walletBalance, pairDecimals] = await Promise.all([
-                pairedContract.balanceOf(userAddress).call(),
-                pairedContract.decimals().call(),
+                pairedContract.balanceOf(userAddress),
+                pairedContract.decimals(),
             ]);            
     
             // Format output
@@ -238,10 +238,10 @@ export function setupToggleElements() {
             // Display balances in the HTML form
             const balance = fromBigIntNumberToDecimal(walletBalance, pairDecimals);
             const displayBalance = formatStringDecimal(balance);
-            const walletDataSpan = document.getElementById("walletData");
+            const walletDataSpan = document.getElementById("inWalletBalance");
     
             // Replace 0,00 with balance. Escape the stars with \
-            walletDataSpan.innerHTML = walletDataSpan.innerHTML.replace(/0,00/g, displayBalance);
+            walletDataSpan.innerHTML = displayBalance;
     
         } catch (error) {
             console.error("Error processing wallet address:", error);

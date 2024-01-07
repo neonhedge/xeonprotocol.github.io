@@ -154,14 +154,10 @@ async function getTokenDecimalAndSymbol(tokenAddress) {
   ]    
   const erc20Contract = new ethers.Contract(tokenAddress, erc20ABI, provider); 
 
-  try {
-      const [decimalsResult, symbolResult] = await Promise.all([
-          erc20Contract.decimals(),
-          erc20Contract.symbol()
-      ]);
-  } catch (error) {
-      console.log(error);
-  }
+const [decimalsResult, symbolResult] = await Promise.all([
+  erc20Contract.decimals(),
+  erc20Contract.symbol()
+]);
   return [Number(decimalsResult), symbolResult];
 }
 
@@ -304,12 +300,20 @@ function fromBigIntNumberToDecimal(number, decimals) {
 }
 
 function fromDecimalToBigInt(number, decimals) {
-  return ethers.utils.parseUnits(number, decimals);
+  try {
+      // Convert to string, only accepts string
+      const numberString = number.toString();
+      const formattedValue = ethers.utils.parseUnits(numberString, decimals);
+      return formattedValue.toString();
+  } catch (error) {
+      console.error("Error converting from Decimal to BigNumber:", error);
+      return "0"; // Return a default value as a string
+  }
 }
 
 function commaNumbering(number){
   return Number(number).toLocaleString();
 }; 
 
-export { CONSTANTS, getAccounts, getCurrentEthUsdcPriceFromUniswapV2, isValidEthereumAddress, truncateAddress, convertToUSD, getTokenUSDValue, getTokenETHValue, getUserBalancesForToken, getPairToken, getSymbol, getTokenDecimals };
+export { CONSTANTS, getAccounts, getCurrentEthUsdcPriceFromUniswapV2, isValidEthereumAddress, truncateAddress, convertToUSD, getTokenUSDValue, getTokenETHValue, getUserBalancesForToken, getPairToken, getSymbol, getTokenDecimals, getTokenDecimalAndSymbol };
 export { fromBigIntNumberToDecimal, fromDecimalToBigInt, commaNumbering, fromWeiToFixed12, fromWeiToFixed5, fromWeiToFixed8, fromWeiToFixed8_unrounded, fromWeiToFixed5_unrounded, fromWeiToFixed2_unrounded, toFixed8_unrounded };

@@ -15,15 +15,18 @@ body.stop-scrolling {
   top: 0;
   bottom: 0;
   display: none;
-  z-index: 10000;}
+  z-index: 10000;
+}
 
 .sweet-alert {
-  position: fixed;
-  top: 50%;
-  left: 0;
-  right:0;
-  margin-left: auto;
-  margin-right: auto;
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important; /* Centering technique with translate */
+  
+  margin-top: 0 !important;
+  margin-left: auto !important;
+  margin-right: auto  !important;
 
   width:100%;
   max-width: 450px;
@@ -42,10 +45,6 @@ body.stop-scrolling {
 @media all and (max-width: 540px) {
   .sweet-alert {
     width: auto;
-    margin-left: 0;
-    margin-right: 0;
-    left: 15px;
-    right: 15px; 
   } 
 }
 
