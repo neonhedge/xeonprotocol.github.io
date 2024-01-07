@@ -6,7 +6,7 @@ async function getCurrentBalancesValue(walletAddress) {
     const transactedTokensArray = await getWalletTokenList(walletAddress);
     let totalUSDValue = 0;
     for (const underlyingTokenAddr of transactedTokensArray) {
-        const result = await hedgingInstance.methods.getUserTokenBalances(underlyingTokenAddr, walletAddress).call();
+        const result = await hedgingInstance.getUserTokenBalances(underlyingTokenAddr, walletAddress);
         const deposited = result[0];
         const withdrawn = result[1];
         const ethUsdPrice = getCurrentEthUsdcPriceFromUniswapV2();
@@ -22,15 +22,15 @@ async function getCurrentBalancesValue(walletAddress) {
 
 // Function to calculate staked tokens value
 async function calculateStakedTokensValueETH(walletAddress) {
-	const stakedBalanceRaw = await stakingInstance.methods.getStakedBalance(walletAddress).call();
+	const stakedBalanceRaw = await stakingInstance.getStakedBalance(walletAddress);
 	const [stakedTokensValueETH, pairedSymbol] = await getTokenETHValue(CONSTANTS.wethAddress, stakedBalanceRaw);
   
 	return stakedTokensValueETH;
 }
 
 // Function to calculate dividents due for claiming
-async function calculateRewardsDue(walletAddress) {
-    const rewardsDue = await stakingInstance.methods.getRewardsDue().call({ from: walletAddress });
+async function calculateRewardsDue() {
+    const rewardsDue = await stakingInstance.getRewardsDue();
     const rewardsDueETH = new BigNumber(rewardsDue).div(1e18);
 
     // Convert rewardsDueETH to a JavaScript number
@@ -40,9 +40,9 @@ async function calculateRewardsDue(walletAddress) {
 
 
 // Function to calculate commission
-async function calculateCommissionDueETH(walletAddress) {
-	const liquidityRewardsDue = await stakingInstance.methods.getLiquidityRewardsDue().call({ from: walletAddress });
-	const collateralRewardsDue = await stakingInstance.methods.getCollateralRewardsDue().call({ from: walletAddress });
+async function calculateCommissionDueETH() {
+	const liquidityRewardsDue = await stakingInstance.getLiquidityRewardsDue();
+	const collateralRewardsDue = await stakingInstance.getCollateralRewardsDue();
 	const liquidityRewardsDueETH = new BigNumber(liquidityRewardsDue).div(1e18);
 	const collateralRewardsDueETH = new BigNumber(collateralRewardsDue).div(1e18);
 	const commissionDueETH = liquidityRewardsDueETH + collateralRewardsDueETH;

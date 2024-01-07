@@ -3,6 +3,7 @@
 ==========================================================================*/
 import { CONSTANTS, commaNumbering } from './constants.js';
 import { initWeb3 } from './dapp-web3-utils.js';
+import { checkAndCallPageTries } from './_wallet.js'
 
 /*=========================================================================
     wallet module functions
@@ -71,9 +72,9 @@ async function handleNetworkChange(networkId, provider) {
     console.log("Network changed:", networkId);
     CONSTANTS.chainID = networkId;
     if (networkId !== CONSTANTS.network) {
+        $(".wallets, .walletpur").css("display", "none");
+        $(".network_switch").css("display", "inline-block");		
         console.log("Reading chain:" + networkId + ", instead of, " + CONSTANTS.network);
-        $(".wallets").css("display", "none");
-        $(".network_switch").css("display", "inline-block");
     } else {
         await initializeConnection(provider);
         console.log("Reading from mainnet: ", networkId);
@@ -212,7 +213,8 @@ async function switchNetwork(provider) {
             // success in switch, reinitialize
 			console.log("Connected to chain:", CONSTANTS.chainID);
             console.log('Successfully switched to the Sepolia Testnet');
-            await initializeConnection();
+            initializeConnection();
+			checkAndCallPageTries();
             return true;
         } catch (error) {
             // error

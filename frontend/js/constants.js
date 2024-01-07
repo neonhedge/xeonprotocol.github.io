@@ -293,15 +293,11 @@ function fromWeiToFixed5(amount){
   return ethFriendly;
 }
 function fromBigIntNumberToDecimal(number, decimals) {
-  const BigIntNumber = ethers.BigNumber.from(number);
-  const BigIntDecimals = ethers.BigNumber.from(decimals);
-  return Number(BigIntNumber.div(BigInt(10).pow(BigIntDecimals)));
+  return ethers.utils.formatUnits(number.toString(), decimals);
 }
 
 function fromDecimalToBigInt(number, decimals) {
-  const BigIntNumber = ethers.BigNumber.from(number);
-  const BigIntDecimals = ethers.BigNumber.from(decimals);
-  return BigIntNumber.mul(BigInt(10).pow(BigIntDecimals));
+  return ethers.utils.parseUnits(number.toString(), decimals);
 }
 
 function commaNumbering(number){
