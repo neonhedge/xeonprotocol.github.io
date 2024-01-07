@@ -1,9 +1,9 @@
-import { getTokenUSDValue, getCurrentEthUsdcPriceFromUniswapV2, getTokenETHValue, CONSTANTS } from './constants.js';
+import { getTokenUSDValue, getCurrentEthUsdcPriceFromUniswapV2, getTokenETHValue, CONSTANTS, fromBigIntNumberToDecimal } from './constants.js';
 
 // Function to fetch the number of deposited tokens by a wallet
 async function getWalletTokenList(walletAddress) {
 	try {
-      const transactedTokensArray = await hedgingInstance.methods.getUserHistory(walletAddress, 0, CONSTANTS.tokenLimit).call();
+      const transactedTokensArray = await hedgingInstance.getUserHistory(walletAddress, 0, CONSTANTS.tokenLimit);
 	  return transactedTokensArray;
 	} catch (error) {
 	  console.error("Error fetching deposited tokens:", error);
@@ -16,10 +16,27 @@ async function userTokenList(walletAddress) {
 
     const tokenListContainer = $('#token-list');
     tokenListContainer.empty();
+
     // Show animation
     tokenListContainer.append('<i class="loading"></i>');
+
     // Fetch the token list
     const tokenAddresses = await getWalletTokenList(walletAddress);
+
+    // Check if the array is empty
+    if (tokenAddresses.length === 0) {
+        tokenListContainer.find('.loading').remove();
+
+        // Clear existing content 
+        tokenListContainer.innerHTML = '';
+        const noTokensMessage = document.createElement('div');
+        noTokensMessage.textContent = 'No ERC20 Deposits Found. Visit Cashier.';
+        noTokensMessage.classList.add('no-hedges-message');
+        tokenListContainer.prepend(noTokensMessage);        
+    
+        console.log("No tokens found for the given wallet address.");
+        return;
+    }
 
     // Formatter for displaying the token value
     const formatValue = (value) => {
@@ -40,7 +57,7 @@ async function userTokenList(walletAddress) {
     };  
 
     for (const tokenAddress of tokenAddresses) {
-        const result = await hedgingInstance.methods.getUserTokenBalances(tokenAddress, walletAddress).call();
+        const result = await hedgingInstance.getUserTokenBalances(tokenAddress, walletAddress);
         const depositedBalance = result[0];
         const withdrawnBalance = result[1];
 
@@ -69,8 +86,6 @@ async function userTokenList(walletAddress) {
             console.log("deposits info:", tokenInfo);
         }
     }
-
-    
 }
 
 // Function to calculate ERC20 token information
@@ -82,19 +97,18 @@ async function getTokenInfo(tokenAddress, balanceRaw) {
 	];
     try {
         // Fetch token name, symbol, and decimals from the ERC20 contract
-        const tokenContract = new web3.eth.Contract(erc20ABI, tokenAddress);
+		const tokenContract = new ethers.Contract(tokenAddress, erc20ABI, window.provider);
         const [tokenName, tokenSymbol, tokenDecimals] = await Promise.all([
-            tokenContract.methods.name().call(),
-            tokenContract.methods.symbol().call(),
-            tokenContract.methods.decimals().call(),
+            tokenContract.name().call(),
+            tokenContract.symbol().call(),
+            tokenContract.decimals().call(),
         ]);
 
         // Format from BigNumber to human-readable
-        const balance = new BigNumber(balanceRaw).div(new BigNumber(10).pow(tokenDecimals));
-        const trueValue = Number(balance);
+        const trueValue = fromBigIntNumberToDecimal(balanceRaw, tokenDecimals);
 
-        // Fetch the USD value of the token balance: accepts wei & BigNumber
-        const usdValue = await getTokenUSDValue(tokenAddress, balanceRaw);
+        // Fetch the USD value of the token balance: accepts decimal
+        const usdValue = await getTokenUSDValue(tokenAddress, trueValue);
         const tokenInfo = {
             name: tokenName,
             symbol: tokenSymbol,
@@ -120,7 +134,7 @@ async function cashierErc20List(walletAddress) {
         //const ethUsdPrice = getCurrentEthUsdcPriceFromUniswapV2();
         // Fetch token information for each deposited token and add them as options
         for (const tokenAddress of depositedTokens) {
-            const [deposited, withdrawn, , ,] = await hedgingInstance.methods.getuserTokenBalances(tokenAddress, walletAddress).call();
+            const [deposited, withdrawn, , ,] = await hedgingInstance.getuserTokenBalances(tokenAddress, walletAddress);
             // Convert deposited and withdrawn balances to BigNumber and handle 1e18 format
             const depositedBalance = new BigNumber(deposited).div(new BigNumber(10).pow(18));
             const withdrawnBalance = new BigNumber(withdrawn).div(new BigNumber(10).pow(18));
@@ -141,7 +155,7 @@ async function cashierErc20List(walletAddress) {
 // Function to get deposited ERC20 tokens
 async function getDepositedTokens() {
 	try {
-		const depositedTokens = await hedgingInstance.methods.getProtocolTokenList().call();
+		const depositedTokens = await hedgingInstance.getProtocolTokenList();
 		return depositedTokens;
 	} catch (error) {
 		console.error("Error fetching deposited tokens:", error);

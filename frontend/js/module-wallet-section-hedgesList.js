@@ -12,22 +12,22 @@ export async function loadHedgesModule(userAddress) {
 
   async function fetchDataAndPopulateList() {
     let data;
-    console.log('fethcing hedges for wallet: ', userAddress)
+    console.log('fetching hedges for wallet: ', userAddress)
     switch (dataType) {
       case 'Options Created':
-        data = await hedgingInstance.methods.getUserOptionsCreated(userAddress, startIndex, limit).call();
+        data = await hedgingInstance.getUserOptionsCreated(userAddress, startIndex, limit);
         break;
       case 'Options Taken':
-        data = await hedgingInstance.methods.getUserOptionsTaken(userAddress, startIndex, limit).call();
+        data = await hedgingInstance.getUserOptionsTaken(userAddress, startIndex, limit);
         break;
       case 'Swaps Created':
-        data = await hedgingInstance.methods.getUserSwapsTaken(userAddress, startIndex, limit).call();
+        data = await hedgingInstance.getUserSwapsTaken(userAddress, startIndex, limit);
         break;
       case 'Swaps Taken':
-        data = await hedgingInstance.methods.getUserSwapsTaken(userAddress, startIndex, limit).call();
+        data = await hedgingInstance.getUserSwapsTaken(userAddress, startIndex, limit);
         break;
       case 'My Bookmarks':
-        data = await hedgingInstance.methods.getmyBookmarks(userAddress).call();
+        data = await hedgingInstance.getmyBookmarks(userAddress);
         break;
       // Handle other cases
       default:

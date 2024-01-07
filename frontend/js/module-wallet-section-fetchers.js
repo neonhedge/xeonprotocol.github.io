@@ -149,7 +149,7 @@ async function fetchSection_RewardsPanel(){
 	// ~ mining rewards are not automatically loaded to wallet page as they need to be populated from past events
 	
 	// Fetch rewards claimed
-	const userRewardsClaimed = await stakingInstance.claimRewardsStaking(userAddress);
+	const userRewardsClaimed = await stakingInstance.claimedRewardsStaking(userAddress);
 	const userLiqRewardsClaimed = await stakingInstance.claimedRewardsLiquidity(userAddress);
 	const userColRewardsClaimed = await stakingInstance.claimedRewardsCollateral(userAddress);
 	
@@ -204,137 +204,132 @@ async function fetchSection_RewardsPanel(){
 
 // 5. Fetch Section Values - STAKING PANEL
 //----------------------------------------------------
-async function fetchSection_StakingPanel(){
-	
-	const accounts = await getAccounts();
+async function fetchSection_StakingPanel() {
+    const accounts = await getAccounts();
     const userAddress = accounts[0];
-	
-	const walletBalanceRaw = await neonInstance.balanceOf(userAddress);
-	const stakedBalanceRaw = await stakingInstance.getStakedBalance(userAddress);
-	const depositedBalanceRaw = await hedgingInstance.getUserTokenBalances(CONSTANTS.neonAddress, userAddress);
-	const deposited = depositedBalanceRaw.deposited;
-	const withdrawn = depositedBalanceRaw.withdrawn;
-	// Staked versus Supply
-	const totalStakedRaw = await stakingInstance.getTotalStaked();
-	const totalSupply = await neonInstance.totalSupply();
-	const burntBalance = await neonInstance.balanceOf(CONSTANTS.burnAddress);
-	const circulatingSupplyRaw = totalSupply - burntBalance;
-	// Distrubuted ETH rewards to staking contract
-	const distributedRewards = await stakingInstance.ethRewardBasis();
-	const distributedRewardsLiqu = await stakingInstance.ethLiquidityRewardBasis();
-	const distributedRewardsColl = await stakingInstance.ethCollateralRewardBasis();
-	// Claimed ETH rewards to staking contract
-	const claimedRewards = await stakingInstance.claimRewardsStaking(userAddress);
-	const claimedRewardsLiqu = await stakingInstance.claimedRewardsLiquidity(userAddress);
-	const claimedRewardsColl = await stakingInstance.claimedRewardsCollateral(userAddress);
-	// My pool assignments
-	const assignmentsRaw = await stakingInstance.getAssignedAndUnassignedAmounts(userAddress);
-	const assignedMiningRaw = assignmentsRaw.assignedForMining;
-	const assignedLiquidityRaw = assignmentsRaw.assignedForLiquidity;
-	const assignedCollateralRaw = assignmentsRaw.assignedForCollateral;
-	const unassignedRaw = assignmentsRaw.unassigned;
 
-	// Step 1: Convert amounts
-	const wethDecimals = 18; const usdtDecimals = 6; const usdcDecimals = 6;
-	
-	// Step 2: Convert normal values
-	const walletBalance = fromBigIntNumberToDecimal(walletBalanceRaw, CONSTANTS.decimals);
-	const stakedBalance = fromBigIntNumberToDecimal(stakedBalanceRaw, CONSTANTS.decimals);
-	const depositedBalance = fromBigIntNumberToDecimal(deposited, CONSTANTS.decimals);
-	const withdrawnBalance = fromBigIntNumberToDecimal(withdrawn, CONSTANTS.decimals);
-	const totalHoldings = walletBalance + stakedBalance + (depositedBalance - withdrawnBalance);
+    const walletBalanceRaw = await neonInstance.balanceOf(userAddress);
+    const stakedBalanceRaw = await stakingInstance.getStakedBalance(userAddress);
+    const depositedBalanceRaw = await hedgingInstance.getUserTokenBalances(CONSTANTS.neonAddress, userAddress);
+    const deposited = depositedBalanceRaw.deposited;
+    const withdrawn = depositedBalanceRaw.withdrawn;
 
-	const totalStaked = fromBigIntNumberToDecimal(totalStakedRaw, CONSTANTS.decimals);
-	const circulatingSupply = fromBigIntNumberToDecimal(circulatingSupplyRaw, CONSTANTS.decimals);
+    const totalStakedRaw = await stakingInstance.getTotalStaked();
+    const totalSupplyBig = ethers.BigNumber.from(await neonInstance.totalSupply());
+    const burntBalanceBig = ethers.BigNumber.from(await neonInstance.balanceOf(CONSTANTS.burnAddress));
+    const circulatingSupplyRaw = totalSupplyBig.sub(burntBalanceBig);
 
-	const distributedRewardsEth = fromBigIntNumberToDecimal(distributedRewards, wethDecimals);
-	const distributedRewardsLiquEth = fromBigIntNumberToDecimal(distributedRewardsLiqu, wethDecimals);
-	const distributedRewardsCollEth = fromBigIntNumberToDecimal(distributedRewardsColl, wethDecimals);
-	const distributedRewardsTotalEth = distributedRewardsEth + distributedRewardsLiquEth + distributedRewardsCollEth;
-	
-	const claimedRewardsEth = fromBigIntNumberToDecimal(claimedRewards, wethDecimals);
-	const claimedRewardsLiquEth = fromBigIntNumberToDecimal(claimedRewardsLiqu, wethDecimals);
-	const claimedRewardsCollEth = fromBigIntNumberToDecimal(claimedRewardsColl, wethDecimals);
-	const claimedRewardsTotalEth = distributedRewardsEth + distributedRewardsLiquEth + distributedRewardsCollEth;
+    const distributedRewards = await stakingInstance.ethRewardBasis();
+    const distributedRewardsLiqu = await stakingInstance.ethLiquidityRewardBasis();
+    const distributedRewardsColl = await stakingInstance.ethCollateralRewardBasis();
 
-	const assignedMining = fromBigIntNumberToDecimal(assignedMiningRaw, CONSTANTS.decimals);
-	const assignedLiquidity = fromBigIntNumberToDecimal(assignedLiquidityRaw, CONSTANTS.decimals);
-	const assignedCollateral = fromBigIntNumberToDecimal(assignedCollateralRaw, CONSTANTS.decimals);
-	const unassigned = fromBigIntNumberToDecimal(unassignedRaw, CONSTANTS.decimals);
-	const totalAssigned = assignedMining + assignedLiquidity + assignedCollateral;
+    const claimedRewards = await stakingInstance.claimedRewardsStaking(userAddress);
+    const claimedRewardsLiqu = await stakingInstance.claimedRewardsLiquidity(userAddress);
+    const claimedRewardsColl = await stakingInstance.claimedRewardsCollateral(userAddress);
 
-	// Step 3: Convert usdt values
-	const xeonAddress = CONSTANTS.neonAddress;
-	const ethUsdPrice = getCurrentEthUsdcPriceFromUniswapV2();
+    const assignmentsRaw = await stakingInstance.getAssignedAndUnassignedAmounts(userAddress);
+    const assignedMiningRaw = assignmentsRaw.assignedForMining;
+    const assignedLiquidityRaw = assignmentsRaw.assignedForLiquidity;
+    const assignedCollateralRaw = assignmentsRaw.assignedForCollateral;
+    const unassignedRaw = assignmentsRaw.unassigned;
 
-	const walletBalanceUSDT = getTokenUSDValue(xeonAddress, walletBalance);
-	const stakedBalanceUSDT = getTokenUSDValue(xeonAddress, stakedBalance);
-	const depositedBalanceUSDT = getTokenUSDValue(xeonAddress, depositedBalance);
-	const withdrawnBalanceUSDT = getTokenUSDValue(xeonAddress, withdrawnBalance);
-	const totalHoldingsUSDT = getTokenUSDValue(xeonAddress, totalHoldings);
+    const wethDecimals = 18;
 
-	const totalStakedUSDT = getTokenUSDValue(xeonAddress, totalStaked);
-	const circulatingSupplyUSDT = getTokenUSDValue(xeonAddress, circulatingSupply);
+    const walletBalance = fromBigIntNumberToDecimal(walletBalanceRaw, CONSTANTS.decimals);
+    const stakedBalance = fromBigIntNumberToDecimal(stakedBalanceRaw, CONSTANTS.decimals);
+    const depositedBalance = fromBigIntNumberToDecimal(deposited, CONSTANTS.decimals);
+    const withdrawnBalance = fromBigIntNumberToDecimal(withdrawn, CONSTANTS.decimals);
+    const totalHoldings = walletBalance + stakedBalance + (depositedBalance - withdrawnBalance);
 
-	const distributedRewardsUSDT = distributedRewardsEth * ethUsdPrice;
-	const distributedRewardsLiqUSDT = distributedRewardsLiquEth * ethUsdPrice;	
-	const distributedRewardsColUSDT = distributedRewardsCollEth * ethUsdPrice;	
-	const distributedRewardsTotalUSDT = distributedRewardsTotalEth * ethUsdPrice;
+    const totalStaked = fromBigIntNumberToDecimal(totalStakedRaw, CONSTANTS.decimals);
+    const circulatingSupply = fromBigIntNumberToDecimal(circulatingSupplyRaw, CONSTANTS.decimals);
 
-	const claimedRewardsUSDT = claimedRewardsEth * ethUsdPrice;
-	const claimedRewardsLiqUSDT = claimedRewardsLiquEth * ethUsdPrice;	
-	const claimedRewardsColUSDT = claimedRewardsCollEth * ethUsdPrice;	
-	const claimedRewardsTotalUSDT = claimedRewardsTotalEth * ethUsdPrice;
+    const distributedRewardsEth = fromBigIntNumberToDecimal(distributedRewards, wethDecimals);
+    const distributedRewardsLiquEth = fromBigIntNumberToDecimal(distributedRewardsLiqu, wethDecimals);
+    const distributedRewardsCollEth = fromBigIntNumberToDecimal(distributedRewardsColl, wethDecimals);
+    const distributedRewardsTotalEth = distributedRewardsEth + distributedRewardsLiquEth + distributedRewardsCollEth;
 
-	const assignedMiningUSDT = getTokenUSDValue(xeonAddress, assignedMining);
-	const assignedLiquidityUSDT = getTokenUSDValue(xeonAddress, assignedLiquidity);
-	const assignedCollateralUSDT = getTokenUSDValue(xeonAddress, assignedCollateral);
-	const unassignedUSDT = getTokenUSDValue(xeonAddress, unassigned);
-	const totalAssignedUSDT = assignedMiningUSDT + assignedLiquidityUSDT + assignedCollateralUSDT;
+    const claimedRewardsEth = fromBigIntNumberToDecimal(claimedRewards, wethDecimals);
+    const claimedRewardsLiquEth = fromBigIntNumberToDecimal(claimedRewardsLiqu, wethDecimals);
+    const claimedRewardsCollEth = fromBigIntNumberToDecimal(claimedRewardsColl, wethDecimals);
+    const claimedRewardsTotalEth = claimedRewardsEth + claimedRewardsLiquEth + claimedRewardsCollEth;
 
-	updateSectionValues_Staking(
-		walletBalance,
-		stakedBalance,
-		depositedBalance,
-		withdrawnBalance,
-		totalHoldings,
-		totalStaked,
-		circulatingSupply,
-		distributedRewardsEth,
-		distributedRewardsLiquEth,
-		distributedRewardsCollEth,
-		distributedRewardsTotalEth,
-		claimedRewardsEth,
-		claimedRewardsLiquEth,
-		claimedRewardsCollEth,
-		claimedRewardsTotalEth,
-		assignedMining,
-		assignedLiquidity,
-		assignedCollateral,
-		unassigned,
-		totalAssigned,
-		walletBalanceUSDT,
-		stakedBalanceUSDT,
-		depositedBalanceUSDT,
-		withdrawnBalanceUSDT,
-		totalHoldingsUSDT,
-		totalStakedUSDT,
-		circulatingSupplyUSDT,
-		distributedRewardsUSDT,
-		distributedRewardsLiqUSDT,
-		distributedRewardsColUSDT,
-		distributedRewardsTotalUSDT,
-		claimedRewardsUSDT,
-		claimedRewardsLiqUSDT,
-		claimedRewardsColUSDT,
-		claimedRewardsTotalUSDT,
-		assignedMiningUSDT,
-		assignedLiquidityUSDT,
-		assignedCollateralUSDT,
-		unassignedUSDT,
-		totalAssignedUSDT
-	);
+    const assignedMining = fromBigIntNumberToDecimal(assignedMiningRaw, CONSTANTS.decimals);
+    const assignedLiquidity = fromBigIntNumberToDecimal(assignedLiquidityRaw, CONSTANTS.decimals);
+    const assignedCollateral = fromBigIntNumberToDecimal(assignedCollateralRaw, CONSTANTS.decimals);
+    const unassigned = fromBigIntNumberToDecimal(unassignedRaw, CONSTANTS.decimals);
+    const totalAssigned = assignedMining + assignedLiquidity + assignedCollateral;
 
+    const xeonAddress = CONSTANTS.neonAddress;
+    const ethUsdPrice = getCurrentEthUsdcPriceFromUniswapV2();
+
+    const walletBalanceUSDT = getTokenUSDValue(xeonAddress, walletBalance);
+    const stakedBalanceUSDT = getTokenUSDValue(xeonAddress, stakedBalance);
+    const depositedBalanceUSDT = getTokenUSDValue(xeonAddress, depositedBalance);
+    const withdrawnBalanceUSDT = getTokenUSDValue(xeonAddress, withdrawnBalance);
+    const totalHoldingsUSDT = getTokenUSDValue(xeonAddress, totalHoldings);
+
+    const totalStakedUSDT = getTokenUSDValue(xeonAddress, totalStaked);
+    const circulatingSupplyUSDT = getTokenUSDValue(xeonAddress, circulatingSupply);
+
+    const distributedRewardsUSDT = distributedRewardsEth * ethUsdPrice;
+    const distributedRewardsLiqUSDT = distributedRewardsLiquEth * ethUsdPrice;
+    const distributedRewardsColUSDT = distributedRewardsCollEth * ethUsdPrice;
+    const distributedRewardsTotalUSDT = distributedRewardsTotalEth * ethUsdPrice;
+
+    const claimedRewardsUSDT = claimedRewardsEth * ethUsdPrice;
+    const claimedRewardsLiqUSDT = claimedRewardsLiquEth * ethUsdPrice;
+    const claimedRewardsColUSDT = claimedRewardsCollEth * ethUsdPrice;
+    const claimedRewardsTotalUSDT = claimedRewardsTotalEth * ethUsdPrice;
+
+    const assignedMiningUSDT = getTokenUSDValue(xeonAddress, assignedMining);
+    const assignedLiquidityUSDT = getTokenUSDValue(xeonAddress, assignedLiquidity);
+    const assignedCollateralUSDT = getTokenUSDValue(xeonAddress, assignedCollateral);
+    const unassignedUSDT = getTokenUSDValue(xeonAddress, unassigned);
+    const totalAssignedUSDT = assignedMiningUSDT + assignedLiquidityUSDT + assignedCollateralUSDT;
+
+    updateSectionValues_Staking(
+        walletBalance,
+        stakedBalance,
+        depositedBalance,
+        withdrawnBalance,
+        totalHoldings,
+        totalStaked,
+        circulatingSupply,
+        distributedRewardsEth,
+        distributedRewardsLiquEth,
+        distributedRewardsCollEth,
+        distributedRewardsTotalEth,
+        claimedRewardsEth,
+        claimedRewardsLiquEth,
+        claimedRewardsCollEth,
+        claimedRewardsTotalEth,
+        assignedMining,
+        assignedLiquidity,
+        assignedCollateral,
+        unassigned,
+        totalAssigned,
+        walletBalanceUSDT,
+        stakedBalanceUSDT,
+        depositedBalanceUSDT,
+        withdrawnBalanceUSDT,
+        totalHoldingsUSDT,
+        totalStakedUSDT,
+        circulatingSupplyUSDT,
+        distributedRewardsUSDT,
+        distributedRewardsLiqUSDT,
+        distributedRewardsColUSDT,
+        distributedRewardsTotalUSDT,
+        claimedRewardsUSDT,
+        claimedRewardsLiqUSDT,
+        claimedRewardsColUSDT,
+        claimedRewardsTotalUSDT,
+        assignedMiningUSDT,
+        assignedLiquidityUSDT,
+        assignedCollateralUSDT,
+        unassignedUSDT,
+        totalAssignedUSDT
+    );
 }
 
 // Export the fetch functions

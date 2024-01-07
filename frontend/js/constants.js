@@ -51,13 +51,14 @@ function convertToUSD(value, pairedCurrency, ethUsdPrice) {
 }
 
 // Function to get token USD value
-// accepts bigInt & BigNumber
-// outputs Number
+// accepts Decimal Number
+// outputs BigInt
 async function getTokenUSDValue(underlyingTokenAddr, balanceRaw) {
+balanceRaw = Number(balanceRaw);
   const ethUsdPrice = getCurrentEthUsdcPriceFromUniswapV2();
   try {
       if (underlyingTokenAddr === CONSTANTS.wethAddress) {
-          const balance = ethers.BigNumber.from(balanceRaw).div(ethers.BigNumber.from(10).pow(18));
+          const balance = fromBigIntNumberToDecimal(balanceRaw, 18);
           const usdValue = convertToUSD(balance, CONSTANTS.wethAddress, ethUsdPrice);
           return usdValue;
       } else {
@@ -90,6 +91,7 @@ async function getTokenUSDValue(underlyingTokenAddr, balanceRaw) {
 // outputs Number ready to display
 // Rename to getUnderlyingValue
 async function getTokenETHValue(underlyingTokenAddr, bigIntBalanceInput) {
+
   try {
       // Convert balance to string
       const input_balance = bigIntBalanceInput.toString();
@@ -106,13 +108,7 @@ async function getTokenETHValue(underlyingTokenAddr, bigIntBalanceInput) {
       }
       // convert from BigNumber to Number
       const pairedAddressDecimal = await getTokenDecimals(pairedAddress);
-      const balance = ethers.BigNumber.from(underlyingValue).div(ethers.BigNumber.from(10).pow(pairedAddressDecimal));
-      const trueValue = Number(balance);
-      /* troubleshoot why this approach isnt working for ERC20 tokens:
-      // convert from BigNumber to Number
-      const pairedAddressDecimal = await getTokenDecimals(pairedAddress);
       const trueValue = fromBigIntNumberToDecimal(underlyingValue, pairedAddressDecimal);
-      */
 
       let pairSymbol;
       if (pairedAddress === '0xdac17f958d2ee523a2206206994597c13d831ec7') {
@@ -293,11 +289,20 @@ function fromWeiToFixed5(amount){
   return ethFriendly;
 }
 function fromBigIntNumberToDecimal(number, decimals) {
-  return ethers.utils.formatUnits(number.toString(), decimals);
+  try {
+      // Convert to BigNumber, since migration to sepolia & etherjs intergration smart contracts are not returning BigNumber/XXXn
+      const bigNumberValue = ethers.BigNumber.from(number);
+      const formattedValue = ethers.utils.formatUnits(bigNumberValue, decimals);
+      
+      return Number(formattedValue);
+  } catch (error) {
+      console.error("Error converting from BigNumber to Decimal:", error);
+      return Number(0); // Return a default value
+  }
 }
 
 function fromDecimalToBigInt(number, decimals) {
-  return ethers.utils.parseUnits(number.toString(), decimals);
+  return ethers.utils.parseUnits(number, decimals);
 }
 
 function commaNumbering(number){

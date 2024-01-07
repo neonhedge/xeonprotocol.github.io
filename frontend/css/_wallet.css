@@ -110,10 +110,10 @@ section#activities {
 }
 @keyframes animate1{
     0%{
-        left: -100%;
+        left: -200%;
     }
     50%,100%{
-        left: 100%;
+        left: 200%;
     }
 }
   
@@ -128,10 +128,10 @@ section#activities {
 }
 @keyframes animate2{
     0%{
-        top: -100%;
+        top: -200%;
     }
     50%,100%{
-        top: 100%;
+        top: 200%;
     }
 }
   
@@ -146,10 +146,10 @@ section#activities {
 }
 @keyframes animate3{
 	0%{
-		right: -100%;
+		right: -200%;
 	}
 	50%,100%{
-		right: 100%;
+		right: 200%;
 	}
 }
   
@@ -164,10 +164,10 @@ section#activities {
 }
 @keyframes animate4{
     0%{
-        bottom: -100%;
+        bottom: -200%;
     }
     50%,100%{
-        bottom: 100%;
+        bottom: 200%;
     }
 }
   
@@ -948,6 +948,7 @@ button#transactSubmit{
 	min-height: 50dvh;
 }
 .trade-list { 
+	position: relative;
 	flex-basis: 63%;
 	max-height: 500px;
 	overflow-y: auto;

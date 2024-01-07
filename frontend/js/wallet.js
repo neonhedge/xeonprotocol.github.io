@@ -1,19 +1,18 @@
 /*=========================================================================
     Import modules
 ==========================================================================*/
-import { CONSTANTS, isValidEthereumAddress, getUserBalancesForToken, getSymbol, fromBigIntNumberToDecimal } from './constants.js';
-import { initWeb3 } from './dapp-web3-utils.js';
-import { unlockedWallet, reqConnect} from './web3-walletstatus-module.js';
-import { prepareDeposit, prepareWithdrawal, refreshBalances } from './module-wallet-writer.js';
+import { CONSTANTS, getAccounts, isValidEthereumAddress, getUserBalancesForToken, getSymbol, fromBigIntNumberToDecimal } from './constants.js';
+import { initializeConnection, unlockedWallet, reqConnect} from './web3-walletstatus-module.js';
+import { approvalDepositInterface, withdrawInterface } from './module-wallet-writer.js';
 import { fetchSection_Networth, fetchSection_BalanceList, fetchSection_HedgePanel, fetchSection_RewardsPanel, fetchSection_StakingPanel } from './module-wallet-section-fetchers.js';
 import { loadHedgesModule } from './module-wallet-section-hedgesList.js';
 
 /*=========================================================================
-    INITIALIZE WEB3
+    Wallet Page Main Functions
 ==========================================================================*/
-initWeb3();
-
 // Start making calls to Dapp modules
+// Each page has this, loads content
+// Has to be called from here (main page script module) not wallet status modules, has to run last on condition wallet unlocked
 export const checkAndCallPageTries = async () => {
     const asyncFunctions = [fetchSection_Networth, fetchSection_BalanceList, fetchSection_HedgePanel, fetchHedgeList, fetchSection_RewardsPanel, fetchSection_StakingPanel];
     for (const func of asyncFunctions) {
@@ -27,6 +26,14 @@ const setatmIntervalAsync = (fn, ms) => {
 };
 
 $(document).ready(async function () {
+    // each page main script starts with initializing wallet
+    $('.waiting_init').css('display', 'inline-block');
+    try{
+        // Now initialize wallet module
+        await initializeConnection();
+    } catch (error) {
+        console.log(error);
+    }
 
     // Ready event listeners on the wallet
     setupToggleElements();
@@ -35,7 +42,7 @@ $(document).ready(async function () {
     const unlockState = await unlockedWallet();
 
     if (unlockState === true) {
-        const accounts = await web3.eth.requestAccounts();
+        const accounts = await provider.listAccounts();
         userAddress = accounts[0];
         
         // Load sections automatically & periodically
@@ -51,7 +58,7 @@ $(document).ready(async function () {
 
 export async function fetchHedgeList() {
     // Wallet connect has to PASS first, so account is available, refresh to avoid empty section
-    const accounts = await web3.eth.requestAccounts();
+    const accounts = await getAccounts();
     const userAddress = accounts[0];
 
     // Load more sections manually not automatically & periodically
@@ -191,7 +198,7 @@ export function setupToggleElements() {
     document.getElementById('erc20-amount').addEventListener('input', async (event) => {
         const tokenAddress = document.getElementById('erc20-address').value.trim();
         const tokenAmount = event.target.value.trim();
-    
+
         if (isNaN(tokenAmount) || parseFloat(tokenAmount) <= 0) {
             alert('Please enter a valid amount.');
             return;
@@ -201,7 +208,7 @@ export function setupToggleElements() {
             return;
         }
         
-        const accounts = await web3.eth.requestAccounts();
+        const accounts = await getAccounts();
         const userAddress = accounts[0];
     
         try {
@@ -211,10 +218,11 @@ export function setupToggleElements() {
                 { inputs: [], name: 'decimals', outputs: [{ internalType: 'uint8', name: '', type: 'uint8' }], stateMutability: 'pure', type: 'function' },
             ];            
    
-            const pairedContract = new web3.eth.Contract(erc20ABI, tokenAddress);
+            const pairedContract = new ethers.Contract(tokenAddress, erc20ABI, window.provider);
+
             const [walletBalance, pairDecimals] = await Promise.all([
-                pairedContract.methods.balanceOf(userAddress).call(),
-                pairedContract.methods.decimals().call(),
+                pairedContract.balanceOf(userAddress).call(),
+                pairedContract.decimals().call(),
             ]);            
     
             // Format output
@@ -273,7 +281,7 @@ export function setupCashingModule(formValues) {
 
     //const tokenAddress = formValues['erc20-address'] ? formValues['erc20-address'] : formValues['erc20-select'];
     const tokenAddress = formValues['erc20-address'];
-    const tokenAmount = formValues['transact-amount'];
+    const tokenAmount = formValues['erc20-amount'];
     const checkboxValue = formValues['checkbox'];
 
     if (tokenAmount <= 0 || tokenAddress == '' || !isValidEthereumAddress(tokenAddress)) {
@@ -287,7 +295,7 @@ export function setupCashingModule(formValues) {
                 confirmButtonText: 'Okay',
                 showConfirmButton: true,
                 showCancelButton: false,
-                animation: 'slide-from-top',
+                animation: 'Pop',
             }, function () {
                 console.log('invalid token address...');
             });
@@ -307,7 +315,7 @@ export function setupCashingModule(formValues) {
                     confirmButtonText: 'Okay',
                     showConfirmButton: true,
                     showCancelButton: false,
-                    animation: 'slide-from-top',
+                    animation: 'Pop',
                 }, function () {
                     console.log('incorrect token address...');
                 }); 
@@ -326,7 +334,7 @@ export function setupCashingModule(formValues) {
                     confirmButtonText: 'Okay',
                     showConfirmButton: true,
                     showCancelButton: false,
-                    animation: 'slide-from-top',
+                    animation: 'Pop',
                 }, function () {
                     console.log('invalid token amount...');
                 });
@@ -335,9 +343,9 @@ export function setupCashingModule(formValues) {
 
         // If validation passes, proceed to approval first
         if (!checkboxValue) {
-            prepareDeposit(tokenAddress, tokenAmount);
+            approvalDepositInterface(tokenAmount, tokenAddress);
         } else {
-            prepareWithdrawal(tokenAddress, tokenAmount);
+            withdrawInterface(tokenAmount, tokenAddress);
         }
 
     } catch (error) {
@@ -396,6 +404,3 @@ document.addEventListener('click', function (event) {
         }
     }
 });
-
-
-
