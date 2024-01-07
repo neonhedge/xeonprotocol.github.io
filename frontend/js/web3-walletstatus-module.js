@@ -60,25 +60,32 @@ async function handleAccountChange(wallets, provider) {
     let wallet = wallets[0];
     wallet = wallets.length ? wallets[0] : null;
     if (wallets.length === 0) {
+		
         console.log("Please connect to MetaMask.");
+		$('.wallets').css('display', 'none');
+        $('.wallet_connect').css('display', 'inline-block');
     } else if (wallets[0] !== window.currentAccount) {
         console.log("Wallet connected:", wallets);
         window.currentAccount = wallets[0];
         await initializeConnection(provider);
+		await checkAndCallPageTries();
     }
 }
 
 async function handleNetworkChange(networkId, provider) {
-    console.log("Network changed:", networkId);
     CONSTANTS.chainID = networkId;
     if (networkId !== CONSTANTS.network) {
-        $(".wallets, .walletpur").css("display", "none");
-        $(".network_switch").css("display", "inline-block");		
         console.log("Reading chain:" + networkId + ", instead of, " + CONSTANTS.network);
+        $(".wallets, .walletpur").css("display", "none");
+        $(".network_switch").css("display", "inline-block");
     } else {
-        await initializeConnection(provider);
         console.log("Reading from mainnet: ", networkId);
+		$(".wallets, .network_switch").css("display", "none");
+        await initializeConnection(provider);
+		await checkAndCallPageTries();
     }
+	
+	await checkAndCallPageTries();
 }
 // Listeners
 ethereum.on("connect", (chainID) => {
@@ -213,8 +220,7 @@ async function switchNetwork(provider) {
             // success in switch, reinitialize
 			console.log("Connected to chain:", CONSTANTS.chainID);
             console.log('Successfully switched to the Sepolia Testnet');
-            initializeConnection();
-			checkAndCallPageTries();
+            await initializeConnection();
             return true;
         } catch (error) {
             // error

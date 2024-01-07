@@ -263,14 +263,14 @@ async function fetchSection_StakingPanel() {
     const xeonAddress = CONSTANTS.neonAddress;
     const ethUsdPrice = getCurrentEthUsdcPriceFromUniswapV2();
 
-    const walletBalanceUSDT = getTokenUSDValue(xeonAddress, walletBalance);
-    const stakedBalanceUSDT = getTokenUSDValue(xeonAddress, stakedBalance);
-    const depositedBalanceUSDT = getTokenUSDValue(xeonAddress, depositedBalance);
-    const withdrawnBalanceUSDT = getTokenUSDValue(xeonAddress, withdrawnBalance);
-    const totalHoldingsUSDT = getTokenUSDValue(xeonAddress, totalHoldings);
+    const walletBalanceUSDT = await getTokenUSDValue(xeonAddress, walletBalance);
+    const stakedBalanceUSDT = await getTokenUSDValue(xeonAddress, stakedBalance);
+    const depositedBalanceUSDT = await getTokenUSDValue(xeonAddress, depositedBalance);
+    const withdrawnBalanceUSDT = await getTokenUSDValue(xeonAddress, withdrawnBalance);
+    const totalHoldingsUSDT = await getTokenUSDValue(xeonAddress, totalHoldings);
 
-    const totalStakedUSDT = getTokenUSDValue(xeonAddress, totalStaked);
-    const circulatingSupplyUSDT = getTokenUSDValue(xeonAddress, circulatingSupply);
+    const totalStakedUSDT = await getTokenUSDValue(xeonAddress, totalStaked);
+    const circulatingSupplyUSDT = await getTokenUSDValue(xeonAddress, circulatingSupply);
 
     const distributedRewardsUSDT = distributedRewardsEth * ethUsdPrice;
     const distributedRewardsLiqUSDT = distributedRewardsLiquEth * ethUsdPrice;
@@ -282,10 +282,10 @@ async function fetchSection_StakingPanel() {
     const claimedRewardsColUSDT = claimedRewardsCollEth * ethUsdPrice;
     const claimedRewardsTotalUSDT = claimedRewardsTotalEth * ethUsdPrice;
 
-    const assignedMiningUSDT = getTokenUSDValue(xeonAddress, assignedMining);
-    const assignedLiquidityUSDT = getTokenUSDValue(xeonAddress, assignedLiquidity);
-    const assignedCollateralUSDT = getTokenUSDValue(xeonAddress, assignedCollateral);
-    const unassignedUSDT = getTokenUSDValue(xeonAddress, unassigned);
+    const assignedMiningUSDT = await getTokenUSDValue(xeonAddress, assignedMining);
+    const assignedLiquidityUSDT = await getTokenUSDValue(xeonAddress, assignedLiquidity);
+    const assignedCollateralUSDT = await getTokenUSDValue(xeonAddress, assignedCollateral);
+    const unassignedUSDT = await getTokenUSDValue(xeonAddress, unassigned);
     const totalAssignedUSDT = assignedMiningUSDT + assignedLiquidityUSDT + assignedCollateralUSDT;
 
     updateSectionValues_Staking(

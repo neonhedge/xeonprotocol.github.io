@@ -112,6 +112,8 @@ function updateSectionValues_Rewards(
     userColRewardsClaimedEth,
     userColRewardsClaimedUSDT
 ) {
+
+    console.log('totalRewardsDueWETH', totalRewardsDueWETH + 'totalRewardsClaimedWETH', totalRewardsClaimedWETH);
     const formatValue = (value) => {
         return `$${value.toFixed(2)}`;
     };
@@ -195,7 +197,7 @@ function updateSectionValues_Staking(
     totalAssignedUSDT
 ) {
     const formatValue = (value) => {
-        return `$${value.toFixed(2)}`;
+        return `($${value.toFixed(2)})`;
     };
 
     const formatString = (number) => {
@@ -213,35 +215,35 @@ function updateSectionValues_Staking(
 
     // Update staking panel
     document.getElementById("stakedBalanceAmnt").textContent = formatString(stakedBalance);
-    document.getElementById("stakedBalanceValue").textContent = formatString(stakedBalanceUSDT);
+    document.getElementById("stakedBalanceValue").textContent = formatValue(stakedBalanceUSDT);
     document.getElementById("totalBalanceAmnt").textContent = formatString(totalHoldings);
-    document.getElementById("totalBalanceValue").textContent = formatString(totalHoldingsUSDT);
+    document.getElementById("totalBalanceValue").textContent = formatValue(totalHoldingsUSDT);
     document.getElementById("stakedSupplyAmnt").textContent = formatString(totalStaked);
-	document.getElementById("stakedSupplyValue").textContent = formatString(totalStakedUSDT);
+	document.getElementById("stakedSupplyValue").textContent = formatValue(totalStakedUSDT);
     document.getElementById("circSupplyAmnt").textContent = formatString(circulatingSupply);
-    document.getElementById("circSupplyValue").textContent = formatString(circulatingSupplyUSDT);
+    document.getElementById("circSupplyValue").textContent = formatValue(circulatingSupplyUSDT);
     document.getElementById("divDistributedAmnt").textContent = formatString(distributedRewardsTotalEth);
-    document.getElementById("divDistributedValue").textContent = formatString(distributedRewardsTotalUSDT);
+    document.getElementById("divDistributedValue").textContent = formatValue(distributedRewardsTotalUSDT);
     document.getElementById("divClaimedAmnt").textContent = formatString(claimedRewardsTotalEth);
-    document.getElementById("divClaimedValue").textContent = formatString(claimedRewardsTotalUSDT);
+    document.getElementById("divClaimedValue").textContent = formatValue(claimedRewardsTotalUSDT);
 
     document.getElementById("tokensAvailableWallet").textContent = formatString(walletBalance);
     document.getElementById("tokensStakedWallet").textContent = formatString(stakedBalance);
     
     // Update assignments panel
     document.getElementById("mystakedTokensAmnt").textContent = formatString(stakedBalance);
-    document.getElementById("myStakedTokensValue").textContent = formatString(stakedBalanceUSDT);
+    document.getElementById("myStakedTokensValue").textContent = formatValue(stakedBalanceUSDT);
     document.getElementById("myAssignedAmnt").textContent = formatString(totalAssigned);
-    document.getElementById("myAssignedValue").textContent = formatString(totalAssignedUSDT);
+    document.getElementById("myAssignedValue").textContent = formatValue(totalAssignedUSDT);
     document.getElementById("myUnassignedAmnt").textContent = formatString(unassigned);
-    document.getElementById("myUnassignedValue").textContent = formatString(unassignedUSDT);
+    document.getElementById("myUnassignedValue").textContent = formatValue(unassignedUSDT);
 
     document.getElementById("assignedToLiquidityAmnt").textContent = formatString(assignedLiquidity);
-    document.getElementById("assignedToLiquidityAmnt").textContent = formatString(assignedLiquidityUSDT);
+    document.getElementById("assignedToLiquidityValue").textContent = formatValue(assignedLiquidityUSDT);
     document.getElementById("assignedToCollateralAmnt").textContent = formatString(assignedCollateral);
-    document.getElementById("assignedToCollateralValue").textContent = formatString(assignedCollateralUSDT);
+    document.getElementById("assignedToCollateralValue").textContent = formatValue(assignedCollateralUSDT);
     document.getElementById("assignedToMiningAmnt").textContent = formatString(assignedMining);
-    document.getElementById("assignedToMiningValue").textContent = formatString(assignedMiningUSDT);
+    document.getElementById("assignedToMiningValue").textContent = formatValue(assignedMiningUSDT);
     
 }
 // Export the fetch functions
