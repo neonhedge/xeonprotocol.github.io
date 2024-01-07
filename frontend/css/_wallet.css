@@ -1190,7 +1190,7 @@ button#transactSubmit{
 	padding-bottom:unset;
 	box-sizing: border-box;
 	border-radius: 10px;
-	font-family: "Space Grotesk", "Nunito Sans";
+	font-family: "Space Grotesk", sans-serif;
   }
   
   .section-title {
@@ -1609,7 +1609,7 @@ button#transactSubmit{
 	margin:2vw auto;
 	margin-top: 0;
 	padding: 20px;
-	font-family: "Space Grotesk", "Nunito Sans";
+	font-family: "Space Grotesk", sans-serif;
 	font-size: clamp(14px, 1vw, 15px);
 	font-weight: 100;
 	cursor:help;
