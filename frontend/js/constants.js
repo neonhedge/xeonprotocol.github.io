@@ -129,20 +129,25 @@ async function getTokenETHValue(underlyingTokenAddr, bigIntBalanceInput) {
 }
 
 // Function to get token decimals
-async function getTokenDecimals(tokenAddress) {
-  // standard ERC20 ABI
-  const erc20ABI = [
-      { constant: true, inputs: [], name: 'name', outputs: [{ name: '', type: 'string' }], type: 'function' },
-      { constant: true, inputs: [], name: 'symbol', outputs: [{ name: '', type: 'string' }], type: 'function' },
-      { constant: true, inputs: [], name: 'decimals', outputs: [{ name: '', type: 'uint8' }], type: 'function' },
+// WETH on Sepolia has 6 decimals, hacked here to 18(mainnet) for dev purposes only
+// Returns default value if call fails
+async function getTokenDecimals(tokenAddress, defaultDecimals = 18) {
+  const decimalsABI = [
+      {inputs:[],name:'decimals',outputs:[{internalType:'uint8',name:'',type:'uint8'}],stateMutability:'view',type:'function'}
   ];
 
-  const pairedContract = new ethers.Contract(tokenAddress, erc20ABI, provider);
-  const [pairedSymbol, pairDecimals] = await Promise.all([
-      pairedContract.symbol(),
-      pairedContract.decimals()
-  ]);
-  return Number(pairDecimals);
+  if (tokenAddress !== CONSTANTS.wethAddress) {
+      try {
+          const pairedContract = new ethers.Contract(tokenAddress, decimalsABI, provider);
+          const pairDecimals = await pairedContract.decimals();
+          return Number(pairDecimals);
+      } catch (error) {
+          console.error("Error fetching decimals:", error);
+          return defaultDecimals;
+      }
+  } else {
+      return Number(18);
+  }
 }
 
 async function getTokenDecimalAndSymbol(tokenAddress) {
@@ -163,6 +168,7 @@ const [decimalsResult, symbolResult] = await Promise.all([
 
 
 // Function to fetch user's token balances
+// Returns Decimal
 async function getUserBalancesForToken(tokenAddress, userAddress) {
   console.log(`getUserBalancesForToken: ${tokenAddress}, ${userAddress}`);
   try {
@@ -177,12 +183,11 @@ async function getUserBalancesForToken(tokenAddress, userAddress) {
       console.log(`deposited: ${deposited}, withdrawn: ${withdrawn}, lockedInUse: ${lockedInUse}, withdrawable: ${withdrawable}, withdrawableValue: ${withdrawableValue}, paired: ${pairedAddress}`);
 
       // Use pair to convert to correct decimals
-
-      const pairedAddressDecimal = await getTokenDecimals(pairedAddress);
-      const depositedBalance = fromBigIntNumberToDecimal(deposited, pairedAddressDecimal);
-      const withdrawnBalance = fromBigIntNumberToDecimal(withdrawn, pairedAddressDecimal);
-      const lockedInUseBalance = fromBigIntNumberToDecimal(lockedInUse, pairedAddressDecimal);
-      const withdrawableBalanceEth = fromBigIntNumberToDecimal(withdrawable, pairedAddressDecimal);
+      const tokenDecimal = await getTokenDecimals(tokenAddress);
+      const depositedBalance = fromBigIntNumberToDecimal(deposited, tokenDecimal);
+      const withdrawnBalance = fromBigIntNumberToDecimal(withdrawn, tokenDecimal);
+      const lockedInUseBalance = fromBigIntNumberToDecimal(lockedInUse, tokenDecimal);
+      const withdrawableBalanceEth = fromBigIntNumberToDecimal(withdrawable, tokenDecimal);
 
       return {
           deposited: depositedBalance,
