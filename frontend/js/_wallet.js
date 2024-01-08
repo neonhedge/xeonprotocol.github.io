@@ -141,116 +141,117 @@ export function setupToggleElements() {
         });
     }); 
 
-// Cashier Token Address paste listener
-document.getElementById('erc20-address').addEventListener('paste', async (event) => {
-    const pastedAddress = event.clipboardData.getData('text/plain');
-    const accounts = await getAccounts();
-    const userAddress = accounts[0];
-    let mybalances = {};
-    if (!isValidEthereumAddress(pastedAddress)) {
-        alert('Please enter a valid Ethereum wallet address.');
-        return;
-    }
-    try {
-        // show address indicators
-        const tokenSymbol = await getSymbol(pastedAddress);
-        const addressDataSpan = document.getElementById("addressData");
-        // replace **** with name. escape the stars with \
-        addressDataSpan.innerHTML = addressDataSpan.innerHTML.replace(/\*\*\*\*/g, tokenSymbol);
-        // get wallet balances
-        mybalances = await getUserBalancesForToken(pastedAddress, userAddress);
-        // format output
-        const formatValue = (value) => {
-            return `$${value.toFixed(2)}`;
-        };
-        const formatString = (number) => {
-            return number.toLocaleString();
-        };
-        const formatStringDecimal = (number) => {
-            const options = {
-                style: 'decimal',
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-            };
-            return number.toLocaleString('en-US', options);
-        };
-
-        // Fetch decimals of the pasted address
-        const tokenDecimals = await getTokenDecimals(pastedAddress);
-
-        // Display balances in the HTML form
-        document.getElementById('depositedBalance').textContent = formatStringDecimal(fromBigIntNumberToDecimal(mybalances.deposited, tokenDecimals));
-        document.getElementById('withdrawnBalance').textContent = formatStringDecimal(fromBigIntNumberToDecimal(mybalances.withdrawn, tokenDecimals));
-        document.getElementById('lockedInUseBalance').textContent = formatStringDecimal(fromBigIntNumberToDecimal(mybalances.lockedInUse, tokenDecimals));
-        document.getElementById('withdrawableBalance').textContent = formatStringDecimal(fromBigIntNumberToDecimal(mybalances.withdrawableBalance, tokenDecimals));
-
-        // Check if the container is already expanded
-        const balancesContainer = document.getElementById('balancesSection');
-        const isExpanded = balancesContainer.classList.contains('expanded');
-        if (!isExpanded) {
-            // If not expanded, toggle to expand
-            balancesContainer.classList.add('expanded');
-            const expandHeight = balancesContainer.scrollHeight + 'px';
-            balancesContainer.style.maxHeight = expandHeight;
+    // Cashier Token Address paste listener
+    document.getElementById('erc20-address').addEventListener('paste', async (event) => {
+        const pastedAddress = event.clipboardData.getData('text/plain');
+        const accounts = await getAccounts();
+        const userAddress = accounts[0];
+        let mybalances = {};
+        if (!isValidEthereumAddress(pastedAddress)) {
+            alert('Please enter a valid Ethereum wallet address.');
+            return;
         }
-    } catch (error) {
-        console.error("Error processing wallet address:", error);
-    }
-});
-
-// Cashier Amount paste listener
-document.getElementById('erc20-amount').addEventListener('input', async (event) => {
-    const tokenAddress = document.getElementById('erc20-address').value.trim();
-    const tokenAmount = event.target.value.trim();
-
-    if (isNaN(tokenAmount) || parseFloat(tokenAmount) < 0) {
-        alert('Please enter a valid amount.');
-        return;
-    }
-    if (!isValidEthereumAddress(tokenAddress)) {
-        alert('Please enter a valid ERC20 token address.');
-        return;
-    }
-
-    const accounts = await getAccounts();
-    const userAddress = accounts[0];
-
-    try {
-        // Fetch balance for ERC20 token address provided using ERC20 balance ABI
-        const erc20ABI = [
-            { inputs: [{ internalType: 'address', name: 'account', type: 'address' }], name: 'balanceOf', outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }], stateMutability: 'view', type: 'function' },
-            { inputs: [], name: 'decimals', outputs: [{ internalType: 'uint8', name: '', type: 'uint8' }], stateMutability: 'pure', type: 'function' },
-        ];
-
-        const pairedContract = new ethers.Contract(tokenAddress, erc20ABI, window.provider);
-
-        const [walletBalance, tokenDecimals] = await Promise.all([
-            pairedContract.balanceOf(userAddress),
-            pairedContract.decimals(),
-        ]);
-
-        // Format output
-        const formatStringDecimal = (number) => {
-            const options = {
-                style: 'decimal',
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
+        try {
+            // show address indicators
+            const tokenSymbol = await getSymbol(pastedAddress);
+            const addressDataSpan = document.getElementById("addressData");
+            // replace **** with name. escape the stars with \
+            addressDataSpan.innerHTML = addressDataSpan.innerHTML.replace(/\*\*\*\*/g, tokenSymbol);
+            // get wallet balances
+            mybalances = await getUserBalancesForToken(pastedAddress, userAddress);
+            // format output
+            const formatValue = (value) => {
+                return `$${value.toFixed(2)}`;
             };
-            return number.toLocaleString('en-US', options);
-        };
+            const formatString = (number) => {
+                return number.toLocaleString();
+            };
+            const formatStringDecimal = (number) => {
+                const options = {
+                    style: 'decimal',
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                };
+                return number.toLocaleString('en-US', options);
+            };
 
-        // Display balances in the HTML form
-        const balance = fromBigIntNumberToDecimal(walletBalance, tokenDecimals);
-        const displayBalance = formatStringDecimal(balance);
-        const walletDataSpan = document.getElementById("inWalletBalance");
+            // Fetch decimals of the pasted address
+            const tokenDecimals = await getTokenDecimals(pastedAddress);
 
-        // Replace
-        walletDataSpan.innerHTML = displayBalance;
+            // Display balances in the HTML form
+            document.getElementById('depositedBalance').textContent = formatStringDecimal(fromBigIntNumberToDecimal(mybalances.deposited, tokenDecimals));
+            document.getElementById('withdrawnBalance').textContent = formatStringDecimal(fromBigIntNumberToDecimal(mybalances.withdrawn, tokenDecimals));
+            document.getElementById('lockedInUseBalance').textContent = formatStringDecimal(fromBigIntNumberToDecimal(mybalances.lockedInUse, tokenDecimals));
+            document.getElementById('withdrawableBalance').textContent = formatStringDecimal(fromBigIntNumberToDecimal(mybalances.withdrawableBalance, tokenDecimals));
 
-    } catch (error) {
-        console.error("Error processing wallet address:", error);
-    }
-});
+            // Check if the container is already expanded
+            const balancesContainer = document.getElementById('balancesSection');
+            const isExpanded = balancesContainer.classList.contains('expanded');
+            if (!isExpanded) {
+                // If not expanded, toggle to expand
+                balancesContainer.classList.add('expanded');
+                const expandHeight = balancesContainer.scrollHeight + 'px';
+                balancesContainer.style.maxHeight = expandHeight;
+            }
+        } catch (error) {
+            console.error("Error processing wallet address:", error);
+        }
+    });
+
+    // Cashier Amount paste listener
+    document.getElementById('erc20-amount').addEventListener('input', async (event) => {
+        const tokenAddress = document.getElementById('erc20-address').value.trim();
+        const tokenAmount = event.target.value.trim();
+
+        if (isNaN(tokenAmount) || parseFloat(tokenAmount) < 0) {
+            alert('Please enter a valid amount.');
+            return;
+        }
+        if (!isValidEthereumAddress(tokenAddress)) {
+            alert('Please enter a valid ERC20 token address.');
+            return;
+        }
+
+        const accounts = await getAccounts();
+        const userAddress = accounts[0];
+
+        try {
+            // Fetch balance for ERC20 token address provided using ERC20 balance ABI
+            const erc20ABI = [
+                { inputs: [{ internalType: 'address', name: 'account', type: 'address' }], name: 'balanceOf', outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }], stateMutability: 'view', type: 'function' },
+                { inputs: [], name: 'decimals', outputs: [{ internalType: 'uint8', name: '', type: 'uint8' }], stateMutability: 'pure', type: 'function' },
+            ];
+
+            const pairedContract = new ethers.Contract(tokenAddress, erc20ABI, window.provider);
+
+            const [walletBalance, tokenDecimals] = await Promise.all([
+                pairedContract.balanceOf(userAddress),
+                pairedContract.decimals(),
+            ]);
+
+            // Format output
+            const formatStringDecimal = (number) => {
+                const options = {
+                    style: 'decimal',
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                };
+                return number.toLocaleString('en-US', options);
+            };
+
+            // Display balances in the HTML form
+            const balance = fromBigIntNumberToDecimal(walletBalance, tokenDecimals);
+            const displayBalance = formatStringDecimal(balance);
+            const walletDataSpan = document.getElementById("inWalletBalance");
+
+            // Replace
+            walletDataSpan.innerHTML = displayBalance;
+
+        } catch (error) {
+            console.error("Error processing wallet address:", error);
+        }
+    });
+}
 
 /* ========================================================================
     Write Function Code starts here
