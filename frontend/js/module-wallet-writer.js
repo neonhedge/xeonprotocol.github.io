@@ -339,7 +339,9 @@ function tokenApprovedMessage(tokenAmount, tokenAddress) {
     // Slide in approval success
     $("#allowanceSuccess").fadeIn("slow");
 
-    approvalDepositInterface(tokenAmount, tokenAddress);    
+    setTimeout(function() {
+        approvalDepositInterface(tokenAmount, tokenAddress); 
+    }, 4000);  
 }
 
 async function vaultDeposit(tokenAddress, tokenAmount) {
@@ -394,6 +396,11 @@ function tokenDepositedMessage(transactionHash) {
     $(".interfaceWindow").hide();
     // Slide in approval success
     $("#depositSuccess").fadeIn("slow");
+    // Reset cashier button
+    $('#transactSubmit').html('Deposit Again..');
+    // Disable all buttons
+    $('.cancel').prop("disabled", true);
+
     // Wait for 3 seconds
     setTimeout(function() {
         // Enable confirm button again
