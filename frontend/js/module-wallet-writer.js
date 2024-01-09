@@ -1,7 +1,8 @@
 /*=========================================================================
     Import modules
 ==========================================================================*/
-import { CONSTANTS, truncateAddress, fromBigIntNumberToDecimal, fromDecimalToBigInt, getAccounts, getTokenDecimalAndSymbol } from './constants.js';
+import { CONSTANTS, getUserBalancesForToken, truncateAddress, fromBigIntNumberToDecimal, fromDecimalToBigInt, getAccounts, getTokenDecimalAndSymbol, getSymbol } from './constants.js';
+import { initializeConnection } from './web3-walletstatus-module.js';
 
 /*======================================================
     WRITE FUNCTION CALLS for the wallet module
@@ -35,7 +36,7 @@ async function allowanceCheck(tokenAddress) {
 }
 
 async function approvalDepositInterface(tokenAmount, tokenAddress) {
-    
+    tokenAmount = Number(tokenAmount);
     // Prepare addresses
     const accounts = await getAccounts();
     const walletAddress = accounts[0];
@@ -53,6 +54,22 @@ async function approvalDepositInterface(tokenAmount, tokenAddress) {
     // token balance check
     const walletBalanceRaw = await neonInstance.balanceOf(walletAddress);
     const walletBalance = fromBigIntNumberToDecimal(walletBalanceRaw, decimals);
+
+    // Check sufficient funds
+    if (tokenAmount > walletBalance) {
+        console.log('Insufficient Wallet Balance.');
+        swal({
+            title: "Insufficient Wallet Balance",
+            type: "warning",
+            text: "You don't have enough tokens to continue..",
+            html: true,
+            showCancelButton: false,
+            confirmButtonColor: "#04C86C",
+            confirmButtonText: "Ooops",
+            closeOnConfirm: true
+        }, async function(isConfirm) {  }); // close swal
+        return;
+    }
 
     let transactionMessage = '';
     let proceedButtonText = 'checking ...';
@@ -209,6 +226,7 @@ async function approvalDepositInterface(tokenAmount, tokenAddress) {
     let depositRequired = allowance >= tokenAmount && walletBalance >= tokenAmount;
     let approved = allowance >= tokenAmount && walletBalance >= tokenAmount;
     swal({
+        type: "info",
         title: "Vault Deposit",
         text: transactionMessage,
         html: true,
@@ -218,34 +236,36 @@ async function approvalDepositInterface(tokenAmount, tokenAddress) {
         cancelButtonText: "Cancel",
         closeOnConfirm: false,
         closeOnCancel: true
-    }, async function () {
-        // Check if wallet has enough balance
-        if (!allowanceRequired && !depositRequired && !approved) {
-            $('.confirm').prop("disabled", true);
-        } else {
-            $('.confirm').prop("disabled", false);
-            // change button text
-            $('.confirm').html('<i class="fa fa-spinner fa-spin"></i> Processing...');
-    
-            if (allowanceRequired) {
-                // Approving message
-                tokenApprovingMessage();
-                // Submit Transaction to Vault
-                vaultApprove(tokenAddress, tokenAmount);
-            } else if (depositRequired) {                
-                // Request message displayed
-                tokenDepositingMessage();
-                // Submit Transaction to Vault
-                vaultDeposit(tokenAddress, tokenAmount);
+    }, async function(isConfirm) {
+        if (isConfirm) {
+            // Check if wallet has enough permissions
+            if (!allowanceRequired && !depositRequired && !approved) {
+                $('.confirm').prop("disabled", true);
+            } else {
+                $("#transactSubmit").html('<i class="fa fa-spinner fa-spin"></i> transacting...');
+                $('.confirm').prop("disabled", false);
+                $('.confirm').html('<i class="fa fa-spinner fa-spin"></i> Processing...');
+        
+                if (allowanceRequired) {
+                    tokenApprovingMessage();
+                    // Submit Transaction to Vault
+                    vaultApprove(tokenAddress, tokenAmount);
+                } else if (depositRequired) {         
+                    tokenDepositingMessage();
+                    // Submit Transaction to Vault
+                    vaultDeposit(tokenAddress, tokenAmount);
+                }
             }
-            
-        } // close else            
-    }); // close swal
+        }  else {
+            // User clicked the cancel button
+            swal("Cancelled", "Your money is safe :)", "error");
+            $('#transactSubmit').html('Deposit Again..');
+        }       
+    });
 
-    // Run display scrips on swal load
-    // Allowance or deposit
+    // Run display changes after swal load
     console.log("allowance: " + allowance + ", tokenAmount: " + tokenAmount + ", walletBalance: " + walletBalance);
-    $("#transactSubmit").html('<i class="fa fa-spinner fa-spin"></i> transacting...');
+
     if (allowance < tokenAmount) {
         // Slide out current message
         $(".interfaceWindow").hide();
@@ -321,29 +341,6 @@ async function vaultApprove(tokenAddress, tokenAmount) {
     }
 }
 
-
-async function tokenApprovingMessage() {
-    // Slide out the existing content
-    $(".interfaceWindow").hide();
-    // Slide in the new content
-    $("#approvalInProgress").fadeIn(2);
-
-    // Disable confirm button
-    $('.confirm').prop("disabled", true);
-}
-
-
-function tokenApprovedMessage(tokenAmount, tokenAddress) {
-    // Slide out approval in progress
-    $(".interfaceWindow").hide();
-    // Slide in approval success
-    $("#allowanceSuccess").fadeIn("slow");
-
-    setTimeout(function() {
-        approvalDepositInterface(tokenAmount, tokenAddress); 
-    }, 4000);  
-}
-
 async function vaultDeposit(tokenAddress, tokenAmount) {
     try {
         // Retrieve wallet connected
@@ -380,6 +377,258 @@ async function vaultDeposit(tokenAddress, tokenAmount) {
     }
 }
 
+// Withdrawal process handler
+// Receives decimals 
+async function withdrawInterface(tokenAddress, tokenAmount) {
+    tokenAmount = Number(tokenAmount);
+    const accounts = await getAccounts();
+    const walletAddress = accounts[0];
+    const vaultAddress = CONSTANTS.hedgingAddress;
+    const vaultAddressTrunc = truncateAddress(vaultAddress);
+
+    if (accounts.length === 0) {
+        console.log('No wallet connected. Please connect a wallet.');
+        swal({
+            title: "Connect Wallet",
+            text: "Please connect your wallet to proceed..",
+            html: true,
+            showCancelButton: false,
+            confirmButtonColor: "#04C86C",
+            confirmButtonText: "Ooops",
+            closeOnConfirm: true
+        }, async function(isConfirm) {
+            
+        }); // close swal
+        return;
+    }
+
+    // Format output
+    const formatStringDecimal = (number) => {
+        const options = {
+            style: 'decimal',
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 5,
+        };
+        return number.toLocaleString('en-US', options);
+    };
+    
+    try {
+        // check if wallet has enough balance in Vault: return decimal
+        const mybalances = await getUserBalancesForToken(tokenAddress, walletAddress);
+        const walletBalance = mybalances.withdrawableBalance;
+        const tokenAmountString = formatStringDecimal(tokenAmount);
+        const walletBalanceString = formatStringDecimal(walletBalance);
+        const tokenAmountBigInt = fromDecimalToBigInt(tokenAmount);
+        // symbol for messages
+        const symbol = await getSymbol(tokenAddress);
+
+        // Check sufficient funds
+        /* deprecated
+        if (tokenAmount > walletBalance) {
+            console.log('Insufficient funds to withdraw.');
+            swal({
+                title: "Insufficient Vault Balances",
+                type: "warning",
+                text: "You are attempting to withdraw amount > balance.",
+                html: true,
+                showCancelButton: false,
+                confirmButtonColor: "#04C86C",
+                confirmButtonText: "Ooops",
+                closeOnConfirm: true
+            }, async function(isConfirm) {  }); // close swal
+            return;
+        }
+        */
+
+        // classes on left are for size, on right are for coloring & font
+        // interfaceWindow is displayed once in a swal popup, then changes messages on transaction status
+        let transactionMessage = '';
+        let proceedButtonText = 'checking ...';
+        transactionMessage = `
+                <div id="withdrawConfirm" class="interfaceWindow">
+                    <span class="txStatus">You are about to withdraw</span>
+                    <span class="walletbalanceSpan">${tokenAmountString} ${symbol} from <a href="https://etherscan.io/token/${vaultAddress}" target="_blank">Vault <i class="fa fa-external-link"></i></a></span>
+                    <div class="approvalInfo">
+                        <p>Proceed and confirm the transaction in your wallet.</p>
+                    </div>
+                </div>
+                <div id="withdrawInProgress" class="interfaceWindow">
+                    <span class="txStatus">Withdrawal in progress</span>
+                    <div class="approvalInfo">
+                        <p>Please confirm the transaction in your wallet.</p>
+                    </div>
+                    <span class="walletbalanceSpan">Withdrawing ${tokenAmountString} ${symbol} from <a href="https://etherscan.io/token/${vaultAddress}" target="_blank">Vault <i class="fa fa-external-link"></i></a></span>
+                </div>
+
+                <div id="insufficientBalance" class="interfaceWindow">  
+                    <span class="txStatus">Insufficient Balance</span>
+                    <div class="approvalInfo">
+                        <p> 
+                            <span class="txInfoBody txActionTitle">Available: </span>
+                            <span class="txInfoHead txInfoAmount">${walletBalanceString}</span>
+                            <span class="txInfoHead txInfoSymbol"> ${symbol} <a href="https://etherscan.io/token/${tokenAddress}" target="_blank"><i class="fa fa-external-link"></i></a> </span>
+                        </p>
+                        <p>
+                            <span class="txInfoBody txActionTitle">Required: </span>
+                            <span class="txInfoBody txInfoAmount">${tokenAmountString}</span>
+                            <span class="txInfoBody txInfoSymbol"> ${symbol} <a href="https://etherscan.io/token/${tokenAddress}" target="_blank"><i class="fa fa-external-link"></i></a> </span>
+                        </p>
+                    </div>
+                </div>
+                <div id="withdrawSuccess" class="interfaceWindow">
+                    <span class="txStatus">Withdrawal Success</span>
+                    <div class="approvalInfo">
+                        <p>
+                            <span class="txInfoHead txInfoAmount">${tokenAmountString}</span>
+                            <span class="txInfoHead txInfoSymbol"> ${symbol} <a href="https://etherscan.io/token/${tokenAddress}" target="_blank"><i class="fa fa-external-link"></i></a> </span>
+                        </p>
+                        <p>                   
+                            <span class="txActionTitle">From:</span>
+                            <span class="txInfoAddress">${vaultAddressTrunc} <a href="https://etherscan.io/address/${vaultAddress}" target="_blank"><i class="fa fa-external-link"></i></a></span>  
+                        </p>
+                    </div>
+                    <div class="explainer">
+                        <span> 
+                            <i class="fa fa-info-circle"></i>
+                            Tokens withdrawn back to wallet.
+                        </span>
+                    </div>
+                </div>
+            `;
+
+        // Prepare withdraw states
+        let insufficientBalance = walletBalance < tokenAmount;
+        // Scenarios with closing and proceeding
+        let swalType = "info";
+        let closeOnConfirm = false, showCancelButton = true;
+
+        if (insufficientBalance) {
+            closeOnConfirm = true;
+            showCancelButton = false;
+            swalType = "warning";
+        }
+
+        swal({
+            type: swalType,
+            title: "Vault Withdrawal",
+            text: transactionMessage,
+            html: true,
+            showCancelButton: showCancelButton,
+            confirmButtonColor: "#04C86C",
+            confirmButtonText: proceedButtonText,
+            cancelButtonText: "Cancel",
+            closeOnConfirm: closeOnConfirm,
+            closeOnCancel: true
+        }, async function (isConfirm) {
+            if (isConfirm) {
+                // Check if wallet has enough balance
+                if (insufficientBalance) {
+                    $('.confirm').prop("disabled", true);
+                } else {
+                    $("#transactSubmit").html('<i class="fa fa-spinner fa-spin"></i> transacting...');
+                    $('.confirm').prop("disabled", false);
+                    $('.confirm').html('<i class="fa fa-spinner fa-spin"></i> Processing...');
+                    // Progress notification
+                    tokenWithdrawingMessage(tokenAddress, tokenAmount, symbol);
+                    // Call proceed function
+                    await vaultWithdraw(tokenAddress, tokenAmountBigInt, symbol);
+                }
+            } else {
+                // User clicked the cancel button
+                swal("Cancelled", "Your money is safe :)", "error");
+                $('#transactSubmit').html('Deposit Again..');
+            }
+        });
+
+        // Run display scrips on swal load
+        console.log("request: " + tokenAmount + ", walletBalance: " + walletBalance);
+        if (walletBalance < tokenAmount) {
+            $(".interfaceWindow").hide();
+            $("#insufficientBalance").fadeIn("slow");
+            $('.confirm').html('Oops!');
+        } else {
+            $(".interfaceWindow").hide();
+            $("#withdrawConfirm").fadeIn("slow");
+            $('.confirm').html('Withdraw...');
+        }
+    } catch (error) {
+        console.error('Error:', error.message);
+    }
+}
+
+async function vaultWithdraw(tokenAddress, tokenAmount, tokenSymbol) {
+    try {
+        const accounts = await getAccounts();        
+        const walletAddress = accounts[0];
+        // Gas Tx
+        /*
+        const functionSelector = hedgingInstance.withdrawToken(tokenAddress, tokenAmount).encodeABI();
+        const transactionObject = {
+            to: CONSTANTS.neonAddress,
+            data: functionSelector,
+            from: walletAddress
+        };
+        const gasEstimate = await window.provider.estimateGas(transactionObject);
+        transactionObject.gasLimit = gasEstimate;
+        */
+
+        // Submit Tx
+        const transaction = await hedgingInstance.connect(signer).withdrawToken(tokenAddress, tokenAmount);
+
+        // Wait for the transaction to be mined
+        const receipt = await transaction.wait();
+
+        if (receipt.status === 1) {
+            console.log('Withdrawal successful. Transaction hash:', receipt.transactionHash);
+            // Progress notification
+            tokenWithdrawnMessage(receipt.transactionHash);
+            // Call refresh function
+            refreshBalances();
+        } else {
+            console.log('Withdrawal failed. Receipt status:', receipt.status);
+            swal({
+                title: "Withhdrawal Failed.",
+                type: "error",
+                allowOutsideClick: true,
+                confirmButtonColor: "#F27474",
+                text: "Transaction Failed. Receipt status: " + receipt.status
+            });
+        }
+    } catch (error) {
+        console.error('Withdrawal error:', error.message);
+        swal({
+            title: "Failed.",
+            type: "error",
+            allowOutsideClick: true,
+            confirmButtonColor: "#F27474",
+            text: "Transaction error: " + error.message
+        });
+    }
+}
+
+
+async function tokenApprovingMessage() {
+    // Slide out the existing content
+    $(".interfaceWindow").hide();
+    // Slide in the new content
+    $("#approvalInProgress").fadeIn(2);
+
+    // Disable confirm button
+    $('.confirm').prop("disabled", true);
+}
+
+
+function tokenApprovedMessage(tokenAmount, tokenAddress) {
+    // Slide out approval in progress
+    $(".interfaceWindow").hide();
+    // Slide in approval success
+    $("#allowanceSuccess").fadeIn("slow");
+
+    setTimeout(function() {
+        approvalDepositInterface(tokenAmount, tokenAddress); 
+    }, 4000);  
+}
+
 function tokenDepositingMessage() {
 
     // Slide out the existing content
@@ -403,7 +652,7 @@ function tokenDepositedMessage(transactionHash) {
 
     // Wait for 3 seconds
     setTimeout(function() {
-        // Enable confirm button again
+        // Disable confirm button again
         $('.confirm').prop("disabled", true);
 
         const transactionMessage = `
@@ -416,7 +665,7 @@ function tokenDepositedMessage(transactionHash) {
         </div>`;
 
         swal({
-            title: "Vault Deposit Successful",
+            title: "Deposit Successful",
             type: "success",
             text: transactionMessage,
             html: true,
@@ -425,7 +674,15 @@ function tokenDepositedMessage(transactionHash) {
             confirmButtonText: "Wow!",
             cancelButtonText: "Cancel",
             closeOnConfirm: true
-        });
+        }, async function(isConfirm) {
+            if (isConfirm) {
+                await initializeConnection();
+            }  else {
+                // User clicked the cancel button
+                swal("Cancelled", "Your money is safe :)", "error");
+                $('#transactSubmit').html('Deposit Again..');
+            }       
+        }); // close swal
     }, 3000); 
 }
 
@@ -440,15 +697,48 @@ function tokenWithdrawingMessage() {
     $('.confirm').prop("disabled", true);
 }
 
-function tokenWithdrawnMessage() {
+function tokenWithdrawnMessage(transactionHash) {
 
     // Slide out approval in progress
     $(".interfaceWindow").hide();
     // Slide in approval success
-    $("#depositSuccess").fadeIn("slow");
+    $("#withdrawSuccess").fadeIn("slow");
+    $('#transactSubmit').html('Withdraw Again..');
+    // Disable all buttons
+    $('.cancel').prop("disabled", true);
+    $('.confirm').prop("disabled", true);
 
-    // Enable confirm button again
-    $('.confirm').prop("disabled", false);
+    // Wait for 3 seconds
+    setTimeout(function() {
+        const transactionMessage = `
+        <div class="interfaceWindow">  
+            <div class="approvalInfo">
+                <p>
+                    <span class="txInfoHead txInfoSymbol"> view transaction... <a href="https://sepolia.etherscan.io/tx/${transactionHash}" target="_blank"><i class="fa fa-external-link"></i></a> </span>
+                </p>
+            </div>
+        </div>`;
+
+        swal({
+            title: "Withdrawal Successful",
+            type: "success",
+            text: transactionMessage,
+            html: true,
+            showCancelButton: false,
+            confirmButtonColor: "#04C86C",
+            confirmButtonText: "Wow!",
+            cancelButtonText: "Cancel",
+            closeOnConfirm: true
+        }, async function(isConfirm) {
+            if (isConfirm) {
+                await initializeConnection();
+            }  else {
+                // User clicked the cancel button
+                swal("Cancelled", "Your money is safe :)", "error");
+                $('#transactSubmit').html('Deposit Again..');
+            }       
+        }); // close swal
+    }, 3000); 
 }
 
 
@@ -469,97 +759,8 @@ function tokenWithdrawnMessage() {
 
 
 
-// Receives decimals
-async function withdrawInterface(tokenAddress, tokenAmount) {
-    try {
-        const accounts = await getAccounts();
 
-        if (accounts.length === 0) {
-            console.log('No wallet connected. Please connect a wallet.');
-            return;
-        }
-
-        const walletAddress = accounts[0];
-        const erc20ABI = [
-            { name: 'approve', inputs: [{ name: '_spender', type: 'address' }, { name: '_value', type: 'uint256' }], outputs: [{ name: 'success', type: 'bool' }], type: 'function' },
-            { name: 'balanceOf', inputs: [{ name: '_owner', type: 'address' }], outputs: [{ name: 'balance', type: 'uint256' }], type: 'function' },
-            { name: 'decimals', constant: true, inputs: [], outputs: [{ name: '', type: 'uint8' }], type: 'function' },
-            { name: 'symbol', constant: true, inputs: [], outputs: [{ name: '', type: 'string' }], type: 'function' }
-        ];
-
-        const tokenContract = new ethers.Contract(tokenAddress, erc20ABI, window.provider);
-        const balance = await tokenContract.balanceOf(walletAddress);
-        const tokenDecimals = await tokenContract.decimals();
-        const withdrawAmountWei = fromDecimalToBigInt(tokenAmount, tokenDecimals);
-        const balanceWei = fromDecimalToBigInt(balance, tokenDecimals);
-        const tokenSymbol = await tokenContract.symbol();
-
-        if (withdrawAmountWei > balanceWei) {
-            // Progress notification
-            tokenWithdrawingMessage(tokenAddress, tokenAmount, tokenSymbol);
-            // Call proceed function
-            await proceedWithdrawTx(tokenAddress, withdrawAmountWei, tokenSymbol);
-        } else {
-            console.log('Insufficient funds to withdraw.');
-        }
-    } catch (error) {
-        console.error('Error:', error.message);
-    }
-}
-
-async function proceedWithdrawTx(tokenAddress, tokenAmount, tokenSymbol) {
-    try {
-        const accounts = await getAccounts();
-
-        if (accounts.length === 0) {
-            throw new Error('No wallet connected. Please connect a wallet.');
-        }
-
-        const walletAddress = accounts[0];
-        const functionSelector = hedgingInstance.withdrawToken(tokenAddress, tokenAmount).encodeABI();
-        const transactionObject = {
-            to: CONSTANTS.neonAddress,
-            data: functionSelector,
-            from: walletAddress
-        };
-        const gasEstimate = await window.provider.estimateGas(transactionObject);
-        transactionObject.gasLimit = gasEstimate;
-
-        // Submit withdraw Tx
-        const transaction = await window.provider.sendTransaction(transactionObject);
-        console.log('Transaction sent:', transaction.hash);
-
-        // Wait for the transaction to be mined
-        const receipt = await transaction.wait();
-
-        if (receipt.status === 1) {
-            console.log('Withdrawal successful. Transaction hash:', receipt.transactionHash);
-            // Progress notification
-            tokenWithdrawnMessage(tokenAddress, tokenAmount, tokenSymbol);
-            // Call refresh function
-            refreshBalances();
-        } else {
-            console.log('Withdrawal failed. Receipt status:', receipt.status);
-            swal({
-                title: "Failed.",
-                type: "error",
-                allowOutsideClick: true,
-                confirmButtonColor: "#F27474",
-                text: "Transaction Failed. Receipt status: " + receipt.status
-            });
-        }
-    } catch (error) {
-        console.error('Withdrawal error:', error.message);
-        swal({
-            title: "Failed.",
-            type: "error",
-            allowOutsideClick: true,
-            confirmButtonColor: "#F27474",
-            text: "Transaction error: " + error.message
-        });
-    }
-}
-
+/* Deprecated Deposit Function
 
 async function proceedDepositTx(tokenAddress, tokenAmount, tokenSymbol) {
     try {
@@ -611,6 +812,7 @@ async function proceedDepositTx(tokenAddress, tokenAmount, tokenSymbol) {
         });
     }
 }
+*/
 // Dummy refresh balances on networth card & append <li> to token list
 function refreshBalances() {
     console.log('Refreshing balances...');
@@ -625,5 +827,5 @@ Swal.fire({
     },
 });
 */
-export { allowanceCheck, approvalDepositInterface, withdrawInterface, proceedDepositTx, proceedWithdrawTx };
+export { allowanceCheck, approvalDepositInterface, withdrawInterface };
   

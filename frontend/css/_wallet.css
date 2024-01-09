@@ -819,7 +819,7 @@ button#transactSubmit{
 	text-transform: uppercase;
   }
   input:checked + .slider {
-	background-color: #a1246f;
+	background-color: #f623a1;
   }
   
   input:focus + .slider {

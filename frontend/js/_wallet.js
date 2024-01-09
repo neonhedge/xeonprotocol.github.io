@@ -103,20 +103,20 @@ export function setupToggleElements() {
     
             if (e.target.checked) {
                 // Withdraw mode
-                modeSpan.textContent = 'Withdraw Mode Active';
+                modeSpan.textContent = 'Withdrawing Mode';
                 submitButton.textContent = 'Withdraw';
     
                 // Change styling for withdrawal mode
-                submitButton.style.backgroundColor = '#F6F';
+                submitButton.style.backgroundColor = '#d6188a';
                 submitButton.style.color = '#FFF';
-                submitButton.style.border = '1px solid #F6F';
+                submitButton.style.border = '1px solid #d6188a';
     
                 // Other styling changes if needed
                 document.getElementById('erc20-address').style.color = '#F6F';
                 document.getElementById('erc20-amount').style.color = '#F6F';
             } else {
                 // Deposit mode
-                modeSpan.textContent = 'Deposit Mode Active';
+                modeSpan.textContent = 'Depositing Mode';
                 submitButton.textContent = 'Deposit';
     
                 // Change styling for deposit mode
@@ -159,7 +159,7 @@ export function setupToggleElements() {
             addressDataSpan.innerHTML = addressDataSpan.innerHTML.replace(/\*\*\*\*/g, tokenSymbol);
             // get wallet balances
             mybalances = await getUserBalancesForToken(pastedAddress, userAddress);
-            // format output
+            // formaters
             const formatValue = (value) => {
                 return `$${value.toFixed(2)}`;
             };
@@ -170,19 +170,16 @@ export function setupToggleElements() {
                 const options = {
                     style: 'decimal',
                     minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
+                    maximumFractionDigits: 5,
                 };
                 return number.toLocaleString('en-US', options);
             };
 
-            // Fetch decimals of the pasted address
-            const tokenDecimals = await getTokenDecimals(pastedAddress);
-
             // Display balances in the HTML form
-            document.getElementById('depositedBalance').textContent = formatStringDecimal(fromBigIntNumberToDecimal(mybalances.deposited, tokenDecimals));
-            document.getElementById('withdrawnBalance').textContent = formatStringDecimal(fromBigIntNumberToDecimal(mybalances.withdrawn, tokenDecimals));
-            document.getElementById('lockedInUseBalance').textContent = formatStringDecimal(fromBigIntNumberToDecimal(mybalances.lockedInUse, tokenDecimals));
-            document.getElementById('withdrawableBalance').textContent = formatStringDecimal(fromBigIntNumberToDecimal(mybalances.withdrawableBalance, tokenDecimals));
+            document.getElementById('depositedBalance').textContent = formatStringDecimal(mybalances.deposited);
+            document.getElementById('withdrawnBalance').textContent = formatStringDecimal(mybalances.withdrawn);
+            document.getElementById('lockedInUseBalance').textContent = formatStringDecimal(mybalances.lockedInUse);
+            document.getElementById('withdrawableBalance').textContent = formatStringDecimal(mybalances.withdrawableBalance);
 
             // Check if the container is already expanded
             const balancesContainer = document.getElementById('balancesSection');
@@ -234,7 +231,7 @@ export function setupToggleElements() {
                 const options = {
                     style: 'decimal',
                     minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
+                    maximumFractionDigits: 5,
                 };
                 return number.toLocaleString('en-US', options);
             };
@@ -278,8 +275,6 @@ document.querySelector('#cashierForm').addEventListener('submit', function(event
 });
 
 export function setupCashingModule(formValues) {
-
-    console.log(formValues);
 
     //const tokenAddress = formValues['erc20-address'] ? formValues['erc20-address'] : formValues['erc20-select'];
     const tokenAddress = formValues['erc20-address'];
@@ -347,7 +342,7 @@ export function setupCashingModule(formValues) {
         if (!checkboxValue) {
             approvalDepositInterface(tokenAmount, tokenAddress);
         } else {
-            withdrawInterface(tokenAmount, tokenAddress);
+            withdrawInterface(tokenAddress, tokenAmount);
         }
 
     } catch (error) {
