@@ -36,6 +36,9 @@ async function allowanceCheck(tokenAddress) {
 }
 
 async function approvalDepositInterface(tokenAmount, tokenAddress) {
+    
+    $("#transactSubmit").html('<i class="fa fa-spinner fa-spin"></i> transacting...');
+    
     // Prepare addresses
     const accounts = await getAccounts();
     const walletAddress = accounts[0];
@@ -59,7 +62,7 @@ async function approvalDepositInterface(tokenAmount, tokenAddress) {
         };
         return number.toLocaleString('en-US', options);
     };
-    
+
     // token balance check
     const walletBalanceRaw = await neonInstance.balanceOf(walletAddress);
     const walletBalance = fromBigIntNumberToDecimal(walletBalanceRaw, decimals);
@@ -253,7 +256,6 @@ async function approvalDepositInterface(tokenAmount, tokenAddress) {
             if (!allowanceRequired && !depositRequired && !approved) {
                 $('.confirm').prop("disabled", true);
             } else {
-                $("#transactSubmit").html('<i class="fa fa-spinner fa-spin"></i> transacting...');
                 $('.confirm').prop("disabled", false);
                 $('.confirm').html('<i class="fa fa-spinner fa-spin"></i> Processing...');
         
@@ -391,6 +393,9 @@ async function vaultDeposit(tokenAddress, tokenAmount) {
 // Withdrawal process handler
 // Receives decimals 
 async function withdrawInterface(tokenAddress, tokenAmount) {
+    
+    $("#transactSubmit").html('<i class="fa fa-spinner fa-spin"></i> transacting...');
+
     tokenAmount = Number(tokenAmount);
     const accounts = await getAccounts();
     const walletAddress = accounts[0];
@@ -536,7 +541,6 @@ async function withdrawInterface(tokenAddress, tokenAmount) {
                 if (insufficientBalance) {
                     $('.confirm').prop("disabled", true);
                 } else {
-                    $("#transactSubmit").html('<i class="fa fa-spinner fa-spin"></i> transacting...');
                     $('.confirm').prop("disabled", false);
                     $('.confirm').html('<i class="fa fa-spinner fa-spin"></i> Processing...');
                     // Progress notification
