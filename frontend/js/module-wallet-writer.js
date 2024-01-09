@@ -94,7 +94,7 @@ async function approvalDepositInterface(tokenAmount, tokenAddress) {
                 <div class="explainer">
                     <span> 
                         <i class="fa fa-info-circle"></i>
-                        Token approval is required before depositing to Vault. Click approve below to Sign the Approval Transaction with your wallet.
+                        Token approval is required by Vault before depositing. Proceed to sign the Approval Transaction with your wallet.
                     </span>
                 </div>
             </div>
