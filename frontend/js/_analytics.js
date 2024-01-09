@@ -1,44 +1,96 @@
 /*=========================================================================
     Import modules
 ==========================================================================*/
-import { initWeb3 } from './dapp-web3-utils.js';
-import { unlockedWallet, reqConnect} from './web3-walletstatus-module.js';
+import { CONSTANTS } from './constants.js';
+import { initializeConnection, handleAccountChange, handleNetworkChange} from './web3-walletstatus-module.js';
 import { setCurrent_TrafficSection, setCurrent_HedgeSection, setCurrent_EarningsSection, setCurrent_StakedSection, setCurrent_TokenomicsSection } from './module-analytics-section-fetchers.js';
 import { updateChartValues_Cash, updateChartValues_PIE, updateChartValues_hedges, updateChartValues_Revenue, updateChartValues_Dividents, updateChartValues_Claims, updateChartValues_Staking, updateChartValues_Tokenomics } from './module-analytics-chart-updaters.js';
 
 /*=========================================================================
-    INITIALIZE WEB3
+    Analytics Page Main Functions
 ==========================================================================*/
-initWeb3();
+// Start making calls to Dapp modules
+// Each page has this, loads content
+// Has to be called from here (main page script module) not wallet status modules, has to run last on condition wallet unlocked
+export const checkAndCallPageTries = async () => {
 
+    const scouter = await pageModulesLoadingScript();
+    console.log('connection Scout: '+ scouter);
+    // If wallet check passes & sets all wallet dependencies, then we can load all other scripts below
+    if (scouter) {
+        const asyncFunctions = [setCurrent_TrafficSection, setCurrent_HedgeSection, setCurrent_EarningsSection, setCurrent_StakedSection, setCurrent_TokenomicsSection];
+        for (const func of asyncFunctions) {
+            await func();
+        }
+    }    
+};
+
+const setatmIntervalAsync = (fn, ms) => {
+    fn().then(() => {
+        setTimeout(() => setatmIntervalAsync(fn, ms), ms);
+    });
+};
+
+// This is the main loading script for the page
+// It first checks if a wallet is connected || initialization passes
+// Initialization always returns boolean on whether it passes to load page scripts or not
+// Continue load is the variable catching this state continuosly & triggers event when it changes to stop loading timeout
 $(document).ready(async function () {
-    const accounts = await web3.eth.requestAccounts();
-	const userAddress = accounts[0];
+    // Ready stuff: variables & wallet display
+    $('.waiting_init').css('display', 'inline-block');
 
-    const unlockState = await unlockedWallet();
-    if (unlockState === true) {
-        const setatmIntervalAsync = (fn, ms) => {
-            fn().then(() => {
-                setTimeout(() => setatmIntervalAsync(fn, ms), ms);
-            });
-        };
-        // Load sections automatically & periodically
-        const callPageTries = async () => {
-            const asyncFunctions = [setCurrent_TrafficSection, setCurrent_HedgeSection, setCurrent_EarningsSection, setCurrent_StakedSection, setCurrent_TokenomicsSection];
-            for (const func of asyncFunctions) {
-                await func();
-            }
-        };
-        setatmIntervalAsync(async () => {
-            await callPageTries();
-        }, 30000);
+    // Load sections automatically & periodically
+    setatmIntervalAsync(async () => {
+        await checkAndCallPageTries();
+    }, 45000);
+});
 
-        // Load more sections manually not automatically & periodically
-        // Create an IntersectionObserver to load sections when in view
+async function pageModulesLoadingScript() {
+    // Check if all wallet checks pass before calling page scripts
+    let continueLoad = false;
+    try {
+        continueLoad = await initializeConnection();
+    } catch (error) {
+        console.log(error);
+    }
+
+    if (continueLoad) {
+        return true;
     } else {
+        // Force interface to indicate connection needs
+        handleAccountChange([]);
+    }
+    return false;
+}
+/* UNREFACTORED & REINFORCED - Depracated
+$(document).ready(async function () {
+    // each page main script starts with initializing wallet
+    $('.waiting_init').css('display', 'inline-block');
+    try{
+        // Now initialize wallet module
+        await initializeConnection();
+    } catch (error) {
+        console.log(error);
+    }
+
+    let userAddress = '';
+    const unlockState = await unlockedWallet();
+
+    if (unlockState === true) {
+        const accounts = await getAccounts();
+        userAddress = accounts[0];
+        
+        // Load sections automatically & periodically
+        setatmIntervalAsync(async () => {
+            await checkAndCallPageTries();
+        }, 45000);
+
+    } else {
+        console.log('Requesting Wallet Connection...');
         reqConnect();
     }
 });
+*/
 
 /**************************
     ON PAGE LOAD CALLS 
@@ -146,3 +198,26 @@ function setInitial_TokenomicsChart() {
 
     updateChartValues_Tokenomics(burntSupplyTOKENS, circulatingSupplyTOKENS);
 }
+
+
+// Provider Listeners
+ethereum.on("connect", (chainID) => {
+	// Update chainID on connect
+	CONSTANTS.chainID = chainID.chainId;
+	console.log("Connected to chain:", CONSTANTS.chainID);
+	handleNetworkChange(chainID.chainId)
+});
+
+ethereum.on("accountsChanged", (accounts) => {
+	console.log("Account changed:", accounts);
+	handleAccountChange(accounts);
+
+    // Refresh page
+    checkAndCallPageTries();
+});
+
+ethereum.on("chainChanged", (chainID) => {
+	console.log("Network changed:", chainID);
+	handleNetworkChange(chainID);
+	window.location.reload();
+});

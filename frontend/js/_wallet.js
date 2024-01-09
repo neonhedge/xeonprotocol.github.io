@@ -2,7 +2,7 @@
     Import modules
 ==========================================================================*/
 import { CONSTANTS, getAccounts, isValidEthereumAddress, getUserBalancesForToken, getSymbol, fromBigIntNumberToDecimal, getTokenDecimals } from './constants.js';
-import { initializeConnection, unlockedWallet, reqConnect} from './web3-walletstatus-module.js';
+import { initializeConnection, unlockedWallet, reqConnect, handleAccountChange, handleNetworkChange} from './web3-walletstatus-module.js';
 import { approvalDepositInterface, withdrawInterface } from './module-wallet-writer.js';
 import { fetchSection_Networth, fetchSection_BalanceList, fetchSection_HedgePanel, fetchSection_RewardsPanel, fetchSection_StakingPanel } from './module-wallet-section-fetchers.js';
 import { loadHedgesModule } from './module-wallet-section-hedgesList.js';
@@ -14,47 +14,57 @@ import { loadHedgesModule } from './module-wallet-section-hedgesList.js';
 // Each page has this, loads content
 // Has to be called from here (main page script module) not wallet status modules, has to run last on condition wallet unlocked
 export const checkAndCallPageTries = async () => {
-    const asyncFunctions = [fetchSection_Networth, fetchSection_BalanceList, fetchSection_HedgePanel, fetchHedgeList, fetchSection_RewardsPanel, fetchSection_StakingPanel];
-    for (const func of asyncFunctions) {
-        func();
-    }
+
+    const scouter = await pageModulesLoadingScript();
+    console.log('connection Scout: '+ scouter);
+    // If wallet check passes & sets all wallet dependencies, then we can load all other scripts below
+    if (scouter) {
+        const asyncFunctions = [fetchSection_Networth, fetchSection_BalanceList, fetchSection_HedgePanel, fetchHedgeList, fetchSection_RewardsPanel, fetchSection_StakingPanel];
+        for (const func of asyncFunctions) {
+            func();
+        }
+    }    
 };
+
 const setatmIntervalAsync = (fn, ms) => {
     fn().then(() => {
         setTimeout(() => setatmIntervalAsync(fn, ms), ms);
     });
 };
 
+// This is the main loading script for the page
+// It first checks if a wallet is connected || initialization passes
+// Initialization always returns boolean on whether it passes to load page scripts or not
+// Continue load is the variable catching this state continuosly & triggers event when it changes to stop loading timeout
 $(document).ready(async function () {
-    // each page main script starts with initializing wallet
+    // Ready stuff: variables & wallet display
     $('.waiting_init').css('display', 'inline-block');
-    try{
-        // Now initialize wallet module
-        await initializeConnection();
+
+    // Load sections automatically & periodically
+    setatmIntervalAsync(async () => {
+        await checkAndCallPageTries();
+    }, 45000);
+});
+
+async function pageModulesLoadingScript() {
+    // Check if all wallet checks pass before calling page scripts
+    let continueLoad = false;
+    try {
+        continueLoad = await initializeConnection();
     } catch (error) {
         console.log(error);
     }
 
-    // Ready event listeners on the wallet
-    setupToggleElements();
-
-    let userAddress = '';
-    const unlockState = await unlockedWallet();
-
-    if (unlockState === true) {
-        const accounts = await getAccounts();
-        userAddress = accounts[0];
-        
-        // Load sections automatically & periodically
-        setatmIntervalAsync(async () => {
-            await checkAndCallPageTries();
-        }, 45000);
-
+    if (continueLoad) {
+        // Set up event listeners related to the wallet
+        setupToggleElements();
+        return true;
     } else {
-        console.log('Requesting Wallet Connection...');
-        reqConnect();
+        // Force interface to indicate connection needs
+        handleAccountChange([]);
     }
-});
+    return false;
+}
 
 export async function fetchHedgeList() {
     // Wallet connect has to PASS first, so account is available, refresh to avoid empty section
@@ -159,27 +169,12 @@ export function setupToggleElements() {
             addressDataSpan.innerHTML = addressDataSpan.innerHTML.replace(/\*\*\*\*/g, tokenSymbol);
             // get wallet balances
             mybalances = await getUserBalancesForToken(pastedAddress, userAddress);
-            // formaters
-            const formatValue = (value) => {
-                return `$${value.toFixed(2)}`;
-            };
-            const formatString = (number) => {
-                return number.toLocaleString();
-            };
-            const formatStringDecimal = (number) => {
-                const options = {
-                    style: 'decimal',
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 5,
-                };
-                return number.toLocaleString('en-US', options);
-            };
 
             // Display balances in the HTML form
-            document.getElementById('depositedBalance').textContent = formatStringDecimal(mybalances.deposited);
-            document.getElementById('withdrawnBalance').textContent = formatStringDecimal(mybalances.withdrawn);
-            document.getElementById('lockedInUseBalance').textContent = formatStringDecimal(mybalances.lockedInUse);
-            document.getElementById('withdrawableBalance').textContent = formatStringDecimal(mybalances.withdrawableBalance);
+            document.getElementById('depositedBalance').textContent = commaNumbering(mybalances.deposited);
+            document.getElementById('withdrawnBalance').textContent = commaNumbering(mybalances.withdrawn);
+            document.getElementById('lockedInUseBalance').textContent = commaNumbering(mybalances.lockedInUse);
+            document.getElementById('withdrawableBalance').textContent = commaNumbering(mybalances.withdrawableBalance);
 
             // Check if the container is already expanded
             const balancesContainer = document.getElementById('balancesSection');
@@ -226,19 +221,9 @@ export function setupToggleElements() {
                 pairedContract.decimals(),
             ]);
 
-            // Format output
-            const formatStringDecimal = (number) => {
-                const options = {
-                    style: 'decimal',
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 5,
-                };
-                return number.toLocaleString('en-US', options);
-            };
-
             // Display balances in the HTML form
             const balance = fromBigIntNumberToDecimal(walletBalance, tokenDecimals);
-            const displayBalance = formatStringDecimal(balance);
+            const displayBalance = commaNumbering(balance);
             const walletDataSpan = document.getElementById("inWalletBalance");
 
             // Replace
@@ -402,5 +387,26 @@ document.addEventListener('click', function (event) {
     }
 });
 
+// Provider Listeners
+ethereum.on("connect", (chainID) => {
+	// Update chainID on connect
+	CONSTANTS.chainID = chainID.chainId;
+	console.log("Connected to chain:", CONSTANTS.chainID);
+	handleNetworkChange(chainID.chainId)
+});
+
+ethereum.on("accountsChanged", (accounts) => {
+	console.log("Account changed:", accounts);
+	handleAccountChange(accounts);
+
+    // Refresh page
+    checkAndCallPageTries();
+});
+
+ethereum.on("chainChanged", (chainID) => {
+	console.log("Network changed:", chainID);
+	handleNetworkChange(chainID);
+	window.location.reload();
+});
 
 
