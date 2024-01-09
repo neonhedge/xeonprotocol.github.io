@@ -36,7 +36,6 @@ async function allowanceCheck(tokenAddress) {
 }
 
 async function approvalDepositInterface(tokenAmount, tokenAddress) {
-    tokenAmount = Number(tokenAmount);
     // Prepare addresses
     const accounts = await getAccounts();
     const walletAddress = accounts[0];
@@ -51,9 +50,21 @@ async function approvalDepositInterface(tokenAmount, tokenAddress) {
     const symbol = allowanceResult.symbol;
     tokenAmount = Number(tokenAmount);
 
+    // Format output
+    const formatStringDecimal = (number) => {
+        const options = {
+            style: 'decimal',
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 5,
+        };
+        return number.toLocaleString('en-US', options);
+    };
+    
     // token balance check
     const walletBalanceRaw = await neonInstance.balanceOf(walletAddress);
     const walletBalance = fromBigIntNumberToDecimal(walletBalanceRaw, decimals);
+    const tokenAmountString = formatStringDecimal(tokenAmount);
+    const walletBalanceString = formatStringDecimal(walletBalance);
 
     // Check sufficient funds
     if (tokenAmount > walletBalance) {
@@ -81,7 +92,7 @@ async function approvalDepositInterface(tokenAmount, tokenAddress) {
                 <span class="txStatus">Approval Required</span>
                 <div class="approvalInfo">
                     <p>
-                        <span class="txInfoHead txInfoAmount">${tokenAmount}</span>
+                        <span class="txInfoHead txInfoAmount">${tokenAmountString}</span>
                         <span class="txInfoHead txInfoSymbol"> ${symbol} <a href="https://etherscan.io/token/${tokenAddress}" target="_blank"><i class="fa fa-external-link"></i></a> </span>
                     </p>
                     <p>
@@ -94,7 +105,7 @@ async function approvalDepositInterface(tokenAmount, tokenAddress) {
                 <div class="explainer">
                     <span> 
                         <i class="fa fa-info-circle"></i>
-                        Token approval is required by Vault before depositing. Proceed to sign the Approval Transaction with your wallet.
+                        Vault requires token Approval. Proceed to sign the Approval Transaction with your wallet.
                     </span>
                 </div>
             </div>
@@ -104,7 +115,7 @@ async function approvalDepositInterface(tokenAmount, tokenAddress) {
                 <div class="approvalInfo">
                     <p>Please confirm the transaction in your wallet.</p>
                 </div>
-                <span class="walletbalanceSpan">Approving ${tokenAmount} ${symbol} to <a href="https://etherscan.io/token/${vaultAddress}" target="_blank">Vault <i class="fa fa-external-link"></i></a></span>
+                <span class="walletbalanceSpan">Approving ${tokenAmountString} ${symbol} to <a href="https://etherscan.io/token/${vaultAddress}" target="_blank">Vault <i class="fa fa-external-link"></i></a></span>
             </div>
 
             <div id="depositInProgress" class="interfaceWindow">
@@ -112,7 +123,7 @@ async function approvalDepositInterface(tokenAmount, tokenAddress) {
                 <div class="approvalInfo">
                     <p>Please confirm the transaction in your wallet.</p>
                 </div>
-                <span class="walletbalanceSpan">Depositing ${tokenAmount} ${symbol} to <a href="https://etherscan.io/token/${vaultAddress}" target="_blank">Vault <i class="fa fa-external-link"></i></a></span>
+                <span class="walletbalanceSpan">Depositing ${tokenAmountString} ${symbol} to <a href="https://etherscan.io/token/${vaultAddress}" target="_blank">Vault <i class="fa fa-external-link"></i></a></span>
             </div>
 
             <div id="withdrawInProgress" class="interfaceWindow">
@@ -120,14 +131,14 @@ async function approvalDepositInterface(tokenAmount, tokenAddress) {
                 <div class="approvalInfo">
                     <p>Please confirm the transaction in your wallet.</p>
                 </div>
-                <span class="walletbalanceSpan">Withdrawing ${tokenAmount} ${symbol} from <a href="https://etherscan.io/token/${vaultAddress}" target="_blank">Vault <i class="fa fa-external-link"></i></a></span>
+                <span class="walletbalanceSpan">Withdrawing ${tokenAmountString} ${symbol} from <a href="https://etherscan.io/token/${vaultAddress}" target="_blank">Vault <i class="fa fa-external-link"></i></a></span>
             </div>
 
             <div id="depositRequired" class="interfaceWindow ">  
                 <span class="txStatus">Proceed to Deposit</span>
                 <div class="approvalInfo">
                     <p>
-                        <span class="txInfoHead txInfoAmount">${tokenAmount}</span>
+                        <span class="txInfoHead txInfoAmount">${tokenAmountString}</span>
                         <span class="txInfoHead txInfoSymbol"> ${symbol} <a href="https://etherscan.io/token/${tokenAddress}" target="_blank"><i class="fa fa-external-link"></i></a> </span>
                     </p>
                     <p>
@@ -153,7 +164,7 @@ async function approvalDepositInterface(tokenAmount, tokenAddress) {
                     </p>
                     <p>
                         <span class="txInfoBody txActionTitle">Required:</span>
-                        <span class="txInfoBody txInfoAmount">${tokenAmount}</span>
+                        <span class="txInfoBody txInfoAmount">${tokenAmountString}</span>
                         <span class="txInfoBody txInfoSymbol"> ${symbol} <a href="https://etherscan.io/token/${tokenAddress}" target="_blank"><i class="fa fa-external-link"></i></a> </span>
                     </p>
                 </div>
@@ -163,7 +174,7 @@ async function approvalDepositInterface(tokenAmount, tokenAddress) {
                 <span class="txStatus">Allowance</span>
                 <div class="approvalInfo">
                     <p>
-                        <span class="txInfoHead txInfoAmount">${tokenAmount}</span>
+                        <span class="txInfoHead txInfoAmount">${tokenAmountString}</span>
                         <span class="txInfoHead txInfoSymbol"> ${symbol} <a href="https://etherscan.io/token/${tokenAddress}" target="_blank"><i class="fa fa-external-link"></i></a> </span>
                     </p>
                     <p>
@@ -185,7 +196,7 @@ async function approvalDepositInterface(tokenAmount, tokenAddress) {
                 <span class="txStatus">Deposit Success</span>
                 <div class="approvalInfo">
                     <p>
-                        <span class="txInfoHead txInfoAmount">${tokenAmount}</span>
+                        <span class="txInfoHead txInfoAmount">${tokenAmountString}</span>
                         <span class="txInfoHead txInfoSymbol"> ${symbol} <a href="https://etherscan.io/token/${tokenAddress}" target="_blank"><i class="fa fa-external-link"></i></a> </span>
                     </p>
                     <p>                   
@@ -204,7 +215,7 @@ async function approvalDepositInterface(tokenAmount, tokenAddress) {
                 <span class="txStatus">Withdrawal Success</span>
                 <div class="approvalInfo">
                     <p>
-                        <span class="txInfoHead txInfoAmount">${tokenAmount}</span>
+                        <span class="txInfoHead txInfoAmount">${tokenAmountString}</span>
                         <span class="txInfoHead txInfoSymbol"> ${symbol} <a href="https://etherscan.io/token/${tokenAddress}" target="_blank"><i class="fa fa-external-link"></i></a> </span>
                     </p>
                     <p>                   
