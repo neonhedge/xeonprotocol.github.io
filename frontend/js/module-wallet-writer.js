@@ -262,11 +262,11 @@ async function approvalDepositInterface(tokenAmount, tokenAddress) {
                 if (allowanceRequired) {
                     tokenApprovingMessage();
                     // Submit Transaction to Vault
-                    vaultApprove(tokenAddress, tokenAmount);
+                    await vaultApprove(tokenAddress, tokenAmount);
                 } else if (depositRequired) {         
                     tokenDepositingMessage();
                     // Submit Transaction to Vault
-                    vaultDeposit(tokenAddress, tokenAmount);
+                    await vaultDeposit(tokenAddress, tokenAmount);
                 }
             }
         }  else {
