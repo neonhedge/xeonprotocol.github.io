@@ -272,7 +272,7 @@ async function approvalDepositInterface(tokenAmount, tokenAddress) {
         }  else {
             // User clicked the cancel button
             swal("Cancelled", "Your money is safe :)", "error");
-            $('#transactSubmit').html('Deposit Again..');
+            $('#transactSubmit').html('Deposit');
         }       
     });
 
@@ -413,7 +413,7 @@ async function withdrawInterface(tokenAddress, tokenAmount) {
             confirmButtonText: "Ooops",
             closeOnConfirm: true
         }, async function(isConfirm) {
-            
+            $("#transactSubmit").html('Withdraw');
         }); // close swal
         return;
     }
@@ -551,7 +551,7 @@ async function withdrawInterface(tokenAddress, tokenAmount) {
             } else {
                 // User clicked the cancel button
                 swal("Cancelled", "Your money is safe :)", "error");
-                $('#transactSubmit').html('Deposit Again..');
+                $("#transactSubmit").html('Withdraw');
             }
         });
 
@@ -618,9 +618,9 @@ async function vaultWithdraw(tokenAddress, tokenAmount, tokenSymbol) {
             confirmButtonColor: "#F27474",
             text: "Transaction error: " + error.message
         });
+        $('#transactSubmit').html('Withdraw');
     }
 }
-
 
 async function tokenApprovingMessage() {
     // Slide out the existing content
@@ -631,7 +631,6 @@ async function tokenApprovingMessage() {
     // Disable confirm button
     $('.confirm').prop("disabled", true);
 }
-
 
 function tokenApprovedMessage(tokenAmount, tokenAddress) {
     // Slide out approval in progress
@@ -828,11 +827,6 @@ async function proceedDepositTx(tokenAddress, tokenAmount, tokenSymbol) {
     }
 }
 */
-// Dummy refresh balances on networth card & append <li> to token list
-function refreshBalances() {
-    console.log('Refreshing balances...');
-}
-
 
 // Event listener for modal being hidden
 /*
@@ -842,5 +836,11 @@ Swal.fire({
     },
 });
 */
+
+// Dummy refresh balances on networth card & append <li> to token list
+function refreshBalances() {
+    console.log('Refreshing balances...');
+}
+
 export { allowanceCheck, approvalDepositInterface, withdrawInterface };
   
