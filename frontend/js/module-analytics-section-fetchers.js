@@ -1,343 +1,440 @@
-import { CONSTANTS, getCurrentEthUsdcPriceFromUniswapV2, getTokenETHValue, getTokenUSDValue } from './constants.js';
-import { updateSectionValues_Networth, updateSectionValues_Hedges, updateSectionValues_Rewards, updateSectionValues_Staking } from './module-wallet-section-updaters.js';
-import { getCurrentBalancesValue, calculateStakedTokensValueETH, calculateRewardsDue, calculateCommissionDueETH } from './module-wallet-networth-dependencies.js';
-import { userTokenList, cashierErc20List } from './module-wallet-tokenlist-dependencies.js';
+import { CONSTANTS, fromBigIntNumberToDecimal, getCurrentEthUsdcPriceFromUniswapV2, getTokenETHValue, getTokenUSDValue } from './constants.js';
+import { updateSectionValues_Traffic, updateSectionValues_hedges, updateSectionValues_Earnings, updateSectionValues_Staking, updateSectionValues_Tokenomics } from './module-analytics-section-updaters.js';
+import { updateChartValues_Cash, updateChartValues_PIE, updateChartValues_hedges, updateChartValues_Revenue, updateChartValues_Dividents, updateChartValues_Claims, updateChartValues_Staking, updateChartValues_Tokenomics } from './module-analytics-chart-updaters.js';
 
-// 1. Fetch Section Values - Net Worth
-//-----------------------------------------
-async function fetchSection_Networth(){
-    try {
-        const accounts = await web3.eth.requestAccounts();
-        const userAddress = accounts[0];
-        
-        const walletBalanceRaw = await neonInstance.methods.balanceOf(userAddress).call();
-        const stakedBalanceRaw = await stakingInstance.methods.getStakedBalance(userAddress).call();
+async function setCurrent_TrafficSection() {
+    // Step 1: Read
+    const wethBalances = await hedgingInstance.protocolBalanceMap(CONSTANTS.wethAddress);
+    const wethDeposits = wethBalances[0];
+    const wethWithdrawals = wethBalances[1];
+    const usdtBalances = await hedgingInstance.protocolBalanceMap(CONSTANTS.usdtAddress);
+    const usdtDeposits = usdtBalances[0];
+    const usdtWithdrawals = usdtBalances[1];
+    const usdcBalances = await hedgingInstance.protocolBalanceMap(CONSTANTS.usdcAddress);
+    const usdcDeposits = usdcBalances[0];
+    const usdcWithdrawals = usdcBalances[1];
+    //Fetch equivalents
+    const erc20DepositsInWETH = await hedgingInstance.wethEquivDeposits();
+    const erc20DepositsInUSDT = await hedgingInstance.usdtEquivDeposits();
+    const erc20DepositsInUSDC = await hedgingInstance.usdcEquivDeposits();
+    
+    const erc20WithdrawalsInWETH = await hedgingInstance.wethEquivWithdrawals();
+    const erc20WithdrawalsInUSDT = await hedgingInstance.usdtEquivWithdrawals();
+    const erc20WithdrawalsInUSDC = await hedgingInstance.usdcEquivWithdrawals();
 
-        const transactedTokensArrayList = await hedgingInstance.methods.getUserHistory(userAddress, 0, CONSTANTS.tokenLimit).call();
-        const transactedTokensCount = transactedTokensArrayList.length;
-        
-        // Human Readable
-        const walletBalance = (BigInt(walletBalanceRaw) / BigInt(10) ** BigInt(CONSTANTS.decimals)).toString();
-		const stakedBalance = (BigInt(stakedBalanceRaw) / BigInt(10) ** BigInt(CONSTANTS.decimals)).toString();
+    // Step 2: ETH USD price
+    const ethUsdcPrice = getCurrentEthUsdcPriceFromUniswapV2();
+    
+    // Step 3: Convert WETH amounts
+    const wethDecimals = 18; 
+    const totalDepositWeth = fromBigIntNumberToDecimal(wethDeposits, wethDecimals);
+    const totalWithdrawalWeth = fromBigIntNumberToDecimal(wethWithdrawals, wethDecimals);
 
-        // ETH USD price
-        const ethUsdcPrice = await getCurrentEthUsdcPriceFromUniswapV2();
+    // Step 4: Convert USDT amounts
+    const usdtDecimals = 6; 
+    const totalDepositUSDT = fromBigIntNumberToDecimal(usdtDeposits, usdtDecimals);
+    const totalWithdrawalUSDT = fromBigIntNumberToDecimal(usdtWithdrawals, usdtDecimals);
 
-        // ETH values
-        const rewardsDue = await calculateRewardsDue(userAddress);
-        const commissionDue = await calculateCommissionDueETH(userAddress);
-        const totalCommissionDueETH = commissionDue[0]; //already formated
-        const stakedTokensETH = await calculateStakedTokensValueETH(userAddress); //already formated
-        const [walletTokensETH, pairedSymbol] = await getTokenETHValue(CONSTANTS.neonAddress, walletBalanceRaw); //input in wei, output already formated
+    // Step 5: Convert USDC amounts
+    const usdcDecimals = 6;
+    const totalDepositUSDC = fromBigIntNumberToDecimal(usdcDeposits, usdcDecimals);
+    const totalWithdrawalUSDC = fromBigIntNumberToDecimal(usdcWithdrawals, usdcDecimals);
 
-        //USD values
-        const totalDepositsUSD = await getCurrentBalancesValue(userAddress); //already formated
-        const totalRewardsDueUSD = rewardsDue * ethUsdcPrice; //already formated
-        const totalCommissionDueUSD = commissionDue[0] * ethUsdcPrice; //already formated
-        const stakedTokensUSD = stakedTokensETH * ethUsdcPrice;
-        const walletTokensUSD = walletTokensETH * ethUsdcPrice;
-        const netWorthUSD = walletTokensUSD + stakedTokensUSD + totalCommissionDueUSD + totalRewardsDueUSD + totalDepositsUSD;	
+    // Step 6: Convert ERC20 amounts
+    const totalDepositERC20weth = fromBigIntNumberToDecimal(erc20DepositsInWETH, wethDecimals);
+    const totalWithdrawalERC20weth = fromBigIntNumberToDecimal(erc20WithdrawalsInWETH, wethDecimals);
+    const totalDepositERC20usdt = fromBigIntNumberToDecimal(erc20DepositsInUSDT, usdtDecimals);
+    const totalWithdrawalERC20usdt = fromBigIntNumberToDecimal(erc20WithdrawalsInUSDT, usdtDecimals);
+    const totalDepositERC20usdc = fromBigIntNumberToDecimal(erc20DepositsInUSDC, usdcDecimals);
+    const totalWithdrawalERC20usdc = fromBigIntNumberToDecimal(erc20WithdrawalsInUSDC, usdcDecimals);
 
-		console.log("totalDepositsUSD: " + totalDepositsUSD + ", stakedTokensUSD: " + stakedTokensUSD + ", walletTokensUSD: " + walletTokensUSD + ", totalRewardsDueUSD: " + totalRewardsDueUSD + ", totalCommissionDueUSD " + totalCommissionDueUSD + ", netWorthUSD " + netWorthUSD);
+    // Step 7: Calculate the total deposit amount in USD
+    const totalDepositAmountUsd = (totalDepositWeth.times(ethUsdcPrice))
+        .plus(totalDepositUSDT)
+        .plus(totalDepositUSDC)
+        .plus(totalDepositERC20weth.times(ethUsdcPrice));
 
-        updateSectionValues_Networth(
-            userAddress,
-            walletBalance,
-            stakedBalance,
-            totalDepositsUSD,
-            totalRewardsDueUSD,
-            totalCommissionDueETH,
-            totalCommissionDueUSD,
-			walletTokensUSD,
-            transactedTokensCount,
-            netWorthUSD
-        );
-    } catch (error) {
-        console.error("Error fetching Hedge Panel section data:", error);
-    }
+    // Step 8: Calculate the total withdrawal amount in USD
+    const totalWithdrawalAmountUsd = (totalWithdrawalWeth.times(ethUsdcPrice))
+        .plus(totalWithdrawalUSDT)
+        .plus(totalWithdrawalUSDC)
+        .plus(totalWithdrawalERC20weth.times(ethUsdcPrice));
+
+    // Step X: Calculate ERC20 total deposits
+    const totalDepositERC20_weth = totalDepositERC20weth.plus(totalDepositERC20usdt.div(ethUsdcPrice)).plus(totalDepositERC20usdc.div(ethUsdcPrice));
+    const totalDepositERC20 = totalDepositERC20_weth.times(ethUsdcPrice);
+
+    const totalWithdrawalERC20_weth = totalDepositERC20weth.plus(totalWithdrawalERC20usdt.div(ethUsdcPrice)).plus(totalWithdrawalERC20usdc.div(ethUsdcPrice));
+    const totalWithdrawalERC20 = totalWithdrawalERC20_weth.times(ethUsdcPrice);
+
+    // Step X: Calculate the total transaction volume in USD
+    const transactionVolume = totalDepositAmountUsd.plus(totalWithdrawalAmountUsd);
+
+    const activeERC20S = await hedgingInstance.depositedTokensLength();
+    const activeWallets = 0//await hedgingInstance.depositedWalletsLength();
+
+    //OTC Volume
+    const hedgeVolumeWETH = await hedgingInstance.hedgesCreatedVolume(CONSTANTS.wethAddress);
+    const hedgeVolumeUSDT = await hedgingInstance.hedgesCreatedVolume(CONSTANTS.usdtAddress);
+    const hedgeVolumeUSDC = await hedgingInstance.hedgesCreatedVolume(CONSTANTS.usdcAddress);
+
+    const hedgeVolumeWETHDecimal = fromBigIntNumberToDecimal(hedgeVolumeWETH, wethDecimals);
+    const hedgeVolumeUSDTDecimal = fromBigIntNumberToDecimal(hedgeVolumeUSDT, usdtDecimals);
+    const hedgeVolumeUSDCDecimal = fromBigIntNumberToDecimal(hedgeVolumeUSDC, usdcDecimals);
+
+    const totalHedgeVolumeUSD = (hedgeVolumeWETHDecimal.times(ethUsdcPrice)).plus(hedgeVolumeUSDTDecimal).plus(hedgeVolumeUSDCDecimal);
+
+    // Update the section with current values from protocol
+    updateSectionValues_Traffic(
+        activeWallets, 
+        activeERC20S, 
+        transactionVolume, 
+        totalHedgeVolumeUSD, 
+        totalDepositWeth, 
+        totalDepositUSDT, 
+        totalDepositUSDC, 
+        totalDepositERC20, 
+        totalWithdrawalWeth, 
+        totalWithdrawalUSDT, 
+        totalWithdrawalUSDC, 
+        totalWithdrawalERC20
+    );
+
+    // Update the section charts
+    updateChartValues_Cash(totalDepositAmountUsd, totalWithdrawalAmountUsd);
 }
 
-// 2. Fetch Section Values - ERC20 DEPOSIT BALANCES LIST
-//---------------------------------------------------
-async function fetchSection_BalanceList(){
-	const accounts = await web3.eth.requestAccounts();
-	const userAddress = accounts[0];
+async function setCurrent_HedgeSection() {
+    // Fetch manually base address by base address. erc20s are sold at 10% discount in weth
+    // Reading direct from solidity mappings
+    const hedgesCreatedWETH = await contractInstance.hedgesCreatedVolume(CONSTANTS.wethAddress);
+    const hedgesCreatedUSDT = await contractInstance.hedgesCreatedVolume(CONSTANTS.usdtAddress);
+    const hedgesCreatedUSDC = await contractInstance.hedgesCreatedVolume(CONSTANTS.usdcAddress);
 
-	await userTokenList(userAddress);
-	return;
+    const hedgesTradedWETH = await contractInstance.hedgesTakenVolume(CONSTANTS.wethAddress);
+    const hedgesTradedUSDT = await contractInstance.hedgesTakenVolume(CONSTANTS.usdtAddress);
+    const hedgesTradedUSDC = await contractInstance.hedgesTakenVolume(CONSTANTS.usdcAddress);
+
+    const hedgeCostsWETH = await contractInstance.hedgesCostVolume(CONSTANTS.wethAddress);
+    const hedgeCostsUSDT = await contractInstance.hedgesCostVolume(CONSTANTS.usdtAddress);
+    const hedgeCostsUSDC = await contractInstance.hedgesCostVolume(CONSTANTS.usdcAddress);
+
+    const optionsVolumeWETH = await contractInstance.optionsVolume(CONSTANTS.wethAddress);
+    const optionsVolumeUSDT = await contractInstance.optionsVolume(CONSTANTS.usdtAddress);
+    const optionsVolumeUSDC = await contractInstance.optionsVolume(CONSTANTS.usdcAddress);
+
+    const swapsVolumeWETH = await contractInstance.swapsVolume(CONSTANTS.wethAddress);
+    const swapsVolumeUSDT = await contractInstance.swapsVolume(CONSTANTS.usdtAddress);
+    const swapsVolumeUSDC = await contractInstance.swapsVolume(CONSTANTS.usdcAddress);
+    
+    const settledVolumeWETH = await contractInstance.settledVolume(CONSTANTS.wethAddress);
+    const settledVolumeUSDT = await contractInstance.settledVolume(CONSTANTS.usdtAddress);
+    const settledVolumeUSDC = await contractInstance.settledVolume(CONSTANTS.usdcAddress);
+    
+    const hedgeProfitsWETH = await contractInstance.protocolBaseProfits(CONSTANTS.wethAddress);
+    const hedgeProfitsUSDT = await contractInstance.protocolBaseProfits(CONSTANTS.usdtAddress);
+    const hedgeProfitsUSDC = await contractInstance.protocolBaseProfits(CONSTANTS.usdcAddress);
+
+    const hedgeFeesWETH = await contractInstance.protocolBaseFees(CONSTANTS.wethAddress);
+    const hedgeFeesUSDT = await contractInstance.protocolBaseFees(CONSTANTS.usdtAddress);
+    const hedgeFeesUSDC = await contractInstance.protocolBaseFees(CONSTANTS.usdcAddress);
+
+    const cashierFeesWETH = await contractInstance.protocolCashierFees(CONSTANTS.wethAddress);
+    const cashierFeesUSDT = await contractInstance.protocolCashierFees(CONSTANTS.usdtAddress);
+    const cashierFeesUSDC = await contractInstance.protocolCashierFees(CONSTANTS.usdcAddress);
+  
+    // Fetch ETH to USD conversion rate
+    const ethUsdPrice = await getCurrentEthUsdcPriceFromUniswapV2();
+
+    // Step 3: Convert WETH amounts
+    const wethDecimals = 18; const usdtDecimals = 6; const usdcDecimals = 6;
+
+    const hedgesCreatedEth = new BigNumber(hedgesCreatedWETH).div(10 ** wethDecimals);
+    const hedgesCreatedUsdt = new BigNumber(hedgesCreatedUSDT).div(10 ** usdtDecimals);
+    const hedgesCreatedUsdc = new BigNumber(hedgesCreatedUSDC).div(10 ** usdcDecimals);
+    const hedgesCreatedTUSD = (hedgesCreatedEth * ethUsdPrice) + hedgesCreatedUsdt + hedgesCreatedUsdc;
+    
+    const hedgesTradedEth = new BigNumber(hedgesTradedWETH).div(10 ** wethDecimals);
+    const hedgesTradedUsdt = new BigNumber(hedgesTradedUSDT).div(10 ** usdtDecimals);
+    const hedgesTradedUsdc = new BigNumber(hedgesTradedUSDC).div(10 ** usdcDecimals);
+    const hedgesTradedTUSD = (hedgesTradedEth * ethUsdPrice) + hedgesTradedUsdt + hedgesTradedUsdc;
+
+    const hedgeCostsEth = new BigNumber(hedgeCostsWETH).div(10 ** wethDecimals);
+    const hedgeCostsUsdt = new BigNumber(hedgeCostsUSDT).div(10 ** usdtDecimals);
+    const hedgeCostsUsdc = new BigNumber(hedgeCostsUSDC).div(10 ** usdcDecimals);
+    const hedgeCostsTUSD = (hedgeCostsEth * ethUsdPrice) + hedgeCostsUsdt + hedgeCostsUsdc;
+
+    const optionsVolumeEth = new BigNumber(optionsVolumeWETH).div(10 ** wethDecimals);
+    const optionsVolumeUsdt = new BigNumber(optionsVolumeUSDT).div(10 ** usdtDecimals);
+    const optionsVolumeUsdc = new BigNumber(optionsVolumeUSDC).div(10 ** usdcDecimals);
+    const optionsVolumeTUSD = (optionsVolumeEth * ethUsdPrice) + optionsVolumeUsdt + optionsVolumeUsdc;
+
+    const swapsVolumeEth = new BigNumber(swapsVolumeWETH).div(10 ** wethDecimals);
+    const swapsVolumeUsdt = new BigNumber(swapsVolumeUSDT).div(10 ** usdtDecimals);
+    const swapsVolumeUsdc = new BigNumber(swapsVolumeUSDC).div(10 ** usdcDecimals);
+    const swapsVolumeTUSD = (swapsVolumeEth * ethUsdPrice) + swapsVolumeUsdt + swapsVolumeUsdc; 
+    
+    const settledVolumeEth = new BigNumber(settledVolumeWETH).div(10 ** wethDecimals);
+    const settledVolumeUsdt = new BigNumber(settledVolumeUSDT).div(10 ** usdtDecimals);
+    const settledVolumeUsdc = new BigNumber(settledVolumeUSDC).div(10 ** usdcDecimals);
+    const settledVolumeTUSD = (settledVolumeEth * ethUsdPrice) + settledVolumeUsdt + settledVolumeUsdc; 
+
+    const hedgeProfitsEth = new BigNumber(hedgeProfitsWETH).div(10 ** wethDecimals);
+    const hedgeProfitsUsdt = new BigNumber(hedgeProfitsUSDT).div(10 ** usdtDecimals);
+    const hedgeProfitsUsdc = new BigNumber(hedgeProfitsUSDC).div(10 ** usdcDecimals);
+    const hedgeProfitsTUSD = (hedgeProfitsEth * ethUsdPrice) + hedgeProfitsUsdt + hedgeProfitsUsdc;
+
+    const hedgeFeesEth = new BigNumber(hedgeFeesWETH).div(10 ** wethDecimals);
+    const hedgeFeesUsdt = new BigNumber(hedgeFeesUSDT).div(10 ** usdtDecimals);
+    const hedgeFeesUsdc = new BigNumber(hedgeFeesUSDC).div(10 ** usdcDecimals);
+    const hedgeFeesTUSD = (hedgeFeesEth * ethUsdPrice) + hedgeFeesUsdt + hedgeFeesUsdc;
+
+    const cashierFeesEth = new BigNumber(cashierFeesWETH).div(10 ** wethDecimals);
+    const cashierFeesUsdt = new BigNumber(cashierFeesUSDT).div(10 ** usdtDecimals);
+    const cashierFeesUsdc = new BigNumber(cashierFeesUSDC).div(10 ** usdcDecimals);
+    const cashierFeesTUSD = (cashierFeesEth * ethUsdPrice) + cashierFeesUsdt + cashierFeesUsdc;
+  
+    // Convert ETH values to USD
+    const hedgesTradedTWETH = hedgesTradedTUSD.div(ethUsdPrice);
+    const hedgesCreatedTWETH = hedgesCreatedTUSD.div(ethUsdPrice);
+    const swapsVolumeTWETH = swapsVolumeTUSD.div(ethUsdPrice);
+    const optionsVolumeTWETH = optionsVolumeTUSD.div(ethUsdPrice);
+    const settledVolumeTWETH = settledVolumeTUSD.div(ethUsdPrice);
+    const hedgeCostsTWETH = hedgeCostsTUSD.div(ethUsdPrice);
+    const hedgeProfitsTWETH = hedgeProfitsTUSD.div(ethUsdPrice);
+    const hedgeFeesTWETH = hedgeFeesTUSD.div(ethUsdPrice);
+  
+    // Call the updateSectionValues_hedges function
+    updateSectionValues_hedges(
+        hedgesTradedTUSD,
+        hedgesCreatedTUSD,
+        swapsVolumeTUSD,
+        optionsVolumeTUSD,        
+        settledVolumeTUSD,
+        hedgeCostsTUSD,
+        hedgeProfitsTUSD,
+        hedgeFeesTUSD,
+        cashierFeesTUSD
+    );
+
+    updateChartValues_hedges(1, hedgesTradedTUSD, hedgesCreatedTUSD);
+    updateChartValues_hedges(2, swapsVolumeTUSD, optionsVolumeTUSD);
+    updateChartValues_hedges(3, hedgeCostsTUSD, hedgesTradedTUSD);
+    updateChartValues_hedges(4, hedgeProfitsTUSD, hedgeFeesTUSD);
 }
 
-// 3. Fetch Section Values - HEDGING PANEL
-//----------------------------------------------------
-async function fetchSection_HedgePanel(){
+async function setCurrent_EarningsSection() {
+  // Assuming you have a contract instance named 'contractInstance' to interact with your Solidity contract
+  // Returned as (weth, usdt, usdc, erc20s) erc20s are sold at 10% discount in weth
+  const totalProtocolRevenue = await contractInstance.getProtocolRevenue();
 
-	const accounts = await web3.eth.requestAccounts();
-	const userAddress = accounts[0];
-	// Fetch arrays
-	const userOptionsCreated = await hedgingInstance.methods.myoptionsCreated(userAddress).call();
-	const userSwapsCreated = await hedgingInstance.methods.myswapsCreated(userAddress).call();
-	const userOptionsTaken = await hedgingInstance.methods.myoptionsTaken(userAddress).call();
-	const userSwapsTaken = await hedgingInstance.methods.myswapsTaken(userAddress).call();
-	const userOptionsHistory = await hedgingInstance.methods.myoptionsHistory(userAddress).call();
-	const userSwapsHistory = await hedgingInstance.methods.myswapsHistory(userAddress).call();
-	// Fetch volume
-	const userWrite = await hedgingInstance.methods.getuserWriteVolume(userAddress).call();
-	const userTake = await hedgingInstance.methods.getuserTakeVolume(userAddress).call();
-	// Fetch profits and losses: WETH, USDT, USDC support only for now
-	const userProfitWETH = await hedgingInstance.methods.getUserProfits(CONSTANTS.wethAddress, userAddress).call();
-	const userProfitUSDT = await hedgingInstance.methods.getUserProfits(CONSTANTS.usdtAddress, userAddress).call();
-	const userProfitUSDC = await hedgingInstance.methods.getUserProfits(CONSTANTS.usdcAddress, userAddress).call();
-	const userLossWETH = await hedgingInstance.methods.getUserLosses(CONSTANTS.wethAddress, userAddress).call();
-	const userLossUSDT = await hedgingInstance.methods.getUserLosses(CONSTANTS.usdtAddress, userAddress).call();
-	const userLossUSDC = await hedgingInstance.methods.getUserLosses(CONSTANTS.usdcAddress, userAddress).call();
+  const cashierFeesWETH = await contractInstance.protocolCashierFees(CONSTANTS.wethAddress);
+  const cashierFeesUSDT = await contractInstance.protocolCashierFees(CONSTANTS.usdtAddress);
+  const cashierFeesUSDC = await contractInstance.protocolCashierFees(CONSTANTS.usdcAddress);
+
+  const hedgeFeesWETH = await contractInstance.protocolBaseFees(CONSTANTS.wethAddress);
+  const hedgeFeesUSDT = await contractInstance.protocolBaseFees(CONSTANTS.usdtAddress);
+  const hedgeFeesUSDC = await contractInstance.protocolBaseFees(CONSTANTS.usdcAddress);
+  
+  const totalDistributed = await contractInstance.getTotalDistributed(); // total WETH withdrawn to staking contract. All rewards converted to WETH
+
+  // NEON token Smart Contract Calls
+  const tokentaxRevenue = await contractInstance.getTokenTaxesValue(); // tax from NEON Dex Swaps, returns ETH only
+
+  // Staking Smart Contract Calls
+  const totalClaimedWei = await contractInstance.getTotalClaimed(); // withdrawn to staking contract for claiming. pie chart with: withdrawn Vs claimed
+  const totalUnclaimedWei = await contractInstance.getTotalUnclaimed(); // = deposited - withdrawn.
+  const totalStakers = 1000; // to be developed. address(this) withdraws from userMapBalances to staking contract only
+  const minedHedgesCount = 10;
+  const minersCount = 5;
+  
+  // Ready ETH to USD conversion rate
+  const ethUsdPrice = await getCurrentEthUsdcPriceFromUniswapV2();
+
+  // Decimals
+  const wethDecimals = 18; const usdtDecimals = 6; const usdcDecimals = 6;
+  
+  // - Hedge Revenue = 5% Settlement Fee on profits
+  // - Miner Fees = 15% of above, to miners settling hedges in real time manually
+  // - Token Tax Revenue is Buy/Sell tax on NEON token
+  // - Cashier Revenue = withdrawal charges on major base pairs; WETH, USDT, USDC
+  //const totalRevenueEth = (hedgeRevenueEth - minerFeesEth) + tokenTaxRevenueEth + cashierRevenueEth;
+
+  const totalRevenueEth = new BigNumber(totalProtocolRevenue[0]).div(10 ** wethDecimals);
+  const totalRevenueUsdt = new BigNumber(totalProtocolRevenue[1]).div(10 ** usdtDecimals);
+  const totalRevenueUsdc = new BigNumber(totalProtocolRevenue[2]).div(10 ** usdcDecimals);
+  const totalRevenueTUSD = (totalRevenueEth * ethUsdPrice) + totalRevenueUsdt + totalRevenueUsdc;
+
+  const cashierFeesEth = new BigNumber(cashierFeesWETH).div(10 ** wethDecimals);
+  const cashierFeesUsdt = new BigNumber(cashierFeesUSDT).div(10 ** usdtDecimals);
+  const cashierFeesUsdc = new BigNumber(cashierFeesUSDC).div(10 ** usdcDecimals);
+  const cashierRevenueTUSD = (cashierFeesEth * ethUsdPrice) + cashierFeesUsdt + cashierFeesUsdc;
+
+  const hedgeFeesEth = new BigNumber(hedgeFeesWETH).div(10 ** wethDecimals);
+  const hedgeFeesUsdt = new BigNumber(hedgeFeesUSDT).div(10 ** usdtDecimals);
+  const hedgeFeesUsdc = new BigNumber(hedgeFeesUSDC).div(10 ** usdcDecimals);
+  const hedgeRevenueTUSD = (hedgeFeesEth * ethUsdPrice) + hedgeFeesUsdt + hedgeFeesUsdc;
+
+  const tokenTaxRevenueEth = new BigNumber(tokentaxRevenue).div(10 ** wethDecimals);
+  const tokenTaxRevenueTUSD = (tokenTaxRevenueEth * ethUsdPrice);
+  // Convert remaining
+  const distributedTWETH = web3.utils.fromWei(totalDistributed, 'ether');
+  const totalClaimedTWETH = web3.utils.fromWei(totalClaimedWei, 'ether');
+  const totalUnclaimedTWETH = web3.utils.fromWei(totalUnclaimedWei, 'ether');  
+  // Convert USD values to WETH
+  const minerFeesTWETH = (hedgeRevenueTUSD * 0.05).div(ethUsdPrice);
+  const totalRevenueTWETH = totalRevenueTUSD.div(ethUsdPrice);
+  const cashierRevenueTWETH = cashierRevenueTUSD.div(ethUsdPrice);
+  const hedgeRevenueTWETH = hedgeRevenueTUSD.div(ethUsdPrice);
+  const tokenTaxRevenueTWETH = tokenTaxRevenueTUSD.div(ethUsdPrice);
+  // Convert WETH values to USD
+  const minerFeesTUSD = minerFeesTWETH * ethUsdPrice; 
+  const distributedTUSD = distributedTWETH.div(ethUsdPrice);
+  const totalClaimedTUSD = totalClaimedTWETH.div(ethUsdPrice);
+  const totalUnclaimedTUSD = totalUnclaimedTWETH.div(ethUsdPrice);
+  const minedHedgesTUSD = minerFeesTUSD.div(0.05).div(0.15); //reverse settlement fees & miner fees
+
+  // Call the updateSectionValues_Earnings function to update the HTML
+  updateSectionValues_Earnings(
+    totalRevenueTWETH,
+    totalRevenueTUSD,
+    cashierRevenueTWETH,
+    cashierRevenueTUSD,
+    hedgeRevenueTWETH,
+    hedgeRevenueTUSD,
+    tokenTaxRevenueTWETH,
+    tokenTaxRevenueTUSD,
+    
+    minerFeesTWETH,
+    minerFeesTUSD,
+    distributedTWETH,
+    distributedTUSD,
+    totalUnclaimedTWETH,
+    totalClaimedTUSD,
+    totalUnclaimedTWETH,
+    totalUnclaimedTUSD,
+    minedHedgesCount,
+    minedHedgesTUSD,
+    minersCount,
+    totalStakers
+  );
+
+  updateChartValues_Revenue(cashierRevenueTUSD, hedgeRevenueTUSD, tokenTaxRevenueTUSD);
+  updateChartValues_Dividents(totalRevenueTUSD, distributedTUSD);
+  updateChartValues_Claims(totalClaimedTUSD, totalUnclaimedTUSD);
+  
+}
+
+async function setCurrent_StakedSection(){
+	
+	// Staked & circulating supply
+    const circulatingSupplyRaw = await tokenInst.circulatingSupply(); 
+	const totalStakedRaw = await stakingInstance.getTotalStaked();
+    const totalStakersRaw = await stakingInstance.getTotalStakers(); 
+    // Assigned staked tokens
+	const totalAssignedRaw = await stakingInstance.getTotalAssigned();
+    const totalUnassignedRaw = await stakingInstance.getTotalUnassigned();
+    // Assignement rewards
+	const distributedRewardsLiqu = await stakingInstance.ethLiquidityRewardBasis();
+	const distributedRewardsColl = await stakingInstance.ethCollateralRewardBasis();
+	// Assignment pools tokens
+	const AssignedRewardsMinRaw = await stakingInstance.totalAssignedForMining();
+	const AssignedRewardsColRaw = await stakingInstance.totalAssignedForCollateral();
+	const AssignedRewardsLiqRaw = await stakingInstance.totalAssignedForLiquidity();
+	
 	// Fetch ETH to USD conversion rate
 	const ethUsdPrice = await getCurrentEthUsdcPriceFromUniswapV2();
-
-	// Step 1: Convert lengths
-	const userOptionsCreatedCount = userOptionsCreated.length;
-	const userSwapsCreatedCount = userSwapsCreated.length;
-	const userHedgesCreated = userOptionsCreatedCount + userSwapsCreatedCount;
-
-	const userOptionsTakenCount = userOptionsTaken.length;
-	const userSwapsTakenCount = userSwapsTaken.length;
-	const userHedgesTaken = userOptionsTakenCount + userSwapsTakenCount;
-	
-	const userOptionsHistoryCount = userOptionsHistory.length;
-	const userSwapsHistoryCount = userSwapsHistory.length;
-	
-	// Step 2: Convert amounts
-	const wethDecimals = 18; const usdtDecimals = 6; const usdcDecimals = 6;
-
-	const userWriteEth = new BigNumber(userWrite[0]).div(10 ** wethDecimals);
-	const userWriteUsdt = new BigNumber(userWrite[1]).div(10 ** usdtDecimals);
-	const userWriteUsdc = new BigNumber(userWrite[2]).div(10 ** usdcDecimals);
-	const totalWriteTWETH = userWriteEth + (userWriteUsdt / ethUsdPrice) + (userWriteUsdc / ethUsdPrice);	
-	
-	const userTakeEth = new BigNumber(userTake[0]).div(10 ** wethDecimals);
-	const userTakeUsdt = new BigNumber(userTake[1]).div(10 ** usdtDecimals);
-	const userTakeUsdc = new BigNumber(userTake[2]).div(10 ** usdcDecimals);
-	const totalTakeTWETH = userTakeEth + (userTakeUsdt / ethUsdPrice) + (userTakeUsdc / ethUsdPrice);
-
-	const userProfitEth = new BigNumber(userProfitWETH).div(10 ** wethDecimals);
-	const userProfitUsdt = new BigNumber(userProfitUSDT).div(10 ** usdtDecimals);
-	const userProfitUsdc = new BigNumber(userProfitUSDC).div(10 ** usdcDecimals);
-	const totalProfitTWETH = userProfitEth + (userProfitUsdt / ethUsdPrice) + (userProfitUsdc / ethUsdPrice);
-
-	const userLossEth = new BigNumber(userLossWETH).div(10 ** wethDecimals);
-	const userLossUsdt = new BigNumber(userLossUSDT).div(10 ** usdtDecimals);
-	const userLossUsdc = new BigNumber(userLossUSDC).div(10 ** usdcDecimals);
-	const totalLossTWETH = userLossEth + (userLossUsdt / ethUsdPrice) + (userLossUsdc / ethUsdPrice);
-
-	updateSectionValues_Hedges(
-		userHedgesCreated,
-		userHedgesTaken,
-		totalWriteTWETH,
-		totalTakeTWETH,
-		userOptionsHistoryCount,
-		userSwapsHistoryCount,
-		totalProfitTWETH,
-		totalLossTWETH
-	);
-
-}
-
-// 4. Fetch Section Values - REWARDS PANEL
-//----------------------------------------------------
-async function fetchSection_RewardsPanel(){
-	
-	const accounts = await web3.eth.requestAccounts();
-	const userAddress = accounts[0];
-	// Fetch rewards due
-	const userRewardsDue = await stakingInstance.methods.getRewardsDue(userAddress).call();
-	const userLiqRewardsDue = await stakingInstance.methods.getLiquidityRewardsDue(userAddress).call();
-	const userColRewardsDue = await stakingInstance.methods.getCollateralRewardsDue(userAddress).call();
-	// ~ mining rewards are automatically credited to miner on every hedge settlement.
-	// ~ mining rewards are accumulated in the token addresses of underlying & pair, endless erc20 fee types
-	// ~ mining rewards are not automatically loaded to wallet page as they need to be populated from past events
-	
-	// Fetch rewards claimed
-	const userRewardsClaimed = await stakingInstance.methods.stakerRewardsClaimed(userAddress).call();
-	const userLiqRewardsClaimed = await stakingInstance.methods.stakerLiquidityClaimed(userAddress).call();
-	const userColRewardsClaimed = await stakingInstance.methods.stakerCollateralClaimed(userAddress).call();
-	
-	// Fetch ETH to USD conversion rate
-	const ethUsdPrice = await getCurrentEthUsdcPriceFromUniswapV2();
+    const tokenUsdPrice = await getTokenUSDValue();
 
 	// Step 1: Convert amounts
 	const wethDecimals = 18; const usdtDecimals = 6; const usdcDecimals = 6;
-
-	// Step 2: Convert eth values
-	const userRewardsDueEth = new BigNumber(userRewardsDue).div(10 ** wethDecimals);
-	const userLiqRewardsDueEth = new BigNumber(userLiqRewardsDue).div(10 ** wethDecimals);
-	const userColRewardsDueEth = new BigNumber(userColRewardsDue).div(10 ** wethDecimals);
-	const totalRewardsDueWETH = userRewardsDueEth + userLiqRewardsDueEth + userColRewardsDueEth;
-
-	const userRewardsClaimedEth = new BigNumber(userRewardsClaimed).div(10 ** wethDecimals);
-	const userLiqRewardsClaimedEth = new BigNumber(userLiqRewardsClaimed).div(10 ** wethDecimals);
-	const userColRewardsClaimedEth = new BigNumber(userColRewardsClaimed).div(10 ** wethDecimals);
-	const totalRewardsClaimedWETH = userRewardsClaimedEth + userLiqRewardsClaimedEth + userColRewardsClaimedEth;
-
-	// Step 3: Convert usdt values
-	const userRewardsDueUSDT = userRewardsDueEth * ethUsdPrice;
-	const userLiqRewardsDueUSDT = userLiqRewardsDueEth * ethUsdPrice;
-	const userColRewardsDueUSDT = userColRewardsDueEth * ethUsdPrice;	
-	const totalRewardsDueUSDT = userRewardsDueUSDT + userLiqRewardsDueUSDT + userColRewardsDueUSDT;
-
-	const userRewardsClaimedUSDT = userRewardsClaimedEth * ethUsdPrice;
-	const userLiqRewardsClaimedUSDT = userLiqRewardsClaimedEth * ethUsdPrice;
-	const userColRewardsClaimedUSDT = userColRewardsClaimedEth * ethUsdPrice;
-	const totalRewardsClaimedUSDT = userRewardsClaimedUSDT + userLiqRewardsClaimedUSDT + userColRewardsClaimedUSDT;
-
-	updateSectionValues_Rewards(
-		totalRewardsDueWETH,
-		totalRewardsDueUSDT,
-		totalRewardsClaimedWETH,
-		totalRewardsClaimedUSDT,
-		userRewardsDueEth,
-		userRewardsDueUSDT,
-		userLiqRewardsDueEth,
-		userLiqRewardsDueUSDT,
-		userColRewardsDueEth,
-		userColRewardsDueUSDT,
-		userRewardsClaimedEth,
-		userRewardsClaimedUSDT,
-		userLiqRewardsClaimedEth,
-		userLiqRewardsClaimedUSDT,
-		userColRewardsClaimedEth,
-		userColRewardsClaimedUSDT
-	);
-
-}
-
-// 5. Fetch Section Values - STAKING PANEL
-//----------------------------------------------------
-async function fetchSection_StakingPanel(){
 	
-	const accounts = await web3.eth.requestAccounts();
-	const userAddress = accounts[0];
-	
-	const walletBalanceRaw = await neonInstance.methods.balanceOf(userAddress).call();
-	const stakedBalanceRaw = await stakingInstance.methods.getStakedBalance(userAddress).call();
-	const depositedBalanceRaw = await hedgingInstance.methods.getUserTokenBalances(CONSTANTS.neonAddress, userAddress).call();
-	const [deposited, withdrawn] = depositedBalanceRaw;
-	// Staked versus Supply
-	const totalStakedRaw = await stakingInstance.methods.getTotalStaked().call();
-	const circulatingSupplyRaw = await tokenInst.circulatingSupply(); 
-	// Distrubuted ETH rewards to staking contract
-	const distributedRewards = await stakingInstance.methods.ethRewardBasis().call();
-	const distributedRewardsLiqu = await stakingInstance.methods.ethLiquidityRewardBasis().call();
-	const distributedRewardsColl = await stakingInstance.methods.ethCollateralRewardBasis().call();
-	// Claimed ETH rewards to staking contract
-	const claimedRewards = await stakingInstance.methods.rewardsClaimed().call(userAddress);
-	const claimedRewardsLiqu = await stakingInstance.methods.rewardsClaimedLiquidity(userAddress).call();
-	const claimedRewardsColl = await stakingInstance.methods.rewardsClaimedCollateral(userAddress).call();
-	// My pool assignments
-	const assignmentsRaw = await stakingInstance.methods.getAssignedAndUnassignedAmounts(userAddress).call();
-	const [assignedMiningRaw, assignedLiquidityRaw, assignedCollateralRaw, unassignedRaw] = assignmentsRaw;
-	
-	// Fetch ETH to USD conversion rate
-	const ethUsdPrice = await getCurrentEthUsdcPriceFromUniswapV2();
-	const tokenUsdPrice = await getTokenUSDValue();
-
-	// Step 1: Convert amounts
-	const wethDecimals = 18; const usdtDecimals = 6; const usdcDecimals = 6;
-	
-	// Step 2: Convert normal values
-	const walletBalance = new BigNumber(walletBalanceRaw).div(10 ** CONSTANTS.decimals);
-	const stakedBalance = new BigNumber(stakedBalanceRaw).div(10 ** CONSTANTS.decimals);
-	const depositedBalance = new BigNumber(deposited).div(10 ** CONSTANTS.decimals);
-	const withdrawnBalance = new BigNumber(withdrawn).div(10 ** CONSTANTS.decimals);
-	const totalHoldings = walletBalance + stakedBalance + (depositedBalance - withdrawnBalance);
-
+	// Step 2: Convert from BN to normal values
 	const totalStaked = new BigNumber(totalStakedRaw).div(10 ** CONSTANTS.decimals);
 	const circulatingSupply = new BigNumber(circulatingSupplyRaw).div(10 ** CONSTANTS.decimals);
-
-	const distributedRewardsEth = new BigNumber(distributedRewards).div(10 ** wethDecimals);
+    const totalStakers = totalStakersRaw;
+    const totalAssigned = new BigNumber(totalAssignedRaw).div(10 ** CONSTANTS.decimals);
+    const totalUnassigned = new BigNumber(totalUnassignedRaw).div(10 ** CONSTANTS.decimals);
+    // Assignment breakdown
+    const AssignedRewardsMin = new BigNumber(AssignedRewardsMinRaw).div(10 ** CONSTANTS.decimals);
+    const AssignedRewardsCol = new BigNumber(AssignedRewardsColRaw).div(10 ** CONSTANTS.decimals);
+    const AssignedRewardsLiq = new BigNumber(AssignedRewardsLiqRaw).div(10 ** CONSTANTS.decimals);
+	
+    // Step 3: Convert ETH values
 	const distributedRewardsLiquEth = new BigNumber(distributedRewardsLiqu).div(10 ** wethDecimals);
 	const distributedRewardsCollEth = new BigNumber(distributedRewardsColl).div(10 ** wethDecimals);
-	const distributedRewardsTotalEth = distributedRewardsEth + distributedRewardsLiquEth + distributedRewardsCollEth;
-	
-	const claimedRewardsEth = new BigNumber(claimedRewards).div(10 ** wethDecimals);
-	const claimedRewardsLiquEth = new BigNumber(claimedRewardsLiqu).div(10 ** wethDecimals);
-	const claimedRewardsCollEth = new BigNumber(claimedRewardsColl).div(10 ** wethDecimals);
-	const claimedRewardsTotalEth = distributedRewardsEth + distributedRewardsLiquEth + distributedRewardsCollEth;
+	const totalAssignmentsRewardsEth = distributedRewardsLiquEth + distributedRewardsCollEth;
 
-	const assignedMining = new BigNumber(assignedMiningRaw).div(10 ** CONSTANTS.decimals);
-	const assignedLiquidity = new BigNumber(assignedLiquidityRaw).div(10 ** CONSTANTS.decimals);
-	const assignedCollateral = new BigNumber(assignedCollateralRaw).div(10 ** CONSTANTS.decimals);
-	const unassigned = new BigNumber(unassignedRaw).div(10 ** CONSTANTS.decimals);
-	const totalAssigned = assignedMining + assignedLiquidity + assignedCollateral;
-
-	// Step 3: Convert usdt values
-	const walletBalanceUSDT = walletBalance * getTokenUSDValue;
-	const stakedBalanceUSDT = stakedBalance * getTokenUSDValue;
-	const depositedBalanceUSDT = depositedBalance * getTokenUSDValue;
-	const withdrawnBalanceUSDT = withdrawnBalance * getTokenUSDValue;
-	const totalHoldingsUSDT = totalHoldings * getTokenUSDValue;
-
-	const totalStakedUSDT = totalStaked * getTokenUSDValue;
-	const circulatingSupplyUSDT = circulatingSupply * getTokenUSDValue;
-
-	const distributedRewardsUSDT = distributedRewardsEth * ethUsdPrice;
-	const distributedRewardsLiqUSDT = distributedRewardsLiquEth * ethUsdPrice;	
-	const distributedRewardsColUSDT = distributedRewardsCollEth * ethUsdPrice;	
-	const distributedRewardsTotalUSDT = distributedRewardsTotalEth * ethUsdPrice;
-
-	const claimedRewardsUSDT = claimedRewardsEth * ethUsdPrice;
-	const claimedRewardsLiqUSDT = claimedRewardsLiquEth * ethUsdPrice;	
-	const claimedRewardsColUSDT = claimedRewardsCollEth * ethUsdPrice;	
-	const claimedRewardsTotalUSDT = claimedRewardsTotalEth * ethUsdPrice;
-
-	const assignedMiningUSDT = assignedMining * tokenUsdPrice;
-	const assignedLiquidityUSDT = assignedLiquidity * tokenUsdPrice;
-	const assignedCollateralUSDT = assignedCollateral * tokenUsdPrice;
-	const unassignedUSDT = unassigned * tokenUsdPrice;
-	const totalAssignedUSDT = assignedMiningUSDT + assignedLiquidityUSDT + assignedCollateralUSDT;
+	// Step 4: Convert usdt values
+    const totalStakedUSDT = totalStaked * tokenUsdPrice;
+    const circulatingSupplyUSDT = circulatingSupply * tokenUsdPrice;
+	const totalAssignedUSDT = totalAssigned * tokenUsdPrice;
+	const totalUnassignedUSDT = totalUnassigned * tokenUsdPrice;
+	const totalAssignmentRewardsUSDT = totalAssignmentsRewardsEth * ethUsdPrice;
+	const AssignedRewardsMinUSDT = AssignedRewardsMin * tokenUsdPrice;
+	const AssignedRewardsColUSDT = AssignedRewardsCol * tokenUsdPrice;
+	const AssignedRewardsLiqUSDT = AssignedRewardsLiq * tokenUsdPrice;
 
 	updateSectionValues_Staking(
-		walletBalance,
-		stakedBalance,
-		depositedBalance,
-		withdrawnBalance,
-		totalHoldings,
-		totalStaked,
+		totalStakers,
+        totalStaked,
+        totalStakedUSDT,
 		circulatingSupply,
-		distributedRewardsEth,
-		distributedRewardsLiquEth,
-		distributedRewardsCollEth,
-		distributedRewardsTotalEth,
-		claimedRewardsEth,
-		claimedRewardsLiquEth,
-		claimedRewardsCollEth,
-		claimedRewardsTotalEth,
-		assignedMining,
-		assignedLiquidity,
-		assignedCollateral,
-		unassigned,
+        circulatingSupplyUSDT,
 		totalAssigned,
-		walletBalanceUSDT,
-		stakedBalanceUSDT,
-		depositedBalanceUSDT,
-		withdrawnBalanceUSDT,
-		totalHoldingsUSDT,
-		totalStakedUSDT,
-		circulatingSupplyUSDT,
-		distributedRewardsUSDT,
-		distributedRewardsLiqUSDT,
-		distributedRewardsColUSDT,
-		distributedRewardsTotalUSDT,
-		claimedRewardsUSDT,
-		claimedRewardsLiqUSDT,
-		claimedRewardsColUSDT,
-		claimedRewardsTotalUSDT,
-		assignedMiningUSDT,
-		assignedLiquidityUSDT,
-		assignedCollateralUSDT,
-		unassignedUSDT,
-		totalAssignedUSDT
+        totalAssignedUSDT,
+		totalUnassigned,
+        totalUnassignedUSDT,
+		totalAssignmentsRewardsEth,
+		totalAssignmentRewardsUSDT,
+		AssignedRewardsMin,
+		AssignedRewardsMinUSDT,
+		AssignedRewardsCol,
+		AssignedRewardsColUSDT,
+		AssignedRewardsLiq,
+		AssignedRewardsLiqUSDT
 	);
 
 }
 
+async function setCurrent_TokenomicsSection() {
+    //tokenInst instead of contractInst
+    const symbol = await tokenInst.symbol();
+    const decimals = await tokenInst.decimals();
+    const contractAddress = MyLibrary.platformAddress;
+    const buyTax = await tokenInst.buyTax(); 
+    const sellTax = await tokenInst.sellTax(); 
+    const priceWETH = await tokenInst.price(); 
+    const circSupply = await tokenInst.circulatingSupply(); 
+    const totaSupply = await tokenInst.totalSupply(); 
+    
+    // Fetch ETH to USD conversion rate
+    const ethUsdPrice = await getCurrentEthUsdcPriceFromUniswapV2();
+
+    // Convert WETH to human readable
+    const circulatingSupply = new BigNumber(circSupply).div(10 ** decimals);
+    const totalSupply = new BigNumber(totaSupply).div(10 ** decimals);
+    const burntSupply = totalSupply.minus(circulatingSupply);
+    const priceTWETH = web3.utils.fromWei(priceWETH, 'ether');
+    
+    // Convert USD values to WETH
+    const priceTUSD = priceTWETH.div(ethUsdPrice);
+  
+    // Call the updateSectionValues_Tokenomics function to update the HTML
+    updateSectionValues_Tokenomics(
+        symbol,
+        decimals,
+        contractAddress,
+        buyTax,
+        sellTax,
+        priceTWETH,
+        priceTUSD,
+        burntSupply,
+        circulatingSupply
+    );
+
+    updateChartValues_Tokenomics(burntSupply, circulatingSupply);
+    
+}
 // Export the fetch functions
-export { fetchSection_Networth, fetchSection_BalanceList, fetchSection_HedgePanel, fetchSection_RewardsPanel, fetchSection_StakingPanel };
+export { setCurrent_TrafficSection, setCurrent_HedgeSection, setCurrent_EarningsSection, setCurrent_StakedSection, setCurrent_TokenomicsSection };
