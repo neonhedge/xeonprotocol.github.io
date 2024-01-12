@@ -63,7 +63,7 @@ balance = balance.toString();
       } else {
     // Convert to BigInt
     const addressDecimal = await getTokenDecimals(underlyingTokenAddr);
-    const balanceBigInt = fromDecimalToBigInt(balance, addressDecimal)
+    const balanceBigInt = fromDecimalToBigInt(balance, addressDecimal);
           const underlyingValue = await getTokenETHValue(underlyingTokenAddr, balanceBigInt);
           const balanceNumber = Number(underlyingValue[0]);
           const pairSymbol = underlyingValue[1];
@@ -317,8 +317,20 @@ function fromDecimalToBigInt(number, decimals) {
 }
 
 function commaNumbering(number){
-  return Number(number).toLocaleString();
+const options = {
+  style: 'decimal',
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 5,
+};
+return number.toLocaleString('en-US', options);
 }; 
+// Other backup formaters
+const formatValue = (value) => {
+return `$${value.toFixed(2)}`;
+};
+const formatString = (number) => {
+return number.toLocaleString();
+};
 
 export { CONSTANTS, getAccounts, getCurrentEthUsdcPriceFromUniswapV2, isValidEthereumAddress, truncateAddress, convertToUSD, getTokenUSDValue, getTokenETHValue, getUserBalancesForToken, getPairToken, getSymbol, getTokenDecimals, getTokenDecimalAndSymbol };
 export { fromBigIntNumberToDecimal, fromDecimalToBigInt, commaNumbering, fromWeiToFixed12, fromWeiToFixed5, fromWeiToFixed8, fromWeiToFixed8_unrounded, fromWeiToFixed5_unrounded, fromWeiToFixed2_unrounded, toFixed8_unrounded };

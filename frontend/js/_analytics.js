@@ -9,14 +9,17 @@ import { updateChartValues_Cash, updateChartValues_PIE, updateChartValues_hedges
 /*=========================================================================
     Analytics Page Main Functions
 ==========================================================================*/
-// Start making calls to Dapp modules
-// Each page has this, loads content
-// Has to be called from here (main page script module) not wallet status modules, has to run last on condition wallet unlocked
-export const checkAndCallPageTries = async () => {
+// This is the main loading script for the page
+// It first checks if a wallet is connected || initialization passes
+// Initialization always returns boolean on whether it passes to load page scripts or not
+// scouter == wallect readiness check. If wallet check passes & sets all wallet dependencies, then we can load all other scripts below
+// if conditions to continueLoading change the script stops at scouter, event listeners at bottom of page to help with alerts & state changes
 
+// Start making calls to Dapp modules
+export const checkAndCallPageTries = async () => {
     const scouter = await pageModulesLoadingScript();
     console.log('connection Scout: '+ scouter);
-    // If wallet check passes & sets all wallet dependencies, then we can load all other scripts below
+
     if (scouter) {
         const asyncFunctions = [setCurrent_TrafficSection, setCurrent_HedgeSection, setCurrent_EarningsSection, setCurrent_StakedSection, setCurrent_TokenomicsSection];
         for (const func of asyncFunctions) {
@@ -31,30 +34,29 @@ const setatmIntervalAsync = (fn, ms) => {
     });
 };
 
-// This is the main loading script for the page
-// It first checks if a wallet is connected || initialization passes
-// Initialization always returns boolean on whether it passes to load page scripts or not
-// Continue load is the variable catching this state continuosly & triggers event when it changes to stop loading timeout
+
+// Ready all incl wallet display
 $(document).ready(async function () {
-    // Ready stuff: variables & wallet display
     $('.waiting_init').css('display', 'inline-block');
 
-    // Load sections automatically & periodically
+    // load sections periodically
     setatmIntervalAsync(async () => {
         await checkAndCallPageTries();
     }, 45000);
 });
 
+
+// Checks if all wallet checks pass before calling page modules
 async function pageModulesLoadingScript() {
-    // Check if all wallet checks pass before calling page scripts
     let continueLoad = false;
     try {
         continueLoad = await initializeConnection();
     } catch (error) {
         console.log(error);
     }
-
     if (continueLoad) {
+        // Set up event listeners related to the wallet
+        setupToggleElements();
         return true;
     } else {
         // Force interface to indicate connection needs
@@ -62,6 +64,7 @@ async function pageModulesLoadingScript() {
     }
     return false;
 }
+
 /* UNREFACTORED & REINFORCED - Depracated
 $(document).ready(async function () {
     // each page main script starts with initializing wallet
@@ -200,6 +203,9 @@ function setInitial_TokenomicsChart() {
 }
 
 
+/*  ---------------------------------------
+    BOTTOM OF EVERY MAIN SCRIPT MODULE 
+-------------------------------------- */
 // Provider Listeners
 ethereum.on("connect", (chainID) => {
 	// Update chainID on connect

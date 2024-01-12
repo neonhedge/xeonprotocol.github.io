@@ -10,14 +10,17 @@ import { loadHedgesModule } from './module-wallet-section-hedgesList.js';
 /*=========================================================================
     Wallet Page Main Functions
 ==========================================================================*/
-// Start making calls to Dapp modules
-// Each page has this, loads content
-// Has to be called from here (main page script module) not wallet status modules, has to run last on condition wallet unlocked
-export const checkAndCallPageTries = async () => {
+// This is the main loading script for the page
+// It first checks if a wallet is connected || initialization passes
+// Initialization always returns boolean on whether it passes to load page scripts or not
+// scouter == wallect readiness check. If wallet check passes & sets all wallet dependencies, then we can load all other scripts below
+// if conditions to continueLoading change the script stops at scouter, event listeners at bottom of page to help with alerts & state changes
 
+// Start making calls to Dapp modules
+export const checkAndCallPageTries = async () => {
     const scouter = await pageModulesLoadingScript();
     console.log('connection Scout: '+ scouter);
-    // If wallet check passes & sets all wallet dependencies, then we can load all other scripts below
+
     if (scouter) {
         const asyncFunctions = [fetchSection_Networth, fetchSection_BalanceList, fetchSection_HedgePanel, fetchHedgeList, fetchSection_RewardsPanel, fetchSection_StakingPanel];
         for (const func of asyncFunctions) {
@@ -32,29 +35,26 @@ const setatmIntervalAsync = (fn, ms) => {
     });
 };
 
-// This is the main loading script for the page
-// It first checks if a wallet is connected || initialization passes
-// Initialization always returns boolean on whether it passes to load page scripts or not
-// Continue load is the variable catching this state continuosly & triggers event when it changes to stop loading timeout
+
+// Ready all incl wallet display
 $(document).ready(async function () {
-    // Ready stuff: variables & wallet display
     $('.waiting_init').css('display', 'inline-block');
 
-    // Load sections automatically & periodically
+    // load sections periodically
     setatmIntervalAsync(async () => {
         await checkAndCallPageTries();
     }, 45000);
 });
 
+
+// Checks if all wallet checks pass before calling page modules
 async function pageModulesLoadingScript() {
-    // Check if all wallet checks pass before calling page scripts
     let continueLoad = false;
     try {
         continueLoad = await initializeConnection();
     } catch (error) {
         console.log(error);
     }
-
     if (continueLoad) {
         // Set up event listeners related to the wallet
         setupToggleElements();
@@ -66,8 +66,8 @@ async function pageModulesLoadingScript() {
     return false;
 }
 
+// Lazy loading implementation for Hedges Panel
 export async function fetchHedgeList() {
-    // Wallet connect has to PASS first, so account is available, refresh to avoid empty section
     const accounts = await getAccounts();
     const userAddress = accounts[0];
 
@@ -90,13 +90,12 @@ export async function fetchHedgeList() {
     observer.observe(hedgingSection);
 }
 
-
 /*=========================================================================
     INITIALIZE OTHER MODULES
 ==========================================================================*/
 
+// Event listener for the cashier balances expand/hide
 export function setupToggleElements() {
-    // Event listener for the cashier balances expand/hide
     const toggleBalancesContainer = () => {
         const balancesContainer = document.getElementById('balancesSection');
         balancesContainer.classList.toggle('expanded');
@@ -140,7 +139,6 @@ export function setupToggleElements() {
             }
         }
     });
-       
 
     // Hedges Panel - toggle active class on button click
     const buttons = document.querySelectorAll('.list-toggle button');
@@ -333,7 +331,6 @@ export function setupCashingModule(formValues) {
     } catch (error) {
         console.error('Error:', error.message);
     }
-
 }
 
 // address indicator spans
@@ -387,6 +384,9 @@ document.addEventListener('click', function (event) {
     }
 });
 
+/*  ---------------------------------------
+    BOTTOM OF EVERY MAIN SCRIPT MODULE 
+-------------------------------------- */
 // Provider Listeners
 ethereum.on("connect", (chainID) => {
 	// Update chainID on connect
