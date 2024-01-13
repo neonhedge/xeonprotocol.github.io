@@ -49,29 +49,35 @@ async function setCurrent_TrafficSection() {
     const totalWithdrawalERC20usdc = fromBigIntNumberToDecimal(erc20WithdrawalsInUSDC, usdcDecimals);
 
     // Step 7: Calculate the total deposit amount in USD
-    const totalDepositAmountUsd = (totalDepositWeth.times(ethUsdcPrice))
-        .plus(totalDepositUSDT)
-        .plus(totalDepositUSDC)
-        .plus(totalDepositERC20weth.times(ethUsdcPrice));
+    const totalDepositAmountUsd = (
+        totalDepositWeth * ethUsdcPrice +
+        totalDepositUSDT +
+        totalDepositUSDC +
+        totalDepositERC20weth * ethUsdcPrice
+    );
 
     // Step 8: Calculate the total withdrawal amount in USD
-    const totalWithdrawalAmountUsd = (totalWithdrawalWeth.times(ethUsdcPrice))
-        .plus(totalWithdrawalUSDT)
-        .plus(totalWithdrawalUSDC)
-        .plus(totalWithdrawalERC20weth.times(ethUsdcPrice));
+    const totalWithdrawalAmountUsd = (
+        totalWithdrawalWeth * ethUsdcPrice +
+        totalWithdrawalUSDT +
+        totalWithdrawalUSDC +
+        totalWithdrawalERC20weth * ethUsdcPrice
+    );
 
     // Step X: Calculate ERC20 total deposits
-    const totalDepositERC20_weth = totalDepositERC20weth.plus(totalDepositERC20usdt.div(ethUsdcPrice)).plus(totalDepositERC20usdc.div(ethUsdcPrice));
-    const totalDepositERC20 = totalDepositERC20_weth.times(ethUsdcPrice);
+    const totalDepositERC20_weth = totalDepositERC20weth + totalDepositERC20usdt / ethUsdcPrice + totalDepositERC20usdc / ethUsdcPrice;
+    const totalDepositERC20 = totalDepositERC20_weth * ethUsdcPrice;
 
-    const totalWithdrawalERC20_weth = totalDepositERC20weth.plus(totalWithdrawalERC20usdt.div(ethUsdcPrice)).plus(totalWithdrawalERC20usdc.div(ethUsdcPrice));
-    const totalWithdrawalERC20 = totalWithdrawalERC20_weth.times(ethUsdcPrice);
+    const totalWithdrawalERC20_weth = totalDepositERC20weth + totalWithdrawalERC20usdt / ethUsdcPrice + totalWithdrawalERC20usdc / ethUsdcPrice;
+    const totalWithdrawalERC20 = totalWithdrawalERC20_weth * ethUsdcPrice;
 
     // Step X: Calculate the total transaction volume in USD
-    const transactionVolume = totalDepositAmountUsd.plus(totalWithdrawalAmountUsd);
+    const totalCashierVolumeUSD = totalDepositAmountUsd + totalWithdrawalAmountUsd;
 
+    // Counters
+    const activeTrades = 0; //await hedgingInstance.tradesCreatedLength();, hedgePurchased events count??
     const activeERC20S = await hedgingInstance.depositedTokensLength();
-    const activeWallets = 0//await hedgingInstance.depositedWalletsLength();
+    const activeWallets = 0 //await hedgingInstance.depositedWalletsLength();
 
     //OTC Volume
     const hedgeVolumeWETH = await hedgingInstance.hedgesCreatedVolume(CONSTANTS.wethAddress);
@@ -82,14 +88,23 @@ async function setCurrent_TrafficSection() {
     const hedgeVolumeUSDTDecimal = fromBigIntNumberToDecimal(hedgeVolumeUSDT, usdtDecimals);
     const hedgeVolumeUSDCDecimal = fromBigIntNumberToDecimal(hedgeVolumeUSDC, usdcDecimals);
 
-    const totalHedgeVolumeUSD = (hedgeVolumeWETHDecimal.times(ethUsdcPrice)).plus(hedgeVolumeUSDTDecimal).plus(hedgeVolumeUSDCDecimal);
+    const totalOTCvolumeUSD = (
+        hedgeVolumeWETHDecimal * ethUsdcPrice +
+        hedgeVolumeUSDTDecimal +
+        hedgeVolumeUSDCDecimal
+    );
+
+    // Dex volume, needs an API
+    const totalDEXvolumeUSD = 0;
 
     // Update the section with current values from protocol
     updateSectionValues_Traffic(
         activeWallets, 
         activeERC20S, 
-        transactionVolume, 
-        totalHedgeVolumeUSD, 
+        activeTrades,
+        totalDEXvolumeUSD,
+        totalOTCvolumeUSD, 
+        totalCashierVolumeUSD, 
         totalDepositWeth, 
         totalDepositUSDT, 
         totalDepositUSDC, 
@@ -107,91 +122,91 @@ async function setCurrent_TrafficSection() {
 async function setCurrent_HedgeSection() {
     // Fetch manually base address by base address. erc20s are sold at 10% discount in weth
     // Reading direct from solidity mappings
-    const hedgesCreatedWETH = await contractInstance.hedgesCreatedVolume(CONSTANTS.wethAddress);
-    const hedgesCreatedUSDT = await contractInstance.hedgesCreatedVolume(CONSTANTS.usdtAddress);
-    const hedgesCreatedUSDC = await contractInstance.hedgesCreatedVolume(CONSTANTS.usdcAddress);
+    const hedgesCreatedWETH = await hedgingInstance.hedgesCreatedVolume(CONSTANTS.wethAddress);
+    const hedgesCreatedUSDT = await hedgingInstance.hedgesCreatedVolume(CONSTANTS.usdtAddress);
+    const hedgesCreatedUSDC = await hedgingInstance.hedgesCreatedVolume(CONSTANTS.usdcAddress);
 
-    const hedgesTradedWETH = await contractInstance.hedgesTakenVolume(CONSTANTS.wethAddress);
-    const hedgesTradedUSDT = await contractInstance.hedgesTakenVolume(CONSTANTS.usdtAddress);
-    const hedgesTradedUSDC = await contractInstance.hedgesTakenVolume(CONSTANTS.usdcAddress);
+    const hedgesTradedWETH = await hedgingInstance.hedgesTakenVolume(CONSTANTS.wethAddress);
+    const hedgesTradedUSDT = await hedgingInstance.hedgesTakenVolume(CONSTANTS.usdtAddress);
+    const hedgesTradedUSDC = await hedgingInstance.hedgesTakenVolume(CONSTANTS.usdcAddress);
 
-    const hedgeCostsWETH = await contractInstance.hedgesCostVolume(CONSTANTS.wethAddress);
-    const hedgeCostsUSDT = await contractInstance.hedgesCostVolume(CONSTANTS.usdtAddress);
-    const hedgeCostsUSDC = await contractInstance.hedgesCostVolume(CONSTANTS.usdcAddress);
+    const hedgeCostsWETH = await hedgingInstance.hedgesCostVolume(CONSTANTS.wethAddress);
+    const hedgeCostsUSDT = await hedgingInstance.hedgesCostVolume(CONSTANTS.usdtAddress);
+    const hedgeCostsUSDC = await hedgingInstance.hedgesCostVolume(CONSTANTS.usdcAddress);
 
-    const optionsVolumeWETH = await contractInstance.optionsVolume(CONSTANTS.wethAddress);
-    const optionsVolumeUSDT = await contractInstance.optionsVolume(CONSTANTS.usdtAddress);
-    const optionsVolumeUSDC = await contractInstance.optionsVolume(CONSTANTS.usdcAddress);
+    const optionsVolumeWETH = await hedgingInstance.optionsVolume(CONSTANTS.wethAddress);
+    const optionsVolumeUSDT = await hedgingInstance.optionsVolume(CONSTANTS.usdtAddress);
+    const optionsVolumeUSDC = await hedgingInstance.optionsVolume(CONSTANTS.usdcAddress);
 
-    const swapsVolumeWETH = await contractInstance.swapsVolume(CONSTANTS.wethAddress);
-    const swapsVolumeUSDT = await contractInstance.swapsVolume(CONSTANTS.usdtAddress);
-    const swapsVolumeUSDC = await contractInstance.swapsVolume(CONSTANTS.usdcAddress);
+    const swapsVolumeWETH = await hedgingInstance.swapsVolume(CONSTANTS.wethAddress);
+    const swapsVolumeUSDT = await hedgingInstance.swapsVolume(CONSTANTS.usdtAddress);
+    const swapsVolumeUSDC = await hedgingInstance.swapsVolume(CONSTANTS.usdcAddress);
     
-    const settledVolumeWETH = await contractInstance.settledVolume(CONSTANTS.wethAddress);
-    const settledVolumeUSDT = await contractInstance.settledVolume(CONSTANTS.usdtAddress);
-    const settledVolumeUSDC = await contractInstance.settledVolume(CONSTANTS.usdcAddress);
+    const settledVolumeWETH = await hedgingInstance.settledVolume(CONSTANTS.wethAddress);
+    const settledVolumeUSDT = await hedgingInstance.settledVolume(CONSTANTS.usdtAddress);
+    const settledVolumeUSDC = await hedgingInstance.settledVolume(CONSTANTS.usdcAddress);
     
-    const hedgeProfitsWETH = await contractInstance.protocolBaseProfits(CONSTANTS.wethAddress);
-    const hedgeProfitsUSDT = await contractInstance.protocolBaseProfits(CONSTANTS.usdtAddress);
-    const hedgeProfitsUSDC = await contractInstance.protocolBaseProfits(CONSTANTS.usdcAddress);
+    const hedgeProfitsWETH = await hedgingInstance.protocolPairProfits(CONSTANTS.wethAddress);
+    const hedgeProfitsUSDT = await hedgingInstance.protocolPairProfits(CONSTANTS.usdtAddress);
+    const hedgeProfitsUSDC = await hedgingInstance.protocolPairProfits(CONSTANTS.usdcAddress);
 
-    const hedgeFeesWETH = await contractInstance.protocolBaseFees(CONSTANTS.wethAddress);
-    const hedgeFeesUSDT = await contractInstance.protocolBaseFees(CONSTANTS.usdtAddress);
-    const hedgeFeesUSDC = await contractInstance.protocolBaseFees(CONSTANTS.usdcAddress);
+    const hedgeFeesWETH = await hedgingInstance.protocolPairedFees(CONSTANTS.wethAddress);
+    const hedgeFeesUSDT = await hedgingInstance.protocolPairedFees(CONSTANTS.usdtAddress);
+    const hedgeFeesUSDC = await hedgingInstance.protocolPairedFees(CONSTANTS.usdcAddress);
 
-    const cashierFeesWETH = await contractInstance.protocolCashierFees(CONSTANTS.wethAddress);
-    const cashierFeesUSDT = await contractInstance.protocolCashierFees(CONSTANTS.usdtAddress);
-    const cashierFeesUSDC = await contractInstance.protocolCashierFees(CONSTANTS.usdcAddress);
+    const cashierFeesWETH = await hedgingInstance.protocolCashierFees(CONSTANTS.wethAddress);
+    const cashierFeesUSDT = await hedgingInstance.protocolCashierFees(CONSTANTS.usdtAddress);
+    const cashierFeesUSDC = await hedgingInstance.protocolCashierFees(CONSTANTS.usdcAddress);
   
     // Fetch ETH to USD conversion rate
-    const ethUsdPrice = await getCurrentEthUsdcPriceFromUniswapV2();
+    const ethUsdPrice = getCurrentEthUsdcPriceFromUniswapV2();
 
     // Step 3: Convert WETH amounts
     const wethDecimals = 18; const usdtDecimals = 6; const usdcDecimals = 6;
 
-    const hedgesCreatedEth = new BigNumber(hedgesCreatedWETH).div(10 ** wethDecimals);
-    const hedgesCreatedUsdt = new BigNumber(hedgesCreatedUSDT).div(10 ** usdtDecimals);
-    const hedgesCreatedUsdc = new BigNumber(hedgesCreatedUSDC).div(10 ** usdcDecimals);
+    const hedgesCreatedEth = fromBigIntNumberToDecimal(hedgesCreatedWETH, wethDecimals);
+    const hedgesCreatedUsdt = fromBigIntNumberToDecimal(hedgesCreatedUSDT, usdtDecimals);
+    const hedgesCreatedUsdc = fromBigIntNumberToDecimal(hedgesCreatedUSDC, usdcDecimals);
     const hedgesCreatedTUSD = (hedgesCreatedEth * ethUsdPrice) + hedgesCreatedUsdt + hedgesCreatedUsdc;
     
-    const hedgesTradedEth = new BigNumber(hedgesTradedWETH).div(10 ** wethDecimals);
-    const hedgesTradedUsdt = new BigNumber(hedgesTradedUSDT).div(10 ** usdtDecimals);
-    const hedgesTradedUsdc = new BigNumber(hedgesTradedUSDC).div(10 ** usdcDecimals);
+    const hedgesTradedEth = fromBigIntNumberToDecimal(hedgesTradedWETH, wethDecimals);
+    const hedgesTradedUsdt = fromBigIntNumberToDecimal(hedgesTradedUSDT, usdtDecimals);
+    const hedgesTradedUsdc = fromBigIntNumberToDecimal(hedgesTradedUSDC, usdcDecimals);
     const hedgesTradedTUSD = (hedgesTradedEth * ethUsdPrice) + hedgesTradedUsdt + hedgesTradedUsdc;
 
-    const hedgeCostsEth = new BigNumber(hedgeCostsWETH).div(10 ** wethDecimals);
-    const hedgeCostsUsdt = new BigNumber(hedgeCostsUSDT).div(10 ** usdtDecimals);
-    const hedgeCostsUsdc = new BigNumber(hedgeCostsUSDC).div(10 ** usdcDecimals);
+    const hedgeCostsEth = fromBigIntNumberToDecimal(hedgeCostsWETH, wethDecimals);
+    const hedgeCostsUsdt = fromBigIntNumberToDecimal(hedgeCostsUSDT, usdtDecimals);
+    const hedgeCostsUsdc = fromBigIntNumberToDecimal(hedgeCostsUSDC, usdcDecimals);
     const hedgeCostsTUSD = (hedgeCostsEth * ethUsdPrice) + hedgeCostsUsdt + hedgeCostsUsdc;
 
-    const optionsVolumeEth = new BigNumber(optionsVolumeWETH).div(10 ** wethDecimals);
-    const optionsVolumeUsdt = new BigNumber(optionsVolumeUSDT).div(10 ** usdtDecimals);
-    const optionsVolumeUsdc = new BigNumber(optionsVolumeUSDC).div(10 ** usdcDecimals);
+    const optionsVolumeEth = fromBigIntNumberToDecimal(optionsVolumeWETH, wethDecimals);
+    const optionsVolumeUsdt = fromBigIntNumberToDecimal(optionsVolumeUSDT, usdtDecimals);
+    const optionsVolumeUsdc = fromBigIntNumberToDecimal(optionsVolumeUSDC, usdcDecimals);
     const optionsVolumeTUSD = (optionsVolumeEth * ethUsdPrice) + optionsVolumeUsdt + optionsVolumeUsdc;
 
-    const swapsVolumeEth = new BigNumber(swapsVolumeWETH).div(10 ** wethDecimals);
-    const swapsVolumeUsdt = new BigNumber(swapsVolumeUSDT).div(10 ** usdtDecimals);
-    const swapsVolumeUsdc = new BigNumber(swapsVolumeUSDC).div(10 ** usdcDecimals);
+    const swapsVolumeEth = fromBigIntNumberToDecimal(swapsVolumeWETH, wethDecimals);
+    const swapsVolumeUsdt = fromBigIntNumberToDecimal(swapsVolumeUSDT, usdtDecimals);
+    const swapsVolumeUsdc = fromBigIntNumberToDecimal(swapsVolumeUSDC, usdcDecimals);
     const swapsVolumeTUSD = (swapsVolumeEth * ethUsdPrice) + swapsVolumeUsdt + swapsVolumeUsdc; 
     
-    const settledVolumeEth = new BigNumber(settledVolumeWETH).div(10 ** wethDecimals);
-    const settledVolumeUsdt = new BigNumber(settledVolumeUSDT).div(10 ** usdtDecimals);
-    const settledVolumeUsdc = new BigNumber(settledVolumeUSDC).div(10 ** usdcDecimals);
+    const settledVolumeEth = fromBigIntNumberToDecimal(settledVolumeWETH, wethDecimals);
+    const settledVolumeUsdt = fromBigIntNumberToDecimal(settledVolumeUSDT, usdtDecimals);
+    const settledVolumeUsdc = fromBigIntNumberToDecimal(settledVolumeUSDC, usdcDecimals);
     const settledVolumeTUSD = (settledVolumeEth * ethUsdPrice) + settledVolumeUsdt + settledVolumeUsdc; 
 
-    const hedgeProfitsEth = new BigNumber(hedgeProfitsWETH).div(10 ** wethDecimals);
-    const hedgeProfitsUsdt = new BigNumber(hedgeProfitsUSDT).div(10 ** usdtDecimals);
-    const hedgeProfitsUsdc = new BigNumber(hedgeProfitsUSDC).div(10 ** usdcDecimals);
+    const hedgeProfitsEth = fromBigIntNumberToDecimal(hedgeProfitsWETH, wethDecimals);
+    const hedgeProfitsUsdt = fromBigIntNumberToDecimal(hedgeProfitsUSDT, usdtDecimals);
+    const hedgeProfitsUsdc = fromBigIntNumberToDecimal(hedgeProfitsUSDC, usdcDecimals);
     const hedgeProfitsTUSD = (hedgeProfitsEth * ethUsdPrice) + hedgeProfitsUsdt + hedgeProfitsUsdc;
 
-    const hedgeFeesEth = new BigNumber(hedgeFeesWETH).div(10 ** wethDecimals);
-    const hedgeFeesUsdt = new BigNumber(hedgeFeesUSDT).div(10 ** usdtDecimals);
-    const hedgeFeesUsdc = new BigNumber(hedgeFeesUSDC).div(10 ** usdcDecimals);
+    const hedgeFeesEth = fromBigIntNumberToDecimal(hedgeFeesWETH, wethDecimals);
+    const hedgeFeesUsdt = fromBigIntNumberToDecimal(hedgeFeesUSDT, usdtDecimals);
+    const hedgeFeesUsdc = fromBigIntNumberToDecimal(hedgeFeesUSDC, usdcDecimals);
     const hedgeFeesTUSD = (hedgeFeesEth * ethUsdPrice) + hedgeFeesUsdt + hedgeFeesUsdc;
 
-    const cashierFeesEth = new BigNumber(cashierFeesWETH).div(10 ** wethDecimals);
-    const cashierFeesUsdt = new BigNumber(cashierFeesUSDT).div(10 ** usdtDecimals);
-    const cashierFeesUsdc = new BigNumber(cashierFeesUSDC).div(10 ** usdcDecimals);
+    const cashierFeesEth = fromBigIntNumberToDecimal(cashierFeesWETH, wethDecimals);
+    const cashierFeesUsdt = fromBigIntNumberToDecimal(cashierFeesUSDT, usdtDecimals);
+    const cashierFeesUsdc = fromBigIntNumberToDecimal(cashierFeesUSDC, usdcDecimals);
     const cashierFeesTUSD = (cashierFeesEth * ethUsdPrice) + cashierFeesUsdt + cashierFeesUsdc;
   
     // Convert ETH values to USD
@@ -224,26 +239,26 @@ async function setCurrent_HedgeSection() {
 }
 
 async function setCurrent_EarningsSection() {
-  // Assuming you have a contract instance named 'contractInstance' to interact with your Solidity contract
+  // Assuming you have a contract instance named 'hedgingInstance' to interact with your Solidity contract
   // Returned as (weth, usdt, usdc, erc20s) erc20s are sold at 10% discount in weth
-  const totalProtocolRevenue = await contractInstance.getProtocolRevenue();
+  const totalProtocolRevenue = await hedgingInstance.getProtocolRevenue();
 
-  const cashierFeesWETH = await contractInstance.protocolCashierFees(CONSTANTS.wethAddress);
-  const cashierFeesUSDT = await contractInstance.protocolCashierFees(CONSTANTS.usdtAddress);
-  const cashierFeesUSDC = await contractInstance.protocolCashierFees(CONSTANTS.usdcAddress);
+  const cashierFeesWETH = await hedgingInstance.protocolCashierFees(CONSTANTS.wethAddress);
+  const cashierFeesUSDT = await hedgingInstance.protocolCashierFees(CONSTANTS.usdtAddress);
+  const cashierFeesUSDC = await hedgingInstance.protocolCashierFees(CONSTANTS.usdcAddress);
 
-  const hedgeFeesWETH = await contractInstance.protocolBaseFees(CONSTANTS.wethAddress);
-  const hedgeFeesUSDT = await contractInstance.protocolBaseFees(CONSTANTS.usdtAddress);
-  const hedgeFeesUSDC = await contractInstance.protocolBaseFees(CONSTANTS.usdcAddress);
+  const hedgeFeesWETH = await hedgingInstance.protocolBaseFees(CONSTANTS.wethAddress);
+  const hedgeFeesUSDT = await hedgingInstance.protocolBaseFees(CONSTANTS.usdtAddress);
+  const hedgeFeesUSDC = await hedgingInstance.protocolBaseFees(CONSTANTS.usdcAddress);
   
-  const totalDistributed = await contractInstance.getTotalDistributed(); // total WETH withdrawn to staking contract. All rewards converted to WETH
+  const totalDistributed = await hedgingInstance.getTotalDistributed(); // total WETH withdrawn to staking contract. All rewards converted to WETH
 
   // NEON token Smart Contract Calls
-  const tokentaxRevenue = await contractInstance.getTokenTaxesValue(); // tax from NEON Dex Swaps, returns ETH only
+  const tokentaxRevenue = await hedgingInstance.getTokenTaxesValue(); // tax from NEON Dex Swaps, returns ETH only
 
   // Staking Smart Contract Calls
-  const totalClaimedWei = await contractInstance.getTotalClaimed(); // withdrawn to staking contract for claiming. pie chart with: withdrawn Vs claimed
-  const totalUnclaimedWei = await contractInstance.getTotalUnclaimed(); // = deposited - withdrawn.
+  const totalClaimedWei = await hedgingInstance.getTotalClaimed(); // withdrawn to staking contract for claiming. pie chart with: withdrawn Vs claimed
+  const totalUnclaimedWei = await hedgingInstance.getTotalUnclaimed(); // = deposited - withdrawn.
   const totalStakers = 1000; // to be developed. address(this) withdraws from userMapBalances to staking contract only
   const minedHedgesCount = 10;
   const minersCount = 5;

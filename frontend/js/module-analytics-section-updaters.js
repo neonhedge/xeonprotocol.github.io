@@ -1,11 +1,12 @@
 
+import { CONSTANTS, fromBigIntNumberToDecimal, getCurrentEthUsdcPriceFromUniswapV2 } from './constants.js';
 //*======================================================*/
 // Functions to update the sections with the new values
 //*======================================================*/
 
 // 1. Update Section Values - Traffic Panel
 //----------------------------------------------------
-async function updateSectionValues_Traffic(activeWallets, activeERC20S, transactionVolume, hedgeVolume, totalDepositWeth, totalDepositUSDT, totalDepositUSDC, totalDepositERC20, totalDepositERC20_weth, totalWithdrawalWeth, totalWithdrawalUSDT, totalWithdrawalUSDC, totalWithdrawalERC20, totalWithdrawalERC20_weth) {
+async function updateSectionValues_Traffic(activeWallets, activeERC20S, activeTrades, totalDEXvolumeUSD, totalOTCvolumeUSD, totalCashierVolumeUSD, totalDepositWeth, totalDepositUSDT, totalDepositUSDC, totalDepositERC20, totalWithdrawalWeth, totalWithdrawalUSDT, totalWithdrawalUSDC, totalWithdrawalERC20) {
     
   // Format Amounts
   const formatAmount = (amount) => {
@@ -18,13 +19,7 @@ async function updateSectionValues_Traffic(activeWallets, activeERC20S, transact
   };
 
   // Fetch current ETH price in USD
-  const ethUsdcPrice = await getCurrentEthUsdcPriceFromUniswapV2();
-
-  // Convert values to USD
-  const totalDepositWethUSD = totalDepositWeth.times(ethUsdcPrice);
-  const totalWithdrawalWethUSD = totalWithdrawalWeth.times(ethUsdcPrice);
-  const transactionVolumeUSD = transactionVolume.times(ethUsdcPrice);
-  const hedgeVolumeUSD = hedgeVolume.times(ethUsdcPrice);
+  const ethUsdcPrice = getCurrentEthUsdcPriceFromUniswapV2();
 
   // Update active wallets value
   document.getElementById("activeWalletsValue").textContent = activeWallets.toString();
@@ -33,13 +28,16 @@ async function updateSectionValues_Traffic(activeWallets, activeERC20S, transact
   document.getElementById("activeTokensValue").textContent = activeERC20S.toString();
 
   // Update transaction volume value
-  document.getElementById("swapsCountValue").textContent = formatValue(transactionVolumeUSD);
+  document.getElementById("tradesCountValue").textContent = activeTrades.toString();
 
-  // Update hedge volume value
-  document.getElementById("hedgeVolumeValue").textContent = formatValue(hedgeVolumeUSD);
+  // Update cashier & hedges volume value
+  document.getElementById("cashierVolumeValue").textContent = formatValue(totalCashierVolumeUSD);
+  document.getElementById("otcVolumeValue").textContent = formatValue(totalOTCvolumeUSD);
+  document.getElementById("dexVolumeValue").textContent = formatValue(totalDEXvolumeUSD);
 
   // Update total deposits
-  const totalDeposits = totalDepositWethUSD.plus(totalDepositUSDT).plus(totalDepositUSDC).plus(totalDepositERC20);
+  const totalDepositWethUSD = totalDepositWeth * ethUsdcPrice;
+  const totalDeposits = totalDepositWethUSD + totalDepositUSDT + totalDepositUSDC + totalDepositERC20;
   document.getElementById("totalDepositsValue").textContent = formatValue(totalDeposits);
 
   // Update individual deposit amounts
@@ -56,7 +54,8 @@ async function updateSectionValues_Traffic(activeWallets, activeERC20S, transact
   document.getElementById("deposits_erc20Value").textContent = formatValue(totalDepositERC20);
 
   // Update total withdrawals
-  const totalWithdrawals = totalWithdrawalWethUSD.plus(totalWithdrawalUSDT).plus(totalWithdrawalUSDC).plus(totalWithdrawalERC20);
+  const totalWithdrawalWethUSD = totalWithdrawalWeth * ethUsdcPrice;
+  const totalWithdrawals = totalWithdrawalWethUSD + totalWithdrawalUSDT + totalWithdrawalUSDC + totalWithdrawalERC20;
   document.getElementById("totalWithdrawalsValue").textContent = formatValue(totalWithdrawals);
 
   // Update individual withdrawal amounts
