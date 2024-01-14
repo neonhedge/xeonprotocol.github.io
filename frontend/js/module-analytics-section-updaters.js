@@ -6,7 +6,7 @@ import { CONSTANTS, fromBigIntNumberToDecimal, getCurrentEthUsdcPriceFromUniswap
 
 // 1. Update Section Values - Traffic Panel
 //----------------------------------------------------
-async function updateSectionValues_Traffic(activeWallets, activeERC20S, activeTrades, totalDEXvolumeUSD, totalOTCvolumeUSD, totalCashierVolumeUSD, totalDepositWeth, totalDepositUSDT, totalDepositUSDC, totalDepositERC20, totalWithdrawalWeth, totalWithdrawalUSDT, totalWithdrawalUSDC, totalWithdrawalERC20) {
+async function updateSectionValues_Traffic(activeWallets, activeERC20S, activeTrades, totalDEXvolumeUSD, totalOTCvolumeUSD, totalCashierVolumeUSD, totalDepositWeth, totalDepositUSDT, totalDepositUSDC, totalDepositERC20, totalWithdrawalWeth, totalWithdrawalUSDT, totalWithdrawalUSDC, totalWithdrawalERC20, totalOTCvolume, otcVolumeWETHDecimal, otcVolumeUSDTDecimal, otcVolumeUSDCDecimal) {
     
   // Format Amounts
   const formatAmount = (amount) => {
@@ -41,16 +41,16 @@ async function updateSectionValues_Traffic(activeWallets, activeERC20S, activeTr
   document.getElementById("totalDepositsValue").textContent = formatValue(totalDeposits);
 
   // Update individual deposit amounts
-  document.getElementById("deposits_wethAmnt").textContent = totalDepositWeth.toString();
+  document.getElementById("deposits_wethAmnt").textContent = formatAmount(totalDepositWeth);
   document.getElementById("deposits_wethValue").textContent = formatValue(totalDepositWethUSD);
 
-  document.getElementById("deposits_usdcAmnt").textContent = totalDepositUSDC.toString();
+  document.getElementById("deposits_usdcAmnt").textContent = formatAmount(totalDepositUSDC);
   document.getElementById("deposits_usdcValue").textContent = formatValue(totalDepositUSDC);
 
-  document.getElementById("deposits_usdtAmnt").textContent = totalDepositUSDT.toString();
+  document.getElementById("deposits_usdtAmnt").textContent = formatAmount(totalDepositUSDT);
   document.getElementById("deposits_usdtValue").textContent = formatValue(totalDepositUSDT);
 
-  document.getElementById("deposits_erc20Amnt").textContent = formatAmount(totalDepositERC20_weth);
+  document.getElementById("deposits_erc20Amnt").textContent = formatAmount(totalDepositERC20);
   document.getElementById("deposits_erc20Value").textContent = formatValue(totalDepositERC20);
 
   // Update total withdrawals
@@ -59,26 +59,49 @@ async function updateSectionValues_Traffic(activeWallets, activeERC20S, activeTr
   document.getElementById("totalWithdrawalsValue").textContent = formatValue(totalWithdrawals);
 
   // Update individual withdrawal amounts
-  document.getElementById("withdrawals_wethAmnt").textContent = totalWithdrawalWeth.toString();
+  document.getElementById("withdrawals_wethAmnt").textContent = formatAmount(totalWithdrawalWeth);
   document.getElementById("withdrawals_wethValue").textContent = formatValue(totalWithdrawalWethUSD);
 
-  document.getElementById("withdrawals_usdcAmnt").textContent = totalWithdrawalUSDC.toString();
+  document.getElementById("withdrawals_usdcAmnt").textContent = formatAmount(totalWithdrawalUSDC);
   document.getElementById("withdrawals_usdcValue").textContent = formatValue(totalWithdrawalUSDC);
 
-  document.getElementById("withdrawals_usdtAmnt").textContent = totalWithdrawalUSDT.toString();
+  document.getElementById("withdrawals_usdtAmnt").textContent = formatAmount(totalWithdrawalUSDT);
   document.getElementById("withdrawals_usdtValue").textContent = formatValue(totalWithdrawalUSDT);
 
-  document.getElementById("withdrawals_erc20Amnt").textContent = formatAmount(totalWithdrawalERC20_weth);
+  document.getElementById("withdrawals_erc20Amnt").textContent = formatAmount(totalWithdrawalERC20);
   document.getElementById("withdrawals_erc20Value").textContent = formatValue(totalWithdrawalERC20);
+
+  // Update OTC volume
+  const otcVolumeWETHUSD = otcVolumeWETHDecimal * ethUsdcPrice;
+  document.getElementById("totalOTCVolume").textContent = formatValue(totalOTCvolumeUSD);
+  document.getElementById("otcVol_wethAmnt").textContent = formatAmount(otcVolumeWETHDecimal);
+  document.getElementById("otcVol_wethValue").textContent = formatValue(otcVolumeWETHUSD);
+  document.getElementById("otcVol_usdtAmnt").textContent = formatAmount(otcVolumeUSDTDecimal);
+  document.getElementById("otcVol_usdtValue").textContent = formatValue(otcVolumeUSDTDecimal);
+  document.getElementById("otcVol_usdcAmnt").textContent = formatAmount(otcVolumeUSDCDecimal);
+  document.getElementById("otcVol_usdcValue").textContent = formatValue(otcVolumeUSDCDecimal);
+
 }
 
 // 2. Update Section Values - Hedges Panel
 //----------------------------------------------------
-function updateSectionValues_hedges(hedgesTraded, hedgesCreated, swapsVolume, optionsVolume, settledVolume, hedgeCostsTotal, hedgeProfits, hedgeFees, cashierFees) {
+function updateSectionValues_hedges(activeTokensCount, totalTakenCount, swapsTakenCount, hedgesTakenCount, hedgesTraded, hedgesCreated, swapsVolume, optionsVolume, settledVolume, hedgeCostsTotal, hedgeProfits, hedgeFees) {
   // Format values
   const formatValue = (value) => {
     return `$${value.toFixed(2)}`;
   };
+
+  // Volume
+  document.getElementById("hedgeVolumeValue").textContent = formatValue(hedgesTraded);
+  document.getElementById("buyVolumeValue").textContent = formatValue(hedgeCostsTotal);
+  document.getElementById("settleVolumeValue").textContent = formatValue(settledVolume);
+  document.getElementById("feeVolumeValue").textContent = formatValue(hedgeFees);
+
+  // Counters
+  document.getElementById("activeTokensCount").textContent = activeTokensCount;
+  document.getElementById("tradedHedgesCount").textContent = totalTakenCount;
+  document.getElementById("tradedOptionsCount").textContent = hedgesTakenCount;
+  document.getElementById("tradedSwapsCount").textContent = swapsTakenCount;
 
   // Update hedges traded and created
   document.getElementById("hedgesTraded").textContent = formatValue(hedgesTraded);

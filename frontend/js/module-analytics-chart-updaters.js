@@ -96,7 +96,7 @@ function createBarChart(chartCanvas, labels, datasets, indexAxis, legendPosition
     CHARTING FUNCTIONS
 ==========================================================================*/
 
-function updateChartValues_Cash(netDeposit, netWithdraw) {
+function updateChartValues_Cashier(netDeposit, netWithdraw) {
     const chartDataCash = [netDeposit, netWithdraw];
     const chartCanvasCash = document.getElementById('depositWithdrawalChart');
     const chartContextCash = chartCanvasCash.getContext('2d');
@@ -173,7 +173,7 @@ function updateChartValues_Cash(netDeposit, netWithdraw) {
     });
 }
 
-function updateChartValues_PIE(weth, usdt, usdc, erc20) {
+function updateChartValues_Currencies(weth, usdt, usdc, erc20) {
     const chartDataPie = [weth, usdt, usdc, erc20];
     const chartLabelsPie = ['WETH', 'USDT', 'USDC', 'ERC20'];
     const chartCanvasPie = document.getElementById('cashingPieChart');
@@ -243,7 +243,7 @@ function updateChartValues_hedges(chartID, valueA, valueB) {
                     enabled: true
                 }
             },
-            aspectRatio: 2.5,
+            aspectRatio: 1,
             responsive: true,
             maintainAspectRatio: true
         }
@@ -407,4 +407,4 @@ function updateChartValues_Tokenomics(burntSupplyT, circulatingSupplyT) {
 }
 
 // Export the fetch functions
-export { updateChartValues_Cash, updateChartValues_PIE, updateChartValues_hedges, updateChartValues_Revenue, updateChartValues_Dividents, updateChartValues_Claims, updateChartValues_Staking, updateChartValues_Tokenomics };
+export { updateChartValues_Cashier, updateChartValues_Currencies, updateChartValues_hedges, updateChartValues_Revenue, updateChartValues_Dividents, updateChartValues_Claims, updateChartValues_Staking, updateChartValues_Tokenomics };
