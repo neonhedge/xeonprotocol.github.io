@@ -2,7 +2,11 @@ import { CONSTANTS, fromBigIntNumberToDecimal, fromDecimalToBigInt, getCurrentEt
 import { updateSectionValues_Traffic, updateSectionValues_hedges, updateSectionValues_Earnings, updateSectionValues_Staking, updateSectionValues_Tokenomics } from './module-analytics-section-updaters.js';
 import { updateChartValues_Cashier, updateChartValues_Currencies, updateChartValues_hedges, updateChartValues_Revenue, updateChartValues_Dividents, updateChartValues_Claims, updateChartValues_Staking, updateChartValues_Tokenomics } from './module-analytics-chart-updaters.js';
 
-async function setCurrent_TrafficSection() {
+async function setCurrent_TrafficSection() {   
+    
+    const wethDecimals = 18; const usdtDecimals = 6; const usdcDecimals = 6;
+    const ethUsdcPrice = getCurrentEthUsdcPriceFromUniswapV2();
+
     // Step 1: Fetch Deposit Withdrawal Volume from Vault mappings
     const wethBalances = await hedgingInstance.protocolBalanceMap(CONSTANTS.wethAddress);
     const wethDeposits = wethBalances[0];
@@ -13,6 +17,7 @@ async function setCurrent_TrafficSection() {
     const usdcBalances = await hedgingInstance.protocolBalanceMap(CONSTANTS.usdcAddress);
     const usdcDeposits = usdcBalances[0];
     const usdcWithdrawals = usdcBalances[1];
+
     // Fetch equivalents
     const erc20DepositsInWETH = await hedgingInstance.wethEquivDeposits();
     const erc20DepositsInUSDT = await hedgingInstance.usdtEquivDeposits();
@@ -36,25 +41,18 @@ async function setCurrent_TrafficSection() {
 
     // Dex volume, needs an API
     const totalDEXvolumeWETH = 0;
-    
 
-    // Step 2: ETH USD price
-    const ethUsdcPrice = getCurrentEthUsdcPriceFromUniswapV2();
-
-    // Step 3: Convert WETH amounts
-    const wethDecimals = 18;
+    // Step 2: Convert WETH amounts    
     const totalDepositWeth = fromBigIntNumberToDecimal(wethDeposits, wethDecimals);
     const totalWithdrawalWeth = fromBigIntNumberToDecimal(wethWithdrawals, wethDecimals);
     const totalDepositWethUSD = totalDepositWeth * ethUsdcPrice;
     const totalWithdrawalWethUSD = totalWithdrawalWeth * ethUsdcPrice;
 
     // Step 4: Convert USDT amounts
-    const usdtDecimals = 6;
     const totalDepositUSDT = fromBigIntNumberToDecimal(usdtDeposits, usdtDecimals);
     const totalWithdrawalUSDT = fromBigIntNumberToDecimal(usdtWithdrawals, usdtDecimals);
 
     // Step 5: Convert USDC amounts
-    const usdcDecimals = 6;
     const totalDepositUSDC = fromBigIntNumberToDecimal(usdcDeposits, usdcDecimals);
     const totalWithdrawalUSDC = fromBigIntNumberToDecimal(usdcWithdrawals, usdcDecimals);
 
@@ -95,7 +93,7 @@ async function setCurrent_TrafficSection() {
     const totalCashierVolumeUSD = totalDepositAmountUsd + totalWithdrawalAmountUsd;
 
     // Counters
-    const activeOptions = await hedgingInstance.optionsTakenLength();
+    const activeOptions = await hedgingInstance.optionsTakenLength(); 
     const activeSwaps = await hedgingInstance.equityswapsTakenLength();
     const activeTrades = BigInt(activeOptions) + BigInt(activeSwaps);
     const activeERC20S = await hedgingInstance.depositedTokensLength();
