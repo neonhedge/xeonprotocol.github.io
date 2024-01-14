@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.4;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
@@ -17,6 +17,9 @@ contract StakingContract is Ownable {
     uint256 public totalAssignedForMining;
     uint256 public totalAssignedForLiquidity;
     uint256 public totalAssignedForCollateral;
+    uint256 public claimedRewards;
+    uint256 public claimedRewardsLiq;
+    uint256 public claimedRewardsCol;
     address[] public stakerAddresses;
 
     struct Staker {
@@ -174,6 +177,7 @@ contract StakingContract is Ownable {
         staker.lastClaimedDay = block.timestamp;
         lastRewardBasis[msg.sender] = ethRewardBasis;
         claimedRewardsStaking[msg.sender] += stakerRewardShare;
+        claimedRewards += stakerRewardShare;
 
         payable(msg.sender).transfer(stakerRewardShare);
 
@@ -190,6 +194,7 @@ contract StakingContract is Ownable {
         staker.lastClaimedDay = block.timestamp;
         lastLiquidityRewardBasis[msg.sender] = ethLiquidityRewardBasis;
         claimedRewardsLiquidity[msg.sender] += liquidityRewardShare;
+        claimedRewardsLiq += liquidityRewardShare;
 
         payable(msg.sender).transfer(liquidityRewardShare);
 
@@ -206,6 +211,7 @@ contract StakingContract is Ownable {
         staker.lastClaimedDay = block.timestamp;
         lastCollateralRewardBasis[msg.sender] = ethCollateralRewardBasis;
         claimedRewardsCollateral[msg.sender] += collateralRewardShare;
+        claimedRewardsCol += collateralRewardShare;
 
         payable(msg.sender).transfer(collateralRewardShare);
 

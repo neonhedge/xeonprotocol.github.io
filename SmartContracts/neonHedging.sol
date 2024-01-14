@@ -2,9 +2,9 @@
 pragma solidity ^0.8.4;
 
 // Xeon Protocol - Universal ERC20 OTC Hedging and Lending. 
-// Testnet Version 1.6
-// Deployed on Goerli Testnet 29/12/2024
-// Goerli testnet on the basis of Uniswap V2 Router support
+// Testnet Version 2.1
+// Deployed on Sepolia Testnet 15/01/2024
+// Sepolia testnet on the basis of Uniswap V2 Router support
 
 // ====================Description===========================
 // Protocol accepts an ERC20 address to function as below;
@@ -74,7 +74,7 @@ interface IWETH9 {
     function transferFrom(address src, address dst, uint wad) external returns (bool);
 }
 
-contract NEONHEDGE {
+contract oXEONVAULT {
 
     using SafeMath for uint256;
     bool private isExecuting;
@@ -191,7 +191,10 @@ contract NEONHEDGE {
     // more volume mappings
     mapping(address => uint256) public protocolCashierFees;
     mapping(address => mapping(address => uint256)) public equivUserHedged;
-    mapping(address => mapping(address => uint256)) public equivUserCosts;   
+    mapping(address => mapping(address => uint256)) public equivUserCosts; 
+
+    // miner mappings
+    mapping(address => bool) public minerMap;
 
     // mapping bookmarks of each user
     mapping(address => mapping(uint256 => bool)) public bookmarks;
@@ -207,8 +210,12 @@ contract NEONHEDGE {
     uint public depositedTokensLength;
     uint public optionsCreatedLength;
     uint public equityswapsCreatedLength;
+    uint public equityswapsTakenLength;
+    uint public optionsTakenLength;
     uint public optionID;
     uint public topupRequestID;
+    uint public settledTradesCount;
+    uint public miners;
     
     // fee variables
     uint256 public feeNumerator;
@@ -223,10 +230,10 @@ contract NEONHEDGE {
     uint256 public wethEquivWithdrawals;
     uint256 public usdtEquivWithdrawals;
     uint256 public usdcEquivWithdrawals;
-    
+
     // core addresses
-    address private constant UNISWAP_FACTORY_ADDRESS = 0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f;
-    address private constant UNISWAP_ROUTER_ADDRESS = 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D;
+    address private constant UNISWAP_FACTORY_ADDRESS = 0x7E0987E5b3a30e3f2828572Bb659A548460a3003;
+    address private constant UNISWAP_ROUTER_ADDRESS = 0xC532a74256D3Db42D0Bf7a0400fEFDbad7694008;
     address public wethAddress;
     address public usdtAddress;
     address public usdcAddress;
@@ -248,9 +255,9 @@ contract NEONHEDGE {
     constructor() {
         IUniswapV2Router02 router = IUniswapV2Router02(UNISWAP_ROUTER_ADDRESS);
         wethAddress = router.WETH();
-        usdtAddress = 0xC2C527C0CACF457746Bd31B2a698Fe89de2b6d49; // USDT address on Goerli
-        usdcAddress = 0xde637d4C445cA2aae8F782FFAc8d2971b93A4998; // USDC address on Goerli
-        XeonAddress = 0xF97Fcb2015eCd8F8063fE5DbBA98b5d8E2D9a53A; // V 1.0 deployed 12/12/2023 16:28:48
+        usdtAddress = 0x297B8d4B35294e730087ADF0597A31a9bC1746af; // oUSDT address on Sepolia
+        usdcAddress = 0x8267cF9254734C6Eb452a7bb9AAF97B392258b21; // USDC address on Sepolia
+        XeonAddress = 0xee52247FbF02Ad3d5b001Fa6C75b4324A0EE4d9d; // V2.0 deployed 03/01/2024 16:28:48
         // Variables
         feeNumerator = 5;
         feeDenominator = 1000;
@@ -289,7 +296,8 @@ contract NEONHEDGE {
         uto.deposited += _amount;
 
         // Log new token address
-        // protocolBalanceMap is analytics only. userBalanceMap stores withdrawable balance
+        // protocolBalanceMap is analytics only, curcial to log below. 
+        // userBalanceMap stores protocols withdrawable balance
         if (protocolBalanceMap[_token].deposited == 0) {
             userERC20s[address(this)].push(_token);
             depositedTokensLength++;
@@ -379,7 +387,7 @@ contract NEONHEDGE {
             require(cost >= newOption.createValue, "Swap collateral must be equal value");
             myswapsCreated[msg.sender].push(optionID);
             equityswapsCreated.push(optionID);
-            optionsCreatedLength ++;
+            equityswapsCreatedLength ++;
             tokenOptions[token].push(optionID);
         } else {
             myoptionsCreated[msg.sender].push(optionID);
@@ -425,20 +433,15 @@ contract NEONHEDGE {
 
         // Update arrays and takes count
         if (hedge.hedgeType == HedgeType.SWAP) {
+            equityswapsTakenLength ++;
+            equityswapsBought[hedge.token].push(_optionId);
             equityswapsTaken.push(_optionId);
             myswapsTaken[msg.sender].push(_optionId);
-        } else if (hedge.hedgeType == HedgeType.CALL) {
+        } else {
+            optionsTakenLength ++;
+            optionsBought[hedge.token].push(_optionId);
             optionsTaken.push(_optionId);
             myoptionsTaken[msg.sender].push(_optionId);
-        }
-
-        // Log options for token
-        if (hedge.hedgeType == HedgeType.CALL || hedge.hedgeType == HedgeType.PUT) {
-            optionsBought[hedge.token].push(_optionId);
-        }
-
-        if (hedge.hedgeType == HedgeType.SWAP) {
-            equityswapsBought[hedge.token].push(_optionId);
         }
 
         // Log pair tokens involved in protocol revenue
@@ -557,19 +560,15 @@ contract NEONHEDGE {
         bool newAddressFlag;
     }
 
-    // Settle a hedge
     function settleHedge(uint256 _optionId) external {
         HedgeInfo memory hedgeInfo;
         require(_optionId < optionID, "Invalid option ID");
         hedgingOption storage option = hedgeMap[_optionId];
-
         // Check if either zapWriter or zapTaker flags are true, or if the hedge has expired
         require(option.zapWriter || option.zapTaker || block.timestamp >= option.dt_expiry, "Hedge cannot be settled yet");
 
-        // Initialize local variables
         (hedgeInfo.underlyingValue, ) = getUnderlyingValue(option.token, option.amount);
 
-        // Get storage ready for user balances of the owner, taker, and contract
         userBalance storage oti = userBalanceMap[option.paired][option.owner];
         userBalance storage otiU = userBalanceMap[option.token][option.owner];
         userBalance storage tti = userBalanceMap[option.paired][option.taker];
@@ -586,42 +585,41 @@ contract NEONHEDGE {
             hedgeInfo.marketOverStart = hedgeInfo.underlyingValue > option.startValue.add(option.cost);
             if (hedgeInfo.marketOverStart) {
                 // Taker profit in pair currency = underlying - cost - strike value
-                hedgeInfo.payOff = hedgeInfo.underlyingValue.sub(option.startValue.add(option.cost));
                 // Convert to equivalent tokens lockedInUse by owner, factor fee
+                // Check if collateral is enough, otherwise use max balance from Owner lockedInUse
+                hedgeInfo.payOff = hedgeInfo.underlyingValue.sub(option.startValue.add(option.cost));
                 (hedgeInfo.priceNow, ) = getUnderlyingValue(option.token, 1);
                 hedgeInfo.tokensDue = hedgeInfo.payOff.div(hedgeInfo.priceNow);
-                // Check if collateral is enough, otherwise use max balance from Owner lockedInUse
                 if (otiU.lockedinuse < hedgeInfo.tokensDue){
                     hedgeInfo.tokensDue = otiU.lockedinuse;
                 }
                 hedgeInfo.tokenFee = calculateFee(hedgeInfo.tokensDue);
                 // Move payoff - in underlying, take full gains from owner, credit taxed payoff to taker, pocket difference
-                ttiU.deposited += hedgeInfo.tokensDue.sub(hedgeInfo.tokenFee);
-                otiU.lockedinuse -= option.amount - hedgeInfo.tokensDue;
-                otiU.withdrawn += hedgeInfo.tokensDue;
+                ttiU.deposited = ttiU.deposited.add(hedgeInfo.tokensDue.sub(hedgeInfo.tokenFee));
+                otiU.lockedinuse = otiU.lockedinuse.sub(option.amount.sub(hedgeInfo.tokensDue));
+                otiU.withdrawn = otiU.withdrawn.add(hedgeInfo.tokensDue);
                 // Restore winners collateral
-                oti.deposited += option.cost.sub(hedgeInfo.pairedFee);
-                tti.lockedinuse -= option.cost;
-                tti.withdrawn += option.cost;
+                oti.deposited = oti.deposited.add(option.cost.sub(hedgeInfo.pairedFee));
+                tti.lockedinuse = tti.lockedinuse.sub(option.cost);
+                tti.withdrawn = tti.withdrawn.add(option.cost);
                 // Move cost - credit taxes in both, as profit is in underlying and cost is in pair
-                ccUT.deposited += (hedgeInfo.tokenFee * 85).div(100);
-                ccBT.deposited += (hedgeInfo.pairedFee * 85).div(100);
+                ccUT.deposited = ccUT.deposited.add((hedgeInfo.tokenFee * 85) / 100);
+                ccBT.deposited = ccBT.deposited.add((hedgeInfo.pairedFee * 85) / 100);
                 // Miner fee - 15% of protocol fee for settling option. Mining call options always come with 2 token fees
-                minrT.deposited += (hedgeInfo.tokenFee * 15).div(100);
-                minrB.deposited += (hedgeInfo.pairedFee * 15).div(100);
+                minrT.deposited = minrT.deposited.add((hedgeInfo.tokenFee * 15) / 100);
+                minrB.deposited = minrB.deposited.add((hedgeInfo.pairedFee * 15) / 100);
                 // Log wallet PL: 0 - owner won, 1 taker won
-                logPL(hedgeInfo.payOff - calculateFee(hedgeInfo.payOff), option.paired, option.owner, option.taker, 1);
+                logPL(hedgeInfo.payOff.sub(calculateFee(hedgeInfo.payOff)), option.paired, option.owner, option.taker, 1);
             } else {
                 // Move payoff - owner wins cost & losses nothing. 
-                oti.deposited += option.cost.sub(hedgeInfo.pairedFee);
-                tti.lockedinuse -= option.cost;
-                tti.withdrawn += option.cost;
+                oti.deposited = oti.deposited.add(option.cost.sub(hedgeInfo.pairedFee));
+                tti.lockedinuse = tti.lockedinuse.sub(option.cost);
+                tti.withdrawn = tti.withdrawn.add(option.cost);
                 // Restore winners collateral - underlying to owner. none to taker.
-                oti.lockedinuse -= option.amount;
+                oti.lockedinuse = oti.lockedinuse.sub(option.amount);
                 // Move money - credit pair fees only as the payout is in paired currency. 
-                ccBT.deposited += (hedgeInfo.pairedFee * 85).div(100);
-                // Miner fee - 15% of protocol fee for settling option
-                minrB.deposited += (hedgeInfo.pairedFee * 15).div(100);
+                ccBT.deposited = ccBT.deposited.add((hedgeInfo.pairedFee * 85) / 100);
+                minrB.deposited = minrB.deposited.add((hedgeInfo.pairedFee * 15) / 100);
                 // Log wallet PL: 0 - owner won, 1 taker won
                 logPL(option.cost.sub(hedgeInfo.pairedFee), option.paired, option.owner, option.taker, 0);
             }
@@ -629,105 +627,94 @@ contract NEONHEDGE {
             hedgeInfo.isBelowStrikeValue = hedgeInfo.underlyingValue < option.startValue.sub(option.cost);
             if (hedgeInfo.isBelowStrikeValue) {
                 // Taker profit in paired = strike value - underlying - cost
-                hedgeInfo.payOff = option.startValue.sub(hedgeInfo.underlyingValue).sub(option.cost);
                 // Convert to equivalent tokens lockedInUse by writer, factor fee
+                // Check if writer collateral is enough, otherwise use max balance from writer lockedInUse
+                hedgeInfo.payOff = option.startValue.sub(hedgeInfo.underlyingValue).sub(option.cost);
                 (hedgeInfo.priceNow, ) = getUnderlyingValue(option.token, 1);
                 hedgeInfo.tokensDue = hedgeInfo.payOff.div(hedgeInfo.priceNow);
-                // Check if writer collateral is enough, otherwise use max balance from writer lockedInUse
                 if (otiU.lockedinuse < hedgeInfo.tokensDue){
                     hedgeInfo.tokensDue = otiU.lockedinuse;
                 }
                 hedgeInfo.tokenFee = calculateFee(hedgeInfo.tokensDue);
                 // Move payoff - in underlying, take value difference from writer, credit taxed payoff to taker, pocket difference
-                ttiU.deposited += hedgeInfo.tokensDue.sub(hedgeInfo.tokenFee);
-                otiU.lockedinuse -= option.amount - hedgeInfo.tokensDue;
-                otiU.withdrawn += hedgeInfo.tokensDue;
+                ttiU.deposited = ttiU.deposited.add(hedgeInfo.tokensDue.sub(hedgeInfo.tokenFee));
+                otiU.lockedinuse = otiU.lockedinuse.sub(option.amount.sub(hedgeInfo.tokensDue));
+                otiU.withdrawn = otiU.withdrawn.add(hedgeInfo.tokensDue);
                 // Restore winners collateral
-                oti.deposited += option.cost.sub(hedgeInfo.pairedFee);
-                tti.lockedinuse -= option.cost;
-                tti.withdrawn += option.cost;
+                oti.deposited = oti.deposited.add(option.cost.sub(hedgeInfo.pairedFee));
+                tti.lockedinuse = tti.lockedinuse.sub(option.cost);
+                tti.withdrawn = tti.withdrawn.add(option.cost);
                 // Move cost - credit taxes in both, as profit is in underlying and cost is in paired
-                ccUT.deposited += (hedgeInfo.tokenFee * 85).div(100);
-                ccBT.deposited += (hedgeInfo.pairedFee * 85).div(100);
+                ccUT.deposited = ccUT.deposited.add((hedgeInfo.tokenFee * 85) / 100);
+                ccBT.deposited = ccBT.deposited.add((hedgeInfo.pairedFee * 85) / 100);
                 // Miner fee - 15% of protocol fee for settling option. Mining call options always come with 2 token fees
-                minrT.deposited += (hedgeInfo.tokenFee * 15).div(100);
-                minrB.deposited += (hedgeInfo.pairedFee * 15).div(100);
-                // Log wallet PL: 0 - owner won, 1 taker won
-                logPL(hedgeInfo.payOff - calculateFee(hedgeInfo.payOff), option.paired, option.owner, option.taker, 1);
+                minrT.deposited = minrT.deposited.add((hedgeInfo.tokenFee * 15) / 100);
+                minrB.deposited = minrB.deposited.add((hedgeInfo.pairedFee * 15) / 100);
+                logPL(hedgeInfo.payOff.sub(calculateFee(hedgeInfo.payOff)), option.paired, option.owner, option.taker, 1);
             } else {
                 // Move payoff - owner wins cost & losses nothing
-                oti.deposited += option.cost.sub(hedgeInfo.pairedFee);
-                tti.lockedinuse -= option.cost;
-                tti.withdrawn += option.cost;
+                oti.deposited = oti.deposited.add(option.cost.sub(hedgeInfo.pairedFee));
+                tti.lockedinuse = tti.lockedinuse.sub(option.cost);
+                tti.withdrawn = tti.withdrawn.add(option.cost);
                 // Restore winners collateral - underlying to owner. none to taker
-                oti.lockedinuse -= option.amount;
+                oti.lockedinuse = oti.lockedinuse.sub(option.amount);
                 // Move money - credit pair fees only as the payout is in paired. 
-                ccBT.deposited += (hedgeInfo.pairedFee * 85).div(100);
-                // Miner fee - 15% of protocol fee for settling option
-                minrB.deposited += (hedgeInfo.pairedFee * 15).div(100);
-                // Log wallet PL: 0 - owner won, 1 taker won
+                ccBT.deposited = ccBT.deposited.add((hedgeInfo.pairedFee * 85) / 100);
+                minrB.deposited = minrB.deposited.add((hedgeInfo.pairedFee * 15) / 100);
                 logPL(option.cost.sub(hedgeInfo.pairedFee), option.paired, option.owner, option.taker, 0);
             }
         } else if (option.hedgeType == HedgeType.SWAP) {
             if (hedgeInfo.underlyingValue > option.startValue) {
                 hedgeInfo.payOff = hedgeInfo.underlyingValue.sub(option.startValue);
-                // Max loss config
                 if (hedgeInfo.payOff > option.cost) {
                     hedgeInfo.payOff = option.cost;
                 }
-                // Convert equivalent in tokens
                 (hedgeInfo.priceNow, ) = getUnderlyingValue(option.token, 1);
                 hedgeInfo.tokensDue = hedgeInfo.payOff.div(hedgeInfo.priceNow);
                 hedgeInfo.tokenFee = calculateFee(hedgeInfo.tokensDue);
                 // Move money - in underlying, take full gains from owner, credit taxed amount to taker, pocket difference
-                ttiU.deposited += hedgeInfo.tokensDue.sub(hedgeInfo.tokenFee);
-                otiU.lockedinuse -= option.amount;
-                otiU.withdrawn += hedgeInfo.tokensDue;
-                // Restore winner collateral - for taker restore cost (swaps have no premium)
-                tti.lockedinuse -= option.cost;
+                ttiU.deposited = ttiU.deposited.add(hedgeInfo.tokensDue.sub(hedgeInfo.tokenFee));
+                otiU.lockedinuse = otiU.lockedinuse.sub(option.amount);
+                otiU.withdrawn = otiU.withdrawn.add(hedgeInfo.tokensDue);
+                 // Restore winner collateral - for taker restore cost (swaps have no premium)
+                tti.lockedinuse = tti.lockedinuse.sub(option.cost);
                 // Move money - take taxes from profits in underlying. none in paired because taker won underlying tokens
-                ccUT.deposited += (hedgeInfo.tokenFee * 85).div(100);
+                ccUT.deposited = ccUT.deposited.add((hedgeInfo.tokenFee * 85) / 100);
                 // Miner fee - 15% of protocol fee for settling option. none in paired because taker won underlying tokens
-                minrT.deposited += (hedgeInfo.tokenFee * 15).div(100);
-                // Log wallet PL: 0 - owner won, 1 taker won
-                logPL(hedgeInfo.payOff - calculateFee(hedgeInfo.payOff), option.paired, option.owner, option.taker, 0);
+                minrT.deposited = minrT.deposited.add((hedgeInfo.tokenFee * 15) / 100);
+                logPL(hedgeInfo.payOff.sub(calculateFee(hedgeInfo.payOff)), option.paired, option.owner, option.taker, 0);
             } else {                
                 hedgeInfo.payOff = option.startValue.sub(hedgeInfo.underlyingValue);
-                // Max loss config
                 if (hedgeInfo.payOff > option.cost) {
                     hedgeInfo.payOff = option.cost;
                 }
                 // Move payoff - loss of paired cost to taker only, owner loses nothing
                 // 1. credit equivalent payoff in paired to owner
                 // 2. credit takers full cost back & then debit loss using withrawn instantly
-                oti.deposited += hedgeInfo.payOff.sub(hedgeInfo.pairedFee);
-                tti.lockedinuse -= option.cost;
-                tti.withdrawn += hedgeInfo.payOff;
+                oti.deposited = oti.deposited.add(hedgeInfo.payOff.sub(hedgeInfo.pairedFee));
+                tti.lockedinuse = tti.lockedinuse.sub(option.cost);
+                tti.withdrawn = tti.withdrawn.add(hedgeInfo.payOff);
                 // Restore winner collateral - for owner, all underlying tokens
-                otiU.lockedinuse -= option.amount;
+                otiU.lockedinuse = otiU.lockedinuse.sub(option.amount);
                 // Move money - profits in pair so only paired fees credited
-                ccBT.deposited += (hedgeInfo.pairedFee * 85).div(100);
+                ccBT.deposited = ccBT.deposited.add((hedgeInfo.pairedFee * 85) / 100);
                 // Miner fee - 15% of protocol fee for settling option. none in underlying tokens
-                minrB.deposited += (hedgeInfo.pairedFee * 15).div(100);
-                // Log wallet PL: 0 - owner won, 1 taker won
+                minrB.deposited = minrB.deposited.add((hedgeInfo.pairedFee * 15) / 100);
                 logPL(hedgeInfo.payOff, option.paired, option.owner, option.taker, 1);
             }
         }
 
-        // Update hedge
         option.status = 3;
         option.endValue = hedgeInfo.underlyingValue;
         option.dt_settled = block.timestamp;
 
-        // Log settled hedges
         if(option.hedgeType == HedgeType.CALL || option.hedgeType == HedgeType.PUT) {
             optionsSettled[option.token].push(_optionId);            
         }
         if(option.hedgeType == HedgeType.SWAP) {
             equityswapsSettled[option.token].push(_optionId);
         }
-        
-        // Log fee / payoff stats
+        logMiningData(msg.sender);
         logAnalyticsFees(option.token, hedgeInfo.tokenFee, hedgeInfo.pairedFee, hedgeInfo.tokensDue, option.cost, hedgeInfo.underlyingValue);
         
         // Catch new erc20 address so that wallet can log all underlying token balances credited to it
@@ -735,60 +722,40 @@ contract NEONHEDGE {
         if(hedgeInfo.tokensDue > 0 && hedgeInfo.newAddressFlag) {            
             userERC20s[option.taker].push(option.token);            
         }
-        // Emit
+    
         emit hedgeSettled(option.token, _optionId, hedgeInfo.underlyingValue, hedgeInfo.payOff, msg.sender);
         emit minedHedge(_optionId, msg.sender, option.token, option.paired, hedgeInfo.tokenFee, hedgeInfo.pairedFee);
     }
 
-    // Log Protocol Revenue
-    // - in frontend use userBalanceMap to get raw revenue balances and populate sums
-    function logAnalyticsFees(address token, uint256 tokenFee, uint256 pairedFee, uint256 tokenProfit, uint256 pairProfit, uint256 endValue) internal {
-       (address paired, ) = getPairAddressZK(token);
-        protocolProfitsTokens[token] += tokenProfit;
-        protocolPairProfits[paired] += pairProfit;
-        protocolFeesTokens[token] += tokenFee;
-        protocolPairedFees[paired] += pairedFee;
-        settledVolume[paired] += endValue;
+    function logMiningData(address miner) internal {
+        settledTradesCount ++;
+        if(!minerMap[miner]) {
+            minerMap[miner] = true;
+            miners ++;
+        }
     }
 
-    // Log User PL in paired value
+    function logAnalyticsFees(address token, uint256 tokenFee, uint256 pairedFee, uint256 tokenProfit, uint256 pairProfit, uint256 endValue) internal {
+        (address paired, ) = getPairAddressZK(token);
+        // all profits made by traders
+        protocolProfitsTokens[token] = protocolProfitsTokens[token].add(tokenProfit); 
+        protocolPairProfits[paired] = protocolPairProfits[paired].add(pairProfit);
+        // fees collected by protocol
+        protocolFeesTokens[token] = protocolFeesTokens[token].add(tokenFee);
+        protocolPairedFees[paired] = protocolPairedFees[paired].add(pairedFee);
+        settledVolume[paired] = settledVolume[paired].add(endValue);
+    }
+
     function logPL(uint256 amount, address paired, address optionowner, address optiontaker, uint winner) internal {
         if(winner == 0) {
-            userPLMap[paired][optionowner].profits += amount;
-            userPLMap[paired][optiontaker].losses += amount;
-        }else if(winner == 1) {
-            userPLMap[paired][optiontaker].profits += amount;
-            userPLMap[paired][optionowner].losses += amount;
+            userPLMap[paired][optionowner].profits = userPLMap[paired][optionowner].profits.add(amount);
+            userPLMap[paired][optiontaker].losses = userPLMap[paired][optiontaker].losses.add(amount);
+        } else if(winner == 1) {
+            userPLMap[paired][optiontaker].profits = userPLMap[paired][optiontaker].profits.add(amount);
+            userPLMap[paired][optionowner].losses = userPLMap[paired][optionowner].losses.add(amount);
         }
     }
 
-    /* equivUserHedged DEPRACATED 28/12/2023
-    // Underlying value equivalent logging
-    function updateEquivUserHedged(address token, address paired, uint256 createValue) internal {
-        if (token == wethAddress || paired == wethAddress) {
-            equivUserHedged[msg.sender][wethAddress] += createValue;
-        }
-        if (token == usdtAddress || paired == usdtAddress) {
-            equivUserHedged[msg.sender][usdtAddress] += createValue;
-        }
-        if (token == usdcAddress || paired == usdcAddress) {
-            equivUserHedged[msg.sender][usdcAddress] += createValue;
-        }
-    }
-
-    // Underlying cost equivalent logging
-    function updateEquivUserCosts(address token, address paired, uint256 createValue) internal {
-        if (token == wethAddress || paired == wethAddress) {
-            equivUserCosts[msg.sender][wethAddress] += createValue;
-        }
-        if (token == usdtAddress || paired == usdtAddress) {
-            equivUserCosts[msg.sender][usdtAddress] += createValue;
-        }
-        if (token == usdcAddress || paired == usdcAddress) {
-            equivUserCosts[msg.sender][usdcAddress] += createValue;
-        }
-    }
-    */
     // Fees
     function updateFee(uint256 numerator, uint256 denominator) onlyOwner external {
       feeNumerator = numerator;
@@ -898,7 +865,7 @@ contract NEONHEDGE {
         withdrawn = uto.withdrawn;
         lockedinuse = uto.lockedinuse;
         withdrawable = (uto.deposited).sub(uto.withdrawn).sub(uto.lockedinuse);
-        if(token != wethAddress && token != usdtAddress && token != usdcAddress ){
+        if(token != usdtAddress && token != usdcAddress ){
             (withdrawableValue, paired) = getUnderlyingValue(token, withdrawable);
         }else{
             (withdrawableValue, paired) = (withdrawable, address(0));
@@ -961,15 +928,7 @@ contract NEONHEDGE {
     function getUserSwapsTaken(address user, uint startIndex, uint limit) public view returns (uint[] memory) {
         return getSubset(myswapsTaken[user], startIndex, limit);
     }
-    /* depracated 28/12/2023
-    // Functions to retrieve volume for user
-    function getEquivUserHedged(address user, address token) external view returns (uint256) {
-        return equivUserHedged[user][token];
-    }
-    function getEquivUserCosts(address user, address token) external view returns (uint256) {
-        return equivUserCosts[user][token];
-    }
-    */
+    
     // Functions to retrieve PL for user
     function getEquivUserPL(address user, address pairedCurrency) external view returns (uint256 profits, uint256 losses) {
         return (userPLMap[pairedCurrency][user].profits, userPLMap[pairedCurrency][user].losses);
