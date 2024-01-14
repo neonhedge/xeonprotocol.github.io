@@ -4,7 +4,7 @@
 import { CONSTANTS } from './constants.js';
 import { initializeConnection, handleAccountChange, handleNetworkChange} from './web3-walletstatus-module.js';
 import { setCurrent_TrafficSection, setCurrent_HedgeSection, setCurrent_EarningsSection, setCurrent_StakedSection, setCurrent_TokenomicsSection } from './module-analytics-section-fetchers.js';
-import { updateChartValues_Cash, updateChartValues_PIE, updateChartValues_hedges, updateChartValues_Revenue, updateChartValues_Dividents, updateChartValues_Claims, updateChartValues_Staking, updateChartValues_Tokenomics } from './module-analytics-chart-updaters.js';
+import { updateChartValues_Cashier, updateChartValues_Currencies, updateChartValues_hedges, updateChartValues_Revenue, updateChartValues_Dividents, updateChartValues_Claims, updateChartValues_Staking, updateChartValues_Tokenomics } from './module-analytics-chart-updaters.js';
 
 /*=========================================================================
     Analytics Page Main Functions
@@ -55,8 +55,7 @@ async function pageModulesLoadingScript() {
         console.log(error);
     }
     if (continueLoad) {
-        // Set up event listeners related to the wallet
-        setupToggleElements();
+        // Set up event listeners related to the page if any
         return true;
     } else {
         // Force interface to indicate connection needs
@@ -129,7 +128,7 @@ function setInitial_CashingChart() {
     const initialNetDeposit = 15000;
     const initialNetWithdraw = -9000;
 
-    updateChartValues_Cash(initialNetDeposit, initialNetWithdraw);
+    updateChartValues_Cashier(initialNetDeposit, initialNetWithdraw);
 }
 
 function setInitial_CashingChartPie() {
@@ -138,7 +137,7 @@ function setInitial_CashingChartPie() {
     const initialUSDC = 350000;
     const initialERC20 = 720000;
 
-    updateChartValues_PIE(initialWeth, initialUSDT, initialUSDC, initialERC20);
+    updateChartValues_Currencies(initialWeth, initialUSDT, initialUSDC, initialERC20);
 }
 
 function setInitial_hedgesChartA() {
