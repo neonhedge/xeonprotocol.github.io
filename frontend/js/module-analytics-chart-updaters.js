@@ -381,12 +381,12 @@ function updateChartValues_Claims(netClaimed, netUnclaimed) {
     ]);
 }
 
-function updateChartValues_Staking(netProfit, netLoss) {
-    if((netProfit && netLoss) == 0) {
-        netProfit= 50;
-        netLoss= 50;
+function updateChartValues_Staking(stakedSupply, circulatingSupply) {
+    if((stakedSupply && circulatingSupply) == 0) {
+        stakedSupply= 50;
+        circulatingSupply= 50;
     }
-    const chartDataStake = [netProfit, netLoss];
+    const chartDataStake = [stakedSupply, circulatingSupply];
 
     updateBarChart('stakedsupplyChart', [""], [
         {

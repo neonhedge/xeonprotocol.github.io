@@ -452,6 +452,10 @@ async function setCurrent_StakedSection(){
 		AssignedRewardsLiqUSDT
 	);
 
+    updateChartValues_Staking(
+        totalStakedUSDT, 
+        circulatingSupplyUSDT        
+    );
 }
 
 async function setCurrent_TokenomicsSection() {
