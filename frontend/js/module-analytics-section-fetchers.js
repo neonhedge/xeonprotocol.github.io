@@ -178,7 +178,7 @@ async function setCurrent_HedgeSection() {
     // Counters
     const activeERC20S = await hedgingInstance.depositedTokensLength();
     const swapsTakenCount = await hedgingInstance.equityswapsTakenLength();
-    const hedgesTakenCount = await hedgingInstance.hedgesTakenLength();
+    const hedgesTakenCount = await hedgingInstance.optionsTakenLength();
     const totalTakenCount = BigInt(swapsTakenCount) + BigInt(hedgesTakenCount);
   
     // Fetch ETH to USD conversion rate
@@ -260,11 +260,14 @@ async function setCurrent_HedgeSection() {
 }
 
 async function setCurrent_EarningsSection() {
-    // erc20s are sold at 10% discount in weth, to be accounted for in future
-    const revenueWETH = await hedgingInstance.userBalanceMap(CONSTANTS.wethAddress, CONSTANTS.hedgingAddress);
-    const revenueUSDT = await hedgingInstance.userBalanceMap(CONSTANTS.usdtAddress, CONSTANTS.hedgingAddress);
-    const revenueUSDC = await hedgingInstance.userBalanceMap(CONSTANTS.usdcAddress, CONSTANTS.hedgingAddress);
-
+    // Settlement revenue: erc20s are sold at 10% discount in weth, to be accounted for in future
+    const revenueWETHraw = await hedgingInstance.userBalanceMap(CONSTANTS.wethAddress, CONSTANTS.hedgingAddress);
+    const revenueWETH = revenueWETHraw.deposited;
+    const revenueUSDTraw = await hedgingInstance.userBalanceMap(CONSTANTS.usdtAddress, CONSTANTS.hedgingAddress);
+    const revenueUSDT = revenueUSDTraw.deposited;
+    const revenueUSDCraw = await hedgingInstance.userBalanceMap(CONSTANTS.usdcAddress, CONSTANTS.hedgingAddress);
+    const revenueUSDC = revenueUSDCraw.deposited;
+    // Cashier revenue
     const cashierFeesWETH = await hedgingInstance.protocolCashierFees(CONSTANTS.wethAddress);
     const cashierFeesUSDT = await hedgingInstance.protocolCashierFees(CONSTANTS.usdtAddress);
     const cashierFeesUSDC = await hedgingInstance.protocolCashierFees(CONSTANTS.usdcAddress);
@@ -272,6 +275,9 @@ async function setCurrent_EarningsSection() {
     const hedgeFeesWETH = await hedgingInstance.protocolPairedFees(CONSTANTS.wethAddress);
     const hedgeFeesUSDT = await hedgingInstance.protocolPairedFees(CONSTANTS.usdtAddress);
     const hedgeFeesUSDC = await hedgingInstance.protocolPairedFees(CONSTANTS.usdcAddress);
+
+    // Farming revenue
+    const farmingFees = 0;//await hedgingInstance.farmingFees(CONSTANTS.wethAddress);
   
     // Claims
     const totalDistributed = await stakingInstance.ethRewardBasis(); // all rewards converted to WETH, deposited to staking contract
@@ -296,9 +302,7 @@ async function setCurrent_EarningsSection() {
     // - Hedge Revenue = 5% Settlement Fee on profits
     // - Miner Fees = 15% of above, to miners settling hedges in real time manually
     // - Token Tax Revenue is Buy/Sell tax on NEON token
-    // - Cashier Revenue = withdrawal charges on major base pairs; WETH, USDT, USDC
-    //const totalRevenueEth = (hedgeRevenueEth - minerFeesEth) + tokenTaxRevenueEth + cashierRevenueEth;
-
+    // - Cashier Revenue is withdrawal charges on major base pairs; WETH, USDT, USDC
     const revenueTWETH = fromBigIntNumberToDecimal(revenueWETH, wethDecimals);
     const revenueTUSDT = fromBigIntNumberToDecimal(revenueUSDT, usdtDecimals);
     const revenueTUSDC = fromBigIntNumberToDecimal(revenueUSDC, usdcDecimals);
@@ -316,22 +320,27 @@ async function setCurrent_EarningsSection() {
 
     const tokenTaxRevenueEth = fromBigIntNumberToDecimal(tokentaxRevenue, wethDecimals);
     const tokenTaxRevenueTUSD = (tokenTaxRevenueEth * ethUsdPrice);
+
+    const farmingFeesUSD = fromBigIntNumberToDecimal(farmingFees, wethDecimals);
     // Convert remaining
     const distributedTWETH = fromBigIntNumberToDecimal(totalDistributed, wethDecimals);
     const totalClaimedTWETH = fromBigIntNumberToDecimal(totalClaimedWei, CONSTANTS.decimals);
     const totalUnclaimedTWETH = fromBigIntNumberToDecimal(totalUnclaimedWei, wethDecimals);  
+    const undistributedTWETH = tokenTaxRevenueEth - distributedTWETH;
     // Convert USD values to WETH
-    const minerFeesTWETH = (hedgeRevenueTUSD * 0.05).div(ethUsdPrice);
-    const totalRevenueTWETH = totalRevenueTUSD.div(ethUsdPrice);
-    const cashierRevenueTWETH = cashierRevenueTUSD.div(ethUsdPrice);
-    const hedgeRevenueTWETH = hedgeRevenueTUSD.div(ethUsdPrice);
-    const tokenTaxRevenueTWETH = tokenTaxRevenueTUSD.div(ethUsdPrice);
+    const minerFeesTWETH = (hedgeRevenueTUSD * 0.05) / ethUsdPrice;
+    const totalRevenueTWETH = totalRevenueTUSD / ethUsdPrice;
+    const cashierRevenueTWETH = cashierRevenueTUSD / ethUsdPrice;
+    const hedgeRevenueTWETH = hedgeRevenueTUSD / ethUsdPrice;
+    const tokenTaxRevenueTWETH = tokenTaxRevenueTUSD / ethUsdPrice;
+    const farmingFeesTWETH = farmingFeesUSD / ethUsdPrice;
     // Convert WETH values to USD
     const minerFeesTUSD = minerFeesTWETH * ethUsdPrice; 
-    const distributedTUSD = distributedTWETH.div(ethUsdPrice);
-    const totalClaimedTUSD = totalClaimedTWETH.div(ethUsdPrice);
-    const totalUnclaimedTUSD = totalUnclaimedTWETH.div(ethUsdPrice);
-    const minedHedgesTUSD = minerFeesTUSD.div(0.05).div(0.15); //reverse settlement fees & miner fees
+    const distributedTUSD = distributedTWETH / ethUsdPrice;
+    const undistributedTUSD = undistributedTWETH / ethUsdPrice;
+    const totalClaimedTUSD = totalClaimedTWETH / ethUsdPrice;
+    const totalUnclaimedTUSD = totalUnclaimedTWETH / ethUsdPrice;
+    const minedHedgesTUSD = (minerFeesTUSD / 0.05) / 0.15; //reverse settlement fees & miner fees
 
   // Call the updateSectionValues_Earnings function to update the HTML
   updateSectionValues_Earnings(
@@ -343,11 +352,14 @@ async function setCurrent_EarningsSection() {
     hedgeRevenueTUSD,
     tokenTaxRevenueTWETH,
     tokenTaxRevenueTUSD,
-    
+    farmingFeesTWETH,
+    farmingFeesUSD,
     minerFeesTWETH,
     minerFeesTUSD,
     distributedTWETH,
     distributedTUSD,
+    undistributedTWETH,
+    undistributedTUSD,
     totalUnclaimedTWETH,
     totalClaimedTUSD,
     totalUnclaimedTWETH,
@@ -467,7 +479,7 @@ async function setCurrent_TokenomicsSection() {
     const priceTWETH = fromBigIntNumberToDecimal(priceWETH, wethDecimals);
     
     // Convert USD values to WETH
-    const priceTUSD = priceTWETH.div(ethUsdPrice);
+    const priceTUSD = priceTWETH / ethUsdPrice;
   
     // Call the updateSectionValues_Tokenomics function to update the HTML
     updateSectionValues_Tokenomics(

@@ -16,7 +16,7 @@
 	<meta name="theme-color" content="#ffffff">
 	<meta name="author" content="Kaveman-x">
 	<!-- title page & SEO meta -->
-	<title>NEON - Dashboard</title>
+	<title>XEON - Dashboard</title>
 	<meta name="description" content="neon hedge is a universal ERC20 hedging and lending platform">
 	<meta name="keywords" content="erc20, crypto, hedging, call options, swaps, lending, collateral, website, html, html5, css">
     <!-- google fonts -->
@@ -35,10 +35,11 @@
 	<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 	<!-- analytics windows scripts -->
 	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js"></script>
-	<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+    <script type="module" src="js/ethers-5.0.umd.min.js"></script>
     <script type="module" src="js/_analytics.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script type="application/javascript" src="js/sweetalert/sweetalert.min.js"></script>
+    <script type="application/javascript" src="js/sweetalert/sweetalert.min.js"></script>    
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/bignumber.js/9.0.0/bignumber.min.js"></script>
 </head>
 <body>
 	<!-- Accessibility: Skip to content -->
@@ -108,20 +109,20 @@
                         <p class="card-value" id="activeTokensValue">-</p>
                     </div>
                     <div class="traffic-card">
-                        <h4 class="card-title">Hedges Taken</h4>
-                        <p class="card-value" id="swapsCountValue">-</p>
+                        <h4 class="card-title" title="The number of trades taken on the OTC market.">OTC Trades</h4>
+                        <p class="card-value" id="tradesCountValue">-</p>
                     </div>
                     <div class="traffic-card">
                         <h4 class="card-title">Cashier Volume</h4>
-                        <p class="card-value" id="swapsCountValue">-</p>
+                        <p class="card-value" id="cashierVolumeValue">-</p>
                     </div>
                     <div class="traffic-card">
-                        <h4 class="card-title">Options Volume</h4>
-                        <p class="card-value" id="swapsCountValue">-</p>
+                        <h4 class="card-title">OTC Volume</h4>
+                        <p class="card-value" id="otcVolumeValue" title="The total volume of trades on the OTC market.">-</p>
                     </div>
                     <div class="traffic-card">
-                        <h4 class="card-title">Swaps Volume</h4>
-                        <p class="card-value" id="swapsCountValue">-</p>
+                        <h4 class="card-title" title="Dex volume generates revenue for the protocol.">DEX Volume</h4>
+                        <p class="card-value" id="dexVolumeValue">-</p>
                     </div>
                 </div>
                 
@@ -192,7 +193,7 @@
                                             <div class="currency-details">
                                                 <span class="currency-name"><img src="./imgs/usdc-token.svg" alt="coin" style="width:32px; height:32px;"> USDC</span>
                                                 <div class="align-right">
-                                                    <span id="withdrawals_usdcAmnt" class="amount">0</span> (<span id="withdrawals_usdcAmnt" class="value">$0</span>)
+                                                    <span id="withdrawals_usdcAmnt" class="amount">0</span> (<span id="withdrawals_usdcValue" class="value">$0</span>)
                                                 </div>
                                             </div>
                                         </li>
@@ -200,7 +201,7 @@
                                             <div class="currency-details">
                                                 <span class="currency-name"><img src="./imgs/usdt-token.svg" alt="coin" style="width:32px; height:32px;"> USDT</span>
                                                 <div class="align-right">
-                                                    <span id="withdrawals_usdtAmnt" class="amount">0</span> (<span id="withdrawals_usdtAmnt" class="value">$0</span>)
+                                                    <span id="withdrawals_usdtAmnt" class="amount">0</span> (<span id="withdrawals_usdtValue" class="value">$0</span>)
                                                 </div>
                                             </div>
                                         </li>
@@ -208,20 +209,65 @@
                                             <div class="currency-details">
                                                 <span class="currency-name"><img src="./imgs/erc20-gold-token.svg" alt="coin" style="width:32px; height:32px;"> ERC20</span>
                                                 <div class="align-right">
-                                                    <span id="withdrawals_erc20Amnt" class="amount">0</span> (<span id="withdrawals_erc20Amnt" class="value">$0</span>)
+                                                    <span id="withdrawals_erc20Amnt" class="amount">0</span> (<span id="withdrawals_erc20Value" class="value">$0</span>)
                                                 </div>
                                             </div>
                                         </li>
                                     </ul>
                                 </div>
                             </div><!-- widget-content -->
-                        </div> <!-- widget -->
+                        </div> <!-- Withdrawals widget -->
+
+                        <div class="widget">
+                            <div class="widget-content">
+                                <div class="total-amount">
+                                    <h4 class="widget-title">OTC Volume</h4>
+                                    <p id="totalOTCVolume" class="align-right" title="The total trading volume on the OTC market, based on startValue. Read Docs..">$0.00</p>
+                                </div>
+                                <div class="breakdown">
+                                    <ul>
+                                        <li>
+                                            <div class="currency-details">
+                                                <span class="currency-name"><img src="./imgs/weth-token.svg" alt="coin" style="width:32px; height:32px;"> WETH Equiv</span>
+                                                <div class="align-right">
+                                                    <span id="otcVol_wethAmnt" class="amount">0</span> (<span id="otcVol_wethValue" class="value">$0</span>)
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="currency-details">
+                                                <span class="currency-name"><img src="./imgs/usdt-token.svg" alt="coin" style="width:32px; height:32px;"> USDT Equiv</span>
+                                                <div class="align-right">
+                                                    <span id="otcVol_usdcAmnt" class="amount">0</span> (<span id="otcVol_usdcValue" class="value">$0</span>)
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="currency-details">
+                                                <span class="currency-name"><img src="./imgs/usdc-token.svg" alt="coin" style="width:32px; height:32px;"> USDC Equiv</span>
+                                                <div class="align-right">
+                                                    <span id="otcVol_usdtAmnt" class="amount">0</span> (<span id="otcVol_usdtValue" class="value">$0</span>)
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li>                 
+                                            <div class="currency-details">
+                                                <span class="currency-name"><img src="./imgs/erc20-gold-token.svg" alt="coin" style="width:32px; height:32px;"> Other</span>
+                                                <div class="align-right">
+                                                    <span id="withdrawals_erc20Amnt" class="amount">0</span> (<span id="otcVol_otherValue" class="value">$0</span>)
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div><!-- widget-content -->
+                        </div> <!-- OTC widget -->
                     </div>
 
                     <div class="section section-big-chart">
-                        <h4 class="widget-title">Deposits / Withdrawals</h4>
+                        <h4 class="widget-title">Cashier</h4>
                         <canvas id="depositWithdrawalChart"></canvas>
-                        <h4 class="widget-title">Transaction Volume</h4>
+                        <h4 class="widget-title">Currencies</h4>
                         <canvas id="cashingPieChart"></canvas>
                     </div>
                 </div><!-- trafficStats-->
@@ -235,19 +281,36 @@
 				</div>
                 <div class="traffic-section">
                     <div class="traffic-card">
+                        <h4 class="card-title" title="based on start value">Hedge Volume</h4>
+                        <p class="card-value" id="hedgeVolumeValue">-</p>
+                    </div>
+                    <div class="traffic-card">
+                        <h4 class="card-title" title="based on cost value">Buy Volume</h4>
+                        <p class="card-value" id="buyVolumeValue">-</p>
+                    </div>
+                    <div class="traffic-card">
+                        <h4 class="card-title" title="fees collected on settlement">Fee Volume</h4>
+                        <p class="card-value" id="feeVolumeValue">-</p>
+                    </div>
+                    <div class="traffic-card">
+                        <h4 class="card-title" title="fees collected on settlement">Settled Volume</h4>
+                        <p class="card-value" id="settleVolumeValue">-</p>
+                    </div>
+                    
+                    <div class="traffic-card">
                         <h4 class="card-title">ERC20 Types</h4>
-                        <p class="card-value" id="activeWalletsValue">-</p>
+                        <p class="card-value" id="activeTokensCount">-</p>
                     </div>
                     <div class="traffic-card">
-                        <h4 class="card-title">Hedges Count</h4>
-                        <p class="card-value" id="activeTokensValue">-</p>
+                        <h4 class="card-title" title="number of hedges taken">Hedges Count</h4>
+                        <p class="card-value" id="tradedHedgesCount">-</p>
                     </div>
                     <div class="traffic-card">
-                        <h4 class="card-title">Options Count</h4>
+                        <h4 class="card-title" title="number of options taken">Options Count</h4>
                         <p class="card-value" id="optionsCountValue">-</p>
                     </div>
                     <div class="traffic-card">
-                        <h4 class="card-title">Swaps Count</h4>
+                        <h4 class="card-title" title="number of swaps taken">Swaps Count</h4>
                         <p class="card-value" id="swapsCountValue">-</p>
                     </div>
                 </div>
@@ -279,7 +342,7 @@
 							<div class="cardDataRow grid grid-cols-2">
 								<div class="flex flex-col cardData">
 									<div class="grid-sect-subtitle splitView stakedTitle"><span>hedge costs: </span><span id="hedgeCostsTotal">$0</span></div>
-									<div class="grid-sect-subtitle splitView stakedTitle"><span>hedge value: </span><span id="hedgesValueTotal">$0</span></div>
+									<div class="grid-sect-subtitle splitView stakedTitle"><span>hedge value: </span><span id="hedgeValueTotal">$0</span></div>
 								</div>
 								<div class="hedgeChart">
                                     <canvas id="hedgeBarChartC"></canvas>
@@ -372,7 +435,7 @@
                                         </li>
                                         <li>
                                             <div class="currency-details">
-                                                <span class="currency-name">Hedges</span>
+                                                <span class="currency-name">OTC Trades</span>
                                                 <div class="align-right">
                                                     <span id="hedgeRevenueAmnt" class="amount">0</span> (<span id="hedgeRevenueValue" class="value">$0</span>)
                                                 </div>
@@ -386,6 +449,14 @@
                                                 </div>
                                             </div>
                                         </li>
+                                        <li>
+                                            <div class="currency-details">
+                                                <span class="currency-name" title="Liquidity for Xeon run Hedges">Farming</span>
+                                                <div class="align-right">
+                                                    <span id="farmingRevenueAmnt" class="amount">0</span> (<span id="farmingRevenueValue" class="value">$0</span>)
+                                                </div>
+                                            </div>
+                                        </li>
                                     </ul>
                                 </div>
                             </div>
@@ -393,10 +464,18 @@
                         <div class="widget">
                             <div class="widget-content">
                                 <div class="total-amount">
-                                    <h4 class="widget-title">Total Dividents</h4>
+                                    <h4 class="widget-title">Dividents | Rewards</h4>
                                 </div>
                                 <div class="breakdown">
                                     <ul>
+                                        <li>
+                                            <div class="currency-details">
+                                                <span class="currency-name">Revenue Pending</span>
+                                                <div class="align-right">
+                                                    <span id="totalRevenueUndistrAmnt" class="amount">0</span> (<span id="totalRevenueUndistrValue" class="value">$0</span>)
+                                                </div>
+                                            </div>
+                                        </li>
                                         <li>
                                             <div class="currency-details">
                                                 <span class="currency-name">Revenue Distributed</span>
@@ -436,7 +515,7 @@
                         <div class="widget">
                             <div class="widget-content">
                                 <div class="total-amount">
-                                    <h4 class="widget-title">Miners Stats</h4>
+                                    <h4 class="widget-title">Miner | Settlement Stats</h4>
                                 </div>
                                 <div class="breakdown">
                                     <ul>
@@ -450,7 +529,7 @@
                                         </li>
                                         <li>
                                             <div class="currency-details">
-                                                <span class="currency-name">Mined Hedges</span>
+                                                <span class="currency-name">Mined Volume</span>
                                                 <div class="align-right">
                                                     <span id="minedHedgesCount" class="amount">0</span> (<span id="minedHedgesValue" class="value">$0</span>)
                                                 </div>
@@ -564,7 +643,7 @@
                     <div class="assignGrids staking-summary-grid grid grid-cols-2 gap-5">
                         <!--
                         <div class="stakeDataRow flex items-center justify-between gap-2">
-                            <div class="grid-sect-title">Total Staked NEON</div>
+                            <div class="grid-sect-title">Total Staked XEON</div>
                             <div class="grid-sect-title" style="color:#33856b !important;">0 ($0)</div>
                         </div>
 
@@ -639,7 +718,7 @@
                 <div class="token-info-widget">
                     <div class="widget-title">
                         <span class="icon"><i class="fas fa-info-circle"></i></span>
-                        NEON is an ERC20 Token on Arbitrum Blockchain
+                        XEON is an ERC20 Token on Arbitrum Blockchain
                     </div>
                     <div class="widget-content">
                         <div class="token-info-section">
@@ -656,7 +735,7 @@
                                     <span class="icon"><i class="fas fa-coins"></i></span>
                                     Token Symbol
                                     </h4>
-                                    <p id="tokenoSymbol">NEON</p>
+                                    <p id="tokenoSymbol">XEON</p>
                                 </div>
                                 <div class="info-item">
                                     <h4>
@@ -687,21 +766,21 @@
                                 <span class="icon"><i class="fas fa-list-ol"></i></span>
                                 Total Supply
                             </h4>
-                            <p  id="tokenoTotalSupply">300,000,000 NEON</p>
+                            <p  id="tokenoTotalSupply">300,000,000 XEON</p>
                             </div>
                             <div class="info-item">
                             <h4>
                                 <span class="icon"><i class="fas fa-burn"></i></span>
                                 Burnt Supply
                             </h4>
-                            <p  id="tokenoBurnt">10,000, 000 NEON</p>
+                            <p  id="tokenoBurnt">10,000, 000 XEON</p>
                             </div>
                             <div class="info-item">
                             <h4>
                                 <span class="icon"><i class="fas fa-sync-alt"></i></span>
                                 Circulating Supply
                             </h4>
-                            <p  id="tokenoCirculating">290,000, 000 NEON</p>
+                            <p  id="tokenoCirculating">290,000, 000 XEON</p>
                             </div>
                         </div>
                     </div>
@@ -711,7 +790,7 @@
                         </div>
                         <div class="tokenomicsBriefing">
                             <h4>* This Token is Deflationary!</h4>
-                            <p>NEON is the native token of our Ecosystem. </p>
+                            <p>XEON is the native token of our Ecosystem. </p>
                             <p>Fundamental for tokenizing income rights whilst stimulating protocol revenue.</p>
                             <p>Token utility within the protocol includes: </br>Stake to gain hedge mining rights, </br>Stake to provide native lending collateral, </br>Stake to provide native hedge liquidity, </br>Stake to claim portion of revenue share.</p>
                             <p>Read more on <a href="#jump-to-section" class="walletStateLink"><text text-anchor="middle"  style="color:#188dd6;"> token-utility... <i class="fa fa-link" aria-hidden="true"></i></text></a></p>

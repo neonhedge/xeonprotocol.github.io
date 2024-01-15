@@ -100,8 +100,8 @@ function updateSectionValues_hedges(activeTokensCount, totalTakenCount, swapsTak
   // Counters
   document.getElementById("activeTokensCount").textContent = activeTokensCount;
   document.getElementById("tradedHedgesCount").textContent = totalTakenCount;
-  document.getElementById("tradedOptionsCount").textContent = hedgesTakenCount;
-  document.getElementById("tradedSwapsCount").textContent = swapsTakenCount;
+  document.getElementById("optionsCountValue").textContent = hedgesTakenCount;
+  document.getElementById("swapsCountValue").textContent = swapsTakenCount;
 
   // Update hedges traded and created
   document.getElementById("hedgesTraded").textContent = formatValue(hedgesTraded);
@@ -131,10 +131,14 @@ function updateSectionValues_Earnings(
   hedgeRevenueUsd,
   tokenTaxRevenueEth,
   tokenTaxRevenueUsd,
+  farmingFeesEth,
+  farmingFeesUsd,
   minerFeesEth,
   minerFeesUsd,
   distributedEth,
   distributedUsd,
+  undistributedEth,
+  undistributedUsd,
   totalClaimedEth,
   totalClaimedUsd,
   totalUnclaimedEth,
@@ -166,13 +170,21 @@ function updateSectionValues_Earnings(
   document.getElementById("taxRevenueAmnt").textContent = formatAmount(tokenTaxRevenueEth);
   document.getElementById("taxRevenueValue").textContent = formatValue(tokenTaxRevenueUsd);
 
+  // Update farming revenues    
+  document.getElementById("farmingRevenueAmnt").textContent = formatAmount(farmingFeesEth);
+  document.getElementById("farmingRevenueValue").textContent = formatValue(farmingFeesUsd);
+
   // Update total revenues    
-  document.getElementById("totalRevenueAmnt").textContent = formatAmount(totalRevenueEth);
+  //document.getElementById("totalRevenueAmnt").textContent = formatAmount(totalRevenueEth);
   document.getElementById("totalRevenueValue").textContent = formatValue(totalRevenueUsd);
 
   // Update distributed
   document.getElementById("totalRevenueDistrAmnt").textContent = formatValue(distributedEth);
   document.getElementById("totalRevenueDistrValue").textContent = formatValue(distributedUsd);
+
+  // Update undistributed
+  document.getElementById("totalRevenueUndistrAmnt").textContent = formatValue(undistributedEth);
+  document.getElementById("totalRevenueUndistrValue").textContent = formatValue(undistributedUsd);
 
   // Update total claimed
   document.getElementById("totalClaimedAmnt").textContent = formatAmount(totalClaimedEth);
@@ -195,8 +207,8 @@ function updateSectionValues_Earnings(
   document.getElementById("totalStakers").textContent = totalStakers;
 
   // Calculate and update total fees
-  const totalFeesEth = minerFeesEth.plus(protocolFeesEth);
-  const totalFeesUsd = minerFeesUsd.plus(protocolFeesUsd);
+  const totalFeesEth = minerFeesEth.plus(totalRevenueEth);
+  const totalFeesUsd = minerFeesUsd.plus(totalRevenueUsd);
   document.getElementById("totalFeesValue").textContent = formatValue(totalFeesUsd);
 }
 
