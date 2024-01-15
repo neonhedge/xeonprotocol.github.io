@@ -397,8 +397,7 @@ async function setCurrent_StakedSection(){
 	const AssignedRewardsLiqRaw = await stakingInstance.totalAssignedForLiquidity();
 	
 	// Fetch ETH to USD conversion rate
-	const ethUsdPrice = getCurrentEthUsdcPriceFromUniswapV2();
-    const tokenUsdPrice = await getTokenUSDValue();
+	const ethUsdPrice = getCurrentEthUsdcPriceFromUniswapV2();    
 
 	// Step 1: Convert amounts
 	const wethDecimals = 18; const usdtDecimals = 6; const usdcDecimals = 6;
@@ -406,13 +405,16 @@ async function setCurrent_StakedSection(){
 	// Step 2: Convert from BN to normal values
 	const totalStaked = fromBigIntNumberToDecimal(totalStakedRaw, CONSTANTS.decimals);
 	const circulatingSupply = fromBigIntNumberToDecimal(circulatingSupplyRaw, CONSTANTS.decimals);
-    const totalStakers = totalStakersRaw;
+        const totalStakersString = totalStakersRaw.toString();
+        const totalStakers = Number(totalStakersRaw);
     const totalAssigned = fromBigIntNumberToDecimal(totalAssignedRaw, CONSTANTS.decimals);
     const totalUnassigned = fromBigIntNumberToDecimal(totalUnassignedRaw, CONSTANTS.decimals);
     // Assignment breakdown
     const AssignedRewardsMin = fromBigIntNumberToDecimal(AssignedRewardsMinRaw, CONSTANTS.decimals);
     const AssignedRewardsCol = fromBigIntNumberToDecimal(AssignedRewardsColRaw, CONSTANTS.decimals);
     const AssignedRewardsLiq = fromBigIntNumberToDecimal(AssignedRewardsLiqRaw, CONSTANTS.decimals);
+    // Get XEON token USD price: input decimal output decimal
+    const tokenUsdPrice = await getTokenUSDValue(CONSTANTS.neonAddress, 1);
 	
     // Step 3: Convert ETH values
     const distributedRewardsEth = fromBigIntNumberToDecimal(distributedRewards, wethDecimals);
@@ -460,26 +462,25 @@ async function setCurrent_TokenomicsSection() {
     const buyTax = await neonInstance._initialBuyTax(); 
     const sellTax = await neonInstance._initialSellTax();
     const BigIntInput = fromDecimalToBigInt(1, decimals);
-    const [priceWETH, pairedSymbol] = await getTokenETHValue(CONSTANTS.neonAddress, BigIntInput);
+    const [priceTWETH, pairedSymbol] = await getTokenETHValue(CONSTANTS.neonAddress, BigIntInput);
 
     const totalStakedRaw = await stakingInstance.getTotalStaked();
     const totalSupplyBig = await neonInstance.totalSupply();
     const burntBalanceBig = await neonInstance.balanceOf(CONSTANTS.burnAddress);
     const circSupply = BigInt(totalSupplyBig) - BigInt(burntBalanceBig);
 
-    const totaSupply = await neonInstance.totalSupply(); 
+    const totalSupplyRaw = await neonInstance.totalSupply(); 
     
     // Fetch ETH to USD conversion rate
     const ethUsdPrice = getCurrentEthUsdcPriceFromUniswapV2();
 
     // Convert WETH to human readable
     const circulatingSupply = fromBigIntNumberToDecimal(circSupply, decimals);
-    const totalSupply = fromBigIntNumberToDecimal(totaSupply, decimals);
-    const burntSupply = totalSupply.minus(circulatingSupply);
-    const priceTWETH = fromBigIntNumberToDecimal(priceWETH, wethDecimals);
+    const totalSupply = fromBigIntNumberToDecimal(totalSupplyRaw, decimals);
+    const burntSupply = totalSupply - circulatingSupply;
     
     // Convert USD values to WETH
-    const priceTUSD = priceTWETH / ethUsdPrice;
+    const priceTUSD = priceTWETH * ethUsdPrice;
   
     // Call the updateSectionValues_Tokenomics function to update the HTML
     updateSectionValues_Tokenomics(
@@ -491,7 +492,8 @@ async function setCurrent_TokenomicsSection() {
         priceTWETH,
         priceTUSD,
         burntSupply,
-        circulatingSupply
+        circulatingSupply,
+        totalSupply
     );
 
     updateChartValues_Tokenomics(burntSupply, circulatingSupply);

@@ -197,22 +197,32 @@ function updateChartValues_Currencies(weth, usdt, usdc, erc20) {
 
 //Do for all charts in one go
 function updateChartValues_hedges(chartID, valueA, valueB) {
+    if((valueA && valueB) == 0) {
+        valueA= 50;
+        valueB= 50;
+    }
     const chartDataHedgeA = [valueA, valueB];
 
     let hedgeChartID, chartLabels;
 
-    if (chartID === 1) {
+    if (chartID == 1) {
         hedgeChartID = "hedgeBarChartA";
         chartLabels = ["Traded Hedges", "Created Hedges"];
-    } else if (chartID === 2) {
+    } else if (chartID == 2) {
         hedgeChartID = "hedgeBarChartB";
         chartLabels = ["Options Volume", "Swaps Volume"];
-    } else if (chartID === 3) {
+    } else if (chartID == 3) {
         hedgeChartID = "hedgeBarChartC";
         chartLabels = ["Hedge Costs", "Underlying Value"];
-    } else if (chartID === 4) {
+    } else if (chartID == 4) {
         hedgeChartID = "hedgeBarChartD";
         chartLabels = ["Hedge Profits", "Hedge Losses"];
+    }
+
+    // Check if the chart already exists and destroy it
+    const existingChart = Chart.getChart(document.getElementById(hedgeChartID));
+    if (existingChart) {
+        existingChart.destroy();
     }
 
     const hedgeData = {
@@ -251,6 +261,10 @@ function updateChartValues_hedges(chartID, valueA, valueB) {
 }
 
 function updateChartValues_Revenue(cashierRevenue, hedgeRevenue, tokenRevenue) {
+    if((hedgeRevenue && tokenRevenue) == 0) {
+        hedgeRevenue= 50;
+        tokenRevenue= 50;
+    }
     const chartData = [cashierRevenue, hedgeRevenue, tokenRevenue];
     const chartLabelsRevenue = ['Cashier', 'Hedges', 'TokenTax'];
 
@@ -273,6 +287,10 @@ function updateChartValues_Revenue(cashierRevenue, hedgeRevenue, tokenRevenue) {
 
 
 function updateChartValues_Dividents(netRevenue, netDistributed) {
+    if((netRevenue && netDistributed) == 0) {
+        netRevenue= 50;
+        netDistributed= 50;
+    }
     const chartData = [netRevenue, netDistributed];
     const chartCanvasDividents = document.getElementById('dividentsChart');
 
@@ -347,6 +365,10 @@ function updateChartValues_Dividents(netRevenue, netDistributed) {
     });
 }
 function updateChartValues_Claims(netClaimed, netUnclaimed) {
+    if((netClaimed && netUnclaimed) == 0) {
+        netClaimed= 50;
+        netUnclaimed= 50;
+    }
     const chartData = [netClaimed, netUnclaimed];
     const chartLabelsClaims = ['Claimed', 'Unclaimed'];
 
@@ -360,6 +382,10 @@ function updateChartValues_Claims(netClaimed, netUnclaimed) {
 }
 
 function updateChartValues_Staking(netProfit, netLoss) {
+    if((netProfit && netLoss) == 0) {
+        netProfit= 50;
+        netLoss= 50;
+    }
     const chartDataStake = [netProfit, netLoss];
 
     updateBarChart('stakedsupplyChart', [""], [

@@ -207,8 +207,8 @@ function updateSectionValues_Earnings(
   document.getElementById("totalStakers").textContent = totalStakers;
 
   // Calculate and update total fees
-  const totalFeesEth = minerFeesEth.plus(totalRevenueEth);
-  const totalFeesUsd = minerFeesUsd.plus(totalRevenueUsd);
+  const totalFeesEth = minerFeesEth + totalRevenueEth;
+  const totalFeesUsd = minerFeesUsd + totalRevenueUsd;
   document.getElementById("totalFeesValue").textContent = formatValue(totalFeesUsd);
 }
 
@@ -246,7 +246,7 @@ function updateSectionValues_Staking(
   document.getElementById("stakedValue").textContent = formatValue(totalStakedUSDT);
   document.getElementById("circAmount").textContent = formatAmount(circulatingSupply);
   document.getElementById("circValue").textContent = formatValue(circulatingSupplyUSDT);
-  document.getElementById("stakersCount").textContent = formatAmount(totalStakers);
+  document.getElementById("stakersCount").textContent = totalStakers;
 
   // Update assigned totals
   document.getElementById("assignedStakesAmnt").textContent = formatAmount(totalAssigned);
@@ -281,6 +281,15 @@ function updateSectionValues_Tokenomics(symbol, decimals, contractAddress, buyTa
       return `$${value.toFixed(2)}`;
   };
 
+  const formatStringDecimal = (number) => {
+		const options = {
+			style: 'decimal',
+			minimumFractionDigits: 2,
+			maximumFractionDigits: 7,
+		};
+		return number.toLocaleString('en-US', options);
+	};
+
     // Update
     document.getElementById("tokenoSymbol").textContent = symbol;
     document.getElementById("tokenoDecimals").textContent = decimals;
@@ -288,7 +297,7 @@ function updateSectionValues_Tokenomics(symbol, decimals, contractAddress, buyTa
     document.getElementById("tokenoTaxes").textContent = buyTax + '/' + sellTax;
   
     // Update price
-    document.getElementById("tokenoPriceUSD").textContent = formatAmount(priceTUSD);
+    document.getElementById("tokenoPriceUSD").textContent = formatStringDecimal(priceTUSD);
   
     // Update supply  
     document.getElementById("tokenoBurnt").textContent = formatValue(burntSupply);
