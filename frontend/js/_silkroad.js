@@ -395,12 +395,22 @@ $(document).on('click', '#create_button', function(e){
 	createForm();
 });
 // Listeners: set sidebar globals
-$(document).on('click', '#statsLabel', function(e){
+$(document).on('click', '#statsLabel', async function(e){
 	window.sidebarTab = 1;
+	// quick one: refresh sidebar
+	const searchInput = $('#searchBar').val();
+    if (searchInput.length >= 40 && window.web3.utils.isAddress(searchInput) == true) {
+        // filter sidebar infor for token
+        await loadSidebarVolume_Token(searchInput);
+    } else {
+        await loadSidebarVolume_All();
+    }
 });
 
 $(document).on('click', '#eventsLabel', function(e){
 	window.sidebarTab = 2;
+	// quick one: refresh sidebar
+	loadPastEvents();
 });
 
 // Attach event handler to document object for event delegation
