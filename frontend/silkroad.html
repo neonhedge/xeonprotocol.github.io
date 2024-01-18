@@ -16,7 +16,7 @@
 	<meta name="theme-color" content="#ffffff">
 	<meta name="author" content="Kaveman-x">
 	<!-- title page & SEO meta -->
-	<title>NEON - OTC Silkroad</title>
+	<title>XEON - OTC Silkroad</title>
 	<meta name="description" content="neon hedge is a universal ERC20 hedging and lending platform">
 	<meta name="keywords" content="erc20, crypto, hedging, call options, swaps, lending, collateral, website, html, html5, css">
 	<!-- google fonts -->
@@ -33,12 +33,13 @@
     <link rel="stylesheet" type="text/css" href="css/_silkroad.css">
     <link rel="stylesheet" type="text/css" href="css/sweetalert/sweetalert.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-	<!-- floor scripts -->    
+	<!-- marketplace page scripts -->    
 	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js"></script>
-    <!-- <script src="https://unpkg.com/@metamask/legacy-web3@latest/dist/metamask.web3.min.js"></script> -- //legacy -->
-	<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+	<script type="module" src="js/ethers-5.0.umd.min.js"></script>
 	<script type="module" src="js/_silkroad.js"></script>
-	<script type="application/javascript" src="js/sweetalert/sweetalert.min.js"></script>
+
+	<script type="application/javascript" src="js/sweetalert/sweetalert.min.js"></script>	
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/bignumber.js/9.0.0/bignumber.min.js"></script>
 </head>
 
 <body>
@@ -106,13 +107,13 @@
 						<h4 title="P2P options market place">> OTC_Silkroad</h4> <!-- _OTC___Rooms_ -->
 					</div>
 					<div class="asideNavs">
-						<div class="asideNavsinside" id="erc20Options" title="create - buy - discover and track OTC ERC20 Call | Put Options">Call Options</div>
+						<div class="asideNavsinside" id="erc20Options" title="create - buy - discover and track OTC ERC20 Call Options">Call Options</div>
 					</div>
 					<div class="asideNavs">
-						<div class="asideNavsinside" id="equitySwaps" title="create - buy - discover and track OTC ERC20 Equity Swaps">Put Options</div>
+						<div class="asideNavsinside" id="equitySwaps" title="create - buy - discover and track OTC Put Options">Put Options</div>
 					</div>
 					<div class="asideNavs">
-						<div class="asideNavsinside" id="erc20Loans" title="create or discover OTC loans collateralized by ERC20 tokens">Equity Swaps</div>
+						<div class="asideNavsinside" id="erc20Loans" title="create - buy - discover and track OTC ERC20 Equity Swaps">Equity Swaps</div>
 					</div>
 					<div class="asideNavs">
 						<div class="asideNavsinside" id="socialstream">Social</div>
@@ -153,13 +154,13 @@
 							<div class="projectLogo" style="background-image:url('./imgs/erc20-uniswap-tr.png')"></div>
 							<div class="projectName">
 								<div>Vela Exchange<a class="blockexplorer" href="https://etherscan.io/address/'`+pairAddress+`" target="_blank" alt="SC" title="Go to Etherscan">0x00..000</a></div>
-								<div class="tl_bagsize">10,200,000 VELA</div>
+								<div class="tl_bagsize">--,--,-- VELA</div>
 							</div>
 						</div>
 						<div class="valueHold">
 							<div class="assetsValue">
 								<div class="valueTitle"></div>
-								<div class="assetsMarketValue highlightOption">2.4 ETH</div>
+								<div class="assetsMarketValue highlightOption">-- ETH</div>
 							</div>
 							<div class="assetsType">
 								<div class="typeTitle">HEDGE</div>
@@ -169,15 +170,15 @@
 
 						<div class="strategyContainer">
 							<div class="optionMarksHold">
-								<div class="optionMark"><span>Strike:</span><span class="oMfigure">0.0002 eth</span></div>
-								<div class="optionMark"><span>Premium:</span><span class="oMfigure">0.11 eth</span></div>
-								<div class="optionMark"><span>Expires:</span><span class="oMfigure">21 days</span></div>
+								<div class="optionMark"><span>Strike:</span><span class="oMfigure">--,-- eth</span></div>
+								<div class="optionMark"><span>Premium:</span><span class="oMfigure">--,-- eth</span></div>
+								<div class="optionMark"><span>Expires:</span><span class="oMfigure">-- days</span></div>
 							</div>
 							<div class="strategyHold">
 								<img class="strategyImage" src="./imgs/call-option.svg" />
 								<div class="strategyDataHold">
 									<div class="topValue-call">profit zone</div>
-									<div class="bottomValue-call">max loss 0.0002eth</div>
+									<div class="bottomValue-call">max loss --,-- eth</div>
 								</div>
 							</div>
 						</div>
@@ -195,13 +196,13 @@
 							<div class="projectLogo" style="background-image:url('./imgs/erc20-shitcoin-tr.png')"></div>
 							<div class="projectName">
 								<div>Vela Exchange<a class="blockexplorer" href="https://etherscan.io/address/'`+pairAddress+`" target="_blank" alt="SC" title="Go to Etherscan">0x00..000</a></div>
-								<div class="tl_bagsize">10,200,000 VELA</div>
+								<div class="tl_bagsize">--,--,-- VELA</div>
 							</div>
 						</div>
 						<div class="valueHold">
 							<div class="assetsValue">
 								<div class="valueTitle"></div>
-								<div class="assetsMarketValue highlightOption">2.4 ETH</div>
+								<div class="assetsMarketValue highlightOption">-- ETH</div>
 							</div>
 							<div class="assetsType">
 								<div class="typeTitle">HEDGE</div>
@@ -211,14 +212,14 @@
 
 						<div class="strategyContainer">
 							<div class="optionMarksHold">
-								<div class="optionMark"><span>Strike:</span><span class="oMfigure">0.0002 eth</span></div>
-								<div class="optionMark"><span>Premium:</span><span class="oMfigure">0.11 eth</span></div>
-								<div class="optionMark"><span>Expires:</span><span class="oMfigure">21 days</span></div>
+								<div class="optionMark"><span>Strike:</span><span class="oMfigure">--,-- eth</span></div>
+								<div class="optionMark"><span>Premium:</span><span class="oMfigure">--,-- eth</span></div>
+								<div class="optionMark"><span>Expires:</span><span class="oMfigure">-- days</span></div>
 							</div>
 							<div class="strategyHold">
 								<img class="strategyImage" src="./imgs/put-option.svg" />
 								<div class="strategyDataHold">
-									<div class="topValue-put">max loss 0.0002eth</div>
+									<div class="topValue-put">max loss --,-- eth</div>
 									<div class="bottomValue-put">profit zone</div>
 								</div>
 							</div>
@@ -237,13 +238,13 @@
 							<div class="projectLogo" style="background-image:url('./imgs/erc20-shitcoin-tr.png')"></div>
 							<div class="projectName">
 								<div>Vela Exchange<a class="blockexplorer" href="https://etherscan.io/address/'`+pairAddress+`" target="_blank" alt="SC" title="Go to Etherscan">0x00..000</a></div>
-								<div class="tl_bagsize">10,200,000 VELA</div>
+								<div class="tl_bagsize">--,--,-- VELA</div>
 							</div>
 						</div>
 						<div class="valueHold">
 							<div class="assetsValue">
 								<div class="valueTitle"></div>
-								<div class="assetsMarketValue highlightOption">2.4 ETH</div>
+								<div class="assetsMarketValue highlightOption">-- ETH</div>
 							</div>
 							<div class="assetsType">
 								<div class="typeTitle">HEDGE</div>
@@ -253,15 +254,15 @@
 
 						<div class="strategyContainer">
 							<div class="optionMarksHold">
-								<div class="optionMark"><span>Strike:</span><span class="oMfigure">0.0002 eth</span></div>
-								<div class="optionMark"><span>Premium:</span><span class="oMfigure">0.11 eth</span></div>
-								<div class="optionMark"><span>Expires:</span><span class="oMfigure">21 days</span></div>
+								<div class="optionMark"><span>Strike:</span><span class="oMfigure">--,-- eth</span></div>
+								<div class="optionMark"><span>Premium:</span><span class="oMfigure">--,-- eth</span></div>
+								<div class="optionMark"><span>Expires:</span><span class="oMfigure">-- days</span></div>
 							</div>
 							<div class="strategyHold">
 								<img class="strategyImage" src="./imgs/call-option.svg" />
 								<div class="strategyDataHold">
 									<div class="topValue-call">profit zone</div>
-									<div class="bottomValue-call">max loss 0.0002eth</div>
+									<div class="bottomValue-call">max loss --,-- eth</div>
 								</div>
 							</div>
 						</div>
@@ -279,13 +280,13 @@
 							<div class="projectLogo" style="background-image:url('./imgs/erc20-uniswap-tr.png')"></div>
 							<div class="projectName">
 								<div>Vela Exchange<a class="blockexplorer" href="https://etherscan.io/address/'`+pairAddress+`" target="_blank" alt="SC" title="Go to Etherscan">0x00..000</a></div>
-								<div class="tl_bagsize">10,200,000 VELA</div>
+								<div class="tl_bagsize">--,--,-- VELA</div>
 							</div>
 						</div>
 						<div class="valueHold">
 							<div class="assetsValue">
 								<div class="valueTitle"></div>
-								<div class="assetsMarketValue highlightOption">2.4 ETH</div>
+								<div class="assetsMarketValue highlightOption">-- ETH</div>
 							</div>
 							<div class="assetsType">
 								<div class="typeTitle">HEDGE</div>
@@ -295,15 +296,15 @@
 
 						<div class="strategyContainer">
 							<div class="optionMarksHold">
-								<div class="optionMark"><span>Strike:</span><span class="oMfigure">0.0002 eth</span></div>
-								<div class="optionMark"><span>Premium:</span><span class="oMfigure">0.11 eth</span></div>
-								<div class="optionMark"><span>Expires:</span><span class="oMfigure">21 days</span></div>
+								<div class="optionMark"><span>Strike:</span><span class="oMfigure">--,-- eth</span></div>
+								<div class="optionMark"><span>Premium:</span><span class="oMfigure">--,-- eth</span></div>
+								<div class="optionMark"><span>Expires:</span><span class="oMfigure">-- days</span></div>
 							</div>
 							<div class="strategyHold">
 								<img class="strategyImage" src="./imgs/call-option.svg" />
 								<div class="strategyDataHold">
 									<div class="topValue-call">profit zone</div>
-									<div class="bottomValue-call">max loss 0.0002eth</div>
+									<div class="bottomValue-call">max loss --,-- eth</div>
 								</div>
 							</div>
 						</div>
@@ -321,13 +322,13 @@
 							<div class="projectLogo" style="background-image:url('./imgs/erc20-uniswap-tr.png')"></div>
 							<div class="projectName">
 								<div>Vela Exchange<a class="blockexplorer" href="https://etherscan.io/address/'`+pairAddress+`" target="_blank" alt="SC" title="Go to Etherscan">0x00..000</a></div>
-								<div class="tl_bagsize">10,200,000 VELA</div>
+								<div class="tl_bagsize">--,--,-- VELA</div>
 							</div>
 						</div>
 						<div class="valueHold">
 							<div class="assetsValue">
 								<div class="valueTitle"></div>
-								<div class="assetsMarketValue highlightOption">2.4 ETH</div>
+								<div class="assetsMarketValue highlightOption">-- ETH</div>
 							</div>
 							<div class="assetsType">
 								<div class="typeTitle">HEDGE</div>
@@ -337,14 +338,14 @@
 
 						<div class="strategyContainer">
 							<div class="optionMarksHold">
-								<div class="optionMark"><span>Strike:</span><span class="oMfigure">0.0002 eth</span></div>
-								<div class="optionMark"><span>Premium:</span><span class="oMfigure">0.11 eth</span></div>
-								<div class="optionMark"><span>Expires:</span><span class="oMfigure">21 days</span></div>
+								<div class="optionMark"><span>Strike:</span><span class="oMfigure">--,-- eth</span></div>
+								<div class="optionMark"><span>Premium:</span><span class="oMfigure">--,-- eth</span></div>
+								<div class="optionMark"><span>Expires:</span><span class="oMfigure">-- days</span></div>
 							</div>
 							<div class="strategyHold">
 								<img class="strategyImage" src="./imgs/put-option.svg" />
 								<div class="strategyDataHold">
-									<div class="topValue-put">max loss 0.0002eth</div>
+									<div class="topValue-put">max loss --,-- eth</div>
 									<div class="bottomValue-put">profit zone</div>
 								</div>
 							</div>
@@ -363,13 +364,13 @@
 							<div class="projectLogo" style="background-image:url('./imgs/erc20-shitcoin-tr.png')"></div>
 							<div class="projectName">
 								<div>Vela Exchange<a class="blockexplorer" href="https://etherscan.io/address/'`+pairAddress+`" target="_blank" alt="SC" title="Go to Etherscan">0x00..000</a></div>
-								<div class="tl_bagsize">10,200,000 VELA</div>
+								<div class="tl_bagsize">--,--,-- VELA</div>
 							</div>
 						</div>
 						<div class="valueHold">
 							<div class="assetsValue">
 								<div class="valueTitle"></div>
-								<div class="assetsMarketValue highlightOption">2.4 ETH</div>
+								<div class="assetsMarketValue highlightOption">-- ETH</div>
 							</div>
 							<div class="assetsType">
 								<div class="typeTitle">HEDGE</div>
@@ -379,14 +380,14 @@
 
 						<div class="strategyContainer">
 							<div class="optionMarksHold">
-								<div class="optionMark"><span>Strike:</span><span class="oMfigure">0.0002 eth</span></div>
-								<div class="optionMark"><span>Premium:</span><span class="oMfigure">0.11 eth</span></div>
-								<div class="optionMark"><span>Expires:</span><span class="oMfigure">21 days</span></div>
+								<div class="optionMark"><span>Strike:</span><span class="oMfigure">--,-- eth</span></div>
+								<div class="optionMark"><span>Premium:</span><span class="oMfigure">--,-- eth</span></div>
+								<div class="optionMark"><span>Expires:</span><span class="oMfigure">-- days</span></div>
 							</div>
 							<div class="strategyHold">
 								<img class="strategyImage" src="./imgs/put-option.svg" />
 								<div class="strategyDataHold">
-									<div class="topValue-put">max loss 0.0002eth</div>
+									<div class="topValue-put">max loss --,-- eth</div>
 									<div class="bottomValue-put">profit zone</div>
 								</div>
 							</div>
@@ -404,8 +405,8 @@
             </div><!-- timeline close -->
 
 			<div class="rewardsInformer">
-				<i class="fa fa-bomb" aria-hidden="true"></i> ** pre-Beta V1 - private **</br>
-				Welcome to the OTC Silkroad. Hedge any ERC20 token. Borrow against any ERC20 token. Write, Buy, and Manage your OTC hedges & loans here.
+				<i class="fa fa-bomb" aria-hidden="true"></i> ** pre-Beta - private **</br>
+				Welcome to the OTC Silkroad. Hedge or Borrow against any ERC20 token. Write, Buy, and Manage your OTC trades here...
 			</div>
 			
 			<div id="sidebar">
@@ -511,7 +512,7 @@
 						</div>
 					</div>
 					<!-- call to action button -->				
-					<a href="#" target="_blank" class="ndiripano btn btn-cta" data-aos="fade-left" data-aos-delay="200">Buy $NEON</a>
+					<a href="#" target="_blank" class="ndiripano btn btn-cta" data-aos="fade-left" data-aos-delay="200">Buy $XEON</a>
 				</div>
 			</div>
 		</section>
