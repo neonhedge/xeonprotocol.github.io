@@ -1,10 +1,10 @@
 import { MyGlobals } from './_silkroad.js';
-import { CONSTANTS, getUserBalancesForToken, truncateAddress, fromWeiToFixed12, fromWeiToFixed5, fromWeiToFixed8, fromWeiToFixed8_unrounded, fromWeiToFixed5_unrounded, fromWeiToFixed2_unrounded, toFixed8_unrounded } from './constants.js';
+import { CONSTANTS, getUserBalancesForToken, truncateAddress, commaNumbering, fromWeiToFixed5, getTokenDecimals, isValidEthereumAddress, fromDecimalToBigInt, fromBigIntNumberToDecimal } from './constants.js';
 
 async function refreshDataOnElements() {
 	// Fetch data for all items in MyGlobals.outputArray concurrently
 	const promises = MyGlobals.outputArray.map(async (optionId) => {
-		const result = await hedgingInstance.methods.getHedgeDetails(optionId).call();
+		const result = await hedgingInstance.getHedgeDetails(optionId);
 		// Convert timestamp to human-readable dates
 		const dt_created = new Date(result.dt_created * 1000).toLocaleString();
 		const dt_started = new Date(result.dt_started * 1000).toLocaleString();
@@ -30,7 +30,7 @@ async function refreshDataOnElements() {
 		// Values 
 		//..if option available then show market & current strike price
 		//..if option is taken then show start and market price
-		const [marketvalue, pairedAddress] = await hedgingInstance.methods.getUnderlyingValue(tokenAddress, result.amount).call();
+		const [marketvalue, pairedAddress] = await hedgingInstance.getUnderlyingValue(tokenAddress, result.amount);
 		const element = $(`#${optionId}buyButton`);
 		let profit = marketvalue - (result.startvalue + result.cost);
 		let borderColor = '';
@@ -73,18 +73,19 @@ async function loadOptions(){
 	if (window.nav === 1 && window.filters === 1) { // Get vacant call options, exclude taken
 		//FILTER BY TOKEN ADDRESS
 		let filterAddress = $('#searchBar').val();
-		if(window.nav == 1 && window.filters == 4 && filterAddress.length >= 40 && web3.utils.isAddress(filterAddress) == true){//filter by token address
+		if(window.nav == 1 && window.filters == 4 && filterAddress.length >= 40 && isValidEthereumAddress(filterAddress) == true){//filter by token address
 			if (MyGlobals.lastItemIndex !== 0) {
 				if (window.readLimit + 1 > MyGlobals.lastItemIndex) {
 					window.readLimit = MyGlobals.lastItemIndex - 1;
 				}
 				MyGlobals.startIndex = MyGlobals.lastItemIndex - 1 - window.readLimit;
 			} else { // Start from the latest item in the array, our solidity reads incrementally so subtract window.readLimit -1 point to pick correct starting point for reads
-				let allHedgesLength = await hedgingInstance.methods.getOptionsForTokenCount(filterAddress).call();
+				let allHedgesLength = await hedgingInstance.getCountTokenOptions(filterAddress);
 				MyGlobals.startIndex = allHedgesLength - 1 - window.readLimit;
+				if(MyGlobals.startIndex < 0){MyGlobals.startIndex = 0;}
 			}
 				
-			let optionsArray = await hedgingInstance.methods.getOptionsForToken(filterAddress, MyGlobals.startIndex, window.readLimit).call();
+			let optionsArray = await hedgingInstance.getOptionsForToken(filterAddress, MyGlobals.startIndex, window.readLimit);
 
 			if (optionsArray.length > 0) {
 				$('#hedgesTimeline').empty();		
@@ -99,19 +100,20 @@ async function loadOptions(){
 				noOptionsSwal();
 			}
 		}
-		else { // UNFILTERED FETCH ALL OPTIONS
+		else { // UNFILTERED FETCH ALL OPTIONS - EXCLUDE TAKEN
 			if (MyGlobals.lastItemIndex !== 0) {
 				if (window.readLimit + 1 > MyGlobals.lastItemIndex) {
 				  window.readLimit = MyGlobals.lastItemIndex - 1;
 				}
 				MyGlobals.startIndex = MyGlobals.lastItemIndex - window.readLimit - 1;
 			} else { // Start from the latest item in the array, our solidity reads incrementally so subtract window.readLimit -1 point to pick correct starting point for reads
-				let allHedgesLength = await hedgingInstance.methods.getAllHedgesLength().call();
-				MyGlobals.startIndex = allHedgesLength - window.readLimit - 1;
+				let optionsCreatedLength = await hedgingInstance.optionsCreatedLength();
+				MyGlobals.startIndex = optionsCreatedLength - window.readLimit - 1;
+				if(MyGlobals.startIndex < 0){MyGlobals.startIndex = 0;}
 			}
 			
-			let optionsArray = await hedgingInstance.methods.getAllHedges(MyGlobals.startIndex, window.readLimit).call();
-			let takenArray = await hedgingInstance.methods.getAllHedgesTaken(MyGlobals.startIndex, 1000000000).call();
+			let optionsArray = await hedgingInstance.getAllOptions(MyGlobals.startIndex, window.readLimit);
+			let takenArray = await hedgingInstance.getAllOptionsTaken(MyGlobals.startIndex, 1000);
 			
 			// Use filter() method to get vacant options
 			let vacantOptionsArray = optionsArray.filter(hedgeID => !takenArray.includes(hedgeID));
@@ -137,38 +139,47 @@ async function loadOptions(){
 	//CALL OPTIONS MY POSITIONS
 	if (window.nav === 1 && window.filters === 2) { // Get my positions; mix of taken and created
 		if (MyGlobals.lastItemIndex !== 0) {
-		  if (window.readLimit + 1 > MyGlobals.lastItemIndex) {
-			window.readLimit = MyGlobals.lastItemIndex - 1;
-		  }
-		  MyGlobals.startIndex = MyGlobals.lastItemIndex - 1 - window.readLimit;
-		} else { // Start from the latest item in the array, our solidity reads incrementally so subtract window.readLimit -1 point to pick correct starting point for reads
-			let myHedgesLength = await hedgingInstance.methods.getUserHedgesLength(userAddress).call();
-		  	MyGlobals.startIndex = myHedgesLength - 1 - window.readLimit;
-		}
-	  
-		let arrayType = true;
-		let optionsArray = await hedgingInstance.methods.getmyHedgesFromXY(MyGlobals.startIndex, window.readLimit, arrayType).call({ from: MyGlobals.wallet });
-	  
-		if (optionsArray.length > 0) {
-		  $('#hedgesTimeline').empty();
-	  
-		  // Update MyGlobals.outputArray directly
-		  MyGlobals.MyGlobals.outputArray.push(...optionsArray);
-	  
-		  for (const hedgeID of optionsArray) {
-			await fetchOptionCard(hedgeID);
-		  }
-	  
-		  // Update last result index
-		  MyGlobals.lastItemIndex = MyGlobals.startIndex;
+			if (window.readLimit + 1 > MyGlobals.lastItemIndex) {
+				window.readLimit = MyGlobals.lastItemIndex - 1;
+			}
+			MyGlobals.startIndex = MyGlobals.lastItemIndex - 1 - window.readLimit;
 		} else {
-		  noOptionsSwal();
+			let myOptionsCreatedLength = await hedgingInstance.getUserOptionsCreatedLength(MyGlobals.wallet);
+			let myOptionsTakenLength = await hedgingInstance.getUserOptionsTakenLength(MyGlobals.wallet);
+		
+			MyGlobals.startIndex = Math.max(myOptionsCreatedLength, myOptionsTakenLength) - 1 - window.readLimit;
+			if(MyGlobals.startIndex < 0){MyGlobals.startIndex = 0;}
+		}
+		
+		// Fetch both created and taken options for use in combined array
+		let optionsCreatedArray = await hedgingInstance.getUserOptionsCreated(MyGlobals.wallet, MyGlobals.startIndex, window.readLimit);
+		let optionsTakenArray = await hedgingInstance.getUserOptionsTaken(MyGlobals.wallet, MyGlobals.startIndex, window.readLimit);
+		
+		// Combine and sort the arrays
+		let allOptionsArray = [...optionsCreatedArray, ...optionsTakenArray].sort((a, b) => a - b);
+		
+		// Output
+		if (allOptionsArray.length > 0) {
+			$('#hedgesTimeline').empty();
+		
+			// Update MyGlobals.outputArray directly
+			MyGlobals.MyGlobals.outputArray.push(...allOptionsArray);
+		
+			for (const hedgeID of allOptionsArray) {
+				await fetchOptionCard(hedgeID);
+			}
+		
+			// Update last result index
+			MyGlobals.lastItemIndex = MyGlobals.startIndex;
+		} else {
+			noOptionsSwal();
 		}
 	}
+	
 
 	//BOOKMARKED HEDGES
 	if(window.nav === 1 && window.filters === 3){//get my bookmarks
-		let optionsArray = await hedgingInstance.methods.getmyBookmarks(MyGlobals.wallet).call();
+		let optionsArray = await hedgingInstance.getmyBookmarks(MyGlobals.wallet);
 		if(optionsArray.length > 0){
 			$('#hedgesTimeline').empty();
 			// Update MyGlobals.outputArray directly
@@ -193,18 +204,18 @@ async function loadOptions(){
 
 		//FILTER BY TOKEN ADDRESS
 		let filterAddress2 = $('#searchBar').val();
-		if(window.nav == 1 && window.filters == 4 && filterAddress2.length >= 40 && web3.utils.isAddress(filterAddress2) == true){//filter by token address
+		if(window.nav == 1 && window.filters == 4 && filterAddress2.length >= 40 && isValidEthereumAddress(filterAddress2) == true){//filter by token address
 			if (MyGlobals.lastItemIndex !== 0) {
 				if (window.readLimit + 1 > MyGlobals.lastItemIndex) {
 					window.readLimit = MyGlobals.lastItemIndex - 1;
 				}
 				MyGlobals.startIndex = MyGlobals.lastItemIndex - 1 - window.readLimit;
 			} else { // Start from the latest item in the array, our solidity reads incrementally so subtract window.readLimit -1 point to pick correct starting point for reads
-				let allSwapsLength = await hedgingInstance.methods.getSwapsForTokenCount(filterAddress).call();
+				let allSwapsLength = await hedgingInstance.getSwapsForTokenCount(filterAddress2);
 				MyGlobals.startIndex = allSwapsLength - 1 - window.readLimit;
 			}
 				
-			let optionsArray = await hedgingInstance.methods.getSwapsForToken(filterAddress2, MyGlobals.startIndex, window.readLimit).call();
+			let optionsArray = await hedgingInstance.getSwapsForToken(filterAddress2, MyGlobals.startIndex, window.readLimit);
 
 			if (optionsArray.length > 0) {
 				$('#hedgesTimeline').empty();		
@@ -218,7 +229,7 @@ async function loadOptions(){
 			} else {
 				noOptionsSwal();
 			}
-		}// UNFILTERED - FETCH ALL SWAPS
+		}// UNFILTERED - FETCH ALL SWAPS - EXCLUDE TAKEN
 		else {
 			if (MyGlobals.lastItemIndex !== 0) {
 				if (window.readLimit + 1 > MyGlobals.lastItemIndex) {
@@ -226,12 +237,13 @@ async function loadOptions(){
 				}
 				MyGlobals.startIndex = MyGlobals.lastItemIndex - window.readLimit - 1;
 			} else { // Start from the latest item in the array, our solidity reads incrementally so subtract window.readLimit -1 point to pick correct starting point for reads
-				let allSwapsLength = await hedgingInstance.methods.getAllSwapsLength().call();
+				let allSwapsLength = await hedgingInstance.getAllSwapsLength();
 				MyGlobals.startIndex = allSwapsLength - window.readLimit - 1;
+				if(MyGlobals.startIndex < 0){MyGlobals.startIndex = 0;}
 			}
 			
-			let optionsArray = await hedgingInstance.methods.getAllSwaps(MyGlobals.startIndex, window.readLimit).call();
-			let takenArray = await hedgingInstance.methods.getAllSwapsTaken(MyGlobals.startIndex, 1000000000).call();
+			let optionsArray = await hedgingInstance.getAllSwaps(MyGlobals.startIndex, window.readLimit);
+			let takenArray = await hedgingInstance.getAllSwapsTaken(MyGlobals.startIndex, 1000);
 			
 			// Use filter() method to get vacant swaps
 			let vacantOptionsArray = optionsArray.filter(hedgeID => !takenArray.includes(hedgeID));
@@ -256,37 +268,48 @@ async function loadOptions(){
 	//EQUITY SWAPS MY POSITIONS
 	if (window.nav === 2 && window.filters === 2) { // Get my positions; mix of taken and created
 		if (MyGlobals.lastItemIndex !== 0) {
-		  if (window.readLimit + 1 > MyGlobals.lastItemIndex) {
-			window.readLimit = MyGlobals.lastItemIndex - 1;
-		  }
-		  MyGlobals.startIndex = MyGlobals.lastItemIndex - 1 - window.readLimit;
-		} else { // Start from the latest item in the array, our solidity reads incrementally so subtract window.readLimit -1 point to pick correct starting point for reads
-			let mySwapsLength = await hedgingInstance.methods.getUserSwapsLength(MyGlobals.wallet).call();
-		  	MyGlobals.startIndex = mySwapsLength - 1 - window.readLimit;
-		}
-	  
-		let arrayType = false;
-		let optionsArray = await hedgingInstance.methods.getmySwapsFromXY(MyGlobals.startIndex, window.readLimit, arrayType).call({ from: MyGlobals.wallet });
-	  
-		if (optionsArray.length > 0) {
-		  $('#hedgesTimeline').empty();
-	  
-		  // Update MyGlobals.outputArray directly
-		  MyGlobals.MyGlobals.outputArray.push(...optionsArray);
-	  
-		  for (const hedgeID of optionsArray) {
-			await fetchOptionCard(hedgeID);
-		  }
-	  
-		  // Update last result index
-		  MyGlobals.lastItemIndex = MyGlobals.startIndex;
+			if (window.readLimit + 1 > MyGlobals.lastItemIndex) {
+				window.readLimit = MyGlobals.lastItemIndex - 1;
+			}
+			MyGlobals.startIndex = MyGlobals.lastItemIndex - 1 - window.readLimit;
 		} else {
-		  noOptionsSwal();
+			let myOptionsCreatedLength = await hedgingInstance.getUserOptionsCreatedLength(MyGlobals.wallet);
+			let myOptionsTakenLength = await hedgingInstance.getUserOptionsTakenLength(MyGlobals.wallet);
+		
+			MyGlobals.startIndex = Math.max(myOptionsCreatedLength, myOptionsTakenLength) - 1 - window.readLimit;
+			if(MyGlobals.startIndex < 0){MyGlobals.startIndex = 0;}
 		}
+		
+		// Fetch both created and taken swaps
+		let swapsCreatedArray = await hedgingInstance.getUserSwapsCreated(MyGlobals.wallet, MyGlobals.startIndex, window.readLimit);
+		let swapsTakenArray = await hedgingInstance.getUserSwapsTaken(MyGlobals.wallet, MyGlobals.startIndex, window.readLimit);
+		
+		// Combine and sort the arrays
+		let allSwapsArray = [...swapsCreatedArray, ...swapsTakenArray].sort((a, b) => a - b);
+		
+		// Combine both types of swaps
+		//let combinedArray = [...allOptionsArray, ...allSwapsArray]; if we need both
+		let combinedArray = allSwapsArray;
+		
+		if (combinedArray.length > 0) {
+			$('#hedgesTimeline').empty();
+		
+			// Update MyGlobals.outputArray directly
+			MyGlobals.MyGlobals.outputArray.push(...combinedArray);
+		
+			for (const hedgeID of combinedArray) {
+				await fetchOptionCard(hedgeID);
+			}
+		
+			// Update last result index
+			MyGlobals.lastItemIndex = MyGlobals.startIndex;
+		} else {
+			noOptionsSwal();
+		}		
 	}
 	//BOOKMARKED EQUITY SWAPS
 	if(window.nav === 2 && window.filters === 3){//get my bookmarks
-		let optionsArray = await hedgingInstance.methods.getmyBookmarks(MyGlobals.wallet).call();
+		let optionsArray = await hedgingInstance.getmyBookmarks(MyGlobals.wallet);
 		if(optionsArray.length > 0){
 			$('#hedgesTimeline').empty();
 			// Update MyGlobals.outputArray directly
@@ -310,7 +333,7 @@ async function loadOptions(){
 
 async function fetchOptionCard(optionId){
     try{
-		let result = await hedgingInstance.methods.getHedgeDetails(optionId).call();
+		let result = await hedgingInstance.getHedgeDetails(optionId);
 		//name and symbol
 		let name,symbol;
 		fetchNameSymbol(result.token).then(t=>{name=t.name,symbol=t.symbol}).catch(e=>console.error(e));
@@ -327,6 +350,12 @@ async function fetchOptionCard(optionId){
         let truncatedTaker = taker.substring(0, 6) + '...' + taker.slice(-3);
 		//hedge status
 		let status = parseFloat(result.status);
+		
+		//amount
+		let amountTokenDecimals = await getTokenDecimals(tokenAddress);
+		let amountRaw = fromBigIntNumberToDecimal(result.amount, amountTokenDecimals);
+		let amount = commaNumbering(amountRaw);
+
 		//hedge type
 		let hedgeType;
 		if (result.hedgeType === 'CALL') {
@@ -338,26 +367,33 @@ async function fetchOptionCard(optionId){
 		} else {
 			console.log('Hedge type is unknown');
 		}
-		//amount
-		let amount = parseFloat((result.amount / Math.pow(10, MyGlobals.decimals)).toFixed(2));
-		//market value
-		const [marketvalue, pairedAddress] = await hedgingInstance.methods.getUnderlyingValue(tokenAddress, result.amount).call();
+
+		//paired symbol
 		let pairSymbol;
-		if (pairedAddress === '0xdac17f958d2ee523a2206206994597c13d831ec7') {
+		if (pairedAddress === CONSTANTS.usdtAddress) {
 			pairSymbol = 'USDT';
-		} else if (pairedAddress === '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48') {
+		} else if (pairedAddress === CONSTANTS.usdcAddress) {
 			pairSymbol = 'USDC';
-		} else if (pairedAddress === '0x0000000000000000000000000000000000000000') {
-			pairSymbol = 'ETH';
+		} else if (pairedAddress === CONSTANTS.wethAddress) {
+			pairSymbol = 'WETH';
 		}
-		//start value
-		let startvalue = parseFloat(fromWeiToFixed5(result.startvalue));
-		//end value
-		let endvalue = parseFloat(fromWeiToFixed5(result.endvalue));
-		//cost value
-		let cost = parseFloat(fromWeiToFixed5(result.cost));
+		//market value current
+		const [marketvalueCurrent, pairedAddress] = await hedgingInstance.getUnderlyingValue(tokenAddress, result.amount);
+		const pairedAddressDecimal = await getTokenDecimals(pairedAddress);
+		const marketvalue = fromBigIntNumberToDecimal(marketvalueCurrent, pairedAddressDecimal);
+
+		//start value, based on token decimals
+		let startvalue, endvalue, cost, strikevalue;
+		if (pairedAddress === CONSTANTS.usdtAddress || pairedAddress === CONSTANTS.usdcAddress) { //USDT or USDC
+			startvalue = fromBigIntNumberToDecimal(result.startvalue, 6);
+			endvalue = fromBigIntNumberToDecimal(result.endvalue, 6);
+			cost = fromBigIntNumberToDecimal(result.cost, 6);
+		} else if (pairedAddress === CONSTANTS.wethAddress) { //WETH
+			startvalue = fromBigIntNumberToDecimal(result.startvalue, 18);
+			endvalue = fromBigIntNumberToDecimal(result.endvalue, 18);
+			cost = fromBigIntNumberToDecimal(result.cost, 18);
+		}
 		//strike value
-		let strikevalue;
 		if(startvalue>0){
 			strikevalue = cost + startvalue;
 		}else{
@@ -429,7 +465,7 @@ async function fetchOptionCard(optionId){
 		//bookmark check
 		var bookmark = 'addBookmark("'+optionId+'")';
 		var unbookmark = 'removeBookmark("'+optionId+'")';
-		var bookmarkState = await hedgingInstance.methods.getBookmark(MyGlobals.wallet, optionId).call();
+		var bookmarkState = await hedgingInstance.getBookmark(MyGlobals.wallet, optionId);
 		if(!bookmarkState){
 			var bookmark_btn = "<div class='raise_S_tab _bookmarkjump' onclick='"+bookmark+"'><img src='./imgs/bookmark_.png' width='18px'/></div>";
 		}
@@ -504,7 +540,7 @@ async function fetchOptionCard(optionId){
 
 async function fetchOptionStrip(optionId) {
     try{
-		let result = await hedgingInstance.methods.getHedgeDetails(optionId).call();
+		let result = await hedgingInstance.getHedgeDetails(optionId);
 		//name and symbol
 		let name; let symbol;
 		fetchNameSymbol(result.token).then(t=>{name=t.name,symbol=t.symbol}).catch(e=>console.error(e));
@@ -521,6 +557,10 @@ async function fetchOptionStrip(optionId) {
         let truncatedTaker = taker.substring(0, 6) + '...' + taker.slice(-3);
 		//hedge status
 		let status = parseFloat(result.status);
+		//amount
+		let amountTokenDecimals = await getTokenDecimals(tokenAddress);
+		let amountRaw = fromBigIntNumberToDecimal(result.amount, amountTokenDecimals);
+		let amount = commaNumbering(amountRaw);
 		//hedge type
 		let hedgeType;
 		if (result.hedgeType === 'CALL') {
@@ -532,27 +572,33 @@ async function fetchOptionStrip(optionId) {
 		} else {
 			console.log('Hedge type is unknown');
 		}
-		//amount
-		let amount = parseFloat((result.amount / Math.pow(10, MyGlobals.decimals)).toFixed(2));
-		//market value
-		const [marketvalue, pairedAddress] = await hedgingInstance.methods.getUnderlyingValue(tokenAddress, result.amount).call();
+		//paired symbol
 		let pairSymbol;
-		if (pairedAddress === '0xdac17f958d2ee523a2206206994597c13d831ec7') {
+		if (pairedAddress === CONSTANTS.usdtAddress) {
 			pairSymbol = 'USDT';
-		} else if (pairedAddress === '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48') {
+		} else if (pairedAddress === CONSTANTS.usdcAddress) {
 			pairSymbol = 'USDC';
-		} else if (pairedAddress === '0x0000000000000000000000000000000000000000') {
-			pairSymbol = 'ETH';
+		} else if (pairedAddress === CONSTANTS.wethAddress) {
+			pairSymbol = 'WETH';
 		}
-		//start value
-		let startvalue = parseFloat(fromWeiToFixed5(result.startvalue));
-		//end value
-		let endvalue = parseFloat(fromWeiToFixed5(result.endvalue));
-		//cost value
-		let cost = parseFloat(fromWeiToFixed5(result.cost));
+		//market value current
+		const [marketvalueCurrent, pairedAddress] = await hedgingInstance.getUnderlyingValue(tokenAddress, result.amount);
+		const pairedAddressDecimal = await getTokenDecimals(pairedAddress);
+		const marketvalue = fromBigIntNumberToDecimal(marketvalueCurrent, pairedAddressDecimal);
+
+		//start value, based on token decimals
+		let startvalue, endvalue, cost, strikevalue;
+		if (pairedAddress === CONSTANTS.usdtAddress || pairedAddress === CONSTANTS.usdcAddress) { //USDT or USDC
+			startvalue = fromBigIntNumberToDecimal(result.startvalue, 6);
+			endvalue = fromBigIntNumberToDecimal(result.endvalue, 6);
+			cost = fromBigIntNumberToDecimal(result.cost, 6);
+		} else if (pairedAddress === CONSTANTS.wethAddress) { //WETH
+			startvalue = fromBigIntNumberToDecimal(result.startvalue, 18);
+			endvalue = fromBigIntNumberToDecimal(result.endvalue, 18);
+			cost = fromBigIntNumberToDecimal(result.cost, 18);
+		}
 		//strike value
-		let strikevalue;
-		if(startvalue > 0){
+		if(startvalue>0){
 			strikevalue = cost + startvalue;
 		}else{
 			strikevalue = cost + marketvalue;
@@ -587,9 +633,9 @@ const erc20ABI=[{"constant":!0,"inputs":[],"name":"name","outputs":[{"name":"","
 
 async function fetchNameSymbol(tokenAddress){
 	try {
-		const tokenContract = new web3.eth.Contract(erc20ABI, tokenAddress);
-		const name = await tokenContract.methods.name().call();
-		const symbol = await tokenContract.methods.symbol().call();
+		const tokenContract = new ethers.Contract(tokenAddress, erc20ABI, window.provider);
+		const name = await tokenContract.name();
+		const symbol = await tokenContract.symbol();
 		// Return the token information
 		return { name, symbol };
 	  } catch (error) {console.error('Failed to fetch token information:', error);}

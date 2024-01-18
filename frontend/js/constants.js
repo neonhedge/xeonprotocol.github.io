@@ -242,15 +242,56 @@ async function getSymbol(tokenAddress) {
   return symbol;
 }
 
+// Get pair address - ALT just call getPairAddressZK from hedging contract
+async function getPairAddress(tokenAddress) {
+  const UNISWAP_FACTORY_ADDRESS = CONSTANTS.UNISWAP_FACTORY_ADDRESS; 
+  const wethAddress = CONSTANTS.wethAddress;
+  const usdtAddress = CONSTANTS.usdtAddress; 
+  const usdcAddress = CONSTANTS.usdcAddress;
+
+  const factory = new ethers.Contract(
+      UNISWAP_FACTORY_ADDRESS,
+      [
+          {
+              constant: true,
+              inputs: [{ name: 'tokenA', type: 'address' }, { name: 'tokenB', type: 'address' }],
+              name: 'getPair',
+              outputs: [{ name: '', type: 'address' }],
+              type: 'function',
+          },
+      ],
+      provider
+  );
+
+  try {
+      const wethPairAddress = await factory.getPair(tokenAddress, wethAddress);
+      const usdtPairAddress = await factory.getPair(tokenAddress, usdtAddress);
+      const usdcPairAddress = await factory.getPair(tokenAddress, usdcAddress);
+
+      if (wethPairAddress !== '0x0000000000000000000000000000000000000000') {
+          return { pairAddress: wethPairAddress, pairedCurrency: wethAddress };
+      } else if (usdtPairAddress !== '0x0000000000000000000000000000000000000000') {
+          return { pairAddress: usdtPairAddress, pairedCurrency: usdtAddress };
+      } else if (usdcPairAddress !== '0x0000000000000000000000000000000000000000') {
+          return { pairAddress: usdcPairAddress, pairedCurrency: usdcAddress };
+      } else {
+          throw new Error("TokenValue: token is not paired with WETH, USDT, or USDC");
+      }
+  } catch (error) {
+      throw error;
+  }
+}
+
 // HELPERS
-//Tokens unrounded
+// Tokens unrounded
 function fromWeiToFixed2_unrounded(amount) {//doesnt round up figures
   var amount = amount / Math.pow(10, CONSTANTS.decimals);
   var fixed = 2;
   var re = new RegExp('^-?\\d+(?:\.\\d{0,' + (fixed || -1) + '})?');
   return amount.toString().match(re)[0];
 }
-//ETH unrounded
+
+// ETH unrounded
 function toFixed8_unrounded(amount) {
   //accepts decimals
   var parsed_eth = parseFloat(amount);

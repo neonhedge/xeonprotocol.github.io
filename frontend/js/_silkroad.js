@@ -1,20 +1,77 @@
 /*=========================================================================
     Import modules
 ==========================================================================*/
-import { CONSTANTS, getUserBalancesForToken, truncateAddress, getPairToken, getSymbol, fromWeiToFixed12, fromWeiToFixed5, fromWeiToFixed8, fromWeiToFixed8_unrounded, fromWeiToFixed5_unrounded, fromWeiToFixed2_unrounded, toFixed8_unrounded } from './constants.js';
-import { initWeb3 } from './dapp-web3-utils.js';
-import { unlockedWallet, reqConnect, popupSuccess } from './web3-walletstatus-module.js';
+import { CONSTANTS, getUserBalancesForToken, truncateAddress, getPairToken, getSymbol, getAccounts, isValidEthereumAddress, fromBigIntNumberToDecimal, } from './constants.js';
+import { initializeConnection, unlockedWallet, reqConnect, handleAccountChange, handleNetworkChange, popupSuccess} from './web3-walletstatus-module.js';
+import { getTokenInfo } from './module-wallet-tokenlist-dependencies.js';
 import { refreshDataOnElements, loadOptions, fetchOptionStrip, fetchNameSymbol, prepareTimestamp, noOptionsSwal } from './module-market-card-fetchers.js';
 import { loadSidebar, loadSidebarVolume_All, loadSidebarVolume_Token, loadPastEvents } from './module-market-sidebar-fetchers.js';
 
 /*=========================================================================
-    INITIALIZE WEB3 & LOCAL CONSTANTS
+    Wallet Page Main Functions
 ==========================================================================*/
+// This is the main loading script for the page
+// It first checks if a wallet is connected || initialization passes
+// Initialization always returns boolean on whether it passes to load page scripts or not
+// scouter == wallect readiness check. If wallet check passes & sets all wallet dependencies, then we can load all other scripts below
+// if conditions to continueLoading change the script stops at scouter, event listeners at bottom of page to help with alerts & state changes
 
-initWeb3();
+// Start making calls to Dapp modules
+export const checkAndCallPageTries = async () => {
+    const scouter = await pageModulesLoadingScript();
+    console.log('connection Scout: '+ scouter);
+
+    if (scouter) {
+        const asyncFunctions = [refreshDataOnElements, loadSidebar ];
+        for (const func of asyncFunctions) {
+            func();
+        }
+    }    
+};
+
+const setatmIntervalAsync = (fn, ms) => {
+    fn().then(() => {
+        setTimeout(() => setatmIntervalAsync(fn, ms), ms);
+    });
+};
+
+
+// Ready all incl wallet display
+$(document).ready(async function () {
+    $('.waiting_init').css('display', 'inline-block');
+
+    // load sections periodically
+    setatmIntervalAsync(async () => {
+        await checkAndCallPageTries();
+    }, 45000);
+});
+
+
+// Checks if all wallet checks pass before calling page modules
+async function pageModulesLoadingScript() {
+    let continueLoad = false;
+    try {
+        continueLoad = await initializeConnection();
+    } catch (error) {
+        console.log(error);
+    }
+    if (continueLoad) {
+        return true;
+    } else {
+        // Force interface to indicate connection needs
+        handleAccountChange([]);
+    }
+    return false;
+}
+
+//notes:
+//looping script to update options card
+//script takes a global new array of optionIDs at any time then uses those IDs to update value, settlement state
+//option cards are fetched on nav or tab click or results subset tabs in sets of 30
+//each subset fetch stores the last array index to know where it left when fetching more results
 
 /*========================================================================
-    ON PAGE LOAD  
+    On page load
 ==========================================================================*/
 //define globals
 export const MyGlobals = {
@@ -27,7 +84,7 @@ export const MyGlobals = {
 	lossBg : 'imgs/repayment2.webp'
 };
 
-//which tab is highlighted
+//define tab is highlighted
 $(document).ready(function(){
 	$('#erc20Options').css({'background' : 'rgba(214, 24, 138,0.1)','border' : '1px solid #62006b'});//left panel
 	$('#discoverTab').css({'background' : 'rgba(214, 24, 138, 0.1)','border' : '1px solid #62006b'});//try rgb(8, 231, 254) - bright blue
@@ -88,7 +145,20 @@ $(document).on('click', '#socialstream', function(e){
 	$('.asideNavsinside').removeAttr('style'); //reset styles
 	$(this).css({'border' : '1px solid #62006b', 'background' : 'rgba(214, 24, 138, 0.15)'});//set style
 	//set global
-		
+	swal(
+		{
+			title: 'Coming...',
+			text: 'Social will be introduced in later Beta testing. \nIt will provide a live feed of opinions on deals.',
+			type: 'info',
+			html: false,
+			dangerMode: false,
+			confirmButtonText: 'okay',
+			showConfirmButton: true,
+			showCancelButton: false,
+			animation: 'slide-from-top',
+		}, function () {
+			console.log('social feed coming soon...');
+		}); 
 });
 //filters
 $(document).on('click', '#discoverTab', function(e){
@@ -125,44 +195,6 @@ $(document).on('click', '#bookmarksTab', function(e){
 	loadOptions(MyGlobals.startIndex, window.readLimit);
 });
 
-//notes:
-//looping script to update options card
-//script takes a global new array of optionIDs at any time then uses those IDs to update value, settlement state
-//option cards are fetched on nav or tab click or results subset tabs in sets of 30
-//each subset fetch stores the last array index to know where it left when fetching more results
-
-
-$(document).ready(async function () {
-
-    const unlockState = await unlockedWallet();
-    if (unlockState === true) {
-
-		const accounts = await web3.eth.requestAccounts();
-		MyGlobals.wallet = accounts[0];
-
-        const setAsyncInterval = (fn, ms) => {
-            fn().then(() => {
-                setTimeout(() => setAsyncInterval(fn, ms), ms);
-            });
-        };
-        // Load sections automatically & periodically
-        const refreshDealCards = async () => {
-            const asyncFunctions = [ refreshDataOnElements, loadSidebar ];
-            for (const func of asyncFunctions) {
-                await func();
-            }
-        };
-        setAsyncInterval(async () => {
-            await refreshDealCards();
-        }, 30000);
-
-        // Load more sections manually not automatically & periodically
-        // Create an IntersectionObserver to load sections when in view
-    } else {
-        reqConnect();
-    }
-});
-
 
 /*=========================================================================
     HELPER FUNCTIONS
@@ -170,50 +202,67 @@ $(document).ready(async function () {
 
 async function addBookmark(optionId) {
 	try {
-		// Estimate gasLimit
-		const encodedData = hedgingInstance.methods.bookmarkHedge(optionId).encodeABI();
-		const estimateGas = await web3.eth.estimateGas({
-			data: encodedData,
-			from: MyGlobals.wallet,
-			to: CONSTANTS.hedgingAddress
-		});
-  
-		// Estimate gasPrice
-		const gasPrice = await web3.eth.getGasPrice();
+		
+		// Submit Tx
+        const transaction = await hedgingInstance.connect(signer).bookmarkHedge(optionId);
+
+        // Wait for the transaction to be mined
+        const receipt = await transaction.wait();
+
+        if (receipt.status === 1) {
 	
-		// Send transaction
-		const receipt = await hedgingInstance.methods.bookmarkHedge(optionId).send({
-			from: MyGlobals.wallet,
-			gasPrice: gasPrice,
-			gasLimit: estimateGas,
-		});
-	
-		// Bookmark state updated successfully
-		console.log('Bookmark State Updated:', receipt.events.BookmarkToggle.returnValues.bookmarked);
-	
-		// Display bookmark state in a browser alert
-		alert('Bookmark State Updated: ' + receipt.events.BookmarkToggle.returnValues.bookmarked);
-	
-		const state = receipt.events.bookmarked.returnValues[2];
-		const hedge = receipt.events.bookmarked.returnValues[1];
-	
-		const tx_hash = receipt.transactionHash;
-		const outputCurrency = ''; // or GUN - currency focus is outcome of Tx
-		const type = 'success'; // or error
-		const wallet = '';
-		const receivedTokens = 0;
-	
-		let message, nonTxAction;
-		if (state) {
-			message = 'Bookmark saved!';
-			nonTxAction = 'hedge: ' + hedge + ' bookmarked: ';
+			// Bookmark state updated successfully
+			console.log('Bookmark State Updated:', receipt.events.BookmarkToggle.returnValues.bookmarked);
+		
+			// Display bookmark state in a browser alert
+			alert('Bookmark State Updated: ' + receipt.events.BookmarkToggle.returnValues.bookmarked);
+		
+			const state = receipt.events.bookmarked.returnValues[2];
+			const hedge = receipt.events.bookmarked.returnValues[1];
+		
+			const tx_hash = receipt.transactionHash;
+			const outputCurrency = ''; // or GUN - currency focus is outcome of Tx
+			const type = 'success'; // or error
+			const wallet = '';
+			const receivedTokens = 0;
+		
+			let message, nonTxAction;
+			if (state) {
+				message = 'Bookmark saved..';
+				title = 'Bookmarked!';
+				nonTxAction = 'hedge: ' + hedge + ' bookmarked: ';
+			} else {
+				title = 'Removed!';
+				message = 'Bookmark removed..';
+				nonTxAction = 'hedge: ' + hedge + ' unmarked: ';
+			}
+		
+			// Call popupSuccess function without waiting for it to complete (async)
+			popupSuccess(type, outputCurrency, tx_hash, message, 0, receivedTokens, wallet, nonTxAction);
+
+			swal ({
+				title: title,
+				text: message,
+				type: 'success',
+				html: false,
+				dangerMode: false,
+				showConfirmButton: false,
+				showCancelButton: false,
+				animation: "Pop",
+				allowOutsideClick: true,
+				timer: 1800,
+			})
 		} else {
-			message = 'Bookmark removed!';
-			nonTxAction = 'hedge: ' + hedge + ' unmarked: ';
-		}
-	
-		// Call popupSuccess function without waiting for it to complete (async)
-		popupSuccess(type, outputCurrency, tx_hash, message, 0, receivedTokens, wallet, nonTxAction);
+            console.log('Bookmarking failed. Receipt status:', receipt.status);
+            swal({
+                title: "Bookmarking Failed.",
+                type: "error",
+                allowOutsideClick: true,
+                confirmButtonColor: "#F27474",
+                text: "Transaction Failed. Receipt status: " + receipt.status
+            });
+        }
+
 	} catch (error) {
 		// Handle error
 		const text = error.message;
@@ -223,7 +272,7 @@ async function addBookmark(optionId) {
 			allowOutsideClick: true,
 			text: text,
 			html: false,
-			confirmButtonColor: "#8e523c"
+			confirmButtonColor: "#F27474"
 		});
 	}
 }  
@@ -322,7 +371,7 @@ async function createForm() {
 	  </div>`;
   
 	swal({
-		title: "Write: Option | Swap | Loan",
+		title: "create OTC trade",
 		text: privatize,
 		type: "prompt",
 		html: true,
@@ -371,7 +420,7 @@ async function handlePaste(event) {
     var pastedText = clipboardData.getData('text');
 
     // Check if the pasted text is a valid ERC20 token address
-    if (isERC20TokenAddress(pastedText)) {
+    if (isValidEthereumAddress(pastedText)) {
         // update the input field value with the pasted token address
         event.target.value = pastedText;
 		await fetchUserTokenBalance(pastedText);
@@ -380,12 +429,8 @@ async function handlePaste(event) {
     }
 }
 
-function isERC20TokenAddress(address) {
-    return web3.utils.isAddress(address);
-}
-
 async function fetchUserTokenBalance(tokenAddress){
-	const accounts = await web3.eth.requestAccounts();
+	const accounts = getAccounts();
     const userAddress = accounts[0];
 	//fetch balances for user under token address
 	const mybalances = await getUserBalancesForToken(tokenAddress, userAddress);
@@ -414,80 +459,6 @@ async function fetchUserTokenBalance(tokenAddress){
 //==============================================================
 // Move to writes module
 //==============================================================
-async function getTokenInfo(tokenAddress) {
-	const erc20ABI = [
-	  {
-		constant: true,
-		inputs: [],
-		name: 'name',
-		outputs: [{ name: '', type: 'string' }],
-		type: 'function',
-	  },
-	  {
-		constant: true,
-		inputs: [],
-		name: 'decimals',
-		outputs: [{ name: '', type: 'uint8' }],
-		type: 'function',
-	  },
-	  {
-		constant: true,
-		inputs: [],
-		name: 'symbol',
-		outputs: [{ name: '', type: 'string' }],
-		type: 'function',
-	  },
-	];
-  
-	const tokenContract = new web3.eth.Contract(erc20ABI, tokenAddress);
-  
-	try {
-	  const tokenName = await tokenContract.methods.name().call();
-	  const tokenSymbol = await tokenContract.methods.symbol().call();
-	  const tokenDecimals = await tokenContract.methods.decimals().call();
-  
-	  return { name: tokenName, symbol: tokenSymbol, decimals: tokenDecimals };
-	} catch (error) {
-	  console.error('Error fetching token information:', error);
-	  return null;
-	}
-}
-
-// Get pair address - ALT just call getPairAddressZK from hedging contract
-async function getPairAddress(tokenAddress) {
-  const UNISWAP_FACTORY_ADDRESS = CONSTANTS.UNISWAP_FACTORY_ADDRESS; 
-  const wethAddress = CONSTANTS.wethAddress;
-  const usdtAddress = CONSTANTS.usdtAddress; 
-  const usdcAddress = CONSTANTS.usdcAddress;
-
-  const factory = new web3.eth.Contract([
-    {
-      constant: true,
-      inputs: [],
-      name: 'getPair',
-      outputs: [{ name: '', type: 'address' }],
-      type: 'function',
-    },
-  ], UNISWAP_FACTORY_ADDRESS);
-
-  try {
-    const wethPairAddress = await factory.methods.getPair(tokenAddress, wethAddress).call();
-    const usdtPairAddress = await factory.methods.getPair(tokenAddress, usdtAddress).call();
-    const usdcPairAddress = await factory.methods.getPair(tokenAddress, usdcAddress).call();
-
-    if (wethPairAddress !== '0x0000000000000000000000000000000000000000') {
-      return { pairAddress: wethPairAddress, pairedCurrency: wethAddress };
-    } else if (usdtPairAddress !== '0x0000000000000000000000000000000000000000') {
-      return { pairAddress: usdtPairAddress, pairedCurrency: usdtAddress };
-    } else if (usdcPairAddress !== '0x0000000000000000000000000000000000000000') {
-      return { pairAddress: usdcPairAddress, pairedCurrency: usdcAddress };
-    } else {
-      throw new Error("TokenValue: token is not paired with WETH, USDT, or USDC");
-    }
-  } catch (error) {
-    throw error;
-  }
-}
 
 // Submit call function to hedging contract to create hedge
 async function createHedgeSubmit() {
@@ -519,68 +490,43 @@ async function createHedgeSubmit() {
 	}
     
 	// get token info and pair infor, price and cost is in pair currency
-	const tokenInfo = await getTokenInfo(tokenAddress);
+	const tokenAmountWei = fromDecimalToBigIntNumber(tokenAmount);
+	const tokenInfo = await getTokenInfo(tokenAddress, tokenAmountWei);
 	const tokenDecimals = tokenInfo.decimals;
 
-	const pairInfo = await getPairAddress(tokenAddress);
-	const pairAddress = pairInfo.pairAddress;
+	const pairAddress = await hedgingInstance.getPairAddressZK(tokenAddress);
 
-	const pairInfo2 = await getTokenInfo(pairAddress.pairedCurrency);
-	const pairDecimals = pairInfo2.decimals;
+	const pairInfo = await getTokenInfo(pairAddress.pairedCurrency);
+	const pairDecimals = pairInfo.decimals;
 	
 	// use decimals to convert number up to 18 decimals
-	const amountWei = new BigNumber(tokenAmount.toString()).times(10 ** tokenDecimals);
-	const costWei = new BigNumber(cost.toString()).times(10 ** pairDecimals);
-	const strikePriceWei = new BigNumber(strikePrice.toString()).times(10 ** pairDecimals);
+	const amountWei = fromBigIntNumberToDecimal(tokenAmount, tokenDecimals);
+	const costWei = fromBigIntNumberToDecimal(cost, pairDecimals);
+	const strikePriceWei = fromBigIntNumberToDecimal(strikePrice, pairDecimals);
 
-	// estimate gasLimit
-	var encodedData = hedgingInstance.methods.createHedge(
-		hedgeType,
-		tokenAddy,
-		amountWei,
-		costWei,
-		strikePriceWei,
-		deadline
-	).encodeABI();
-	// gas estimation error can occur on overpricing, even the local network test Txs can fail
-	var estimateGas = await web3.eth.estimateGas({
-		data: encodedData,
-		from: accounts[0],
-		to: CONSTANTS.hedgingAddress
-	});
-	// estimate the gasPrice
-	var gasPrice = await web3.eth.getGasPrice(); 
-	// call createHedge function on Hedging contract
 	try {
-	  const deadline = Math.floor(Date.now() / 1000);
+		// prepare Tx
+		const transaction = await hedgingInstance.connect(signer).createHedge(hedgeType, tokenAddy, amountWei, costWei, strikePriceWei);
+		// Wait for the transaction to be mined
+		const receipt = await transaction.wait();
 
-	  const tx = hedgingInstance.methods.createHedge(
-		hedgeType,
-		tokenAddy,
-		amountWei,
-		costWei,
-		strikePriceWei,
-		deadline
-	  );
-	  tx.send({ from: accounts[0], gasPrice: gasPrice, gasLimit: estimateGas })
-		.on('receipt', function (receipt) { // use .on to avoid blocking behavior - i.e. If Ethereum node experiences delays, our JavaScript code will be blocked while waiting for the transaction receipt 
-		  console.log('Transaction hash:', receipt.transactionHash);
-		  if (receipt.status === true) {
-			alert('Transaction submitted successfully');
+		if (receipt.status === true) {
+			console.log('Transaction hash:', receipt.transactionHash);
 			handleTransactionSuccess(receipt.transactionHash); // Define this function as needed
-		  } else {
-			alert('Transaction failed');
+		} else {
+			console.log('Transaction failed. Receipt status:', receipt.status);
 			handleTransactionFailure(receipt.status); // Define this function as needed
-		  }
-		})
-		.on('error', function (error) {
-		  console.error('Transaction error:', error);
-		  alert('Transaction failed');
-		  handleTransactionError(error.message); // Define this function as needed
-		});
+		}
+		
 	} catch (error) {
-	  console.error('Transaction error:', error);
-	  alert('Transaction failed');
+		console.error('Transaction error:', error);
+		const text = error.message;
+		swal({
+			title: "Transaction error.",
+			type: "error",
+			confirmButtonColor: "#F27474",
+			text: text,
+		});
 	}
 }
 
@@ -588,7 +534,7 @@ function handleTransactionSuccess(transactionHash) {
 	// Display a success message based on the status
 	var message = "Transaction Submitted Successfully";
 	swal({
-	  title: "Failed.",
+	  title: "Writing Success.",
 	  type: "error",
 	  confirmButtonColor: "#F27474",
 	  text: message,
@@ -600,7 +546,7 @@ function handleTransactionFailure(status) {
 	// Display a user-friendly message based on the status
 	var message = status ? "Transaction Failed" : "Transaction Reverted";
 	swal({
-	  title: "Failed.",
+	  title: "Writing Failed.",
 	  type: "error",
 	  confirmButtonColor: "#F27474",
 	  text: message,
@@ -610,33 +556,54 @@ function handleTransactionFailure(status) {
 //==========================================================================
 // Events Listening
 //==========================================================================
-hedgingInstance.events.hedgeCreated()
-  .on('data', function(event) {
+const filter_hedgeCreated = await hedgingInstance.filters.hedgeCreated();
+hedgingInstance.on(filter_hedgeCreated, (token, hedgeID, createValue, type, owner) => {
+    const event = { returnValues: { token, hedgeID, createValue, type, owner } };
     const listItem = createEventListItem(event);
     document.getElementById('eventsList').appendChild(listItem);
-  });
-hedgingInstance.events.hedgePurchased()
-  .on('data', function(event) {
-    const listItem = createEventListItem(event);
-    document.getElementById('eventsList').appendChild(listItem);
-  });
+});
 
-  hedgingInstance.events.hedgeSettled()
-  .on('data', function(event) {
+const filter_hedgePurchased = hedgingInstance.filters.hedgePurchased();
+hedgingInstance.on(filter_hedgePurchased, (token, hedgeID, startValue, type, buyer) => {
+    const event = { returnValues: { token, hedgeID, startValue, type, buyer } };
     const listItem = createEventListItem(event);
     document.getElementById('eventsList').appendChild(listItem);
-  });
+});
 
-  hedgingInstance.events.minedHedge()
-  .on('data', function(event) {
+const filter_hedgeSettled = hedgingInstance.filters.hedgeSettled();
+hedgingInstance.on(filter_hedgeSettled, (token, hedgeID, endValue, payOff, miner) => {
+    const event = { returnValues: { token, hedgeID, endValue, payOff, miner } };
     const listItem = createEventListItem(event);
     document.getElementById('eventsList').appendChild(listItem);
-  });
+});
+
+const filter_minedHedge = hedgingInstance.filters.minedHedge();
+hedgingInstance.on(filter_minedHedge, (optionId, miner, token, paired, tokenFee, pairFee) => {
+    const event = { returnValues: { optionId, miner, token, paired, tokenFee, pairFee } };
+    const listItem = createEventListItem(event);
+    document.getElementById('eventsList').appendChild(listItem);
+});
+
+
+// Prepare opup success messages on event
+hedgingInstance.on(filter_hedgeCreated, (token, optionId, amount, hedgeType, cost, tx_hash) => {
+    const outputCurrency = ''; // using nonTxBased message with empty currency
+    const type = 'success'; // or error
+    const wallet = '';
+    const message = 'Hedge Created Successfully';
+    const nonTxAction = 'Token: ' + truncateAddress(token) + '<br>Hedge ID: ' + optionId + '<br>Amount: ' + amount + '<br>Hedge Type: ' + hedgeType + '<br>Premium: ' + cost;
+    popupSuccess(type, outputCurrency, tx_hash, message, 0, 0, wallet, nonTxAction);
+})
+.on('changed', (event) => {
+    // Remove event from local database
+    console.log('Event changed:', event);
+})
+.on('error', console.error);
+
 
 // Listen to live events
 // ADD HEDGE MINED - to be used for live transactions on sidebar
 // when user searches or filters by token address, only events matching the address will be displayed/filtered
-
 async function createEventListItem(event) {
 	const searchBarValue = getSearchBarValue();
 
@@ -707,32 +674,31 @@ async function createEventListItem(event) {
   return listItem;
 }
 
-// Listen for the hedgeCreated event
-hedgingInstance.events.hedgeCreated()
-	.on('data', function (event) {
-		console.log(event);
-		var token = truncateAddress(event.returnValues.token);
-		var optionId = event.returnValues.optionId;
-		var amount = event.returnValues.amount;
-		var hedgeType = event.returnValues.hedgeType;
-		var cost = event.returnValues.cost;
-		var tx_hash = event.transactionHash;
 
-		// You can add any additional actions you need to perform here
-		
-		var outputCurrency = '';//using nonTxBased message with empty currency
-		var type = 'success';//or error
-		var wallet = '';
-		var message = 'Hedge Created Successfully';
-		var nonTxAction = 'Token: ' + token + '<br>Hedge ID: ' + optionId + '<br>Amount: ' + amount + '<br>Hedge Type: ' + hedgeType + '<br>Premium: ' + cost;
-		popupSuccess(type,outputCurrency,tx_hash,message,0,0,wallet,nonTxAction);
-	})
-	.on('changed', function (event) {
-		// Remove event from local database
-		console.log(event);
-	})
-	.on('error', console.error);
-
+/*  ---------------------------------------
+    BOTTOM OF EVERY MAIN SCRIPT MODULE 
+-------------------------------------- */
+// Begin listening for the Connect event
+hedgingInstance.on("Connect", (chainId, event) => {
+	// Update chainID on connect
+	CONSTANTS.chainID = chainId;
+	console.log("Connected to chain:", CONSTANTS.chainID);
+	handleNetworkChange(chainId);
+});
   
+// Begin listening for the AccountsChanged event
+hedgingInstance.on("AccountsChanged", (accounts, event) => {
+	console.log("Account changed:", accounts);
+	handleAccountChange(accounts);
+  
+	// Refresh page
+	checkAndCallPageTries();
+});
+  
+// Begin listening for the ChainChanged event
+hedgingInstance.on("ChainChanged", async (chainId, event) => {
+	console.log("Network changed:", chainId);
+	await handleNetworkChange(chainId);
+	window.location.reload();
+});
 
-// END OF JAVASCRIPT
