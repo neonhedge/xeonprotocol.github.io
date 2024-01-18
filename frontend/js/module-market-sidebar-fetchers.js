@@ -1,4 +1,4 @@
-import { CONSTANTS, getCurrentEthUsdcPriceFromUniswapV2, getTokenETHValue, getTokenUSDValue, truncateAddress, getPairToken, getSymbol, } from './constants.js';
+import { CONSTANTS, getCurrentEthUsdcPriceFromUniswapV2, getTokenETHValue, getTokenUSDValue, truncateAddress, getPairToken, getSymbol, fromBigIntNumberToDecimal, } from './constants.js';
 import { updateSectionValues_volumes, updateSectionValues_volumesERC20 } from './module-market-sidebar-updaters.js';
 // Load hedge volume: created, bought, settled, payouts, fees
 // Load token stats and information when searchBar contains token address
@@ -19,6 +19,8 @@ async function loadSidebar() {
 
 async function loadSidebarVolume_All() {
     
+    // Fetch manually base address by base address. erc20s are sold at 10% discount in weth
+    // Reading direct from solidity mappings
     const hedgesCreatedWETH = await hedgingInstance.hedgesCreatedVolume(CONSTANTS.wethAddress);
     const hedgesCreatedUSDT = await hedgingInstance.hedgesCreatedVolume(CONSTANTS.usdtAddress);
     const hedgesCreatedUSDC = await hedgingInstance.hedgesCreatedVolume(CONSTANTS.usdcAddress);
@@ -43,78 +45,78 @@ async function loadSidebarVolume_All() {
     const settledVolumeUSDT = await hedgingInstance.settledVolume(CONSTANTS.usdtAddress);
     const settledVolumeUSDC = await hedgingInstance.settledVolume(CONSTANTS.usdcAddress);
     
-    const hedgeProfitsWETH = await hedgingInstance.protocolBaseProfits(CONSTANTS.wethAddress);
-    const hedgeProfitsUSDT = await hedgingInstance.protocolBaseProfits(CONSTANTS.usdtAddress);
-    const hedgeProfitsUSDC = await hedgingInstance.protocolBaseProfits(CONSTANTS.usdcAddress);
+    const hedgeProfitsWETH = await hedgingInstance.protocolPairProfits(CONSTANTS.wethAddress);
+    const hedgeProfitsUSDT = await hedgingInstance.protocolPairProfits(CONSTANTS.usdtAddress);
+    const hedgeProfitsUSDC = await hedgingInstance.protocolPairProfits(CONSTANTS.usdcAddress);
 
-    const hedgeFeesWETH = await hedgingInstance.protocolBaseFees(CONSTANTS.wethAddress);
-    const hedgeFeesUSDT = await hedgingInstance.protocolBaseFees(CONSTANTS.usdtAddress);
-    const hedgeFeesUSDC = await hedgingInstance.protocolBaseFees(CONSTANTS.usdcAddress);
+    const hedgeFeesWETH = await hedgingInstance.protocolPairedFees(CONSTANTS.wethAddress);
+    const hedgeFeesUSDT = await hedgingInstance.protocolPairedFees(CONSTANTS.usdtAddress);
+    const hedgeFeesUSDC = await hedgingInstance.protocolPairedFees(CONSTANTS.usdcAddress);
 
     const cashierFeesWETH = await hedgingInstance.protocolCashierFees(CONSTANTS.wethAddress);
     const cashierFeesUSDT = await hedgingInstance.protocolCashierFees(CONSTANTS.usdtAddress);
     const cashierFeesUSDC = await hedgingInstance.protocolCashierFees(CONSTANTS.usdcAddress);
   
     // Fetch ETH to USD conversion rate
-    const ethUsdPrice = await getCurrentEthUsdcPriceFromUniswapV2();
+    const ethUsdPrice = getCurrentEthUsdcPriceFromUniswapV2();
 
     // Step 3: Convert WETH amounts
     const wethDecimals = 18; const usdtDecimals = 6; const usdcDecimals = 6;
 
-    const hedgesCreatedEth = new BigNumber(hedgesCreatedWETH).div(10 ** wethDecimals);
-    const hedgesCreatedUsdt = new BigNumber(hedgesCreatedUSDT).div(10 ** usdtDecimals);
-    const hedgesCreatedUsdc = new BigNumber(hedgesCreatedUSDC).div(10 ** usdcDecimals);
+    const hedgesCreatedEth = fromBigIntNumberToDecimal(hedgesCreatedWETH, wethDecimals);
+    const hedgesCreatedUsdt = fromBigIntNumberToDecimal(hedgesCreatedUSDT, usdtDecimals);
+    const hedgesCreatedUsdc = fromBigIntNumberToDecimal(hedgesCreatedUSDC, usdcDecimals);
     const hedgesCreatedTUSD = (hedgesCreatedEth * ethUsdPrice) + hedgesCreatedUsdt + hedgesCreatedUsdc;
     
-    const hedgesTradedEth = new BigNumber(hedgesTradedWETH).div(10 ** wethDecimals);
-    const hedgesTradedUsdt = new BigNumber(hedgesTradedUSDT).div(10 ** usdtDecimals);
-    const hedgesTradedUsdc = new BigNumber(hedgesTradedUSDC).div(10 ** usdcDecimals);
+    const hedgesTradedEth = fromBigIntNumberToDecimal(hedgesTradedWETH, wethDecimals);
+    const hedgesTradedUsdt = fromBigIntNumberToDecimal(hedgesTradedUSDT, usdtDecimals);
+    const hedgesTradedUsdc = fromBigIntNumberToDecimal(hedgesTradedUSDC, usdcDecimals);
     const hedgesTradedTUSD = (hedgesTradedEth * ethUsdPrice) + hedgesTradedUsdt + hedgesTradedUsdc;
 
-    const hedgeCostsEth = new BigNumber(hedgeCostsWETH).div(10 ** wethDecimals);
-    const hedgeCostsUsdt = new BigNumber(hedgeCostsUSDT).div(10 ** usdtDecimals);
-    const hedgeCostsUsdc = new BigNumber(hedgeCostsUSDC).div(10 ** usdcDecimals);
+    const hedgeCostsEth = fromBigIntNumberToDecimal(hedgeCostsWETH, wethDecimals);
+    const hedgeCostsUsdt = fromBigIntNumberToDecimal(hedgeCostsUSDT, usdtDecimals);
+    const hedgeCostsUsdc = fromBigIntNumberToDecimal(hedgeCostsUSDC, usdcDecimals);
     const hedgeCostsTUSD = (hedgeCostsEth * ethUsdPrice) + hedgeCostsUsdt + hedgeCostsUsdc;
 
-    const optionsVolumeEth = new BigNumber(optionsVolumeWETH).div(10 ** wethDecimals);
-    const optionsVolumeUsdt = new BigNumber(optionsVolumeUSDT).div(10 ** usdtDecimals);
-    const optionsVolumeUsdc = new BigNumber(optionsVolumeUSDC).div(10 ** usdcDecimals);
+    const optionsVolumeEth = fromBigIntNumberToDecimal(optionsVolumeWETH, wethDecimals);
+    const optionsVolumeUsdt = fromBigIntNumberToDecimal(optionsVolumeUSDT, usdtDecimals);
+    const optionsVolumeUsdc = fromBigIntNumberToDecimal(optionsVolumeUSDC, usdcDecimals);
     const optionsVolumeTUSD = (optionsVolumeEth * ethUsdPrice) + optionsVolumeUsdt + optionsVolumeUsdc;
 
-    const swapsVolumeEth = new BigNumber(swapsVolumeWETH).div(10 ** wethDecimals);
-    const swapsVolumeUsdt = new BigNumber(swapsVolumeUSDT).div(10 ** usdtDecimals);
-    const swapsVolumeUsdc = new BigNumber(swapsVolumeUSDC).div(10 ** usdcDecimals);
+    const swapsVolumeEth = fromBigIntNumberToDecimal(swapsVolumeWETH, wethDecimals);
+    const swapsVolumeUsdt = fromBigIntNumberToDecimal(swapsVolumeUSDT, usdtDecimals);
+    const swapsVolumeUsdc = fromBigIntNumberToDecimal(swapsVolumeUSDC, usdcDecimals);
     const swapsVolumeTUSD = (swapsVolumeEth * ethUsdPrice) + swapsVolumeUsdt + swapsVolumeUsdc; 
     
-    const settledVolumeEth = new BigNumber(settledVolumeWETH).div(10 ** wethDecimals);
-    const settledVolumeUsdt = new BigNumber(settledVolumeUSDT).div(10 ** usdtDecimals);
-    const settledVolumeUsdc = new BigNumber(settledVolumeUSDC).div(10 ** usdcDecimals);
+    const settledVolumeEth = fromBigIntNumberToDecimal(settledVolumeWETH, wethDecimals);
+    const settledVolumeUsdt = fromBigIntNumberToDecimal(settledVolumeUSDT, usdtDecimals);
+    const settledVolumeUsdc = fromBigIntNumberToDecimal(settledVolumeUSDC, usdcDecimals);
     const settledVolumeTUSD = (settledVolumeEth * ethUsdPrice) + settledVolumeUsdt + settledVolumeUsdc; 
 
-    const hedgeProfitsEth = new BigNumber(hedgeProfitsWETH).div(10 ** wethDecimals);
-    const hedgeProfitsUsdt = new BigNumber(hedgeProfitsUSDT).div(10 ** usdtDecimals);
-    const hedgeProfitsUsdc = new BigNumber(hedgeProfitsUSDC).div(10 ** usdcDecimals);
+    const hedgeProfitsEth = fromBigIntNumberToDecimal(hedgeProfitsWETH, wethDecimals);
+    const hedgeProfitsUsdt = fromBigIntNumberToDecimal(hedgeProfitsUSDT, usdtDecimals);
+    const hedgeProfitsUsdc = fromBigIntNumberToDecimal(hedgeProfitsUSDC, usdcDecimals);
     const hedgeProfitsTUSD = (hedgeProfitsEth * ethUsdPrice) + hedgeProfitsUsdt + hedgeProfitsUsdc;
 
-    const hedgeFeesEth = new BigNumber(hedgeFeesWETH).div(10 ** wethDecimals);
-    const hedgeFeesUsdt = new BigNumber(hedgeFeesUSDT).div(10 ** usdtDecimals);
-    const hedgeFeesUsdc = new BigNumber(hedgeFeesUSDC).div(10 ** usdcDecimals);
+    const hedgeFeesEth = fromBigIntNumberToDecimal(hedgeFeesWETH, wethDecimals);
+    const hedgeFeesUsdt = fromBigIntNumberToDecimal(hedgeFeesUSDT, usdtDecimals);
+    const hedgeFeesUsdc = fromBigIntNumberToDecimal(hedgeFeesUSDC, usdcDecimals);
     const hedgeFeesTUSD = (hedgeFeesEth * ethUsdPrice) + hedgeFeesUsdt + hedgeFeesUsdc;
 
-    const cashierFeesEth = new BigNumber(cashierFeesWETH).div(10 ** wethDecimals);
-    const cashierFeesUsdt = new BigNumber(cashierFeesUSDT).div(10 ** usdtDecimals);
-    const cashierFeesUsdc = new BigNumber(cashierFeesUSDC).div(10 ** usdcDecimals);
+    const cashierFeesEth = fromBigIntNumberToDecimal(cashierFeesWETH, wethDecimals);
+    const cashierFeesUsdt = fromBigIntNumberToDecimal(cashierFeesUSDT, usdtDecimals);
+    const cashierFeesUsdc = fromBigIntNumberToDecimal(cashierFeesUSDC, usdcDecimals);
     const cashierFeesTUSD = (cashierFeesEth * ethUsdPrice) + cashierFeesUsdt + cashierFeesUsdc;
   
     // Convert ETH values to USD
-    const hedgesTradedTWETH = hedgesTradedTUSD.div(ethUsdPrice);
-    const hedgesCreatedTWETH = hedgesCreatedTUSD.div(ethUsdPrice);
-    const swapsVolumeTWETH = swapsVolumeTUSD.div(ethUsdPrice);
-    const optionsVolumeTWETH = optionsVolumeTUSD.div(ethUsdPrice);
-    const settledVolumeTWETH = settledVolumeTUSD.div(ethUsdPrice);
-    const hedgeCostsTWETH = hedgeCostsTUSD.div(ethUsdPrice);
-    const hedgeProfitsTWETH = hedgeProfitsTUSD.div(ethUsdPrice);
-    const hedgeFeesTWETH = hedgeFeesTUSD.div(ethUsdPrice);
+    const hedgesTradedTWETH = hedgesTradedTUSD / ethUsdPrice;
+    const hedgesCreatedTWETH = hedgesCreatedTUSD / ethUsdPrice;
+    const swapsVolumeTWETH = swapsVolumeTUSD / ethUsdPrice;
+    const optionsVolumeTWETH = optionsVolumeTUSD / ethUsdPrice;
+    const settledVolumeTWETH = settledVolumeTUSD / ethUsdPrice;
+    const hedgeCostsTWETH = hedgeCostsTUSD / ethUsdPrice;
+    const hedgeProfitsTWETH = hedgeProfitsTUSD / ethUsdPrice;
+    const hedgeFeesTWETH = hedgeFeesTUSD / ethUsdPrice;
   
     // Call the updateSectionValues_hedges function
     updateSectionValues_volumes(
@@ -159,7 +161,8 @@ async function loadSidebarVolume_Token(tokenAddress) {
 		  type: 'function',
 		},
 	];
-	let tokenContract = new web3.eth.Contract(erc20ABI, tokenAddress);
+	
+	let tokenContract = new ethers.Contract(tokenAddress, erc20ABI, window.provider);
 	let tokenName = await tokenContract.methods.name().call(); 
   
     const boughtOptionsCount = boughtOptions.length;
@@ -184,109 +187,111 @@ async function loadSidebarVolume_Token(tokenAddress) {
     );
   }
 
-  // Function to fetch the past events: hedgeCreated, hedgePurchased, hedgeSettled, minedHedge
-  // Exploring Arbitrums official API - its the most convinient and well documented
+  // Function to fetch the past events: 
+  // hedgeCreated, hedgePurchased, hedgeSettled, minedHedge  
   async function loadPastEvents() {
-    const apiUrl = 'https://api.arbiscan.io/api';
-    const apiKey = 'YourApiKeyToken'; 
+    
+    const fromBlock = 0;
+    const toBlock = "latest";
   
-    const latestBlock = 'latest'; 
-    const fromBlock = latestBlock - 100;
-    const toBlock = latestBlock;
-
-    const topic0_hedgeCreated = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef';
-    const topic0_hedgePurchased = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef';
-    const topic0_hedgeSettled = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef';
-    const topic0_minedHedge = '0x123456789abcdef';
+    const filter_hedgeCreated = await hedgingInstance.filters.hedgeCreated();
+    const filter_hedgePurchased = await hedgingInstance.filters.hedgePurchased();
+    const filter_hedgeSettled = await hedgingInstance.filters.hedgeSettled();
+    const filter_minedHedge = await hedgingInstance.filters.minedHedge();
   
-    const url_hedgeCreated = `${apiUrl}?module=logs&action=getLogs&fromBlock=${fromBlock}&toBlock=${toBlock}&topic0=${topic0_hedgeCreated}&apikey=${apiKey}`;
-    const url_hedgePurchased = `${apiUrl}?module=logs&action=getLogs&fromBlock=${fromBlock}&toBlock=${toBlock}&topic0=${topic0_hedgePurchased}&apikey=${apiKey}`;
-    const url_hedgeSettled = `${apiUrl}?module=logs&action=getLogs&fromBlock=${fromBlock}&toBlock=${toBlock}&topic0=${topic0_hedgeSettled}&apikey=${apiKey}`;
-    const url_minedHedge = `${apiUrl}?module=logs&action=getLogs&fromBlock=${fromBlock}&toBlock=${toBlock}&topic0=${topic0_minedHedge}&apikey=${apiKey}`;
-
+    // Listen to events
+    hedgingInstance.on(filter_hedgeCreated, (token, hedgeID, createValue, type, owner) => {
+      prepareEventListItem({ returnValues: { createValue, writer: owner }, transactionHash: "" }, "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef");
+    });
+  
+    hedgingInstance.on(filter_hedgePurchased, (token, hedgeID, payOff, type, buyer) => {
+      prepareEventListItem({ returnValues: { payOff, buyer }, transactionHash: "" }, "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef");
+    });
+  
+    hedgingInstance.on(filter_hedgeSettled, (token, hedgeID, endValue, payOff, miner) => {
+      prepareEventListItem({ returnValues: { endValue, payOff, miner }, transactionHash: "" }, "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef");
+    });
+  
+    hedgingInstance.on(filter_minedHedge, (optionId, miner, token, paired, tokenFee, pairFee) => {
+      prepareEventListItem({ returnValues: { payOff, miner }, transactionHash: "" }, "0x123456789abcdef");
+    });
+  
+    // Set fromBlock and toBlock for filters
+    filter_hedgeCreated.fromBlock = fromBlock;
+    filter_hedgeCreated.toBlock = toBlock;
+  
+    filter_hedgePurchased.fromBlock = fromBlock;
+    filter_hedgePurchased.toBlock = toBlock;
+  
+    filter_hedgeSettled.fromBlock = fromBlock;
+    filter_hedgeSettled.toBlock = toBlock;
+  
+    filter_minedHedge.fromBlock = fromBlock;
+    filter_minedHedge.toBlock = toBlock;
+  
     try {
-        const response_hedgeCreated = await fetch(url_hedgeCreated);
-        const response_hedgePurchased = await fetch(url_hedgePurchased);
-        const response_hedgeSettled = await fetch(url_hedgeSettled);
-        const response_minedHedge = await fetch(url_minedHedge);
-    
-        const data_hedgeCreated = await response_hedgeCreated.json();
-        const data_hedgePurchased = await response_hedgePurchased.json();
-        const data_hedgeSettled = await response_hedgeSettled.json();
-        const data_minedHedge = await response_minedHedge.json();
-    
-        const events_hedgeCreated = data_hedgeCreated.result;
-        const events_hedgePurchased = data_hedgePurchased.result;
-        const events_hedgeSettled = data_hedgeSettled.result;
-        const events_minedHedge = data_minedHedge.result;
-        
-        /* 
-        // Considering the returned result by arbitrum is an array of objects, we read it in the pprepareEventListItem as this;
-        const firstTopic = data_hedgeCreated.result[0].topics[0];
-        const lastTopic = data_hedgeCreated.result[0].topics[data_hedgeCreated.result[0].topics.length - 1];
-        const data = data_hedgeCreated.result[0].data;
-        */
-
-        // eventOne
-        events_hedgeCreated.slice(0, 100).forEach((event) => {
-            prepareEventListItem(event, topic0_hedgeCreated);
-        });
-        // eventTwo
-        events_hedgePurchased.slice(0, 100).forEach((event) => {
-            prepareEventListItem(event, topic0_hedgePurchased);
-        });
-        // eventThree
-        events_hedgeSettled.slice(0, 100).forEach((event) => {
-            prepareEventListItem(event, topic0_hedgeSettled);
-        });
-        // eventFour
-        events_minedHedge.slice(0, 100).forEach((event) => {
-            prepareEventListItem(event, topic0_minedHedge);
-        });
-
+      const events_hedgeCreated = await hedgingInstance.queryFilter(filter_hedgeCreated);
+      const events_hedgePurchased = await hedgingInstance.queryFilter(filter_hedgePurchased);
+      const events_hedgeSettled = await hedgingInstance.queryFilter(filter_hedgeSettled);
+      const events_minedHedge = await hedgingInstance.queryFilter(filter_minedHedge);
+  
+      // Process the events as needed
+      events_hedgeCreated.slice(0, 100).forEach((event) => {
+        prepareEventListItem(event, "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef");
+      });
+  
+      events_hedgePurchased.slice(0, 100).forEach((event) => {
+        prepareEventListItem(event, "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef");
+      });
+  
+      events_hedgeSettled.slice(0, 100).forEach((event) => {
+        prepareEventListItem(event, "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef");
+      });
+  
+      events_minedHedge.slice(0, 100).forEach((event) => {
+        prepareEventListItem(event, "0x123456789abcdef");
+      });
+  
     } catch (error) {
-        console.error('Error fetching events:', error);
-        // Handle the error or display an error message
+      console.error('Error fetching past events:', error);
+      // Handle the error or display an error message
     }
 }
-
+  
 function prepareEventListItem(event, eventTopic) {
     // Display the events in the sidebar div
     const sidebarDiv = document.getElementById('eventsList');
     // Create the list item
     const listItem = document.createElement('li');
-    
-    /* OUR event.returnValues. approach is based on live events, here for placeholder only
-    // we will change to array objects parsing during live testing after knowing how indexed topics are ordered for each event
-    */
+  
     // title
     const titleSpan = document.createElement('span');
     titleSpan.textContent = event.title;
     listItem.appendChild(titleSpan);
-    
+  
     // amount/value
     const amountSpan = document.createElement('span');
     const pairToken = getPairToken(event.returnValues.optionId);
     const pairTokenSymbol = getSymbol(pairToken);
-    if(eventTopic == '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef') {//if hedgeCreated
-        amountSpan.textContent = (event.returnValues.createValue) + ' ' + pairTokenSymbol;
+    if (eventTopic === '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef') { //if hedgeCreated
+      amountSpan.textContent = (event.returnValues.createValue) + ' ' + pairTokenSymbol;
     }
-    if(eventTopic == '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef') {//if hedgePurchased
-        amountSpan.textContent = (event.returnValues.payOff) + ' ' + pairTokenSymbol;
+    if (eventTopic === '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef') { //if hedgePurchased
+      amountSpan.textContent = (event.returnValues.payOff) + ' ' + pairTokenSymbol;
     }
-    if(eventTopic == '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef') {//if hedgeSettled
-        amountSpan.textContent = (event.returnValues.endValue) + ' ' + pairTokenSymbol;
+    if (eventTopic === '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef') { //if hedgeSettled
+      amountSpan.textContent = (event.returnValues.endValue) + ' ' + pairTokenSymbol;
     }
-    if(eventTopic == '0x123456789abcdef') {//if minedHedge
-        amountSpan.textContent = (event.returnValues.payOff) + ' ' + pairTokenSymbol;
+    if (eventTopic === '0x123456789abcdef') { //if minedHedge
+      amountSpan.textContent = (event.returnValues.payOff) + ' ' + pairTokenSymbol;
     }
     listItem.appendChild(amountSpan);
-    
+  
     // address
     const dealerSpan = document.createElement('span');
     dealerSpan.textContent = truncateAddress((event.returnValues.writer || event.returnValues.buyer || event.returnValues.miner));
     listItem.appendChild(dealerSpan);
-    
+  
     // link
     const txSpan = document.createElement('span');
     const link = document.createElement('a');
@@ -294,7 +299,7 @@ function prepareEventListItem(event, eventTopic) {
     link.textContent = 'Transaction';
     txSpan.appendChild(link);
     listItem.appendChild(txSpan);
-    
+  
     // Add list item to the sidebar
     sidebarDiv.appendChild(listItem);
 }
