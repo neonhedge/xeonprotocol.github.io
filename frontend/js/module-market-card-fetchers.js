@@ -144,10 +144,12 @@ async function loadOptions(){
 			}
 			MyGlobals.startIndex = MyGlobals.lastItemIndex - 1 - window.readLimit;
 		} else {
-			let myOptionsCreatedLength = await hedgingInstance.getUserOptionsCreatedLength(MyGlobals.wallet);
-			let myOptionsTakenLength = await hedgingInstance.getUserOptionsTakenLength(MyGlobals.wallet);
+			let myhedgesCreatedArray = await hedgingInstance.myoptionsCreated(MyGlobals.wallet);
+			let myhedgesCreatedLength = myhedgesCreatedArray.length;
+			let myhedgesTakenArray = await hedgingInstance.myoptionsTaken(MyGlobals.wallet);
+			let myhedgesTakenLength = myhedgesTakenArray.length;
 		
-			MyGlobals.startIndex = Math.max(myOptionsCreatedLength, myOptionsTakenLength) - 1 - window.readLimit;
+			MyGlobals.startIndex = Math.max(myhedgesCreatedLength, myhedgesTakenLength) - 1 - window.readLimit;
 			if(MyGlobals.startIndex < 0){MyGlobals.startIndex = 0;}
 		}
 		
@@ -273,10 +275,12 @@ async function loadOptions(){
 			}
 			MyGlobals.startIndex = MyGlobals.lastItemIndex - 1 - window.readLimit;
 		} else {
-			let myOptionsCreatedLength = await hedgingInstance.getUserOptionsCreatedLength(MyGlobals.wallet);
-			let myOptionsTakenLength = await hedgingInstance.getUserOptionsTakenLength(MyGlobals.wallet);
+			let myhedgesCreatedArray = await hedgingInstance.myswapsCreated(MyGlobals.wallet);
+			let myhedgesCreatedLength = myhedgesCreatedArray.length;
+			let myhedgesTakenArray = await hedgingInstance.myswapsTaken(MyGlobals.wallet);
+			let myhedgesTakenLength = myhedgesTakenArray.length;
 		
-			MyGlobals.startIndex = Math.max(myOptionsCreatedLength, myOptionsTakenLength) - 1 - window.readLimit;
+			MyGlobals.startIndex = Math.max(myhedgesCreatedLength, myhedgesTakenLength) - 1 - window.readLimit;
 			if(MyGlobals.startIndex < 0){MyGlobals.startIndex = 0;}
 		}
 		

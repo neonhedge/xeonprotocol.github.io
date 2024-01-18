@@ -133,12 +133,20 @@ async function loadSidebarVolume_All() {
 }
 
 async function loadSidebarVolume_Token(tokenAddress) {
-    const boughtOptions = await contract.methods.getBoughtOptionsERC20(tokenAddress, startIndex, limit).call();
-    const boughtSwaps = await contract.methods.getBoughtSwapsERC20(tokenAddress, startIndex, limit).call();
-    const settledOptions = await contract.methods.getSettledOptionsERC20(tokenAddress, startIndex, limit).call();
-    const settledSwaps = await contract.methods.getSettledSwapsERC20(tokenAddress, startIndex, limit).call();
-    const options = await contract.methods.getOptionsForToken(tokenAddress, startIndex, limit).call();
-    const swaps = await contract.methods.getSwapsForToken(tokenAddress, startIndex, limit).call();
+    let startIndex, limit = 10000;
+
+    // reading direct from public mappings
+    // get volume in paired value
+    const pairAddress = await getPairToken(tokenAddress);
+    const boughtOptions = await contract.hedgesTakenVolume(pairAddress);
+    const boughtSwaps = await contract.swapsVolume(pairAddress);
+
+    const boughtOptionsCR = await contract.methods.getAllOptionsTaken(tokenAddress, startIndex, limit).call();
+    const boughtSwapsCR = await contract.methods.getAllSwapsTaken(tokenAddress, startIndex, limit).call();
+    const settledOptionsCR = await contract.methods.getSettledOptionsERC20(tokenAddress, startIndex, limit).call();
+    const settledSwapsCR = await contract.methods.getSettledSwapsERC20(tokenAddress, startIndex, limit).call();
+    const optionsCR = await contract.methods.getOptionsForToken(tokenAddress, startIndex, limit).call();
+    const swapsCR = await contract.methods.getSwapsForToken(tokenAddress, startIndex, limit).call();
 
     // token price in paired currency
     const [tokenPrice, pairedSymbol] = await getTokenETHValue(tokenAddress);
@@ -165,12 +173,12 @@ async function loadSidebarVolume_Token(tokenAddress) {
 	let tokenContract = new ethers.Contract(tokenAddress, erc20ABI, window.provider);
 	let tokenName = await tokenContract.methods.name().call(); 
   
-    const boughtOptionsCount = boughtOptions.length;
-    const boughtSwapsCount = boughtSwaps.length;
-    const settledOptionsCount = settledOptions.length;
-    const settledSwapsCount = settledSwaps.length;
-    const optionsCount = options.length;
-    const swapsCount = swaps.length;
+    const boughtOptionsCount = boughtOptionsCR.length;
+    const boughtSwapsCount = boughtSwapsCR.length;
+    const settledOptionsCount = settledOptionsCR.length;
+    const settledSwapsCount = settledSwapsCR.length;
+    const optionsCount = optionsCR.length;
+    const swapsCount = swapsCR.length;
   
     // Call the updateSectionValues_hedges function
     updateSectionValues_volumesERC20(
