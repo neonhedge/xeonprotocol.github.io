@@ -69,9 +69,15 @@ async function refreshDataOnElements() {
 //will load from last index only to a certain limit
 
 async function loadOptions(){
-	//CALL OPTIONS
+
+	// Show loading animation on timeline
+	const timelineContainer = $('#hedgesTimeline');
+	timelineContainer.empty();
+	timelineContainer.append('<i class="loading"></i>');
+
+	// 1. CALL OPTIONS
 	if (window.nav === 1 && window.filters === 1) { // Get vacant call options, exclude taken
-		//FILTER BY TOKEN ADDRESS
+		// Filter by token address
 		let filterAddress = $('#searchBar').val();
 		if(window.nav == 1 && window.filters == 4 && filterAddress.length >= 40 && isValidEthereumAddress(filterAddress) == true){//filter by token address
 			if (MyGlobals.lastItemIndex !== 0) {
@@ -333,6 +339,9 @@ async function loadOptions(){
 
 	//SOCIAL TWITTER FEED #neonhedge
 	
+
+	// Hide loading animation on timeline
+	timelineContainer.find('.loading').remove();		
 }
 
 async function fetchOptionCard(optionId){
@@ -456,7 +465,7 @@ async function fetchOptionCard(optionId){
 			action_btn = "<div id='"+optionId+"buyButton' class='option_S_tab actionButton activeButton'>Active</div>";
 			activity_btn = `
 			<div class="option_S_tab _bullbear">
-				<span class="status-dot inprogress"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 16 16" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><circle cx="8" cy="8" r="8"></circle></svg><span style="white-space: nowrap;">Running</span></span>
+				<span class="status-dot inprogress"><svg stroke="currentColor" fill="#089353" stroke-width="0" viewBox="0 0 16 16" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><circle cx="8" cy="8" r="8"></circle></svg><span style="white-space: nowrap;">Running</span></span>
 			</div>`;
 		}
 		if(status == 3){
@@ -654,7 +663,8 @@ async function prepareTimestamp(timeprint){
 	return start;
 }
 async function noOptionsSwal(){
-	$('#hedgesTimeline').empty().append('<span id="sl_refreshing" class="sl_refresh">no hedges found...</span>');
+	$('#hedgesTimeline').empty().append('<div class="no-hedges-message sl_refresh">No Events Found. Write or Buy OTC hedges to populate this area...</span>');
+
 	//proceed to swal
 	var privatize = '<div class="clms_case">nothing to find here...</div>';
 	swal({

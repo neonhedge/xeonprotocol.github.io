@@ -198,6 +198,11 @@ async function loadSidebarVolume_Token(tokenAddress) {
   // Function to fetch the past events: 
   // hedgeCreated, hedgePurchased, hedgeSettled, minedHedge  
   async function loadPastEvents() {
+
+    // Show loading animation
+    const pastEventsContainer = $('#scifiUI');
+	pastEventsContainer.empty();
+	pastEventsContainer.append('<i class="loading"></i>');
     
     const fromBlock = 0;
     const toBlock = "latest";
@@ -238,37 +243,45 @@ async function loadSidebarVolume_Token(tokenAddress) {
     filter_minedHedge.toBlock = toBlock;
   
     try {
-      const events_hedgeCreated = await hedgingInstance.queryFilter(filter_hedgeCreated);
-      const events_hedgePurchased = await hedgingInstance.queryFilter(filter_hedgePurchased);
-      const events_hedgeSettled = await hedgingInstance.queryFilter(filter_hedgeSettled);
-      const events_minedHedge = await hedgingInstance.queryFilter(filter_minedHedge);
+        const events_hedgeCreated = await hedgingInstance.queryFilter(filter_hedgeCreated);
+        const events_hedgePurchased = await hedgingInstance.queryFilter(filter_hedgePurchased);
+        const events_hedgeSettled = await hedgingInstance.queryFilter(filter_hedgeSettled);
+        const events_minedHedge = await hedgingInstance.queryFilter(filter_minedHedge);
+        
+        // Process the events as needed
+        events_hedgeCreated.slice(0, 100).forEach((event) => {
+            prepareEventListItem(event, "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef");
+        });
   
-      // Process the events as needed
-      events_hedgeCreated.slice(0, 100).forEach((event) => {
-        prepareEventListItem(event, "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef");
-      });
+        events_hedgePurchased.slice(0, 100).forEach((event) => {
+            prepareEventListItem(event, "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef");
+        });
   
-      events_hedgePurchased.slice(0, 100).forEach((event) => {
-        prepareEventListItem(event, "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef");
-      });
+        events_hedgeSettled.slice(0, 100).forEach((event) => {
+            prepareEventListItem(event, "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef");
+        });
   
-      events_hedgeSettled.slice(0, 100).forEach((event) => {
-        prepareEventListItem(event, "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef");
-      });
-  
-      events_minedHedge.slice(0, 100).forEach((event) => {
-        prepareEventListItem(event, "0x123456789abcdef");
-      });
+        events_minedHedge.slice(0, 100).forEach((event) => {
+            prepareEventListItem(event, "0x123456789abcdef");
+        });
+
+        if(events_hedgeCreated.length === 0 && events_hedgePurchased.length === 0 && events_hedgeSettled.length === 0 && events_minedHedge.length === 0) {
+            // empty results output
+            $('#scifiUI').empty().append('<div class="no-hedges-message sl_refresh">No Events Found. Write or Buy OTC hedges to populate this area...</span>');
+        }
   
     } catch (error) {
       console.error('Error fetching past events:', error);
       // Handle the error or display an error message
     }
+
+    // Hide animation
+    pastEventsContainer.find('.loading').remove();
 }
   
 function prepareEventListItem(event, eventTopic) {
     // Display the events in the sidebar div
-    const sidebarDiv = document.getElementById('eventsList');
+    const sidebarDiv = document.getElementById('scifiUI');
     // Create the list item
     const listItem = document.createElement('li');
   
@@ -303,7 +316,7 @@ function prepareEventListItem(event, eventTopic) {
     // link
     const txSpan = document.createElement('span');
     const link = document.createElement('a');
-    link.href = 'https://arbiscan.io/tx/' + event.transactionHash;
+    link.href = 'https://etherscan.io/tx/' + event.transactionHash;
     link.textContent = 'Transaction';
     txSpan.appendChild(link);
     listItem.appendChild(txSpan);

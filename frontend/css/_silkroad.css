@@ -54,29 +54,27 @@ section.page-title {
 	position: absolute;
 	left: 0;
 	right: 0;
-	margin-left: 20px;
-	margin-right: 20px;
+	margin-left: auto;
+	margin-right: auto;
 	top:-80px;
 	z-index: 10;
+  	max-width: max-content;
 
 	padding: 5px 20px;
 	border: 1px solid rgba(51, 153, 255, 0.15);
 	border-radius: 8px;
-/*
-	background-color: rgba(29, 163, 216, 0.2);
-	background-color: rgba(29, 129, 216, 0.2);
-*/
 	background-color: rgba(29, 129, 216, 0.15);
 	animation: hideDiv 30s forwards;
 	transition: 0.5s;
 
-	font-family: Raleway, "Space Grotesk";
+	font-family: 'Raleway',"Space Grotesk", sans-serif;
 	font-size: clamp(12.5px, 1vw, 13px);
 	font-weight: 200;
 	text-align: center;
 	cursor:help;
 	transition: background-color 0.3s;
-	color: #08e7fe;
+	color: #08e7fe;	
+	line-height: 2.5;
 }
 @keyframes hideDiv {
 	0% {
@@ -115,7 +113,7 @@ section.sectionCenter {
 	border-bottom: 0.5px dotted #188dd6;
 }
 .clubSinnage h4{
-	font-family: Raleway,'Neon',monospace, sans-serif, Tahoma, Geneva;
+	font-family: 'Raleway',"Space Grotesk", sans-serif;
 	font-size: clamp(22px, 3vw, 28px) !important;
 	font-weight:100;
 	letter-spacing:1px;
@@ -1093,21 +1091,21 @@ fieldset input{
     border:0.5px solid #089353;
 }
 .buyButton:hover {
-    background-color: #252525;
-    color: #089353;
+    background-color: #089353;
+    color: #FFF;
     border:0.5px solid #FFF;
 }
 .activeButton{
-    color: rgba(255, 255, 255, 0.9);
-    border:0.5px solid #089353;
+    color: #08e7fe;
+    border:0.5px solid #08e7fe;
 }
 .expiredButton{
     color: #d23969;
     border:0.5px solid #FFF;
 }
 .expiredButton:hover {
-    background-color: #252525;
-    color: #d22b60;
+    background-color: #f623a1;
+    color: #FFF;
     border:0.5px solid pink;
 }
 ._activestate, ._bookmarkjump{
@@ -1309,6 +1307,32 @@ section.cta{
 	background-color: #130228;
 	z-index:1;
 	position: relative;
+}
+  /*=================
+  Common NEON Styles
+  ===================*/
+
+  .no-hedges-message {
+	position: relative;
+	margin: 0px auto;
+	padding: 4vw;
+	box-sizing: border-box;
+	
+	text-align: center;
+	font-family: "Space Grotesk", "Monospace", sans-serif;
+	font-size: clamp(14px, 1vw, 15px);
+	font-weight: 100;
+	cursor: help;
+	transition: background-color 0.3s;
+	color: transparent;
+	background-clip: text;
+	text-fill-color: transparent;
+	border: 0.5px solid rgba(51, 153, 255, 0.5);
+	border-radius: 8px;
+	background-image: linear-gradient(to right, #08e7fe, #d6188a);
+}  
+.transparentTextLoading {
+	color: transparent !important;
 }
 /*===============================
       BOTTOM OF EVERY CSS FILE

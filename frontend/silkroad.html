@@ -153,41 +153,43 @@
 						<div class="tl_hedgeGrid">
 							<div class="projectLogo" style="background-image:url('./imgs/erc20-uniswap-tr.png')"></div>
 							<div class="projectName">
-								<div>Vela Exchange<a class="blockexplorer" href="https://etherscan.io/address/'`+pairAddress+`" target="_blank" alt="SC" title="Go to Etherscan">0x00..000</a></div>
-								<div class="tl_bagsize">--,--,-- VELA</div>
+								<div class="transparentTextLoading">Vela Exchange<a class="blockexplorer transparentTextLoading" href="https://etherscan.io/address/'`+pairAddress+`" target="_blank" alt="SC" title="Go to Etherscan">0x00..000</a></div>
+								<div class="tl_bagsize transparentTextLoading">--,--,-- VELA</div>
 							</div>
 						</div>
 						<div class="valueHold">
 							<div class="assetsValue">
 								<div class="valueTitle"></div>
-								<div class="assetsMarketValue highlightOption">-- ETH</div>
+								<div class="assetsMarketValue highlightOption transparentTextLoading">-- ETH</div>
 							</div>
 							<div class="assetsType">
 								<div class="typeTitle">HEDGE</div>
-								<div class="assetsTypeValue highlightOption">Call Option</div>
+								<div class="assetsTypeValue highlightOption transparentTextLoading">Call Option</div>
 							</div>
 						</div>
 
 						<div class="strategyContainer">
 							<div class="optionMarksHold">
-								<div class="optionMark"><span>Strike:</span><span class="oMfigure">--,-- eth</span></div>
-								<div class="optionMark"><span>Premium:</span><span class="oMfigure">--,-- eth</span></div>
-								<div class="optionMark"><span>Expires:</span><span class="oMfigure">-- days</span></div>
+								<div class="optionMark"><span>Strike:</span><span class="oMfigure transparentTextLoading">--,-- eth</span></div>
+								<div class="optionMark"><span>Premium:</span><span class="oMfigure transparentTextLoading">--,-- eth</span></div>
+								<div class="optionMark"><span>Expires:</span><span class="oMfigure transparentTextLoading">-- days</span></div>
 							</div>
 							<div class="strategyHold">
 								<img class="strategyImage" src="./imgs/call-option.svg" />
 								<div class="strategyDataHold">
 									<div class="topValue-call">profit zone</div>
-									<div class="bottomValue-call">max loss --,-- eth</div>
+									<div class="bottomValue-call">max loss</div>
 								</div>
 							</div>
 						</div>
 						<div class="optionSummary">
-							`+activity_btn+`
-							`+action_btn+`
+							<div class="option_S_tab _bullbear">
+								<span class="status-dot inprogress transparentTextLoading"><svg stroke="currentColor" fill="#188dd6" stroke-width="0" viewBox="0 0 16 16" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><circle cx="8" cy="8" r="8"></circle></svg><span style="white-space: nowrap;">Vacant</span></span>
+							</div>
+							<div id='"+optionId+"buyButton' class='option_S_tab actionButton buyButton transparentTextLoading'>Buy Option</div>
 							<div class="option_S_tab _bookmarkjump">
-								<a class="view_project" href="hedge.html?id=`+optionId+`" target="_blank" alt="View" title="full details">view</a>
-								`+bookmark_btn+`
+								<a class="view_project" href="" target="_blank" alt="View" title="full details">view</a>
+								<div class='raise_S_tab _bookmarkjump' onclick='"+bookmark+"'><img src='./imgs/bookmark_.png' width='18px'/></div>
 							</div>
 						</div>
 					</div>
@@ -195,41 +197,44 @@
 						<div class="tl_hedgeGrid">
 							<div class="projectLogo" style="background-image:url('./imgs/erc20-shitcoin-tr.png')"></div>
 							<div class="projectName">
-								<div>Vela Exchange<a class="blockexplorer" href="https://etherscan.io/address/'`+pairAddress+`" target="_blank" alt="SC" title="Go to Etherscan">0x00..000</a></div>
-								<div class="tl_bagsize">--,--,-- VELA</div>
+								<div class="transparentTextLoading">Vela Exchange<a class="blockexplorer transparentTextLoading" href="https://etherscan.io/address/'`+pairAddress+`" target="_blank" alt="SC" title="Go to Etherscan">0x00..000</a></div>
+								<div class="tl_bagsize transparentTextLoading">--,--,-- VELA</div>
 							</div>
 						</div>
 						<div class="valueHold">
 							<div class="assetsValue">
 								<div class="valueTitle"></div>
-								<div class="assetsMarketValue highlightOption">-- ETH</div>
+								<div class="assetsMarketValue highlightOption transparentTextLoading">-- ETH</div>
 							</div>
 							<div class="assetsType">
 								<div class="typeTitle">HEDGE</div>
-								<div class="assetsTypeValue highlightOption">Call Option</div>
+								<div class="assetsTypeValue highlightOption transparentTextLoading">Call Option</div>
 							</div>
 						</div>
 
 						<div class="strategyContainer">
 							<div class="optionMarksHold">
-								<div class="optionMark"><span>Strike:</span><span class="oMfigure">--,-- eth</span></div>
-								<div class="optionMark"><span>Premium:</span><span class="oMfigure">--,-- eth</span></div>
-								<div class="optionMark"><span>Expires:</span><span class="oMfigure">-- days</span></div>
+								<div class="optionMark"><span>Strike:</span><span class="oMfigure transparentTextLoading">--,-- eth</span></div>
+								<div class="optionMark"><span>Premium:</span><span class="oMfigure transparentTextLoading">--,-- eth</span></div>
+								<div class="optionMark"><span>Expires:</span><span class="oMfigure transparentTextLoading">-- days</span></div>
 							</div>
 							<div class="strategyHold">
 								<img class="strategyImage" src="./imgs/put-option.svg" />
 								<div class="strategyDataHold">
-									<div class="topValue-put">max loss --,-- eth</div>
+									<div class="topValue-put">max loss</div>
 									<div class="bottomValue-put">profit zone</div>
 								</div>
 							</div>
 						</div>
 						<div class="optionSummary">
-							`+activity_btn+`
-							`+action_btn+`
+							<div class="option_S_tab _bullbear">
+								<span class="status-dot inprogress transparentTextLoading"><svg stroke="currentColor" fill="#089353" stroke-width="0" viewBox="0 0 16 16" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><circle cx="8" cy="8" r="8"></circle></svg><span style="white-space: nowrap;">Running</span></span>
+							</div>
+							<div id='"+optionId+"buyButton' class='option_S_tab actionButton activeButton transparentTextLoading'>Active</div>
+							
 							<div class="option_S_tab _bookmarkjump">
-								<a class="view_project" href="hedge.html?id=`+optionId+`" target="_blank" alt="View" title="full details">view</a>
-								`+bookmark_btn+`
+								<a class="view_project" href="" target="_blank" alt="View" title="full details">view</a>
+								<div class='raise_S_tab _bookmarkjump' onclick='"+unbookmark+"'><img src='./imgs/unbookmark_.png' width='18px'/></div>
 							</div>
 						</div>
 					</div>
@@ -237,41 +242,43 @@
 						<div class="tl_hedgeGrid">
 							<div class="projectLogo" style="background-image:url('./imgs/erc20-shitcoin-tr.png')"></div>
 							<div class="projectName">
-								<div>Vela Exchange<a class="blockexplorer" href="https://etherscan.io/address/'`+pairAddress+`" target="_blank" alt="SC" title="Go to Etherscan">0x00..000</a></div>
-								<div class="tl_bagsize">--,--,-- VELA</div>
+								<div class="transparentTextLoading">Vela Exchange<a class="blockexplorer transparentTextLoading" href="https://etherscan.io/address/'`+pairAddress+`" target="_blank" alt="SC" title="Go to Etherscan">0x00..000</a></div>
+								<div class="tl_bagsize transparentTextLoading">--,--,-- VELA</div>
 							</div>
 						</div>
 						<div class="valueHold">
 							<div class="assetsValue">
 								<div class="valueTitle"></div>
-								<div class="assetsMarketValue highlightOption">-- ETH</div>
+								<div class="assetsMarketValue highlightOption transparentTextLoading">-- ETH</div>
 							</div>
 							<div class="assetsType">
 								<div class="typeTitle">HEDGE</div>
-								<div class="assetsTypeValue highlightOption">Call Option</div>
+								<div class="assetsTypeValue highlightOption transparentTextLoading">Call Option</div>
 							</div>
 						</div>
 
 						<div class="strategyContainer">
 							<div class="optionMarksHold">
-								<div class="optionMark"><span>Strike:</span><span class="oMfigure">--,-- eth</span></div>
-								<div class="optionMark"><span>Premium:</span><span class="oMfigure">--,-- eth</span></div>
-								<div class="optionMark"><span>Expires:</span><span class="oMfigure">-- days</span></div>
+								<div class="optionMark"><span>Strike:</span><span class="oMfigure transparentTextLoading">--,-- eth</span></div>
+								<div class="optionMark"><span>Premium:</span><span class="oMfigure transparentTextLoading">--,-- eth</span></div>
+								<div class="optionMark"><span>Expires:</span><span class="oMfigure transparentTextLoading">-- days</span></div>
 							</div>
 							<div class="strategyHold">
 								<img class="strategyImage" src="./imgs/call-option.svg" />
 								<div class="strategyDataHold">
 									<div class="topValue-call">profit zone</div>
-									<div class="bottomValue-call">max loss --,-- eth</div>
+									<div class="bottomValue-call">max loss</div>
 								</div>
 							</div>
 						</div>
 						<div class="optionSummary">
-							`+activity_btn+`
-							`+action_btn+`
+							<div class="option_S_tab _bullbear">
+								<span class="status-dot ended transparentTextLoading"><svg stroke="currentColor" fill="orange" stroke-width="0" viewBox="0 0 16 16" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><circle cx="8" cy="8" r="8"></circle></svg><span style="white-space: nowrap;">Expired</span></span>
+							</div>
+							<div id='"+optionId+"buyButton' class='option_S_tab actionButton expiredButton transparentTextLoading'>Settle</div>
 							<div class="option_S_tab _bookmarkjump">
-								<a class="view_project" href="hedge.html?id=`+optionId+`" target="_blank" alt="View" title="full details">view</a>
-								`+bookmark_btn+`
+								<a class="view_project" href="" target="_blank" alt="View" title="full details">view</a>
+								<div class='raise_S_tab _bookmarkjump' onclick='"+bookmark+"'><img src='./imgs/bookmark_.png' width='18px'/></div>
 							</div>
 						</div>
 					</div>
@@ -279,41 +286,43 @@
 						<div class="tl_hedgeGrid">
 							<div class="projectLogo" style="background-image:url('./imgs/erc20-uniswap-tr.png')"></div>
 							<div class="projectName">
-								<div>Vela Exchange<a class="blockexplorer" href="https://etherscan.io/address/'`+pairAddress+`" target="_blank" alt="SC" title="Go to Etherscan">0x00..000</a></div>
-								<div class="tl_bagsize">--,--,-- VELA</div>
+								<div class="transparentTextLoading">Vela Exchange<a class="blockexplorer transparentTextLoading" href="https://etherscan.io/address/'`+pairAddress+`" target="_blank" alt="SC" title="Go to Etherscan">0x00..000</a></div>
+								<div class="tl_bagsize transparentTextLoading">--,--,-- VELA</div>
 							</div>
 						</div>
 						<div class="valueHold">
 							<div class="assetsValue">
 								<div class="valueTitle"></div>
-								<div class="assetsMarketValue highlightOption">-- ETH</div>
+								<div class="assetsMarketValue highlightOption transparentTextLoading">-- ETH</div>
 							</div>
 							<div class="assetsType">
 								<div class="typeTitle">HEDGE</div>
-								<div class="assetsTypeValue highlightOption">Call Option</div>
+								<div class="assetsTypeValue highlightOption transparentTextLoading">Call Option</div>
 							</div>
 						</div>
 
 						<div class="strategyContainer">
 							<div class="optionMarksHold">
-								<div class="optionMark"><span>Strike:</span><span class="oMfigure">--,-- eth</span></div>
-								<div class="optionMark"><span>Premium:</span><span class="oMfigure">--,-- eth</span></div>
-								<div class="optionMark"><span>Expires:</span><span class="oMfigure">-- days</span></div>
+								<div class="optionMark"><span>Strike:</span><span class="oMfigure transparentTextLoading">--,-- eth</span></div>
+								<div class="optionMark"><span>Premium:</span><span class="oMfigure transparentTextLoading">--,-- eth</span></div>
+								<div class="optionMark"><span>Expires:</span><span class="oMfigure transparentTextLoading">-- days</span></div>
 							</div>
 							<div class="strategyHold">
 								<img class="strategyImage" src="./imgs/call-option.svg" />
 								<div class="strategyDataHold">
 									<div class="topValue-call">profit zone</div>
-									<div class="bottomValue-call">max loss --,-- eth</div>
+									<div class="bottomValue-call">max loss</div>
 								</div>
 							</div>
 						</div>
 						<div class="optionSummary">
-							`+activity_btn+`
-							`+action_btn+`
+							<div class="option_S_tab _bullbear">
+								<span class="status-dot inprogress transparentTextLoading"><svg stroke="currentColor" fill="#188dd6" stroke-width="0" viewBox="0 0 16 16" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><circle cx="8" cy="8" r="8"></circle></svg><span style="white-space: nowrap;">Vacant</span></span>
+							</div>
+							<div id='"+optionId+"buyButton' class='option_S_tab actionButton buyButton transparentTextLoading'>Buy Option</div>
 							<div class="option_S_tab _bookmarkjump">
-								<a class="view_project" href="hedge.html?id=`+optionId+`" target="_blank" alt="View" title="full details">view</a>
-								`+bookmark_btn+`
+								<a class="view_project" href="" target="_blank" alt="View" title="full details">view</a>
+								<div class='raise_S_tab _bookmarkjump' onclick='"+unbookmark+"'><img src='./imgs/unbookmark_.png' width='18px'/></div>
 							</div>
 						</div>
 					</div>
@@ -321,41 +330,43 @@
 						<div class="tl_hedgeGrid">
 							<div class="projectLogo" style="background-image:url('./imgs/erc20-uniswap-tr.png')"></div>
 							<div class="projectName">
-								<div>Vela Exchange<a class="blockexplorer" href="https://etherscan.io/address/'`+pairAddress+`" target="_blank" alt="SC" title="Go to Etherscan">0x00..000</a></div>
-								<div class="tl_bagsize">--,--,-- VELA</div>
+								<div class="transparentTextLoading">Vela Exchange<a class="blockexplorer transparentTextLoading" href="https://etherscan.io/address/'`+pairAddress+`" target="_blank" alt="SC" title="Go to Etherscan">0x00..000</a></div>
+								<div class="tl_bagsize transparentTextLoading">--,--,-- VELA</div>
 							</div>
 						</div>
 						<div class="valueHold">
 							<div class="assetsValue">
 								<div class="valueTitle"></div>
-								<div class="assetsMarketValue highlightOption">-- ETH</div>
+								<div class="assetsMarketValue highlightOption transparentTextLoading">-- ETH</div>
 							</div>
 							<div class="assetsType">
 								<div class="typeTitle">HEDGE</div>
-								<div class="assetsTypeValue highlightOption">Call Option</div>
+								<div class="assetsTypeValue highlightOption transparentTextLoading">Call Option</div>
 							</div>
 						</div>
 
 						<div class="strategyContainer">
 							<div class="optionMarksHold">
-								<div class="optionMark"><span>Strike:</span><span class="oMfigure">--,-- eth</span></div>
-								<div class="optionMark"><span>Premium:</span><span class="oMfigure">--,-- eth</span></div>
-								<div class="optionMark"><span>Expires:</span><span class="oMfigure">-- days</span></div>
+								<div class="optionMark"><span>Strike:</span><span class="oMfigure transparentTextLoading">--,-- eth</span></div>
+								<div class="optionMark"><span>Premium:</span><span class="oMfigure transparentTextLoading">--,-- eth</span></div>
+								<div class="optionMark"><span>Expires:</span><span class="oMfigure transparentTextLoading">-- days</span></div>
 							</div>
 							<div class="strategyHold">
 								<img class="strategyImage" src="./imgs/put-option.svg" />
 								<div class="strategyDataHold">
-									<div class="topValue-put">max loss --,-- eth</div>
+									<div class="topValue-put">max loss</div>
 									<div class="bottomValue-put">profit zone</div>
 								</div>
 							</div>
 						</div>
 						<div class="optionSummary">
-							`+activity_btn+`
-							`+action_btn+`
+							<div class="option_S_tab _bullbear">
+								<span class="status-dot ended transparentTextLoading"><svg stroke="currentColor" fill="orange" stroke-width="0" viewBox="0 0 16 16" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><circle cx="8" cy="8" r="8"></circle></svg><span style="white-space: nowrap;">Expired</span></span>
+							</div>
+							<div id='"+optionId+"buyButton' class='option_S_tab actionButton expiredButton transparentTextLoading'>Settle</div>
 							<div class="option_S_tab _bookmarkjump">
-								<a class="view_project" href="hedge.html?id=`+optionId+`" target="_blank" alt="View" title="full details">view</a>
-								`+bookmark_btn+`
+								<a class="view_project" href="" target="_blank" alt="View" title="full details">view</a>
+								<div class='raise_S_tab _bookmarkjump' onclick='"+bookmark+"'><img src='./imgs/bookmark_.png' width='18px'/></div>
 							</div>
 						</div>
 					</div>
@@ -363,41 +374,43 @@
 						<div class="tl_hedgeGrid">
 							<div class="projectLogo" style="background-image:url('./imgs/erc20-shitcoin-tr.png')"></div>
 							<div class="projectName">
-								<div>Vela Exchange<a class="blockexplorer" href="https://etherscan.io/address/'`+pairAddress+`" target="_blank" alt="SC" title="Go to Etherscan">0x00..000</a></div>
-								<div class="tl_bagsize">--,--,-- VELA</div>
+								<div class="transparentTextLoading">Vela Exchange<a class="blockexplorer transparentTextLoading" href="https://etherscan.io/address/'`+pairAddress+`" target="_blank" alt="SC" title="Go to Etherscan">0x00..000</a></div>
+								<div class="tl_bagsize transparentTextLoading">--,--,-- VELA</div>
 							</div>
 						</div>
 						<div class="valueHold">
 							<div class="assetsValue">
 								<div class="valueTitle"></div>
-								<div class="assetsMarketValue highlightOption">-- ETH</div>
+								<div class="assetsMarketValue highlightOption transparentTextLoading">-- ETH</div>
 							</div>
 							<div class="assetsType">
 								<div class="typeTitle">HEDGE</div>
-								<div class="assetsTypeValue highlightOption">Call Option</div>
+								<div class="assetsTypeValue highlightOption transparentTextLoading">Call Option</div>
 							</div>
 						</div>
 
 						<div class="strategyContainer">
 							<div class="optionMarksHold">
-								<div class="optionMark"><span>Strike:</span><span class="oMfigure">--,-- eth</span></div>
-								<div class="optionMark"><span>Premium:</span><span class="oMfigure">--,-- eth</span></div>
-								<div class="optionMark"><span>Expires:</span><span class="oMfigure">-- days</span></div>
+								<div class="optionMark"><span>Strike:</span><span class="oMfigure transparentTextLoading">--,-- eth</span></div>
+								<div class="optionMark"><span>Premium:</span><span class="oMfigure transparentTextLoading">--,-- eth</span></div>
+								<div class="optionMark"><span>Expires:</span><span class="oMfigure transparentTextLoading">-- days</span></div>
 							</div>
 							<div class="strategyHold">
 								<img class="strategyImage" src="./imgs/put-option.svg" />
 								<div class="strategyDataHold">
-									<div class="topValue-put">max loss --,-- eth</div>
+									<div class="topValue-put">max loss</div>
 									<div class="bottomValue-put">profit zone</div>
 								</div>
 							</div>
 						</div>
 						<div class="optionSummary">
-							`+activity_btn+`
-							`+action_btn+`
+							<div class="option_S_tab _bullbear">
+								<span class="status-dot inprogress transparentTextLoading"><svg stroke="currentColor" fill="#188dd6" stroke-width="0" viewBox="0 0 16 16" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><circle cx="8" cy="8" r="8"></circle></svg><span style="white-space: nowrap;">Vacant</span></span>
+							</div>
+							<div id='"+optionId+"buyButton' class='option_S_tab actionButton buyButton transparentTextLoading'>Buy Option</div>
 							<div class="option_S_tab _bookmarkjump">
-								<a class="view_project" href="hedge.html?id=`+optionId+`" target="_blank" alt="View" title="full details">view</a>
-								`+bookmark_btn+`
+								<a class="view_project" href="" target="_blank" alt="View" title="full details">view</a>
+								<div class='raise_S_tab _bookmarkjump' onclick='"+unbookmark+"'><img src='./imgs/unbookmark_.png' width='18px'/></div>
 							</div>
 						</div>
 					</div>
@@ -420,19 +433,19 @@
 							<div id="volumeStats">
 								<div class="neon-container">
 								  <span class="neon-text">Hedged Volume</span>
-								  <span id="hedgeVolume" class="neon-amount hedgedVolume">100</span>
+								  <span id="hedgeVolume" class="neon-amount hedgedVolume">****</span>
 								</div>
 								<div class="neon-container">
 								  <span class="neon-text">Premium Volume</span>
-								  <span id="premiumVolume" class="neon-amount boughtVolume">200</span>
+								  <span id="premiumVolume" class="neon-amount boughtVolume">****</span>
 								</div>
 								<div class="neon-container">
 								  <span class="neon-text">Settle Volume</span>
-								  <span id="settleVolume" class="neon-amount settledVolume">300</span>
+								  <span id="settleVolume" class="neon-amount settledVolume">****</span>
 								</div>
 								<div class="neon-container">
 								  <span class="neon-text">Profit Payoffs</span>
-								  <span id="payoffVolume" class="neon-amount settledVolume">0</span>
+								  <span id="payoffVolume" class="neon-amount settledVolume">****</span>
 								</div>
 							</div>
 							<div id="tokenStats">

@@ -281,23 +281,25 @@ async function addBookmark(optionId) {
 async function onSearchSubmit(event) {
 	event.preventDefault();
 	var inputText = $('#searchBar').val();
-	// if token address pasted
-	if (inputText.length >= 40 && web3.utils.isAddress(inputText) == true) {
-		//set global
+	// Check if token address pasted
+	if (inputText.length >= 40 && isValidEthereumAddress(inputText)) {
+		
+		// Set global filters
 		window.nav = 1;
 		window.filters = 4;
-		//check load continuation
+
+		// Check load continuation
 		MyGlobals.outputArray = [];
 		MyGlobals.startIndex = 0;
 		MyGlobals.lastItemIndex = 0;
 
 		// A - Fetch Options matching address
-		loadOptions(MyGlobals.startIndex, readLimit);
+		await loadOptions(MyGlobals.startIndex, readLimit);
 
 		// B - Update sidebar with token infor: hedge volume and listen to events
 		// function determines what to load based on searchBar input
 		// events are constantly loaded all but filtered only when searchBar contains erc20 address
-		loadSidebar();
+		await loadSidebar();
 	}
 	// if option ID pasted 
 	else if (Number.isInteger(inputText)) {
@@ -305,12 +307,12 @@ async function onSearchSubmit(event) {
 		await fetchOptionStrip(inputText);
 	}
 	else {
-		const privatize = `Only token address or option ID accepted when filtering data!`;
+		const privatize = `Only token address or option ID accepted when filtering storage!`;
   
 	swal({
 		title: "Invalid Prompt",
 		text: privatize,
-		type: "prompt",
+		type: "warning",
 		html: true,
 		dangerMode: true,
 		confirmButtonText: "go back",
