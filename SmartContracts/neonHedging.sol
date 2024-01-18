@@ -2,8 +2,8 @@
 pragma solidity ^0.8.4;
 
 // Xeon Protocol - Universal ERC20 OTC Hedging and Lending. 
-// Testnet Version 2.1
-// Deployed on Sepolia Testnet 15/01/2024
+// Testnet Version 2.3
+// Deployed on Sepolia Testnet 18/01/2024
 // Sepolia testnet on the basis of Uniswap V2 Router support
 
 // ====================Description===========================
@@ -137,7 +137,7 @@ contract oXEONVAULT {
     }
 
     // mapping of wallet token balances [token][user]
-    mapping(address => mapping(address => userBalance)) private userBalanceMap;
+    mapping(address => mapping(address => userBalance)) public userBalanceMap;
 
     //mapping of user-hedge-Ids array for each erc20 token
     mapping(address => mapping(address => uint[])) private userHedgesForTokenMap;
@@ -257,7 +257,7 @@ contract oXEONVAULT {
         wethAddress = router.WETH();
         usdtAddress = 0x297B8d4B35294e730087ADF0597A31a9bC1746af; // oUSDT address on Sepolia
         usdcAddress = 0x8267cF9254734C6Eb452a7bb9AAF97B392258b21; // USDC address on Sepolia
-        XeonAddress = 0xee52247FbF02Ad3d5b001Fa6C75b4324A0EE4d9d; // V2.0 deployed 03/01/2024 16:28:48
+        XeonAddress = 0xDb90a9f7cEaA33a32Ec836Bbadeeaa8772Ad9797; // V2.1 deployed 14/01/2024 21:52:48
         // Variables
         feeNumerator = 5;
         feeDenominator = 1000;
@@ -934,7 +934,7 @@ contract oXEONVAULT {
         return (userPLMap[pairedCurrency][user].profits, userPLMap[pairedCurrency][user].losses);
     }
 
-    // Helper function to retrieve a subset of options or swaps created/taken by all users
+    // Helper function to retrieve a subset of options or swaps created/taken
     function getAllOptions(uint startIndex, uint limit) public view returns (uint[] memory) {
         return getSubset(optionsCreated, startIndex, limit);
     }
@@ -1008,6 +1008,14 @@ contract oXEONVAULT {
         }
 
         return result;
+    }
+
+    // Function to get the length of the options array for a specific token
+    function getCountTokenOptions(address token) external view returns (uint) {
+        return tokenOptions[token].length;
+    }
+     function getCountTokenSwaps(address token) external view returns (uint) {
+        return tokenSwaps[token].length;
     }
 
     // Receive function to accept Ether
