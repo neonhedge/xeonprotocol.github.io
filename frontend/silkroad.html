@@ -275,7 +275,7 @@
 							<div class="option_S_tab _bullbear">
 								<span class="status-dot ended transparentTextLoading"><svg stroke="currentColor" fill="orange" stroke-width="0" viewBox="0 0 16 16" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><circle cx="8" cy="8" r="8"></circle></svg><span style="white-space: nowrap;">Expired</span></span>
 							</div>
-							<div id='"+optionId+"buyButton' class='option_S_tab actionButton expiredButton transparentTextLoading'>Settle</div>
+							<div id='"+optionId+"buyButton' class='option_S_tab actionButton expiredButton transparentTextLoading'>Settle Hedge</div>
 							<div class="option_S_tab _bookmarkjump">
 								<a class="view_project" href="" target="_blank" alt="View" title="full details">view</a>
 								<div class='raise_S_tab _bookmarkjump' onclick='"+bookmark+"'><img src='./imgs/bookmark_.png' width='18px'/></div>
@@ -363,7 +363,7 @@
 							<div class="option_S_tab _bullbear">
 								<span class="status-dot ended transparentTextLoading"><svg stroke="currentColor" fill="orange" stroke-width="0" viewBox="0 0 16 16" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><circle cx="8" cy="8" r="8"></circle></svg><span style="white-space: nowrap;">Expired</span></span>
 							</div>
-							<div id='"+optionId+"buyButton' class='option_S_tab actionButton expiredButton transparentTextLoading'>Settle</div>
+							<div id='"+optionId+"buyButton' class='option_S_tab actionButton expiredButton transparentTextLoading'>Settle Hedge</div>
 							<div class="option_S_tab _bookmarkjump">
 								<a class="view_project" href="" target="_blank" alt="View" title="full details">view</a>
 								<div class='raise_S_tab _bookmarkjump' onclick='"+bookmark+"'><img src='./imgs/bookmark_.png' width='18px'/></div>
@@ -418,8 +418,8 @@
             </div><!-- timeline close -->
 
 			<div class="rewardsInformer">
-				<i class="fa fa-bomb" aria-hidden="true"></i> ** pre-Beta - private **</br>
-				Welcome to the OTC Silkroad. Hedge or Borrow against any ERC20 token. Write, Buy, and Manage your OTC trades here...
+				<i class="fa fa-bomb" aria-hidden="true"></i> ** Pvt Pre-Beta **</br>
+				Welcome to the OTC Silkroad. Hedge or Lend any ERC20. Write, Buy, and Manage your OTC trades here...
 			</div>
 			
 			<div id="sidebar">
@@ -440,7 +440,7 @@
 								  <span id="premiumVolume" class="neon-amount boughtVolume">****</span>
 								</div>
 								<div class="neon-container">
-								  <span class="neon-text">Settle Volume</span>
+								  <span class="neon-text">Settle Hedge Volume</span>
 								  <span id="settleVolume" class="neon-amount settledVolume">****</span>
 								</div>
 								<div class="neon-container">
@@ -457,7 +457,7 @@
 							<input type="radio" name="tab" id="tab2" />
 							<label for="tab2" id="eventsLabel">Live Txs</label>
 							<div class="section">
-								<ul>
+								<ul id="scifiUI">
 								<li><span>bought</span><span>0.14 eth</span><span>0x000...00</span><span>Txn</span></li>
 								<li><span>bought</span><span>0.07 eth</span><span>0x000...00</span><span>Txn</span></li>
 								<li><span>settled</span><span>1.11 eth</span><span>0x000...00</span><span>Txn</span></li>

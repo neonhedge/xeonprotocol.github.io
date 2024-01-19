@@ -22,7 +22,7 @@ export const checkAndCallPageTries = async () => {
     console.log('connection Scout: '+ scouter);
 
     if (scouter) {
-        const asyncFunctions = [refreshDataOnElements, loadSidebar ];
+        const asyncFunctions = [refreshDataOnElements, loadOptions, loadSidebar ];
         for (const func of asyncFunctions) {
             func();
         }
@@ -409,10 +409,10 @@ $(document).on('click', '#statsLabel', async function(e){
     }
 });
 
-$(document).on('click', '#eventsLabel', function(e){
+$(document).on('click', '#eventsLabel', async function(e){
 	window.sidebarTab = 2;
 	// quick one: refresh sidebar
-	loadPastEvents();
+	await loadPastEvents();
 });
 
 // Attach event handler to document object for event delegation

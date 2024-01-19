@@ -1350,3 +1350,53 @@ section.cta{
   text-align:center;
   z-index:150;
 }
+
+
+/* General Loading Animation on Pages */
+@keyframes loading {
+	0% {
+	  transform-origin: 100% 100%;
+	  transform: rotate(0deg);
+	}
+	100% {
+	  transform-origin: 100% 100%;
+	  transform: rotate(360deg);
+	}
+}
+  .loading {
+	position: relative;
+	display: block;
+	z-index: 13;
+	margin: 5vw auto;
+	width: 100px;
+	height: 100px;
+	border: 5px solid transparent;
+	border-radius: 50%;
+	background-color: transparent;
+  }
+  .loading:before {
+	position: absolute;
+	display: block;
+	content: '';
+	z-index: 12;
+	top: 4px;
+	left: 4px;
+	width: 82px;
+	height: 82px;
+	border-radius: 50%;
+	background-color: #0e0b34; /* #0e0b34 or, 0701112d : transparency gives radar look */
+  }
+  .loading:after {
+	position: absolute;
+	display: block;
+	top: 0;
+	content: '';
+	z-index: 11;
+	top: 0px;
+	left: 0px;
+	width: 45px;
+	height: 45px;
+	border-radius: 200px 0 0 0;
+	background: linear-gradient(45deg, rgba(0, 0, 0, 0) 0%, #459ad7 60%, #08e7fe 100%);
+	animation: loading 0.9s linear infinite;
+  }

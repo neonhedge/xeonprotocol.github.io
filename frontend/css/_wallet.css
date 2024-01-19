@@ -272,7 +272,7 @@ section#activities {
 	font-size: clamp(13px, 1vw, 15px);
 	font-family: 'modeseven','bitwise', sans-serif, "Helvetica Neue", Helvetica, Arial !important;
 
-	color: #33856b;
+	color: #089353;
 	color:#08e7fe;
 	/* border: 0.5px dotted #3399ff; */
 	border-bottom: 0.5px dotted #3399ff;
@@ -328,6 +328,7 @@ section#activities {
 	color: #fff6d4;
 	color:#FFF;
 	white-space: nowrap;
+	caret-color: transparent;
   }
 
   .userWallet{
@@ -546,8 +547,8 @@ section#activities {
   }
   
   .value-green {
-	color:#33856b;
-	color:#0b9455;
+	color:#089353;
+	color:#089353;
 	padding-inline-end: 1vw;
   }
 
@@ -757,7 +758,7 @@ section#activities {
 }
 
 button#transactSubmit{
-	background-color: #33856b;
+	background-color: #089353;
 	border: none;
 	color: #fff;
 	padding: 10px 20px;
@@ -953,35 +954,13 @@ button#transactSubmit{
 	max-height: 500px;
 	overflow-y: auto;
 	max-width:70%;
-	border-right: 0.5px dotted #33856b;
+	border-right: 0.5px dotted #089353;
     list-style-type: none;
     padding: 0;
 	padding-right:10px;
 	box-sizing: border-box;
     margin: 0;
 }
-
-.no-hedges-message {
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
-	padding:4vw;
-	box-sizing: border-box;
-	
-	text-align: center;
-	font-family: "Space Grotesk", "Monospace", sans-serif;
-	font-size: clamp(14px, 1vw, 15px);
-	font-weight: 100;
-	cursor: help;
-	transition: background-color 0.3s;
-	color: transparent;
-	background-clip: text;
-	text-fill-color: transparent;
-	border: 0.5px solid rgba(51, 153, 255, 0.5);
-	border-radius: 8px;
-	background-image: linear-gradient(to right, #08e7fe, #d6188a);
-}  
 
 .t-i-lead {
 	max-width: 63%;
@@ -1095,7 +1074,7 @@ button#transactSubmit{
 
 .trade-amount {
 	max-width:100px;
-    color: #33856b;
+    color: #089353;
     font-weight: 500;
     margin-left: 10px;
 }
@@ -1279,7 +1258,7 @@ button#transactSubmit{
 	width: 0;
 	height: 50%;
 	border-right: 1px solid #188dd6;
-	border-image-source: linear-gradient(to top, #188dd6 30%, #33856b 100%);
+	border-image-source: linear-gradient(to top, #188dd6 30%, #089353 100%);
 	border-image-slice: 1;
   }
   
@@ -1460,15 +1439,15 @@ button#transactSubmit{
 }
 
 .list-toggle button:hover, .list-toggle button.active {
-	color: #0b9455;
+	color: #089353;
 	opacity: 0.8;
 	box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-	border: 0.2px solid #0b9455;
+	border: 0.2px solid #089353;
 }
 
 .list-toggle button.active::before {
 	border:0.5px solid #000;
-	background-color: #0b9455;
+	background-color: #089353;
 	box-shadow: 0 0 5px #4CAF50, 0 0 10px #4CAF50, 0 0 15px #4CAF50, 0 0 20px #4CAF50;
 }
   
@@ -1533,8 +1512,7 @@ button#transactSubmit{
 
 .hedge-value {
 	flex-grow: 1;
-    color: #33856b;
-	color:#0b9455 !important;
+	color:#089353 !important;
     font-weight: 400;
 }
 
@@ -1559,7 +1537,7 @@ button#transactSubmit{
 }  
   /* CSS for thin border */
   .button-thin-border {
-	border: 1px solid #4CAF50; /* Change to your desired color */
+	border: 1px solid #089353; /* Change to your desired color */
   }
   
   /* CSS for disabled button */
@@ -1781,7 +1759,7 @@ button:disabled:hover {
 }
 
 .green-value {
-	color: #33856b;
+	color: #089353;
 }
   
 /* ===================
@@ -1872,7 +1850,7 @@ button:disabled:hover {
   }
   
   .staking-widget button, .staking-widget-rewards button {
-	background-color: #33856b;
+	background-color: #089353;
 	color: #fff;
 	border: none;
 	padding: 10px 20px;
@@ -1901,7 +1879,7 @@ button:disabled:hover {
   }
   
   .staking-widget.dark button, .staking-widget-rewards.dark button {
-	background-color: #33856b;
+	background-color: #089353;
 	color: #fff;
   }
   
@@ -1984,7 +1962,7 @@ button:disabled:hover {
   }
 
   .farming-widget .icon {
-	color: #33856b;
+	color: #089353;
 	font-size: 2rem;
 	margin:0px auto;
 	margin-bottom: 10px;
@@ -2061,7 +2039,7 @@ button:disabled:hover {
   }
   
   .farming-widget.dark button {
-	background-color: #33856b;
+	background-color: #089353;
 	color: #fff;
   }
   
@@ -2128,6 +2106,28 @@ button:disabled:hover {
     margin-block: 3%;  
     border-bottom: 1px solid var(--neon-border-color);
 }
+
+.no-hedges-message {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	padding:4vw;
+	box-sizing: border-box;
+	
+	text-align: center;
+	font-family: "Space Grotesk", "Monospace", sans-serif;
+	font-size: clamp(14px, 1vw, 15px);
+	font-weight: 100;
+	cursor: help;
+	transition: background-color 0.3s;
+	color: transparent;
+	background-clip: text;
+	text-fill-color: transparent;
+	border: 0.5px solid rgba(51, 153, 255, 0.5);
+	border-radius: 8px;
+	background-image: linear-gradient(to right, #08e7fe, #d6188a);
+}  
 /*===============================
       BOTTOM OF EVERY CSS FILE
 =================================
