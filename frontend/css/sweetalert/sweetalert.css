@@ -44,7 +44,7 @@ body.stop-scrolling {
 }
 @media all and (max-width: 540px) {
   .sweet-alert {
-    width: auto;
+    width: 90%;
   } 
 }
 
@@ -146,19 +146,21 @@ body.stop-scrolling {
     transform: scale(1); 
   }
   .sweet-alert .sweetInput {
-    width: 50%;
-    box-sizing: border-box;
-    border-radius: 15px;
-    border: 0.5px solid #188dd6;
-    height: 30px;
+    display: inline-block !important;
+    width: 55%;
+    border: 0.5px dashed rgb(6, 209, 231);
+    border-radius: 8px;
     margin-top: 7px;
     margin-bottom: 7px;
-    font-size: 15px;
-    color:#FFF;
-    background-color: #242737;
-    box-shadow: inset 0px 1px 1px rgba(0, 0, 0, 0.06);
-    padding: 0 12px;
-    display: inline-block !important;
+    padding: 0.4rem 0.7rem;    
+    box-sizing: border-box;
+
+    font-family: "Space Grotesk", Monospace,"Nunito Sans", sans-serif;
+    font-size: clamp(14px, 1vw, 14.5px);
+    font-weight: 100;
+    color: rgb(6, 209, 231);
+    background-color: transparent;
+    box-shadow: inset 0px 1px 1px rgba(0, 0, 0, 0.06);    
     -webkit-transition: all 0.3s;
     transition: all 0.3s; 
   }
@@ -314,7 +316,7 @@ body.stop-scrolling {
   right: 1px; 
 }
 .sweet-alert .sa-icon.sa-warning {
-  border-color: #d94800; 
+  border-color: #1e96d5; 
 }
 .sweet-alert .sa-icon.sa-warning .sa-body {
   position: absolute;
@@ -325,7 +327,7 @@ body.stop-scrolling {
   -webkit-border-radius: 2px;
   border-radius: 2px;
   margin-left: -2px;
-  background-color: #d94800; 
+  background-color: #ca1882; 
 }
 .sweet-alert .sa-icon.sa-warning .sa-dot {
   position: absolute;
@@ -336,7 +338,7 @@ body.stop-scrolling {
   margin-left: -3px;
   left: 50%;
   bottom: 5px;
-  background-color: #d94800; 
+  background-color: #ca1882; 
 }
 .sweet-alert .sa-icon.sa-info {
   border-color: #08e7fe; 
@@ -425,7 +427,7 @@ body.stop-scrolling {
   }
   .sweet-alert .sa-icon.sa-success .sa-line {
     height: 5px;
-    background-color: #67be64;
+    background-color: #089353;
     display: block;
     border-radius: 2px;
     position: absolute;
@@ -787,35 +789,35 @@ body.stop-scrolling {
 
 @-webkit-keyframes pulseWarning {
   0% {
-    border-color: #F8D486; }
+    border-color: #1e96d5 }
   100% {
-    border-color: #d94800; } }
+    border-color: #ca1882; } }
 
 @keyframes pulseWarning {
   0% {
-    border-color: #F8D486; }
+    border-color: #1e96d5 }
   100% {
-    border-color: #d94800; } }
+    border-color: #ca1882; } }
 
 .pulseWarning {
-  -webkit-animation: pulseWarning 0.75s infinite alternate;
+  -webkit-animation: pulseWarning 0.95s infinite alternate;
   animation: pulseWarning 0.75s infinite alternate; }
 
 @-webkit-keyframes pulseWarningIns {
   0% {
-    background-color: #F8D486; }
+    background-color: rgba(255, 255, 255, 0.05); }
   100% {
-    background-color: #d94800; } }
+    background-color: #ca1882; } }
 
 @keyframes pulseWarningIns {
   0% {
-    background-color: #F8D486; }
+    background-color: rgba(255, 255, 255, 0.05); }
   100% {
-    background-color: #d94800; } }
+    background-color: #ca1882; } }
 
 .pulseWarningIns {
-  -webkit-animation: pulseWarningIns 0.75s infinite alternate;
-  animation: pulseWarningIns 0.75s infinite alternate; }
+  -webkit-animation: pulseWarningIns 2.0s infinite alternate;
+  animation: pulseWarningIns 2.0s infinite alternate; }
 
 @-webkit-keyframes rotate-loading {
   0% {

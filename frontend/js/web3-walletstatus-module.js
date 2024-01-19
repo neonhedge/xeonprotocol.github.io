@@ -8,35 +8,219 @@ import { initWeb3 } from './dapp-web3-utils.js';
 /*=========================================================================
     wallet module functions
 ==========================================================================*/
-// Checks and passes back status(bool) if wallet is ready for data scripts
+
+// Checks and Returns status(bool) if wallet is ready for data scripts
+// All checks have to pass or it returns false immidietly, displaying the swal for the level it failed at
 async function initializeConnection() {
-	
-	//before initializing, make sure global contract instances are set
+	// 1. Set Provider and Contract instances
 	await initWeb3();
+    // 2. Check Chain
+    let correctChain, unlockedWal = false;
 	try {
-		const correctChain = await chainCheck();
-		console.log('initializing connection...'+correctChain)
+		correctChain = await chainCheck();
+		console.log('initializing correct blockchain...'+correctChain)
 		if (correctChain) {
-			// waiting stance
-			$('.wallets').css('display', 'none');
-			$('.walletpur').css('display', 'inline-block');
-
+            //3. Start syncying block number
 			await currentBlock();
-			setInterval(() => currentBlock(), 40000);
 
-			// Only on condition its correct chain
-			const unlockedWal = await unlockedWallet();
+			//4. Initialize Wallet
+			unlockedWal = await unlockedWallet();
 			if (!unlockedWal) {
 				console.log('initializing failed, wallet locked..')
 				return false; // Failed regardless
 			} else {
+                console.log('initializing success, wallet unlocked..')
                 // not crucial to await, slows page coz of price api
 				walletCheckProceed();
 				setInterval(() => walletCheckProceed(), 40000);
 				return true; // Passed all Checks
 			}
-		} else {
-			//waiting stance
+		} else {			
+            return false;
+		}
+	} catch (error){
+		return false;
+	}
+}
+
+// Called after scripts pass initialization to continue loading
+// Just checks if any accounts are connected to website
+// This is also called constantly by event listerners if no internet, hence always poppin this swal over all others, 
+//...so check initialization again, redundant but only way to verify
+async function handleAccountChange(wallets) {
+    if (wallets.length === 0) {
+        $('.wallets').css('display', 'none');
+        $('.wallet_connect').css('display', 'inline-block');
+        console.log("Please connect to MetaMask.");
+
+        swal({
+            type: "warning",
+            title: "Wallect Required",
+            text: "Please connect a wallet to use the Neon Hedge Dapp.",
+            html: true,
+            showCancelButton: true,
+            confirmButtonColor: "#04C86C",
+            confirmButtonText: "Connect..",
+            cancelButtonText: "Nay.",
+            closeOnConfirm: true
+        }, async function (isConfirm) {
+            if (isConfirm) {
+                reqConnect(wallets);
+            }
+        });
+    }
+    if (wallets[0] !== window.currentAccount) {
+        // global variable..sets to empty array if initialization fails on main page script 'pageModulesLoadingScript', 
+        // check above means: empty --> something === connected
+        window.currentAccount = wallets[0];
+        // Refresh connection message
+        console.log("Wallet Connected:", wallets);
+        swal({
+            type: "success",
+            title: "Wallect Connected",
+            text: `${truncateAddress(wallets[0])}`,
+            html: true,
+            showCancelButton: false,
+            showConfirmButton: true,
+            confirmButtonText: "Close",
+            closeOnConfirm: true,
+            timer: 2000,
+        });
+    }      
+}
+
+async function handleNetworkChange(chainID) {
+    if (chainID !== CONSTANTS.network) {
+        console.log("Reading chain:" + chainID + ", instead of, " + CONSTANTS.network);
+		swal({
+            type: "error",
+            title: "Wrong Blockchain",
+            text: "Please connect to: "+CONSTANTS.network,
+            html: true,
+            showCancelButton: false,
+            confirmButtonColor: "#04C86C",
+            confirmButtonText: "Ooops",
+            closeOnConfirm: true
+        }, async function() {
+            // request network change
+			$('.wallets, .walletpur').css('display', 'none');
+			$('.network_switch').css('display', 'inline-block');
+			switchNetwork();
+        });
+
+        $(".wallets, .walletpur").css("display", "none");
+        $(".network_switch").css("display", "inline-block");
+    } else {
+        console.log("Reading from mainnet: ", chainID);
+		$(".wallets, .network_switch").css("display", "none");
+        await initializeConnection();
+    }
+}
+
+async function unlockedWallet() {
+	let accounts = await provider.listAccounts();
+    try {
+        if (accounts.length > 0) {
+            $('.wallets').css('display', 'none');
+            $('.walletpur').css('display', 'inline-block');
+            return true;
+        } else {
+            $('.wallets').css('display', 'none');
+            $('.wallet_connect').css('display', 'inline-block');
+            console.log("Please connect to MetaMask.");
+            swal({
+                type: "warning",
+                title: "Wallect Required",
+                text: "Please connect wallet to use the Neon Hedge Dapp.",
+                html: true,
+                showCancelButton: true,
+                confirmButtonColor: "#04C86C",
+                confirmButtonText: "Connect..",
+                cancelButtonText: "Nay.",
+                closeOnConfirm: true
+            }, async function (isConfirm) {
+                if (isConfirm) {
+                    reqConnect(wallets);
+                }
+            });
+            return false;
+        }
+    } catch (error) {
+        console.error('Unlocked wallet error:', error);
+        return false;
+    }
+}
+
+async function balanceOf(account) {
+	if (isValidEthereumAddress(account)) {
+		try {
+			const result = await neonInstance.balanceOf(account);
+			const decimals = CONSTANTS.decimals;
+			const balance = fromBigIntNumberToDecimal(result, decimals).toString();
+			const balance_toLocale = commaNumbering(balance);
+            // Update global balance variable
+			CONSTANTS.tokenBalance = balance;
+
+			if (result) {
+				const first = account.substring(0, 5);
+				const last = account.slice(account.length - 3);
+				const privatize = `${first}..${last}`;
+
+				$('#wallet_id').empty().append(privatize);
+				$('#wallet_balance').empty().append(`${balance_toLocale} XEON`);
+				$(".dot").css({ 'background-color': 'rgb(39, 174, 96)' });
+				return balance;
+			} else {
+				console.log(result);
+				swal({
+					title: 'Failed to compute XEON balance.',
+					type: 'error',
+					allowOutsideClick: true,
+					confirmButtonColor: '#F27474',
+					animation: 'Pop',
+					text: 'Issue: '+result,
+				});
+			}
+		} catch (error) {
+			console.log('Balance Fetch Failed...'+error);
+		}
+	}
+	// default value
+	return 0;
+}
+
+async function currentBlock() {
+    try {
+        const block = await provider.getBlockNumber();
+        document.getElementById('blocknumber').innerHTML = `<a href="${CONSTANTS.etherScan}/block/${block}" target="_blank">${block}</a>`;
+        console.log('block number: ', block);
+        return true;
+    } catch (error) {
+        console.log('block error:'+error);
+        $('.dot').css({ 'background-color': '#ec0624' });
+        return false;
+    }
+}
+
+async function chainCheck() {
+    try {
+        const chainID = await provider.getNetwork();
+        const networkId = CONSTANTS.network;
+
+        // Returned as HEX from getChainId so Convert to string	 
+        // const chainIDString = '0x' + chainID.toString(16);
+		const chainIDString = '0x' + (chainID.chainId).toString(16);
+		
+		console.log('chainString: '+chainIDString+' & networkString: '+ networkId)
+
+        if (networkId === chainIDString) {
+            console.log("correct chain: ", chainIDString);
+            $('.wallets').css('display', 'none');
+            $('.waiting_init').css('display', 'inline-block');
+
+            return true;
+        } else {
+            console.log("wrong chain: ", chainIDString);
 			$('.wallets').css('display', 'none');
 			$('.network_switch').css('display', 'inline-block');
 
@@ -59,200 +243,22 @@ async function initializeConnection() {
                     switchNetwork();
                 }
             });
-            return false
-		}
-	} catch (error){
-		return false;
-	}
-}
-
-// Called when sccripts have passed initialization to continue loading
-// Just checks if any accounts are connected to website
-// This is also called constantly by event listerners if no internet, hence always poppin this swal over all others, 
-//...so check initialization again, redundant but only way to verify
-async function handleAccountChange(wallets) {
-    // we let initialize display its swal
-    const continueFr = await initializeConnection();
-    // otherwise show local swal
-    if(continueFr){
-        if (wallets.length === 0) {
-            $('.wallets').css('display', 'none');
-            $('.wallet_connect').css('display', 'inline-block');
-            console.log("Please connect to MetaMask.");
-            swal({
-                type: "warning",
-                title: "Wallect Required",
-                text: "Please connect a wallet to use the Neon Hedge Dapp.",
-                html: true,
-                showCancelButton: true,
-                confirmButtonColor: "#04C86C",
-                confirmButtonText: "Connect..",
-                cancelButtonText: "Nay.",
-                closeOnConfirm: true
-            }, async function (isConfirm) {
-                if (isConfirm) {
-                    reqConnect(wallets);
-                }
-            });
-    
-        }
-        else if (wallets[0] !== window.currentAccount) {
-            // global variable..sets to empty array if initialization fails on main page script 'pageModulesLoadingScript', 
-            // check above means: empty --> something === connected
-            window.currentAccount = wallets[0];
-            // Refresh connection message
-            console.log("Wallet Connected:", wallets);
-            swal({
-                type: "success",
-                title: "Wallect Connected",
-                text: `${truncateAddress(wallets[0])}`,
-                html: true,
-                showCancelButton: false,
-                showConfirmButton: true,
-                confirmButtonText: "Close",
-                closeOnConfirm: true,
-                timer: 2000,
-            });
-        }
-    }
-     
-}
-
-async function handleNetworkChange(chainID) {
-    if (chainID !== CONSTANTS.network) {
-        console.log("Reading chain:" + chainID + ", instead of, " + CONSTANTS.network);
-		swal({
-            type: "error",
-            title: "Wrong Blockchain",
-            text: "Please connect to: "+CONSTANTS.network,
-            html: true,
-            showCancelButton: false,
-            confirmButtonColor: "#04C86C",
-            confirmButtonText: "Ooops",
-            closeOnConfirm: true
-        }, async function() {
-            // request network change
-			$('.wallets, .walletpur').css('display', 'none');
-			$('.network_switch').css('display', 'inline-block');
-			switchNetwork();
-        }); // close swal
-
-        $(".wallets, .walletpur").css("display", "none");
-        $(".network_switch").css("display", "inline-block");
-    } else {
-        console.log("Reading from mainnet: ", chainID);
-		$(".wallets, .network_switch").css("display", "none");
-        await initializeConnection();
-    }
-}
-
-// Other functions follow...
-
-async function unlockedWallet() {
-	let accounts = await provider.listAccounts();
-    try {
-        if (accounts.length > 0) {
-            $('.wallets').css('display', 'none');
-            $('.walletpur').css('display', 'inline-block');
-            return true;
-        } else {
-            $('.wallets').css('display', 'none');
-            $('.wallet_connect').css('display', 'inline-block');
             return false;
         }
     } catch (error) {
-        console.error('Unlocked wallet error:', error);
-        return false;
-    }
-}
-
-async function balanceOf(account) {
-	if (isValidEthereumAddress(account)) {
-		try {
-			const result = await neonInstance.balanceOf(account);
-			const decimals = CONSTANTS.decimals;
-			const balance = fromBigIntNumberToDecimal(result, decimals).toString();
-			const balance_toLocale = commaNumbering(balance);
-			CONSTANTS.tokenBalance = balance;
-
-			if (result) {
-				const first = account.substring(0, 5);
-				const last = account.slice(account.length - 3);
-				const privatize = `${first}..${last}`;
-
-				$('#wallet_id').empty().append(privatize);
-				$('#wallet_balance').empty().append(`${balance_toLocale} XEON`);
-				$(".dot").css({ 'background-color': 'rgb(39, 174, 96)' });
-				return balance;
-			} else {
-				console.log(result);
-				swal({
-					title: 'Failed to compute.',
-					type: 'error',
-					allowOutsideClick: true,
-					confirmButtonColor: '#F27474',
-					animation: 'Pop',
-					text: 'Issue: Something went wrong.',
-				});
-			}
-		} catch (error) {
-			console.log(error);
-			swal({
-				title: 'Neon Hedge Disconnected.',
-				type: 'error',
-				allowOutsideClick: true,
-				confirmButtonColor: '#F27474',
-				animation: 'Pop',
-				text: `> Wallet Locked. \nPlease Unlock Wallet.`,
-			});
-		}
-	}
-	// default value
-	return 0;
-}
-
-async function currentBlock() {
-    try {
-        const block = await provider.getBlockNumber();
-        document.getElementById('blocknumber').innerHTML = `<a href="${CONSTANTS.etherScan}/block/${block}" target="_blank">${block}</a>`;
-        console.log('block: ', block);
-    } catch (error) {
-        console.log(error);
+        // This is the first check to the blockchain, 
+        // If it cant even connect then you're offline
+        // Official Connection/Internet Offline Swal
+        console.error('chain ID retrieval failed:', error);
         swal({
-            title: 'Offline',
+            title: 'Neon Hedge Disconnected.',
             type: 'error',
             allowOutsideClick: true,
             confirmButtonColor: '#F27474',
-            text: error.message,
+            animation: 'Pop',
+            text: `> Internet or Provider Offline. \nPlease Check Connection.`,
         });
-        $('.dot').css({ 'background-color': '#ec0624' });
-    }
-}
 
-async function chainCheck() {
-    try {
-        const chainID = await provider.getNetwork();
-        const networkId = CONSTANTS.network;
-
-        // Returned as HEX from getChainId so Convert to string	 
-        // const chainIDString = '0x' + chainID.toString(16);
-		const chainIDString = '0x' + (chainID.chainId).toString(16);
-		
-		console.log('chainString: '+chainIDString+' & networkString: '+ networkId)
-
-        if (networkId === chainIDString) {
-            console.log("correct chain: ", chainIDString);
-            $('.wallets').css('display', 'none');
-            $('.waiting_init').css('display', 'inline-block');
-            return true;
-        } else {
-            console.log("wrong chain: ", chainIDString);
-            $('.wallets').css('display', 'none');
-            $('.network_switch').css('display', 'inline-block');
-            return false;
-        }
-    } catch (error) {
-        console.error('chain ID retrieval failed:', error);
         return false;
     }
 }
@@ -268,9 +274,11 @@ async function switchNetwork() {
             method: 'wallet_switchEthereumChain',
             params: [{ chainId: '0xaa36a7' }] // not hex
         });
+
 		console.log("Connected to chain:", CONSTANTS.chainID);
         console.log('Successfully switched to the Sepolia Testnet');
         await initializeConnection();
+
         return true;
     } catch (error) {
         return handleSwitchNetworkError(error);
@@ -347,93 +355,6 @@ function showNetworkSwitchErrorAlert() {
         switchNetwork();
     });
 }
-
-/* UNREFACTORED - Deprecated
-async function switchNetwork() {
-    if (window.ethereum) {
-        try {
-            await window.ethereum.request({
-                method: 'wallet_switchEthereumChain',
-                params: [{ chainId: '0xaa36a7' }] // not hex
-            });
-            // success in switch, reinitialize
-			console.log("Connected to chain:", CONSTANTS.chainID);
-            console.log('Successfully switched to the Sepolia Testnet');
-            await initializeConnection();
-            return true;
-        } catch (error) {
-            // error
-            console.log('Error switching to Sepolia Testnet:', error);
-            if (error.code === 4902) {
-                try {
-                    await window.ethereum.request({
-                        method: 'wallet_addEthereumChain',
-                        params: [
-                            {
-                                chainId: '0xaa36a7', // using the Sepolia testnet chain ID
-                                chainName: 'Sepolia Testnet',
-                                nativeCurrency: {
-                                    name: 'Sepolia',
-                                    symbol: 'ETH',
-                                    decimals: 18
-                                },
-                                blockExplorerUrls: [CONSTANTS.etherScan],
-                                rpcUrls: ['https://sepolia.infura.io/v3/'] // using the Sepolia testnet RPC URL
-                            }
-                        ]
-                    });
-                    await initializeConnection();
-                    return true;
-                } catch (addError) {
-                    console.log('add error', addError);
-                    $('.wallets').css('display', 'none');
-                    $('.network_switch').css('display', 'inline-block');
-                    swal({
-                        title: 'Failed to Switch Network',
-                        type: 'info',
-                        text: 'Try again to switch to the Sepolia Testnet.',
-                        showConfirmButton: true,
-                        showCancelButton: true,
-                        confirmButtonText: 'Switch',
-                        cancelButtonText: 'Cancel',
-                        animation: 'Pop',
-                    }, function () {
-                        console.log('initialize retry...');
-                        switchNetwork();
-                    });
-                }
-                return false;
-            } else {
-                console.log('switch error', error);
-                $('.wallets').css('display', 'none');
-                $('.network_switch').css('display', 'inline-block');
-                swal({
-                    title: 'Request Denied by User..',
-                    type: 'info',
-                    text: 'Please switch to the Sepolia Testnet.',
-                    showConfirmButton: true,
-                    showCancelButton: true,
-                    confirmButtonText: 'Switch',
-                    cancelButtonText: 'Cancel',
-                    animation: 'Pop',
-                }, function () {
-                    console.log('initialize retry...');
-                    switchNetwork();
-                });
-            }
-            return false;
-        }
-    } else {
-        swal({
-            title: 'Web3 Provider Missing!',
-            type: 'error',
-            confirmButtonColor: '#F27474',
-            animation: 'Pop',
-            text: 'MetaMask is not installed. Please consider installing it: https://metamask.io/download.html',
-        });
-    }
-}
-*/
 
 async function reqConnect() {
     try {
@@ -556,43 +477,43 @@ $(document).on('click', '#pNotifyX', function (e) {
     $('#popupNotify').css({ 'display': 'none' });
 });
 	
-	$(document).ready(function () {
-		const popup = $("#popupNotify");
-	
-		popup.on("mouseover", function (event) {
-		if (typeof window.pauseCount === 'undefined') {
-			$('#pNt').stop(true);
-			const x = $('#pNt').width();
-			CONSTANTS.popuptimer = (x / 280) * 10;
-		}
-		});
-	
-		popup.on("mouseleave", function (event) {
-		const resumeclock = CONSTANTS.popuptimer * 1000;
-		if (CONSTANTS.popuptimer > 0) {
-			$('#pNt').animate({ width: "0px" }, resumeclock, "swing", function () {
-			$('#pNotifyX').click();
-			});
-		}
-		window.pauseCount = 1;
-		});
-	});
-	
-	$(document).on('click', '.wallet_connect', function () {
-		reqConnect();
-	});
-	
-	$(document).on('click', '.network_switch', function () {
-		switchNetwork();
-	});
-	
-	$(document).on('click', '#wallet_id', function () {
-		disconnectwallet();
-	});
-	
-	$(document).on('click', '#discon', function () {
-		// Handle disconnect logic here
-	});
+$(document).ready(function () {
+    const popup = $("#popupNotify");
+
+    popup.on("mouseover", function (event) {
+        if (typeof window.pauseCount === 'undefined') {
+            $('#pNt').stop(true);
+            const x = $('#pNt').width();
+            CONSTANTS.popuptimer = (x / 280) * 10;
+        }
+    });
+
+    popup.on("mouseleave", function (event) {
+    const resumeclock = CONSTANTS.popuptimer * 1000;
+    if (CONSTANTS.popuptimer > 0) {
+        $('#pNt').animate({ width: "0px" }, resumeclock, "swing", function () {
+        $('#pNotifyX').click();
+        });
+    }
+    window.pauseCount = 1;
+    });
+});
+
+$(document).on('click', '.wallet_connect', function () {
+    reqConnect();
+});
+
+$(document).on('click', '.network_switch', function () {
+    switchNetwork();
+});
+
+$(document).on('click', '#wallet_id', function () {
+    disconnectwallet();
+});
+
+$(document).on('click', '#discon', function () {
+    // Handle disconnect logic here, if it exists in etherjs
+});
 
 
-	export { initializeConnection, unlockedWallet, reqConnect, handleAccountChange, handleNetworkChange, popupSuccess };
+export { initializeConnection, unlockedWallet, chainCheck, reqConnect, handleAccountChange, handleNetworkChange, popupSuccess };

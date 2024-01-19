@@ -1,4 +1,4 @@
-import { CONSTANTS, getCurrentEthUsdcPriceFromUniswapV2, getTokenETHValue, getTokenUSDValue, truncateAddress, getPairToken, getSymbol, fromBigIntNumberToDecimal, } from './constants.js';
+import { CONSTANTS, getCurrentEthUsdcPriceFromUniswapV2, getTokenETHValue, getTokenUSDValue, truncateAddress, getPairToken, getSymbol, fromBigIntNumberToDecimal, isValidEthereumAddress, } from './constants.js';
 import { updateSectionValues_volumes, updateSectionValues_volumesERC20 } from './module-market-sidebar-updaters.js';
 // Load hedge volume: created, bought, settled, payouts, fees
 // Load token stats and information when searchBar contains token address
@@ -7,7 +7,7 @@ async function loadSidebar() {
     const searchInput = $('#searchBar').val();
 
     // check if address exists in search bar
-    if (searchInput.length >= 40 && window.web3.utils.isAddress(searchInput) == true) {
+    if (searchInput.length >= 40 && isValidEthereumAddress(searchInput)) {
         // filter sidebar infor for token
         await loadSidebarVolume_Token(searchInput);
     } else { 

@@ -613,29 +613,41 @@ color: #FED128;
 .shl_inputshold label{
 	display:inline-block;
 	width:40%;
-	text-align:left;
+	text-align: left;
+	font-weight: 100;
+	font-size: 15px;
+	letter-spacing: 0.1px;
 }
 .shl_inputshold label img{
 	width:12px;
-	margin-inline:5px;
+	margin-inline:0.8rem;
 }
 fieldset input{
 	display: none !important;
 }
 #hedgeType{
-	height:30px;
-	margin:7px auto;
-	width:50%;
-	border-radius:10px;
-	border: 0.5px solid #188dd6;
-	background-color: #000;
-	color:#DDD;
-	text-align:center;
-	padding:2px;
+	margin: 7px auto;
+	width: 55%;
+	text-align: center;
+	font-family: "Space Grotesk", Monospace,"Nunito Sans", sans-serif !important;
+    font-size: clamp(14px, 1vw, 14.5px);
+    font-weight: 100;
+    color: rgb(6, 209, 231);
+
+	border: 0.5px dashed rgb(6, 209, 231);
+    border-radius: 8px;
+    padding: 0.4rem 0.7rem;    
+    box-sizing: border-box;
+    background-color: black !important;
+    box-shadow: inset 0px 1px 1px rgba(0, 0, 0, 0.06);    
+    -webkit-transition: all 0.3s;
+    transition: all 0.3s; 
 }
 .walletBalancesTL{
-	margin:5px 0;
-	background-color: #000;
+	width: 95%;
+	margin:10px auto;
+	padding-block: 0.3vw;
+	background-color: #000000c4;
 	border: 0.5px dashed #188dd6;
 	border-radius:5px;
 	
@@ -931,6 +943,9 @@ fieldset input{
 	letter-spacing: 0.1px;
 	border-top: 1.2px dashed #16ca83;
 }
+.topValue-call-preload::after{
+	content: "" !important;
+}
 .bottomValue-call {
 	color:#ef6565;
 	white-space: nowrap;
@@ -956,6 +971,9 @@ fieldset input{
 	font-weight: 100;
 	letter-spacing: 0.1px;
 	border-top: 1.2px dashed #e28d8d;
+}
+.topValue-put-preload::before{
+	content: "" !important;
 }
 .bottomValue-put {
 	position: relative;

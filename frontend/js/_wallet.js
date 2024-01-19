@@ -2,7 +2,7 @@
     Import modules
 ==========================================================================*/
 import { CONSTANTS, getAccounts, isValidEthereumAddress, getUserBalancesForToken, getSymbol, fromBigIntNumberToDecimal, commaNumbering } from './constants.js';
-import { initializeConnection, unlockedWallet, reqConnect, handleAccountChange, handleNetworkChange} from './web3-walletstatus-module.js';
+import { initializeConnection, chainCheck, unlockedWallet, reqConnect, handleAccountChange, handleNetworkChange} from './web3-walletstatus-module.js';
 import { approvalDepositInterface, withdrawInterface } from './module-wallet-writer.js';
 import { fetchSection_Networth, fetchSection_BalanceList, fetchSection_HedgePanel, fetchSection_RewardsPanel, fetchSection_StakingPanel } from './module-wallet-section-fetchers.js';
 import { loadHedgesModule } from './module-wallet-section-hedgesList.js';
@@ -42,23 +42,20 @@ $(document).ready(async function () {
 
     // load sections periodically
     setatmIntervalAsync(async () => {
-        await checkAndCallPageTries();
+        checkAndCallPageTries();
     }, 45000);
 });
-
 
 // Checks if all wallet checks pass before calling page modules
 async function pageModulesLoadingScript() {
     let continueLoad = false;
     try {
-        continueLoad = await initializeConnection();
+        continueLoad = initializeConnection();
 		if (continueLoad) {
             // Set up event listeners related to the wallet
             setupToggleElements();
 			return true;
 		} else {
-			// Force interface to indicate connection needs
-			await handleAccountChange([]);
 			return false;
 		}
     } catch (error) {
@@ -385,23 +382,27 @@ document.addEventListener('click', function (event) {
     }
 });
 
-/*  ---------------------------------------
+/*---------------------------------------
     BOTTOM OF EVERY MAIN SCRIPT MODULE 
--------------------------------------- */
+----------------------------------------*/
 // Provider Listeners
 ethereum.on("connect", (chainID) => {
 	// Update chainID on connect
 	CONSTANTS.chainID = chainID.chainId;
 	console.log("Connected to chain:", CONSTANTS.chainID);
-	handleNetworkChange(chainID.chainId)
+	handleNetworkChange(chainID.chainId);
+    chainCheck();
 });
 
-ethereum.on("accountsChanged", (accounts) => {
-	console.log("Account changed:", accounts);
-	handleAccountChange(accounts);
-
-    // Refresh page
-    checkAndCallPageTries();
+ethereum.on("accountsChanged", async (accounts) => {
+    console.log("Account changed:", accounts);
+	if(accounts.length == 0) {
+		// Refresh wallet widget directly
+		handleAccountChange(accounts);
+	} else {
+		// Refresh accounts & page Feed
+		checkAndCallPageTries();
+	}
 });
 
 ethereum.on("chainChanged", (chainID) => {

@@ -1,8 +1,8 @@
 /*=========================================================================
     Import modules
 ==========================================================================*/
-import { CONSTANTS, getUserBalancesForToken, truncateAddress, getPairToken, getSymbol, getAccounts, isValidEthereumAddress, fromBigIntNumberToDecimal, } from './constants.js';
-import { initializeConnection, unlockedWallet, reqConnect, handleAccountChange, handleNetworkChange, popupSuccess} from './web3-walletstatus-module.js';
+import { CONSTANTS, getUserBalancesForToken, truncateAddress, getPairToken, getSymbol, getAccounts, isValidEthereumAddress, fromBigIntNumberToDecimal, fromDecimalToBigInt, getTokenDecimals, } from './constants.js';
+import { initializeConnection, chainCheck, reqConnect, handleAccountChange, handleNetworkChange, popupSuccess} from './web3-walletstatus-module.js';
 import { getTokenInfo } from './module-wallet-tokenlist-dependencies.js';
 import { refreshDataOnElements, loadOptions, fetchOptionStrip, fetchNameSymbol, prepareTimestamp, noOptionsSwal } from './module-market-card-fetchers.js';
 import { loadSidebar, loadSidebarVolume_All, loadSidebarVolume_Token, loadPastEvents } from './module-market-sidebar-fetchers.js';
@@ -19,14 +19,15 @@ import { loadSidebar, loadSidebarVolume_All, loadSidebarVolume_Token, loadPastEv
 // Start making calls to Dapp modules
 export const checkAndCallPageTries = async () => {
     const scouter = await pageModulesLoadingScript();
-    console.log('connection Scout: '+ scouter);
-
+    
+	console.log('connection Scout: '+ scouter);  
     if (scouter) {
         const asyncFunctions = [refreshDataOnElements, loadSidebar ];
         for (const func of asyncFunctions) {
             func();
         }
-    }    
+    }  
+	
 };
 
 const setatmIntervalAsync = (fn, ms) => {
@@ -42,7 +43,7 @@ $(document).ready(async function () {
 
     // load sections periodically
     setatmIntervalAsync(async () => {
-        await checkAndCallPageTries();
+        checkAndCallPageTries();
     }, 45000);
 });
 
@@ -51,12 +52,10 @@ $(document).ready(async function () {
 async function pageModulesLoadingScript() {
     let continueLoad = false;
     try {
-        continueLoad = await initializeConnection();
+        continueLoad = initializeConnection();
 		if (continueLoad) {
 			return true;
 		} else {
-			// Force interface to indicate connection needs
-			await handleAccountChange([]);
 			return false;
 		}
     } catch (error) {
@@ -348,15 +347,15 @@ async function onSearchSubmit(event) {
 }
 
 async function createForm() {
-	let trimmedUser = MyGlobals.wallet;
+	let trader = MyGlobals.wallet;
 	let truncatedUser = '';
 	let depositedBalance = 0;
 	let withdrawnBalance = 0;
 	let lockedInUseBalance = 0;
 	let withdrawableBalance = 0;
   
-	if (trimmedUser.length === 42) {
-	  truncatedUser = truncateAddress(trimmedUser);
+	if (isValidEthereumAddress(trader)) {
+	  truncatedUser = truncateAddress(trader);
 	} else {
 	  truncatedUser = 'Connect Wallet';
 	}
@@ -370,14 +369,14 @@ async function createForm() {
 		  <option value="2">Equity Swap</option>
 		  <option value="3">Loan Request (coming)</option>
 		</select>
-		<label id="tokenLabel" class="labels"><img src="imgs/info.png" title="token address of the tokens you want to hedge">token Address:</label>
+		<label id="tokenLabel" class="labels"><img src="imgs/info.png" title="token address of the underlying assets or tokens">token address:</label>
 		<input id="tokenAddy" class="sweetInput shldi benown" aria-invalid="false" autocomplete="ERC20 token to hedge">
-		<label id="amountLabel" class="labels"><img src="imgs/info.png" title="amount of the tokens you want to hedge P.S should deposit first, visit wallet page">token amount:</label>
-		<input id="tokenAmount" class="sweetInput shldi benown" aria-invalid="false" autocomplete="amount of tokens to hedge">
-		<label id="premiumLabel" class="labels"><img src="imgs/info.png" title="cost in paired currency on dex">premium:</label>
-		<input id="premium" class="sweetInput shldi benown" aria-invalid="false" autocomplete="cost in paired currency to buy hedge">
-		<label id="strikeLabel" class="labels"><img src="imgs/info.png" title="strike value in paired currency on dex">strike price:</label>
-		<input id="strikePrice" class="sweetInput shldi benown" aria-invalid="false" autocomplete="strike value in paired currency at which hedge breaks even for the buyer">
+		<label id="amountLabel" class="labels"><img src="imgs/info.png" title="amount of the tokens you want to hedge. \nNote: Tokens should be deposited to Vault first, visit wallet page">token amount:</label>
+		<input id="tokenAmount" class="sweetInput shldi benown" aria-invalid="false" autocomplete="amount of tokens in trade">
+		<label id="premiumLabel" class="labels"><img src="imgs/info.png" title="in paired currency, the cost the buyer has to pay to take the OTC trade">premium:</label>
+		<input id="premium" class="sweetInput shldi benown" aria-invalid="false" autocomplete="cost of buying trade">
+		<label id="strikeLabel" class="labels"><img src="imgs/info.png" title="strike price of the underlying tokens in paired currency">strike price:</label>
+		<input id="strikePrice" class="sweetInput shldi benown" aria-invalid="false" autocomplete="break even value for the trade">
 		<br>
 		<div class="walletBalancesTL">
 		  <p>paste token address above & view your balances: </p>
@@ -390,7 +389,7 @@ async function createForm() {
 	  </div>`;
   
 	swal({
-		title: "create OTC trade",
+		title: "Create OTC Trade",
 		text: privatize,
 		type: "prompt",
 		html: true,
@@ -418,7 +417,7 @@ $(document).on('click', '#statsLabel', async function(e){
 	window.sidebarTab = 1;
 	// quick one: refresh sidebar
 	const searchInput = $('#searchBar').val();
-    if (searchInput.length >= 40 && window.web3.utils.isAddress(searchInput) == true) {
+    if (searchInput.length >= 40 && isValidEthereumAddress(searchInput)) {
         // filter sidebar infor for token
         await loadSidebarVolume_Token(searchInput);
     } else {
@@ -459,7 +458,7 @@ async function handlePaste(event) {
 }
 
 async function fetchUserTokenBalance(tokenAddress){
-	const accounts = getAccounts();
+	const accounts = await getAccounts();
     const userAddress = accounts[0];
 	//fetch balances for user under token address
 	const mybalances = await getUserBalancesForToken(tokenAddress, userAddress);
@@ -491,7 +490,7 @@ async function fetchUserTokenBalance(tokenAddress){
 
 // Submit call function to hedging contract to create hedge
 async function createHedgeSubmit() {
-	const accounts = await web3.eth.getAccounts();
+	const accounts = await getAccounts();
 	if (accounts.length === 0) {
 	  alert('Please connect your wallet');
 	  return;
@@ -505,7 +504,7 @@ async function createHedgeSubmit() {
 	const strikePrice = parseFloat(document.getElementById('strikePrice').value);
   
 	// Validate form inputs
-	if (tokenAddy.length < 40 || !web3.utils.isAddress(tokenAddy)) {
+	if (tokenAddy.length < 40 || !isValidEthereumAddress(tokenAddy)) {
 		alert('Invalid token address provided');
 		return;
 	}
@@ -518,24 +517,20 @@ async function createHedgeSubmit() {
 		return;
 	}
     
-	// get token info and pair infor, price and cost is in pair currency
-	const tokenAmountWei = fromDecimalToBigIntNumber(tokenAmount);
-	const tokenInfo = await getTokenInfo(tokenAddress, tokenAmountWei);
-	const tokenDecimals = tokenInfo.decimals;
-
+	// get token info and pair infor, price and cost is in pair currency	
+	const tokenDecimals = await getTokenDecimals(tokenAddress);
+	const tokenAmountWei = await fromDecimalToBigInt(tokenAmount, tokenDecimals);
+	// get dependency variables
 	const pairAddress = await hedgingInstance.getPairAddressZK(tokenAddress);
-
 	const pairInfo = await getTokenInfo(pairAddress.pairedCurrency);
 	const pairDecimals = pairInfo.decimals;
-	
-	// use decimals to convert number up to 18 decimals
-	const amountWei = fromBigIntNumberToDecimal(tokenAmount, tokenDecimals);
+	// prepare other inputs
 	const costWei = fromBigIntNumberToDecimal(cost, pairDecimals);
 	const strikePriceWei = fromBigIntNumberToDecimal(strikePrice, pairDecimals);
 
 	try {
 		// prepare Tx
-		const transaction = await hedgingInstance.connect(signer).createHedge(hedgeType, tokenAddy, amountWei, costWei, strikePriceWei);
+		const transaction = await hedgingInstance.connect(signer).createHedge(hedgeType, tokenAddy, tokenAmountWei, costWei, strikePriceWei);
 		// Wait for the transaction to be mined
 		const receipt = await transaction.wait();
 
@@ -561,11 +556,13 @@ async function createHedgeSubmit() {
 
 function handleTransactionSuccess(transactionHash) {
 	// Display a success message based on the status
-	var message = "Transaction Submitted Successfully";
+	var message = "Trade has been created..\nIt will now appear on the OTC timeline to buyers.";
 	swal({
-	  title: "Writing Success.",
-	  type: "error",
+	  title: "Transaction Submitted Successfully",
+	  type: "success",
+	  confirmButtonText: "Yay!",
 	  confirmButtonColor: "#F27474",
+	  allowOutsideClick: true,
 	  text: message,
 	});
 	swal.close();
@@ -731,15 +728,20 @@ ethereum.on("connect", (chainID) => {
 	CONSTANTS.chainID = chainID.chainId;
 	console.log("Connected to chain:", CONSTANTS.chainID);
 	handleNetworkChange(chainID.chainId)
+	chainCheck();
 });
 
-ethereum.on("accountsChanged", (accounts) => {
-	console.log("Account changed:", accounts);
-	handleAccountChange(accounts);
-
-    // Refresh page
-    checkAndCallPageTries();
-	loadOptions();
+ethereum.on("accountsChanged", async (accounts) => {
+    console.log("Account changed:", accounts);
+	if(accounts.length > 0) {
+		// Refresh accounts & page Feed
+		checkAndCallPageTries();
+		loadOptions();
+	} else {
+		// Refresh wallet widget directly		
+		handleAccountChange(accounts);
+		checkAndCallPageTries();
+	}
 });
 
 ethereum.on("chainChanged", (chainID) => {

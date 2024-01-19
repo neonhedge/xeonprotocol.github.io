@@ -9,7 +9,7 @@
 }
 @font-face {
   font-family: modeseven;
-  src: url(../fonts/Modeseven-L3n5.ttf);
+  src: url(../fonts/modes.ttf);
 }
 @font-face {
   font-family: neon;
@@ -127,6 +127,9 @@ iframe {
 }
 .skip-to-content:focus {
   transform: translateY(0);
+}
+.copy-icon {
+  cursor: pointer;
 }
 
 /*--------------------------------------------------------*/
@@ -488,6 +491,7 @@ button, a.btn {
   font-weight: 500;
   text-decoration: none;
   color: rgba(255, 255, 255, 0.9);
+  caret-color: transparent;
 }
 
 footer {

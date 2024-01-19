@@ -663,26 +663,29 @@ async function prepareTimestamp(timeprint){
 	return start;
 }
 async function noOptionsSwal(){
+	// add message to timeline
 	$('#hedgesTimeline').empty().append('<div class="no-hedges-message sl_refresh">No Events Found. Write or Buy OTC hedges to populate this area...</span>');
 
 	//proceed to swal
-	var privatize = '<div class="clms_case">nothing to find here...</div>';
-	swal({
-			title: "Options Not Found",
-			text: privatize,
-			type: "info",  //var alertTypes = ['error', 'warning', 'info', 'success', 'input', 'prompt'];
-			html: true,
-					dangerMode: true,
-					confirmButtonText: "Okay",
-					confirmButtonColor: "#d6188a", //site pink
-			showConfirmButton: true,
-			showCancelButton: false,
-			allowOutsideClick: true,
-			timer: 80000,
-			animation: "slide-from-top"
-	},function(){//on confirm click
-	
-	});//confirm swal close
+	setTimeout(function() {
+		var privatize = '<div class="clms_case">nothing to find here...</div>';
+		swal({
+				title: "No OTC Trades Found",
+				text: privatize,
+				type: "info",  //var alertTypes = ['error', 'warning', 'info', 'success', 'input', 'prompt'];
+				html: true,
+						dangerMode: true,
+						confirmButtonText: "Okay",
+						confirmButtonColor: "#d6188a", //site pink
+				showConfirmButton: true,
+				showCancelButton: false,
+				allowOutsideClick: true,
+				timer: 2500,
+				animation: "slide-from-top"
+		},function(){//on confirm click
+		
+		});//confirm swal close
+	}, 4500);
 }
 
 export { refreshDataOnElements, loadOptions, fetchOptionCard, fetchOptionStrip, fetchNameSymbol, prepareTimestamp, noOptionsSwal };
