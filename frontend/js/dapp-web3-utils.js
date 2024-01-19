@@ -43,18 +43,6 @@ async function initWeb3() {
   window.hedgingInstance = new ethers.Contract(CONSTANTS.hedgingAddress, CONSTANTS.hedgingContractABI, window.provider);
   window.stakingInstance = new ethers.Contract(CONSTANTS.stakingAddress, CONSTANTS.stakingContractABI, window.provider);
 
-  // check decimals to verify instances
-  const accounts = await provider.listAccounts();
-
-  if (accounts.length > 0) {
-    const balance = await neonInstance.balanceOf(accounts[0]);
-    console.log(balance);
-
-    const decimals = await neonInstance.decimals();
-    console.log(decimals);
-  } else {
-    console.error("No accounts available. Unable to fetch balance and decimals.");
-  }
   
 }
 

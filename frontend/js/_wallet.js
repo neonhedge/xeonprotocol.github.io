@@ -1,7 +1,7 @@
 /*=========================================================================
     Import modules
 ==========================================================================*/
-import { CONSTANTS, getAccounts, isValidEthereumAddress, getUserBalancesForToken, getSymbol, fromBigIntNumberToDecimal, getTokenDecimals } from './constants.js';
+import { CONSTANTS, getAccounts, isValidEthereumAddress, getUserBalancesForToken, getSymbol, fromBigIntNumberToDecimal, commaNumbering } from './constants.js';
 import { initializeConnection, unlockedWallet, reqConnect, handleAccountChange, handleNetworkChange} from './web3-walletstatus-module.js';
 import { approvalDepositInterface, withdrawInterface } from './module-wallet-writer.js';
 import { fetchSection_Networth, fetchSection_BalanceList, fetchSection_HedgePanel, fetchSection_RewardsPanel, fetchSection_StakingPanel } from './module-wallet-section-fetchers.js';
@@ -52,18 +52,19 @@ async function pageModulesLoadingScript() {
     let continueLoad = false;
     try {
         continueLoad = await initializeConnection();
+		if (continueLoad) {
+            // Set up event listeners related to the wallet
+            setupToggleElements();
+			return true;
+		} else {
+			// Force interface to indicate connection needs
+			await handleAccountChange([]);
+			return false;
+		}
     } catch (error) {
         console.log(error);
+		return false;
     }
-    if (continueLoad) {
-        // Set up event listeners related to the wallet
-        setupToggleElements();
-        return true;
-    } else {
-        // Force interface to indicate connection needs
-        handleAccountChange([]);
-    }
-    return false;
 }
 
 // Lazy loading implementation for Hedges Panel

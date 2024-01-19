@@ -22,7 +22,7 @@ export const checkAndCallPageTries = async () => {
     console.log('connection Scout: '+ scouter);
 
     if (scouter) {
-        const asyncFunctions = [refreshDataOnElements, loadOptions, loadSidebar ];
+        const asyncFunctions = [refreshDataOnElements, loadSidebar ];
         for (const func of asyncFunctions) {
             func();
         }
@@ -52,16 +52,17 @@ async function pageModulesLoadingScript() {
     let continueLoad = false;
     try {
         continueLoad = await initializeConnection();
+		if (continueLoad) {
+			return true;
+		} else {
+			// Force interface to indicate connection needs
+			await handleAccountChange([]);
+			return false;
+		}
     } catch (error) {
         console.log(error);
+		return false;
     }
-    if (continueLoad) {
-        return true;
-    } else {
-        // Force interface to indicate connection needs
-        handleAccountChange([]);
-    }
-    return false;
 }
 
 //notes:
@@ -85,7 +86,7 @@ export const MyGlobals = {
 };
 
 //define tab is highlighted
-$(document).ready(function(){
+$(document).ready(async function(){
 	$('#erc20Options').css({'background' : 'rgba(214, 24, 138,0.1)','border' : '1px solid #62006b'});//left panel
 	$('#discoverTab').css({'background' : 'rgba(214, 24, 138, 0.1)','border' : '1px solid #62006b'});//try rgb(8, 231, 254) - bright blue
 	//set global
@@ -97,15 +98,19 @@ $(document).ready(function(){
 	MyGlobals.outputArray = [];
 	MyGlobals.startIndex = 0;
 	MyGlobals.lastItemIndex = 0;
-	loadOptions(MyGlobals.startIndex, window.readLimit);
 
-	//load sidebar
-	loadSidebar();
+	const scouter = await pageModulesLoadingScript();
+	if(scouter){
+		loadOptions(MyGlobals.startIndex, window.readLimit);
 
-	//load past events
-	loadPastEvents();
+		//load sidebar
+		loadSidebar();
+
+		//load past events
+		loadPastEvents();
+	}
 });
-$(document).on('click', '#erc20Options', function(e){
+$(document).on('click', '#erc20Options', async function(e){
 	$('.asideNavsinside').removeAttr('style'); //reset styles
 	$(this).css({'border' : '1px solid #62006b', 'background' : 'rgba(214, 24, 138,0.1)'});//set style
 	//set global
@@ -115,9 +120,13 @@ $(document).on('click', '#erc20Options', function(e){
 	MyGlobals.outputArray = [];
 	MyGlobals.startIndex = 0;
 	MyGlobals.lastItemIndex = 0;
-	loadOptions(MyGlobals.startIndex, window.readLimit);
+
+	const scouter = await pageModulesLoadingScript();
+	if(scouter){
+		loadOptions(MyGlobals.startIndex, window.readLimit);
+	}
 });
-$(document).on('click', '#equitySwaps', function(e){
+$(document).on('click', '#equitySwaps', async function(e){
 	$('.asideNavsinside').removeAttr('style'); //reset styles
 	$(this).css({'border' : '1px solid #62006b', 'background' : 'rgba(214, 24, 138,0.1)'});//set style
 	//set global
@@ -127,9 +136,13 @@ $(document).on('click', '#equitySwaps', function(e){
 	MyGlobals.outputArray = [];
 	MyGlobals.startIndex = 0;
 	MyGlobals.lastItemIndex = 0;
-	loadOptions(MyGlobals.startIndex, window.readLimit);
+	//scout
+	const scouter = await pageModulesLoadingScript();
+	if(scouter){
+		loadOptions(MyGlobals.startIndex, window.readLimit);
+	}
 });
-$(document).on('click', '#erc20Loans', function(e){
+$(document).on('click', '#erc20Loans', async function(e){
 	$('.asideNavsinside').removeAttr('style'); //reset styles
 	$(this).css({'border' : '1px solid #62006b', 'background' : 'rgba(214, 24, 138,0.1)'});//set style
 	//set global
@@ -139,7 +152,11 @@ $(document).on('click', '#erc20Loans', function(e){
 	MyGlobals.outputArray = [];
 	MyGlobals.startIndex = 0;
 	MyGlobals.lastItemIndex = 0;
-	loadOptions(MyGlobals.startIndex, window.readLimit);
+	//scout
+	const scouter = await pageModulesLoadingScript();
+	if(scouter){
+		loadOptions(MyGlobals.startIndex, window.readLimit);
+	}
 });
 $(document).on('click', '#socialstream', function(e){
 	$('.asideNavsinside').removeAttr('style'); //reset styles
@@ -657,17 +674,15 @@ async function setupEventListening() {
         const filter_hedgeCreated = await hedgingInstance.filters.hedgeCreated();
         hedgingInstance.on(filter_hedgeCreated, handleHedgeCreatedEvent);
 
-        const filter_hedgePurchased = hedgingInstance.filters.hedgePurchased();
+        const filter_hedgePurchased = await hedgingInstance.filters.hedgePurchased();
         hedgingInstance.on(filter_hedgePurchased, handleHedgePurchasedEvent);
 
-        const filter_hedgeSettled = hedgingInstance.filters.hedgeSettled();
+        const filter_hedgeSettled = await hedgingInstance.filters.hedgeSettled();
         hedgingInstance.on(filter_hedgeSettled, handleHedgeSettledEvent);
 
-        const filter_minedHedge = hedgingInstance.filters.minedHedge();
+        const filter_minedHedge = await hedgingInstance.filters.minedHedge();
         hedgingInstance.on(filter_minedHedge, handleMinedHedgeEvent);
 
-        // Prepare popup success messages on event
-        hedgingInstance.on(filter_hedgeCreated, handleHedgeCreatedSuccessEvent);
     } catch (error) {
         console.error('Error setting up event listening:', error);
     }
@@ -724,6 +739,7 @@ ethereum.on("accountsChanged", (accounts) => {
 
     // Refresh page
     checkAndCallPageTries();
+	loadOptions();
 });
 
 ethereum.on("chainChanged", (chainID) => {

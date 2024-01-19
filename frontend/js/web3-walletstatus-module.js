@@ -2,7 +2,7 @@
     Import modules
 ==========================================================================*/
 
-import { CONSTANTS, commaNumbering, fromBigIntNumberToDecimal, isValidEthereumAddress } from './constants.js';
+import { CONSTANTS, commaNumbering, fromBigIntNumberToDecimal, getAccounts, isValidEthereumAddress, truncateAddress } from './constants.js';
 import { initWeb3 } from './dapp-web3-utils.js';
 
 /*=========================================================================
@@ -15,7 +15,7 @@ async function initializeConnection() {
 	await initWeb3();
 	try {
 		const correctChain = await chainCheck();
-		console.log('initializing connection...')
+		console.log('initializing connection...'+correctChain)
 		if (correctChain) {
 			// waiting stance
 			$('.wallets').css('display', 'none');
@@ -30,7 +30,8 @@ async function initializeConnection() {
 				console.log('initializing failed, wallet locked..')
 				return false; // Failed regardless
 			} else {
-				await walletCheckProceed();
+                // not crucial to await, slows page coz of price api
+				walletCheckProceed();
 				setInterval(() => walletCheckProceed(), 40000);
 				return true; // Passed all Checks
 			}
@@ -39,63 +40,89 @@ async function initializeConnection() {
 			$('.wallets').css('display', 'none');
 			$('.network_switch').css('display', 'inline-block');
 
-			swal(
-			{
-				title: 'Switch to Sepolia Testnet...',
-				text: 'Failed to initialize Chain.. \nClick connect button to try again.',
-				type: 'info',
-				html: false,
-				dangerMode: false,
-				confirmButtonText: 'Connect',
-				cancelButtonText: 'Cancel',
-				showConfirmButton: true,
-				showCancelButton: true,
-				animation: 'Pop',
-			}, async function () {
-				console.log('initialize retry...');
-				await switchNetwork();
-			});
-			// Failed a check regardless, return.
-			return false;
+            swal({
+                type: "warning",
+                title: "Switch to Sepolia Testnet",
+                text: "Wrong galaxy dude... \nCowboys & Aliens",
+                html: true,
+                showCancelButton: true,
+                confirmButtonColor: "#04C86C",
+                confirmButtonText: "Connect..",
+                cancelButtonText: "Nay.",
+                closeOnConfirm: true,
+                customClass: {
+                    title: 'alien-cowboy-title',
+                },
+            }, async function (isConfirm) {
+                if (isConfirm) {
+                    console.log('initialize retry...');
+                    switchNetwork();
+                }
+            });
+            return false
 		}
 	} catch (error){
 		return false;
 	}
 }
 
+// Called when sccripts have passed initialization to continue loading
+// Just checks if any accounts are connected to website
+// This is also called constantly by event listerners if no internet, hence always poppin this swal over all others, 
+//...so check initialization again, redundant but only way to verify
 async function handleAccountChange(wallets) {
-    let wallet = wallets[0];
-    wallet = wallets.length ? wallets[0] : null;
-    if (wallets.length === 0) {
-		$('.wallets').css('display', 'none');
-        $('.wallet_connect').css('display', 'inline-block');
-		swal({
-			type: "warning",
-            title: "Wallect Required",
-            text: "Please connect a wallet to use the Neon Hedge Dapp.",
-            html: true,
-            showCancelButton: true,
-            confirmButtonColor: "#04C86C",
-            confirmButtonText: "Connect..",
-			cancelButtonText: "Nay.",
-            closeOnConfirm: true
-        }, async function (isConfirm) {
-            if (isConfirm) {
-				reqConnect(wallets);
-			}
-        });
-		console.log("Please connect to MetaMask.");
-    } else if (wallets[0] !== window.currentAccount) {
-        console.log("Wallet connected:", wallets);
-        window.currentAccount = wallets[0];
-        await initializeConnection();
+    // we let initialize display its swal
+    const continueFr = await initializeConnection();
+    // otherwise show local swal
+    if(continueFr){
+        if (wallets.length === 0) {
+            $('.wallets').css('display', 'none');
+            $('.wallet_connect').css('display', 'inline-block');
+            console.log("Please connect to MetaMask.");
+            swal({
+                type: "warning",
+                title: "Wallect Required",
+                text: "Please connect a wallet to use the Neon Hedge Dapp.",
+                html: true,
+                showCancelButton: true,
+                confirmButtonColor: "#04C86C",
+                confirmButtonText: "Connect..",
+                cancelButtonText: "Nay.",
+                closeOnConfirm: true
+            }, async function (isConfirm) {
+                if (isConfirm) {
+                    reqConnect(wallets);
+                }
+            });
+    
+        }
+        else if (wallets[0] !== window.currentAccount) {
+            // global variable..sets to empty array if initialization fails on main page script 'pageModulesLoadingScript', 
+            // check above means: empty --> something === connected
+            window.currentAccount = wallets[0];
+            // Refresh connection message
+            console.log("Wallet Connected:", wallets);
+            swal({
+                type: "success",
+                title: "Wallect Connected",
+                text: `${truncateAddress(wallets[0])}`,
+                html: true,
+                showCancelButton: false,
+                showConfirmButton: true,
+                confirmButtonText: "Close",
+                closeOnConfirm: true,
+                timer: 2000,
+            });
+        }
     }
+     
 }
 
 async function handleNetworkChange(chainID) {
     if (chainID !== CONSTANTS.network) {
         console.log("Reading chain:" + chainID + ", instead of, " + CONSTANTS.network);
 		swal({
+            type: "error",
             title: "Wrong Blockchain",
             text: "Please connect to: "+CONSTANTS.network,
             html: true,
@@ -308,12 +335,12 @@ function showNetworkSwitchErrorAlert() {
     
     swal({
         title: 'Failed to Switch Network',
-        type: 'info',
+        type: 'error',
         text: 'Try again to switch to the Sepolia Testnet.',
         showConfirmButton: true,
         showCancelButton: true,
-        confirmButtonText: 'Switch',
-        cancelButtonText: 'Cancel',
+        confirmButtonText: 'Switch...',
+        cancelButtonText: 'Nay.',
         animation: 'Pop',
     }, function () {
         console.log('Switch network retry...');
@@ -460,7 +487,7 @@ async function reqConnect() {
         return false;
     }
 }
-
+//Dont await this, they are not crucial dependencies to compromise perfomance
 async function walletCheckProceed() {
     try {
         CONSTANTS.decimals = await neonInstance.decimals();

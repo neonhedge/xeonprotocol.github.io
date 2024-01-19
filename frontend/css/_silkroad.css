@@ -11,9 +11,13 @@
 	--neon-border-color: #08f;
 }
 header {
-	padding-block: unset !important;
-	padding-top: 1.2rem !important;
+	padding-block: 0.5rem !important;
+	padding-inline: 6rem 0rem !important;
 	border-bottom: 0.5px solid #15213c !important; /* darker #071432 */
+}
+header .container {
+	max-width: unset !important;
+	padding-inline: unset !important;
 }
 /* ====== transparent NEON background effect - too bright fot marketplace 
 main{
@@ -1331,9 +1335,23 @@ section.cta{
 	border-radius: 8px;
 	background-image: linear-gradient(to right, #08e7fe, #d6188a);
 }  
+
 .transparentTextLoading {
 	color: transparent !important;
 }
+
+.alien-cowboy-title::before {
+    content: '\1F47D'; /* Alien Emoji */
+    margin-right: 10px;
+    font-size: 24px;
+}
+
+.alien-cowboy-title::after {
+    content: '\1F920'; /* Cowboy Emoji */
+    margin-left: 10px;
+    font-size: 24px;
+}
+
 /*===============================
       BOTTOM OF EVERY CSS FILE
 =================================
@@ -1384,7 +1402,7 @@ section.cta{
 	width: 82px;
 	height: 82px;
 	border-radius: 50%;
-	background-color: #0e0b34; /* #0e0b34 or, 0701112d : transparency gives radar look */
+	background-color: #0701112d; /* #0e0b34 gives circle look or, #0701112d : transparency gives radar look */
   }
   .loading:after {
 	position: absolute;
