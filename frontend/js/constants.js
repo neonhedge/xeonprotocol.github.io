@@ -333,6 +333,8 @@ function fromWeiToFixed5(amount){
   var ethFriendly = parsed_eth.toFixed(5);
   return ethFriendly;
 }
+// Accepts BigNumber
+// BN in hex accepted too
 function fromBigIntNumberToDecimal(number, decimals) {
   try {
       // Convert to BigNumber, since migration to sepolia & etherjs intergration smart contracts are not returning BigNumber/XXXn

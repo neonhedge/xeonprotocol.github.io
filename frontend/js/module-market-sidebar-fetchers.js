@@ -297,25 +297,24 @@ async function prepareEventListItem(event, eventTopic) {
   // Create the list item
   const listItem = document.createElement('li');
 
-  // title
+  // Event title
   const titleSpan = document.createElement('span');
-  titleSpan.textContent = event.title;
+  titleSpan.textContent = event.event;
+  titleSpan.title = 'Event Topic: ' + eventTopic;
   listItem.appendChild(titleSpan);
-
-  // amount/value
-  const amountSpan = document.createElement('span');
 
   // Decode event data using ABI
   const decodedValues = await hedgingInstance.interface.decodeEventLog(event.event, event.data, event.topics);
   console.log(decodedValues);
 
-  // Prep
-  console.log('token: ' + decodedValues.token);
-  const pairToken = getPairToken(decodedValues.token);
-  const pairTokenSymbol = getSymbol(pairToken);
-  if(pairToken == CONSTANTS.wethAddress) {
+  // Prep dependencies
+  const pairToken = await getPairToken(decodedValues.token);// returns array
+  const pairedCurrency = pairToken[1];
+  const pairTokenSymbol = await getSymbol(pairedCurrency);
+  let tokenDecimals;
+  if(pairedCurrency == CONSTANTS.wethAddress) {
     tokenDecimals = 18;
-  } else if(pairToken == CONSTANTS.usdtAddress || pairToken == CONSTANTS.usdcAddress) {
+  } else if(pairedCurrency == CONSTANTS.usdtAddress || pairedCurrency == CONSTANTS.usdcAddress) {
     tokenDecimals = 6;
   }
   const optionId = decodedValues.optionId._hex; // Access _hex property
@@ -330,48 +329,57 @@ async function prepareEventListItem(event, eventTopic) {
   let payOffDecimal;
   let endValueDecimal;
 
-  // Update this part based on your events
-  switch (event.name) {
+  // Convert amounts and values
+  const amountSpan = document.createElement('span');
+  amountSpan.title = 'Hover for details';
+  switch (event.event) {
     case 'hedgeCreated':
       createValue = decodedValues.createValue._hex;
-      // Convert values to decimals based on the pair address
+      // Convert values to decimals based on the pair address: accepts hex
       const createValueDecimal = fromBigIntNumberToDecimal(createValue, tokenDecimals);
       amountSpan.textContent = createValueDecimal + ' ' + pairTokenSymbol;
+      amountSpan.title = 'Create Value: ' + createValueDecimal + ' ' + pairTokenSymbol;
       break;
     case 'hedgePurchased':
       payOff = decodedValues.payOff._hex;
       // Convert values to decimals based on the pair address
       payOffDecimal = fromBigIntNumberToDecimal(payOff, tokenDecimals);
       amountSpan.textContent = payOffDecimal + ' ' + pairTokenSymbol;
+      amountSpan.title = 'Pay Off: ' + payOffDecimal + ' ' + pairTokenSymbol;
       break;
     case 'hedgeSettled':
       endValue = decodedValues.endValue._hex
       // Convert values to decimals based on the pair address
       endValueDecimal = fromBigIntNumberToDecimal(endValue, tokenDecimals);
       amountSpan.textContent = endValueDecimal + ' ' + pairTokenSymbol;
+      amountSpan.title = 'End Value: ' + endValueDecimal + ' ' + pairTokenSymbol;
       break;
     case 'minedHedge':
       payOff = decodedValues.payOff._hex;
       // Convert values to decimals based on the pair address
       payOffDecimal = fromBigIntNumberToDecimal(payOff, tokenDecimals);
       amountSpan.textContent = payOffDecimal + ' ' + pairTokenSymbol;
+      amountSpan.title = 'Pay Off: ' + payOffDecimal + ' ' + pairTokenSymbol;
       break;
     default:
       break;
   }
   listItem.appendChild(amountSpan);
 
-  // address
+  // Address
   const dealerSpan = document.createElement('span');
   dealerSpan.textContent = truncateAddress(decodedValues.writer || decodedValues.buyer || decodedValues.miner);
+  dealerSpan.title = 'ERC20 Asset';
   listItem.appendChild(dealerSpan);
 
-  // link
+  // Link
   const txSpan = document.createElement('span');
   const link = document.createElement('a');
-  link.href = 'https://etherscan.io/tx/' + event.transactionHash;
+  link.href = 'https://sepolia.etherscan.io/tx/' + event.transactionHash;
   link.textContent = 'Transaction';
+  link.target = '_blank'; // Add this line to set the target attribute
   txSpan.appendChild(link);
+  txSpan.title = 'Transaction Link';
   listItem.appendChild(txSpan);
 
   // Add list item to the sidebar
