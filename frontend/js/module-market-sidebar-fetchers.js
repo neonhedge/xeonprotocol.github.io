@@ -278,51 +278,105 @@ async function loadSidebarVolume_Token(tokenAddress) {
     // Hide animation
     pastEventsContainer.find('.loading').remove();
 }
-  
-function prepareEventListItem(event, eventTopic) {
-    // Display the events in the sidebar div
-    const sidebarDiv = document.getElementById('scifiUI');
-    // Create the list item
-    const listItem = document.createElement('li');
-  
-    // title
-    const titleSpan = document.createElement('span');
-    titleSpan.textContent = event.title;
-    listItem.appendChild(titleSpan);
-  
-    // amount/value
-    const amountSpan = document.createElement('span');
-    const pairToken = getPairToken(event.returnValues.optionId);
-    const pairTokenSymbol = getSymbol(pairToken);
-    if (eventTopic === '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef') { //if hedgeCreated
-      amountSpan.textContent = (event.returnValues.createValue) + ' ' + pairTokenSymbol;
-    }
-    if (eventTopic === '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef') { //if hedgePurchased
-      amountSpan.textContent = (event.returnValues.payOff) + ' ' + pairTokenSymbol;
-    }
-    if (eventTopic === '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef') { //if hedgeSettled
-      amountSpan.textContent = (event.returnValues.endValue) + ' ' + pairTokenSymbol;
-    }
-    if (eventTopic === '0x123456789abcdef') { //if minedHedge
-      amountSpan.textContent = (event.returnValues.payOff) + ' ' + pairTokenSymbol;
-    }
-    listItem.appendChild(amountSpan);
-  
-    // address
-    const dealerSpan = document.createElement('span');
-    dealerSpan.textContent = truncateAddress((event.returnValues.writer || event.returnValues.buyer || event.returnValues.miner));
-    listItem.appendChild(dealerSpan);
-  
-    // link
-    const txSpan = document.createElement('span');
-    const link = document.createElement('a');
-    link.href = 'https://etherscan.io/tx/' + event.transactionHash;
-    link.textContent = 'Transaction';
-    txSpan.appendChild(link);
-    listItem.appendChild(txSpan);
-  
-    // Add list item to the sidebar
-    sidebarDiv.appendChild(listItem);
+
+async function decodeEvent(event, hedgingInstance) {
+  // Decode the event using ethers.js
+  const parsedLog = await hedgingInstance.interface.parseLog(event);
+
+  // Access the decoded values
+  const decodedValues = parsedLog.values;
+
+  return decodedValues;
 }
+
+async function prepareEventListItem(event, eventTopic) {
+  console.log('past events: ', event);
+
+  // Display the events in the sidebar div
+  const sidebarDiv = document.getElementById('scifiUI');
+  // Create the list item
+  const listItem = document.createElement('li');
+
+  // title
+  const titleSpan = document.createElement('span');
+  titleSpan.textContent = event.title;
+  listItem.appendChild(titleSpan);
+
+  // amount/value
+  const amountSpan = document.createElement('span');
+
+  // Decode event data using ABI
+  const decodedValues = await hedgingInstance.interface.decodeEventLog(event.event, event.data, event.topics);
+  console.log(decodedValues);
+
+  // Prep
+  console.log('token: ' + decodedValues.token);
+  const pairToken = getPairToken(decodedValues.token);
+  const pairTokenSymbol = getSymbol(pairToken);
+  if(pairToken == CONSTANTS.wethAddress) {
+    tokenDecimals = 18;
+  } else if(pairToken == CONSTANTS.usdtAddress || pairToken == CONSTANTS.usdcAddress) {
+    tokenDecimals = 6;
+  }
+  const optionId = decodedValues.optionId._hex; // Access _hex property
+  const optionIdDecimal = parseInt(optionId, 16).toString(); // Convert hex to decimal
+
+  let createValue;
+  let payOff;
+  let endValue;
+
+  // Convert values to decimals based on the pair address
+  let createValueDecimal;
+  let payOffDecimal;
+  let endValueDecimal;
+
+  // Update this part based on your events
+  switch (event.name) {
+    case 'hedgeCreated':
+      createValue = decodedValues.createValue._hex;
+      // Convert values to decimals based on the pair address
+      const createValueDecimal = fromBigIntNumberToDecimal(createValue, tokenDecimals);
+      amountSpan.textContent = createValueDecimal + ' ' + pairTokenSymbol;
+      break;
+    case 'hedgePurchased':
+      payOff = decodedValues.payOff._hex;
+      // Convert values to decimals based on the pair address
+      payOffDecimal = fromBigIntNumberToDecimal(payOff, tokenDecimals);
+      amountSpan.textContent = payOffDecimal + ' ' + pairTokenSymbol;
+      break;
+    case 'hedgeSettled':
+      endValue = decodedValues.endValue._hex
+      // Convert values to decimals based on the pair address
+      endValueDecimal = fromBigIntNumberToDecimal(endValue, tokenDecimals);
+      amountSpan.textContent = endValueDecimal + ' ' + pairTokenSymbol;
+      break;
+    case 'minedHedge':
+      payOff = decodedValues.payOff._hex;
+      // Convert values to decimals based on the pair address
+      payOffDecimal = fromBigIntNumberToDecimal(payOff, tokenDecimals);
+      amountSpan.textContent = payOffDecimal + ' ' + pairTokenSymbol;
+      break;
+    default:
+      break;
+  }
+  listItem.appendChild(amountSpan);
+
+  // address
+  const dealerSpan = document.createElement('span');
+  dealerSpan.textContent = truncateAddress(decodedValues.writer || decodedValues.buyer || decodedValues.miner);
+  listItem.appendChild(dealerSpan);
+
+  // link
+  const txSpan = document.createElement('span');
+  const link = document.createElement('a');
+  link.href = 'https://etherscan.io/tx/' + event.transactionHash;
+  link.textContent = 'Transaction';
+  txSpan.appendChild(link);
+  listItem.appendChild(txSpan);
+
+  // Add list item to the sidebar
+  sidebarDiv.appendChild(listItem);
+}
+
 
 export { loadSidebar, loadSidebarVolume_All, loadSidebarVolume_Token, loadPastEvents }
