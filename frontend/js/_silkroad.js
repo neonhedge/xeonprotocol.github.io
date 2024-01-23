@@ -242,7 +242,7 @@ async function addBookmark(optionId) {
 			const wallet = '';
 			const receivedTokens = 0;
 		
-			let message, nonTxAction;
+			let message = '', title = '', nonTxAction = '';
 			if (state) {
 				message = 'Bookmark saved..';
 				title = 'Bookmarked!';
@@ -328,15 +328,13 @@ async function onSearchSubmit(event) {
 	swal({
 		title: "Invalid Prompt",
 		text: privatize,
-		type: "warning",
+		type: "error",
 		html: true,
-		dangerMode: true,
-		confirmButtonText: "go back",
 		confirmButtonColor: "#171716",
-		closeOnConfirm: false,
+		closeOnConfirm: true,
 		showConfirmButton: true,
 		showCancelButton: false,
-		timer: 4000,
+		timer: 2000,
 		animation: "slide-from-top"
 	},async function(){//on confirm click
 		//clear search bar
@@ -347,20 +345,19 @@ async function onSearchSubmit(event) {
 }
 
 async function createForm() {
-	let trader = MyGlobals.wallet;
+	const trader = await getAccounts();
 	let truncatedUser = '';
-	let depositedBalance = 0;
-	let withdrawnBalance = 0;
-	let lockedInUseBalance = 0;
-	let withdrawableBalance = 0;
-  
-	if (isValidEthereumAddress(trader)) {
-	  truncatedUser = truncateAddress(trader);
+	let depositedBalance = 0, withdrawnBalance = 0, lockedInUseBalance = 0, withdrawableBalance = 0;
+
+  	const isValid = isValidEthereumAddress(trader[0]);
+	if (isValid) {
+	  truncatedUser = truncateAddress(trader[0]);
 	} else {
 	  truncatedUser = 'Connect Wallet';
 	}
   
 	const privatize = `
+	<form id="writeForm">
 	  <div class="shl_inputshold delegate_inputshold setBeneField">
 		<label id="typeLabel" class="labels"><img src="imgs/info.png" title="Options or Equity Swaps (read docs)">hedge type:</label>
 		<select id="hedgeType" name="hedgeType">
@@ -370,13 +367,13 @@ async function createForm() {
 		  <option value="3">Loan Request (coming)</option>
 		</select>
 		<label id="tokenLabel" class="labels"><img src="imgs/info.png" title="token address of the underlying assets or tokens">token address:</label>
-		<input id="tokenAddy" class="sweetInput shldi benown" aria-invalid="false" autocomplete="ERC20 token to hedge">
+		<input id="tokenAddy" class="sweetInput shldi benown" type="text" aria-invalid="false" autocomplete="ERC20 token to hedge">
 		<label id="amountLabel" class="labels"><img src="imgs/info.png" title="amount of the tokens you want to hedge. \nNote: Tokens should be deposited to Vault first, visit wallet page">token amount:</label>
-		<input id="tokenAmount" class="sweetInput shldi benown" aria-invalid="false" autocomplete="amount of tokens in trade">
+		<input id="tokenAmount" class="sweetInput shldi benown" type="number"  aria-invalid="false" autocomplete="amount of tokens in trade">
 		<label id="premiumLabel" class="labels"><img src="imgs/info.png" title="in paired currency, the cost the buyer has to pay to take the OTC trade">premium:</label>
-		<input id="premium" class="sweetInput shldi benown" aria-invalid="false" autocomplete="cost of buying trade">
+		<input id="premium" class="sweetInput shldi benown" type="number" step="any" aria-invalid="false" autocomplete="cost of buying trade">
 		<label id="strikeLabel" class="labels"><img src="imgs/info.png" title="strike price of the underlying tokens in paired currency">strike price:</label>
-		<input id="strikePrice" class="sweetInput shldi benown" aria-invalid="false" autocomplete="break even value for the trade">
+		<input id="strikePrice" class="sweetInput shldi benown" type="number" step="any" aria-invalid="false" autocomplete="break even value for the trade">
 		<br>
 		<div class="walletBalancesTL">
 		  <p>paste token address above & view your balances: </p>
@@ -386,7 +383,8 @@ async function createForm() {
 		  <div><span class="walBalTitle">withdrawn:</span><span id="withdrawnBalance">${withdrawnBalance}</span></div>
 		  <div><span class="walBalTitle">available:</span><span id="withdrawableBalance">${withdrawableBalance}</span></div>
 		</div>
-	  </div>`;
+	  </div>
+	</form>`;
   
 	swal({
 		title: "Create OTC Trade",
@@ -400,11 +398,35 @@ async function createForm() {
 		closeOnConfirm: false,
 		showLoaderOnConfirm: true,
 		showConfirmButton: true,
-		showCancelButton: true,
-		timer: 4000,
-		animation: "slide-from-top"
-	},async function(){//on confirm click
-		await createHedgeSubmit();
+		showCancelButton: true
+	},async function(value){
+		if (value) {
+			// Manually select input elements
+			const hedgeType = document.getElementById('hedgeType').value;
+			const tokenAddress = document.getElementById('tokenAddy').value;
+			const tokenAmount = document.getElementById('tokenAmount').value;
+			const premium = document.getElementById('premium').value;
+			const strikePrice = document.getElementById('strikePrice').value;
+
+			// Prepare the form values if needed
+			const values = {
+				hedgeType,
+				tokenAddress,
+				tokenAmount,
+				premium,
+				strikePrice,
+			};
+
+            // You can use 'values' as needed
+            console.log(values);
+
+            // Continue with your logic here
+            await setupWritingModule(values);
+
+        } else {
+            // Handle cancel or empty input
+            swal.close();
+        }
 	});
 }
 
@@ -412,6 +434,7 @@ async function createForm() {
 $(document).on('click', '#create_button', function(e){
 	createForm();
 });
+
 // Listeners: set sidebar globals
 $(document).on('click', '#statsLabel', async function(e){
 	window.sidebarTab = 1;
@@ -457,101 +480,175 @@ async function handlePaste(event) {
     }
 }
 
-async function fetchUserTokenBalance(tokenAddress){
-	const accounts = await getAccounts();
-    const userAddress = accounts[0];
-	//fetch balances for user under token address
-	const mybalances = await getUserBalancesForToken(tokenAddress, userAddress);
-	// format output
-	const formatValue = (value) => {
-		return `$${value.toFixed(2)}`;
-	};    
-	const formatString = (number) => {
-		return number.toLocaleString();
-	};    
-	const formatStringDecimal = (number) => {
-		const options = {
-			style: 'decimal',
-			minimumFractionDigits: 2,
-			maximumFractionDigits: 2,
-		};
-		return number.toLocaleString('en-US', options);
-	};
-	// Display balances in the HTML form
-	document.getElementById('depositedBalance').textContent = formatStringDecimal(mybalances.deposited);
-	document.getElementById('withdrawnBalance').textContent = formatStringDecimal(mybalances.withdrawn);
-	document.getElementById('lockedInUseBalance').textContent = formatStringDecimal(mybalances.lockedInUse);
-	document.getElementById('withdrawableBalance').textContent = formatStringDecimal(mybalances.withdrawableBalance);
+async function fetchUserTokenBalance(tokenAddress) {
+    try {
+        const accounts = await getAccounts();
+        const userAddress = accounts[0];
+        // fetch balances for user under token address
+        const mybalances = await getUserBalancesForToken(tokenAddress, userAddress);
+
+        // Handle undefined mybalances
+        if (!mybalances) {
+            // Set the displayed values to 0 if mybalances is undefined
+            document.getElementById('depositedBalance').textContent = '0.00';
+            document.getElementById('withdrawnBalance').textContent = '0.00';
+            document.getElementById('lockedInUseBalance').textContent = '0.00';
+            document.getElementById('withdrawableBalance').textContent = '0.00';
+            return;
+        }
+
+        // Format output
+        const formatStringDecimal = (number) => {
+            const options = {
+                style: 'decimal',
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+            };
+            return number.toLocaleString('en-US', options);
+        };
+
+        // Display balances in the HTML form
+        document.getElementById('depositedBalance').textContent = formatStringDecimal(mybalances.deposited || 0);
+        document.getElementById('withdrawnBalance').textContent = formatStringDecimal(mybalances.withdrawn || 0);
+        document.getElementById('lockedInUseBalance').textContent = formatStringDecimal(mybalances.lockedInUse || 0);
+        document.getElementById('withdrawableBalance').textContent = formatStringDecimal(mybalances.withdrawableBalance || 0);
+    } catch (error) {
+        console.error('Error fetching user token balance:', error);
+    }
 }
 
 //==============================================================
 // Move to writes module
 //==============================================================
+export async function setupWritingModule(formValues) {
+    // Get form inputs
+    const hedgeType = formValues['hedgeType'];
+    const tokenAddress = formValues['tokenAddress'];
+    const tokenAmount = formValues['tokenAmount'];
+    const premium = formValues['premium'];
+    const strikePrice = formValues['strikePrice'];
 
-// Submit call function to hedging contract to create hedge
-async function createHedgeSubmit() {
-	const accounts = await getAccounts();
-	if (accounts.length === 0) {
-	  alert('Please connect your wallet');
-	  return;
-	}
-  
-	// Get form inputs
-	const hedgeType = document.getElementById('hedgeType').value;
-	const tokenAddy = document.getElementById('tokenAddy').value;
-	const tokenAmount = parseFloat(document.getElementById('tokenAmount').value);
-	const cost = parseFloat(document.getElementById('premium').value);
-	const strikePrice = parseFloat(document.getElementById('strikePrice').value);
-  
-	// Validate form inputs
-	if (tokenAddy.length < 40 || !isValidEthereumAddress(tokenAddy)) {
-		alert('Invalid token address provided');
-		return;
-	}
-	if (!(tokenAmount > 0 && cost > 0 && strikePrice > 0)) {
-		alert('Invalid amounts provided');
-		return;
-	}
-	if (!(hedgeType == 0 || hedgeType == 1 || hedgeType == 2)) {
-		alert('Invalid hedge type');
-		return;
-	}
+	alert("hedgeType: " + hedgeType + "\ntokenAddress: " + tokenAddress + "\ntokenAmount: " + tokenAmount + "\npremium: " + premium + "\nstrikePrice: " + strikePrice);
     
-	// get token info and pair infor, price and cost is in pair currency	
-	const tokenDecimals = await getTokenDecimals(tokenAddress);
-	const tokenAmountWei = await fromDecimalToBigInt(tokenAmount, tokenDecimals);
-	// get dependency variables
-	const pairAddress = await hedgingInstance.getPairAddressZK(tokenAddress);
-	const pairInfo = await getTokenInfo(pairAddress.pairedCurrency);
-	const pairDecimals = pairInfo.decimals;
-	// prepare other inputs
-	const costWei = fromBigIntNumberToDecimal(cost, pairDecimals);
-	const strikePriceWei = fromBigIntNumberToDecimal(strikePrice, pairDecimals);
-
 	try {
-		// prepare Tx
-		const transaction = await hedgingInstance.connect(signer).createHedge(hedgeType, tokenAddy, tokenAmountWei, costWei, strikePriceWei);
-		// Wait for the transaction to be mined
-		const receipt = await transaction.wait();
+        // Validate form inputs
+        if (!isValidInput(hedgeType, tokenAddress, tokenAmount, premium, strikePrice)) {
+            return;
+        }
 
-		if (receipt.status === true) {
-			console.log('Transaction hash:', receipt.transactionHash);
-			handleTransactionSuccess(receipt.transactionHash); // Define this function as needed
-		} else {
-			console.log('Transaction failed. Receipt status:', receipt.status);
-			handleTransactionFailure(receipt.status); // Define this function as needed
-		}
-		
-	} catch (error) {
-		console.error('Transaction error:', error);
-		const text = error.message;
-		swal({
-			title: "Transaction error.",
-			type: "error",
-			confirmButtonColor: "#F27474",
-			text: text,
-		});
+        // Pass form values to write function
+        await submitWriting(hedgeType, tokenAddress, tokenAmount, premium, strikePrice);
+    } catch (error) {
+        console.error('Error:', error.message);
+    }
+}
+
+function isValidInput(hedgeType, tokenAddress, tokenAmount, premium, strikePrice) {
+    if (isNaN(tokenAmount) || parseFloat(tokenAmount) <= 0) {
+        showInvalidInputMessage('Invalid token amount. Please enter an amount greater than 0.');
+        return false;
+    }
+
+    if (!tokenAddress || !isValidEthereumAddress(tokenAddress)) {
+        showInvalidInputMessage('Invalid ERC20 token address. Please enter a valid address.');
+        return false;
+    }
+
+    if (isNaN(premium) || parseFloat(premium) <= 0) {
+        showInvalidInputMessage('Invalid premium. Please enter a premium greater than 0.');
+        return false;
+    }
+
+    if (isNaN(strikePrice) || parseFloat(strikePrice) <= 0) {
+        showInvalidInputMessage('Invalid strike price. Please enter a strike price greater than 0.');
+        return false;
+    }
+
+    return true;
+}
+
+function showInvalidInputMessage(message) {
+    swal({
+        title: 'Invalid Tx Inputs...',
+        text: message,
+        type: 'info',
+        html: false,
+        dangerMode: false,
+        confirmButtonText: 'Okay',
+        showConfirmButton: true,
+        showCancelButton: false,
+        animation: 'Pop',
+    }, function () {
+        console.log('Invalid input...');
+    });
+}
+
+async function submitWriting(hedgeType, tokenAddress, tokenAmount, premium, strikePrice) {
+    const accounts = await getAccounts();
+    if (accounts.length === 0) {
+        alert('Please connect your wallet');
+        return;
+    }
+    
+    // get token info and pair infor, price and cost are in pair currency
+    const tokenDecimals = await getTokenDecimals(tokenAddress);
+    const tokenAmountWei = fromDecimalToBigInt(tokenAmount, tokenDecimals);
+    // get dependency variables
+    const pairAddress = await hedgingInstance.getPairAddressZK(tokenAddress);
+	let pairDecimals;
+	if (pairAddress == CONSTANTS.wethAddress) {
+		pairDecimals = 18;
+	} else if (pairAddress == CONSTANTS.usdtAddress) {
+		pairDecimals = 6;
+	} else if (pairAddress == CONSTANTS.usdcAddress) {
+		pairDecimals = 6;
+	} else { // remove above hack when on mainnet with actual 18 decimal WETH not 6 on Sepolia
+		pairDecimals = await getTokenDecimals(pairAddress.pairedCurrency);
 	}
+
+    // prepare other inputs
+    const premiumWei = fromDecimalToBigInt(premium, pairDecimals);
+    const strikePriceWei = fromDecimalToBigInt(strikePrice, pairDecimals);
+
+    // Add deadline value
+	hedgeType = parseInt(hedgeType);
+    // Get the current timestamp in seconds & add 6 months for testing
+	const currentTimestamp = Math.floor(Date.now() / 1000);
+	const sixMonthsInSeconds = 6 * 30 * 24 * 60 * 60;
+	const deadline = currentTimestamp + sixMonthsInSeconds;
+
+	console.log('hedgeType: ' + hedgeType + '\ntokenAddress: ' + tokenAddress + '\ntokenAmountWei: ' + tokenAmountWei + '\npremiumWei: ' + premiumWei + '\nstrikePriceWei: ' + strikePriceWei + '\ndeadline: ' + deadline);
+
+    try {
+        // prepare Tx
+        const transaction = await hedgingInstance.connect(signer).createHedge(
+            hedgeType, //pass as integer, uint in solidity
+            tokenAddress, 
+            tokenAmountWei, 
+            premiumWei, 
+            deadline  //pass as integer, uint in solidity
+        );
+
+        // Wait for the transaction to be mined
+        const receipt = await transaction.wait();
+
+        if (receipt.status === 1) {
+            console.log('Transaction hash:', receipt.transactionHash);
+            handleTransactionSuccess(receipt.transactionHash); 
+        } else {
+            console.log('Transaction failed. Receipt status:', receipt.status);
+            handleTransactionFailure(receipt.status); 
+        }
+    } catch (error) {
+        console.error('Transaction error:', error);
+        const text = error.message;
+        swal({
+            title: 'Transaction error.',
+            type: 'error',
+            confirmButtonColor: '#F27474',
+            text: text,
+        });
+    }
 }
 
 function handleTransactionSuccess(transactionHash) {
@@ -581,15 +678,17 @@ function handleTransactionFailure(status) {
 
 
 // Listen to live events
-// ADD HEDGE MINED - to be used for live transactions on sidebar
-// when user searches or filters by token address, only events matching the address will be displayed/filtered
+// Eg: HEDGE created - to be used for live transactions on sidebar
+// Accepts only events 
 async function createEventListItem(event) {
-	const searchBarValue = getSearchBarValue();
+	console.log('raw event: ' + event);
+	const tokenAddress = event.returnValues.token;
+	const tokenAddressExists = false;
+    if (isValidEthereumAddress(tokenAddress)) {
+		tokenAddressExists = true;
+	}
 
-	// Check if the ERC20 token address exists in the search bar
-	const tokenAddressExists = (searchBarValue !== '' && event.returnValues.token === searchBarValue);
-
-	// If the token address exists in the search bar, display only matching list items
+	// If the token address exists, display only matching list items
 	if (tokenAddressExists) {
 		const listItem = document.createElement('li');
 		listItem.classList.add('event-item');
@@ -688,25 +787,25 @@ async function setupEventListening() {
 function handleHedgeCreatedEvent(token, hedgeID, createValue, type, owner) {
     const event = { returnValues: { token, hedgeID, createValue, type, owner } };
     const listItem = createEventListItem(event);
-    document.getElementById('eventsList').appendChild(listItem);
+    document.getElementById('scifiUI').appendChild(listItem);
 }
 
 function handleHedgePurchasedEvent(token, hedgeID, startValue, type, buyer) {
     const event = { returnValues: { token, hedgeID, startValue, type, buyer } };
     const listItem = createEventListItem(event);
-    document.getElementById('eventsList').appendChild(listItem);
+    document.getElementById('scifiUI').appendChild(listItem);
 }
 
 function handleHedgeSettledEvent(token, hedgeID, endValue, payOff, miner) {
     const event = { returnValues: { token, hedgeID, endValue, payOff, miner } };
     const listItem = createEventListItem(event);
-    document.getElementById('eventsList').appendChild(listItem);
+    document.getElementById('scifiUI').appendChild(listItem);
 }
 
 function handleMinedHedgeEvent(optionId, miner, token, paired, tokenFee, pairFee) {
     const event = { returnValues: { optionId, miner, token, paired, tokenFee, pairFee } };
     const listItem = createEventListItem(event);
-    document.getElementById('eventsList').appendChild(listItem);
+    document.getElementById('scifiUI').appendChild(listItem);
 }
 
 function handleHedgeCreatedSuccessEvent(token, optionId, amount, hedgeType, cost, tx_hash) {
