@@ -210,9 +210,9 @@ async function getUserBalancesForToken(tokenAddress, userAddress) {
   }
 }
 
-async function getPairToken(optionId) {
-  const result = await hedgingInstance.getHedgeDetails(optionId);
-  return result.paired;
+async function getPairToken(tokenAddress) {
+  const result = await hedgingInstance.getPairAddressZK(tokenAddress);
+  return result;
 }
 
 async function getAccounts() {
@@ -350,7 +350,8 @@ function fromDecimalToBigInt(number, decimals) {
   try {
       // Convert to string, only accepts string
       const numberString = number.toString();
-      const formattedValue = ethers.utils.parseUnits(numberString, decimals);
+      const decimalsString = decimals.toString();
+      const formattedValue = ethers.utils.parseUnits(numberString, decimalsString);
       return formattedValue.toString();
   } catch (error) {
       console.error("Error converting from Decimal to BigNumber:", error);
