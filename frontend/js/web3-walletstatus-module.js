@@ -15,18 +15,20 @@ async function initializeConnection() {
 	// 1. Set Provider and Contract instances
 	await initWeb3();
     // 2. Check Chain
-    let correctChain, unlockedWal = false;
+    let correctChain = false, unlockedWal = false;
 	try {
 		correctChain = await chainCheck();
 		console.log('initializing correct blockchain...'+correctChain)
 		if (correctChain) {
             //3. Start syncying block number
 			await currentBlock();
+			setInterval(() => currentBlock(), 40000);
 
 			//4. Initialize Wallet
 			unlockedWal = await unlockedWallet();
 			if (!unlockedWal) {
 				console.log('initializing failed, wallet locked..')
+                window.currentAccount = null;
 				return false; // Failed regardless
 			} else {
                 console.log('initializing success, wallet unlocked..')
@@ -69,9 +71,8 @@ async function handleAccountChange(wallets) {
             }
         });
     }
-    if (wallets[0] !== window.currentAccount) {
-        // global variable..sets to empty array if initialization fails on main page script 'pageModulesLoadingScript', 
-        // check above means: empty --> something === connected
+    if (wallets.length !== 0 || wallets[0] !== window.currentAccount) {
+        // global variable..sets to empty array if initialization fails wallet check above, 
         window.currentAccount = wallets[0];
         // Refresh connection message
         console.log("Wallet Connected:", wallets);
@@ -140,7 +141,7 @@ async function unlockedWallet() {
                 closeOnConfirm: true
             }, async function (isConfirm) {
                 if (isConfirm) {
-                    reqConnect(wallets);
+                    reqConnect(accounts);
                 }
             });
             return false;

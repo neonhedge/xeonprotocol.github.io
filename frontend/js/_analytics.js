@@ -41,7 +41,7 @@ $(document).ready(async function () {
 
     // load sections periodically
     setatmIntervalAsync(async () => {
-        await checkAndCallPageTries();
+        checkAndCallPageTries();
     }, 45000);
 });
 
@@ -50,18 +50,16 @@ $(document).ready(async function () {
 async function pageModulesLoadingScript() {
     let continueLoad = false;
     try {
-        continueLoad = await initializeConnection();
+        continueLoad = initializeConnection();
+		if (continueLoad) {
+			return true;
+		} else {
+			return false;
+		}
     } catch (error) {
         console.log(error);
+		return false;
     }
-    if (continueLoad) {
-        // Set up event listeners related to the page if any
-        return true;
-    } else {
-        // Force interface to indicate connection needs
-        handleAccountChange([]);
-    }
-    return false;
 }
 
 /* UNREFACTORED & REINFORCED - Depracated
@@ -206,19 +204,27 @@ function setInitial_TokenomicsChart() {
     BOTTOM OF EVERY MAIN SCRIPT MODULE 
 -------------------------------------- */
 // Provider Listeners
+// Provider Listeners
 ethereum.on("connect", (chainID) => {
 	// Update chainID on connect
 	CONSTANTS.chainID = chainID.chainId;
 	console.log("Connected to chain:", CONSTANTS.chainID);
 	handleNetworkChange(chainID.chainId)
+	chainCheck();
 });
 
-ethereum.on("accountsChanged", (accounts) => {
-	console.log("Account changed:", accounts);
-	handleAccountChange(accounts);
-
-    // Refresh page
-    checkAndCallPageTries();
+ethereum.on("accountsChanged", async (accounts) => {
+    console.log("Account changed:", accounts);
+	if(accounts.length > 0) {
+		handleAccountChange(accounts);
+		// Refresh accounts & page Feed
+		checkAndCallPageTries();
+	} else {
+		handleAccountChange(accounts);
+		// Refresh wallet widget directly, force wallet initialization check first		
+		window.currentAccount = null;
+		checkAndCallPageTries();
+	}
 });
 
 ethereum.on("chainChanged", (chainID) => {

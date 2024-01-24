@@ -5,7 +5,7 @@ import { CONSTANTS, getUserBalancesForToken, truncateAddress, getPairToken, getS
 import { initializeConnection, chainCheck, reqConnect, handleAccountChange, handleNetworkChange, popupSuccess} from './web3-walletstatus-module.js';
 import { getTokenInfo } from './module-wallet-tokenlist-dependencies.js';
 import { refreshDataOnElements, loadOptions, fetchOptionStrip, fetchNameSymbol, prepareTimestamp, noOptionsSwal } from './module-market-card-fetchers.js';
-import { loadSidebar, loadSidebarVolume_All, loadSidebarVolume_Token, loadPastEvents } from './module-market-sidebar-fetchers.js';
+import { loadSidebar, loadSidebarVolume_All, loadSidebarVolume_Token, loadPastEvents, prepareEventListItem } from './module-market-sidebar-fetchers.js';
 
 /*=========================================================================
     Wallet Page Main Functions
@@ -680,6 +680,7 @@ function handleTransactionFailure(status) {
 // Listen to live events
 // Eg: HEDGE created - to be used for live transactions on sidebar
 // Accepts only events 
+/* DEPRECATED
 async function createEventListItem(event) {
 	console.log('raw event: ' + event);
 	const tokenAddress = event.returnValues.token;
@@ -751,6 +752,7 @@ async function createEventListItem(event) {
 
   return listItem;
 }
+*/
 
 
 /*  ---------------------------------------
@@ -784,29 +786,30 @@ async function setupEventListening() {
     }
 }
 
-function handleHedgeCreatedEvent(token, hedgeID, createValue, type, owner) {
-    const event = { returnValues: { token, hedgeID, createValue, type, owner } };
-    const listItem = createEventListItem(event);
-    document.getElementById('scifiUI').appendChild(listItem);
+async function handleHedgeCreatedEvent(token, hedgeID, createValue, type, owner) {
+	const event = { returnValues: { token, hedgeID, createValue, type, owner } };
+	const listItem = await prepareEventListItem(event, "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef");
+	document.getElementById('scifiUI').appendChild(listItem);
 }
-
-function handleHedgePurchasedEvent(token, hedgeID, startValue, type, buyer) {
-    const event = { returnValues: { token, hedgeID, startValue, type, buyer } };
-    const listItem = createEventListItem(event);
-    document.getElementById('scifiUI').appendChild(listItem);
+  
+async function handleHedgePurchasedEvent(token, hedgeID, startValue, type, buyer) {
+	const event = { returnValues: { token, hedgeID, startValue, type, buyer } };
+	const listItem = await prepareEventListItem(event, "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef");
+	document.getElementById('scifiUI').appendChild(listItem);
 }
-
-function handleHedgeSettledEvent(token, hedgeID, endValue, payOff, miner) {
-    const event = { returnValues: { token, hedgeID, endValue, payOff, miner } };
-    const listItem = createEventListItem(event);
-    document.getElementById('scifiUI').appendChild(listItem);
+  
+async function handleHedgeSettledEvent(token, hedgeID, endValue, payOff, miner) {
+	const event = { returnValues: { token, hedgeID, endValue, payOff, miner } };
+	const listItem = await prepareEventListItem(event, "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef");
+	document.getElementById('scifiUI').appendChild(listItem);
 }
-
-function handleMinedHedgeEvent(optionId, miner, token, paired, tokenFee, pairFee) {
-    const event = { returnValues: { optionId, miner, token, paired, tokenFee, pairFee } };
-    const listItem = createEventListItem(event);
-    document.getElementById('scifiUI').appendChild(listItem);
+  
+async function handleMinedHedgeEvent(optionId, miner, token, paired, tokenFee, pairFee) {
+	const event = { returnValues: { optionId, miner, token, paired, tokenFee, pairFee } };
+	const listItem = await prepareEventListItem(event, "0x123456789abcdef");
+	document.getElementById('scifiUI').appendChild(listItem);
 }
+  
 
 function handleHedgeCreatedSuccessEvent(token, optionId, amount, hedgeType, cost, tx_hash) {
     const outputCurrency = ''; // using nonTxBased message with empty currency
@@ -833,12 +836,14 @@ ethereum.on("connect", (chainID) => {
 ethereum.on("accountsChanged", async (accounts) => {
     console.log("Account changed:", accounts);
 	if(accounts.length > 0) {
+		handleAccountChange(accounts);
 		// Refresh accounts & page Feed
 		checkAndCallPageTries();
 		loadOptions();
 	} else {
-		// Refresh wallet widget directly		
 		handleAccountChange(accounts);
+		// Refresh wallet widget directly, force wallet initialization check first		
+		window.currentAccount = null;
 		checkAndCallPageTries();
 	}
 });

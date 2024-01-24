@@ -387,20 +387,22 @@ document.addEventListener('click', function (event) {
 ----------------------------------------*/
 // Provider Listeners
 ethereum.on("connect", (chainID) => {
-	// Update chainID on connect
 	CONSTANTS.chainID = chainID.chainId;
 	console.log("Connected to chain:", CONSTANTS.chainID);
-	handleNetworkChange(chainID.chainId);
-    chainCheck();
+	handleNetworkChange(chainID.chainId)
+	chainCheck();
 });
 
 ethereum.on("accountsChanged", async (accounts) => {
     console.log("Account changed:", accounts);
-	if(accounts.length == 0) {
-		// Refresh wallet widget directly
+	if(accounts.length > 0) {
 		handleAccountChange(accounts);
-	} else {
 		// Refresh accounts & page Feed
+		checkAndCallPageTries();
+	} else {
+		handleAccountChange(accounts);
+		// Refresh wallet widget directly, force wallet initialization check first		
+		window.currentAccount = null;
 		checkAndCallPageTries();
 	}
 });
@@ -410,5 +412,4 @@ ethereum.on("chainChanged", (chainID) => {
 	handleNetworkChange(chainID);
 	window.location.reload();
 });
-
 
