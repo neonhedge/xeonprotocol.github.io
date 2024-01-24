@@ -201,8 +201,8 @@ async function loadSidebarVolume_Token(tokenAddress) {
 
     // Show loading animation
     const pastEventsContainer = $('#scifiUI');
-	pastEventsContainer.empty();
-	pastEventsContainer.append('<i class="loading"></i>');
+	  pastEventsContainer.empty();
+	  pastEventsContainer.append('<i class="loading"></i>');
     
     const fromBlock = 0;
     const toBlock = "latest";
@@ -211,23 +211,6 @@ async function loadSidebarVolume_Token(tokenAddress) {
     const filter_hedgePurchased = await hedgingInstance.filters.hedgePurchased();
     const filter_hedgeSettled = await hedgingInstance.filters.hedgeSettled();
     const filter_minedHedge = await hedgingInstance.filters.minedHedge();
-  
-    // Listen to events
-    hedgingInstance.on(filter_hedgeCreated, (token, hedgeID, createValue, type, owner) => {
-      prepareEventListItem({ returnValues: { createValue, writer: owner }, transactionHash: "" }, "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef");
-    });
-  
-    hedgingInstance.on(filter_hedgePurchased, (token, hedgeID, payOff, type, buyer) => {
-      prepareEventListItem({ returnValues: { payOff, buyer }, transactionHash: "" }, "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef");
-    });
-  
-    hedgingInstance.on(filter_hedgeSettled, (token, hedgeID, endValue, payOff, miner) => {
-      prepareEventListItem({ returnValues: { endValue, payOff, miner }, transactionHash: "" }, "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef");
-    });
-  
-    hedgingInstance.on(filter_minedHedge, (optionId, miner, token, paired, tokenFee, pairFee) => {
-      prepareEventListItem({ returnValues: { payOff, miner }, transactionHash: "" }, "0x123456789abcdef");
-    });
   
     // Set fromBlock and toBlock for filters
     filter_hedgeCreated.fromBlock = fromBlock;
@@ -387,4 +370,4 @@ async function prepareEventListItem(event, eventTopic) {
 }
 
 
-export { loadSidebar, loadSidebarVolume_All, loadSidebarVolume_Token, loadPastEvents }
+export { loadSidebar, loadSidebarVolume_All, loadSidebarVolume_Token, loadPastEvents, prepareEventListItem }

@@ -765,51 +765,37 @@ $(document).ready(async function () {
 });
 
 async function setupEventListening() {
-	let hedgingInstance = window.hedgingInstance;
-	
+	const hedgingInstance = window.hedgingInstance;
+  
 	// Hedging Events
 	try {
-        const filter_hedgeCreated = await hedgingInstance.filters.hedgeCreated();
-        hedgingInstance.on(filter_hedgeCreated, handleHedgeCreatedEvent);
-
-        const filter_hedgePurchased = await hedgingInstance.filters.hedgePurchased();
-        hedgingInstance.on(filter_hedgePurchased, handleHedgePurchasedEvent);
-
-        const filter_hedgeSettled = await hedgingInstance.filters.hedgeSettled();
-        hedgingInstance.on(filter_hedgeSettled, handleHedgeSettledEvent);
-
-        const filter_minedHedge = await hedgingInstance.filters.minedHedge();
-        hedgingInstance.on(filter_minedHedge, handleMinedHedgeEvent);
-
-    } catch (error) {
-        console.error('Error setting up event listening:', error);
-    }
-}
-
-async function handleHedgeCreatedEvent(token, hedgeID, createValue, type, owner) {
-	const event = { returnValues: { token, hedgeID, createValue, type, owner } };
-	const listItem = await prepareEventListItem(event, "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef");
-	document.getElementById('scifiUI').appendChild(listItem);
-}
+	  const filter_hedgeCreated = await hedgingInstance.filters.hedgeCreated();
+	  hedgingInstance.on(filter_hedgeCreated, async (event) => {
+		const listItem = await prepareEventListItem(event, "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef");
+		document.getElementById('scifiUI').appendChild(listItem);
+	  });
   
-async function handleHedgePurchasedEvent(token, hedgeID, startValue, type, buyer) {
-	const event = { returnValues: { token, hedgeID, startValue, type, buyer } };
-	const listItem = await prepareEventListItem(event, "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef");
-	document.getElementById('scifiUI').appendChild(listItem);
-}
+	  const filter_hedgePurchased = await hedgingInstance.filters.hedgePurchased();
+	  hedgingInstance.on(filter_hedgePurchased, async (event) => {
+		const listItem = await prepareEventListItem(event, "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef");
+		document.getElementById('scifiUI').appendChild(listItem);
+	  });
   
-async function handleHedgeSettledEvent(token, hedgeID, endValue, payOff, miner) {
-	const event = { returnValues: { token, hedgeID, endValue, payOff, miner } };
-	const listItem = await prepareEventListItem(event, "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef");
-	document.getElementById('scifiUI').appendChild(listItem);
-}
+	  const filter_hedgeSettled = await hedgingInstance.filters.hedgeSettled();
+	  hedgingInstance.on(filter_hedgeSettled, async (event) => {
+		const listItem = await prepareEventListItem(event, "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef");
+		document.getElementById('scifiUI').appendChild(listItem);
+	  });
   
-async function handleMinedHedgeEvent(optionId, miner, token, paired, tokenFee, pairFee) {
-	const event = { returnValues: { optionId, miner, token, paired, tokenFee, pairFee } };
-	const listItem = await prepareEventListItem(event, "0x123456789abcdef");
-	document.getElementById('scifiUI').appendChild(listItem);
-}
-  
+	  const filter_minedHedge = await hedgingInstance.filters.minedHedge();
+	  hedgingInstance.on(filter_minedHedge, async (event) => {
+		const listItem = await prepareEventListItem(event, "0x123456789abcdef");
+		document.getElementById('scifiUI').appendChild(listItem);
+	  });
+	} catch (error) {
+	  console.error('Error setting up event listening:', error);
+	}
+}  
 
 function handleHedgeCreatedSuccessEvent(token, optionId, amount, hedgeType, cost, tx_hash) {
     const outputCurrency = ''; // using nonTxBased message with empty currency
