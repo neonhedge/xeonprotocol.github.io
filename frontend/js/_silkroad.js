@@ -662,7 +662,6 @@ function handleTransactionSuccess(transactionHash) {
 	  allowOutsideClick: true,
 	  text: message,
 	});
-	swal.close();
 }
   
 function handleTransactionFailure(status) {
@@ -765,37 +764,68 @@ $(document).ready(async function () {
 });
 
 async function setupEventListening() {
-	const hedgingInstance = window.hedgingInstance;
-  
+	let hedgingInstance = window.hedgingInstance;
+	
 	// Hedging Events
 	try {
-	  const filter_hedgeCreated = await hedgingInstance.filters.hedgeCreated();
-	  hedgingInstance.on(filter_hedgeCreated, async (event) => {
-		const listItem = await prepareEventListItem(event, "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef");
-		document.getElementById('scifiUI').appendChild(listItem);
-	  });
+        const filter_hedgeCreated = await hedgingInstance.filters.hedgeCreated();
+        hedgingInstance.on(filter_hedgeCreated, handleHedgeCreatedEvent);
+
+        const filter_hedgePurchased = await hedgingInstance.filters.hedgePurchased();
+        hedgingInstance.on(filter_hedgePurchased, handleHedgePurchasedEvent);
+
+        const filter_hedgeSettled = await hedgingInstance.filters.hedgeSettled();
+        hedgingInstance.on(filter_hedgeSettled, handleHedgeSettledEvent);
+
+        const filter_minedHedge = await hedgingInstance.filters.minedHedge();
+        hedgingInstance.on(filter_minedHedge, handleMinedHedgeEvent);
+
+    } catch (error) {
+        console.error('Error setting up event listening:', error);
+    }
+}
+/* GitHub https://github.com/ethers-io/ethers.js/issues/1307
+hedgingInstance.on(filter_hedgeCreated, async (...args) => {
+	console.log(args[args.length - 1].transactionHash);
+});
+*/
+async function handleHedgeCreatedEvent(token, optionId, createValue, type, writer, transactionHash) {
+	
+	const event = { 
+		returnValues: { token, optionId, createValue, type, writer },
+		event: 'hedgeCreated',
+		transactionHash: transactionHash.transactionHash
+	};
+	//console.log(transactionHash.transactionHash);
+	const listItem = await prepareEventListItem(event, "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef");
+}
   
-	  const filter_hedgePurchased = await hedgingInstance.filters.hedgePurchased();
-	  hedgingInstance.on(filter_hedgePurchased, async (event) => {
-		const listItem = await prepareEventListItem(event, "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef");
-		document.getElementById('scifiUI').appendChild(listItem);
-	  });
-  
-	  const filter_hedgeSettled = await hedgingInstance.filters.hedgeSettled();
-	  hedgingInstance.on(filter_hedgeSettled, async (event) => {
-		const listItem = await prepareEventListItem(event, "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef");
-		document.getElementById('scifiUI').appendChild(listItem);
-	  });
-  
-	  const filter_minedHedge = await hedgingInstance.filters.minedHedge();
-	  hedgingInstance.on(filter_minedHedge, async (event) => {
-		const listItem = await prepareEventListItem(event, "0x123456789abcdef");
-		document.getElementById('scifiUI').appendChild(listItem);
-	  });
-	} catch (error) {
-	  console.error('Error setting up event listening:', error);
-	}
-}  
+async function handleHedgePurchasedEvent(token, optionId, startValue, type, buyer, transactionHash) {
+	const event = {
+		returnValues: { token, optionId, startValue, type, buyer },
+		event: 'hedgePurchased',
+		transactionHash: transactionHash.transactionHash
+	};
+	const listItem = await prepareEventListItem(event, "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef");
+}
+
+async function handleHedgeSettledEvent(token, optionId, endValue, payOff, miner, transactionHash) {
+	const event = {
+		returnValues: { token, optionId, endValue, payOff, miner },
+		event: 'hedgeSettled',
+		transactionHash: transactionHash.transactionHash
+	};
+	const listItem = await prepareEventListItem(event, "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef");
+}
+
+async function handleMinedHedgeEvent(optionId, miner, token, paired, tokenFee, pairFee, transactionHash) {
+	const event = {
+		returnValues: { optionId, miner, token, paired, tokenFee, pairFee },
+		event: 'minedHedge',
+		transactionHash: transactionHash.transactionHash
+	};
+	const listItem = await prepareEventListItem(event, "0x123456789abcdef");
+}
 
 function handleHedgeCreatedSuccessEvent(token, optionId, amount, hedgeType, cost, tx_hash) {
     const outputCurrency = ''; // using nonTxBased message with empty currency

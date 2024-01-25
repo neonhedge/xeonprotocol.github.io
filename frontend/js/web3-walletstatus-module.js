@@ -22,7 +22,6 @@ async function initializeConnection() {
 		if (correctChain) {
             //3. Start syncying block number
 			await currentBlock();
-			setInterval(() => currentBlock(), 40000);
 
 			//4. Initialize Wallet
 			unlockedWal = await unlockedWallet();
@@ -34,7 +33,6 @@ async function initializeConnection() {
                 console.log('initializing success, wallet unlocked..')
                 // not crucial to await, slows page coz of price api
 				walletCheckProceed();
-				setInterval(() => walletCheckProceed(), 40000);
 				return true; // Passed all Checks
 			}
 		} else {			
@@ -197,9 +195,12 @@ async function currentBlock() {
         console.log('block number: ', block);
         return true;
     } catch (error) {
-        console.log('block error:'+error);
+        console.log('block error:' + error);
         $('.dot').css({ 'background-color': '#ec0624' });
         return false;
+    } finally {
+        // Schedule the next execution after a delay to avoid overlaps
+        setTimeout(() => currentBlock(), 20000);
     }
 }
 

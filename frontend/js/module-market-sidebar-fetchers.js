@@ -271,102 +271,108 @@ async function decodeEvent(event, hedgingInstance) {
 
   return decodedValues;
 }
-
+// Accepts Object & eventTopic
+// Objects from past events and live events
+// Live events use custom object: {returnedValues: {optionId, user, token, paired, event: event}, past events: {event: event, event:data, event:topics}}
 async function prepareEventListItem(event, eventTopic) {
-  console.log('past events: ', event);
+  //console.log(`Preparing event list item: ${event}, ${eventTopic}`);
 
-  // Display the events in the sidebar div
-  const sidebarDiv = document.getElementById('scifiUI');
-  // Create the list item
-  const listItem = document.createElement('li');
+	// Display the events in the sidebar div
+	const sidebarDiv = document.getElementById('scifiUI');
+	// Create the list item
+	const listItem = document.createElement('li');
 
-  // Event title
-  const titleSpan = document.createElement('span');
-  titleSpan.textContent = event.event;
-  titleSpan.title = 'Event Topic: ' + eventTopic;
-  listItem.appendChild(titleSpan);
+	// Event title
+	const titleSpan = document.createElement('span');
+	titleSpan.textContent = event.event || ''; // Check if event.event is present
+	titleSpan.title = 'Event Topic: ' + eventTopic;
+	listItem.appendChild(titleSpan);
 
-  // Decode event data using ABI
-  const decodedValues = await hedgingInstance.interface.decodeEventLog(event.event, event.data, event.topics);
-  console.log(decodedValues);
+	let decodedValues;
+	if (event.returnValues) {
+    //console.log('returnValues: ', event.returnValues);
+		// Use returnValues directly if available
+		decodedValues = event.returnValues;
+	} else {
+		// Decode event data using ABI
+		decodedValues = await hedgingInstance.interface.decodeEventLog(
+			event.event,
+			event.data,
+			event.topics
+		);
+	}
+  
+  //console.log('decodedValues: ', decodedValues);
 
-  // Prep dependencies
-  const pairToken = await getPairToken(decodedValues.token);// returns array
-  const pairedCurrency = pairToken[1];
-  const pairTokenSymbol = await getSymbol(pairedCurrency);
-  let tokenDecimals;
-  if(pairedCurrency == CONSTANTS.wethAddress) {
-    tokenDecimals = 18;
-  } else if(pairedCurrency == CONSTANTS.usdtAddress || pairedCurrency == CONSTANTS.usdcAddress) {
-    tokenDecimals = 6;
-  }
-  const optionId = decodedValues.optionId._hex; // Access _hex property
-  const optionIdDecimal = parseInt(optionId, 16).toString(); // Convert hex to decimal
+	// Prep dependencies
+	const pairToken = await getPairToken(decodedValues.token); // returns array
+	const pairedCurrency = pairToken[1];
+	const pairTokenSymbol = await getSymbol(pairedCurrency);
+	let tokenDecimals;
+	if (pairedCurrency == CONSTANTS.wethAddress) {
+		tokenDecimals = 18;
+	} else if (pairedCurrency == CONSTANTS.usdtAddress || pairedCurrency == CONSTANTS.usdcAddress) {
+		tokenDecimals = 6;
+	}
+	const optionId = decodedValues.optionId._hex; // Access _hex property if available
+	const optionIdDecimal = optionId ? parseInt(optionId, 16).toString() : 0; // Convert hex to decimal if available
 
-  let createValue;
-  let payOff;
-  let endValue;
+	// Convert amounts and values
+	const amountSpan = document.createElement('span');
+	amountSpan.title = 'Hover for details';
 
-  // Convert values to decimals based on the pair address
-  let createValueDecimal;
-  let payOffDecimal;
-  let endValueDecimal;
+	switch (event.event) {
+		case 'hedgeCreated':
+			const createValueHex = decodedValues.createValue._hex;
+			const createValueDecimal = fromBigIntNumberToDecimal(createValueHex, tokenDecimals);
+			amountSpan.textContent = createValueDecimal + ' ' + pairTokenSymbol;
+			amountSpan.title = 'Create Value: ' + createValueDecimal + ' ' + pairTokenSymbol;
+			break;
+		case 'hedgePurchased':
+			const payOffHex = decodedValues.payOff._hex;
+			const payOffDecimal = fromBigIntNumberToDecimal(payOffHex, tokenDecimals);
+			amountSpan.textContent = payOffDecimal + ' ' + pairTokenSymbol;
+			amountSpan.title = 'Pay Off: ' + payOffDecimal + ' ' + pairTokenSymbol;
+			break;
+		case 'hedgeSettled':
+			const endValueHex = decodedValues.endValue._hex;
+			const endValueDecimal = fromBigIntNumberToDecimal(endValueHex, tokenDecimals);
+			amountSpan.textContent = endValueDecimal + ' ' + pairTokenSymbol;
+			amountSpan.title = 'End Value: ' + endValueDecimal + ' ' + pairTokenSymbol;
+			break;
+		case 'minedHedge':
+			const minedPayOffHex = decodedValues.payOff._hex;
+			const minedPayOffDecimal = fromBigIntNumberToDecimal(minedPayOffHex, tokenDecimals);
+			amountSpan.textContent = minedPayOffDecimal + ' ' + pairTokenSymbol;
+			amountSpan.title = 'Pay Off: ' + minedPayOffDecimal + ' ' + pairTokenSymbol;
+			break;
+		default:
+			break;
+	}
 
-  // Convert amounts and values
-  const amountSpan = document.createElement('span');
-  amountSpan.title = 'Hover for details';
-  switch (event.event) {
-    case 'hedgeCreated':
-      createValue = decodedValues.createValue._hex;
-      // Convert values to decimals based on the pair address: accepts hex
-      const createValueDecimal = fromBigIntNumberToDecimal(createValue, tokenDecimals);
-      amountSpan.textContent = createValueDecimal + ' ' + pairTokenSymbol;
-      amountSpan.title = 'Create Value: ' + createValueDecimal + ' ' + pairTokenSymbol;
-      break;
-    case 'hedgePurchased':
-      payOff = decodedValues.payOff._hex;
-      // Convert values to decimals based on the pair address
-      payOffDecimal = fromBigIntNumberToDecimal(payOff, tokenDecimals);
-      amountSpan.textContent = payOffDecimal + ' ' + pairTokenSymbol;
-      amountSpan.title = 'Pay Off: ' + payOffDecimal + ' ' + pairTokenSymbol;
-      break;
-    case 'hedgeSettled':
-      endValue = decodedValues.endValue._hex
-      // Convert values to decimals based on the pair address
-      endValueDecimal = fromBigIntNumberToDecimal(endValue, tokenDecimals);
-      amountSpan.textContent = endValueDecimal + ' ' + pairTokenSymbol;
-      amountSpan.title = 'End Value: ' + endValueDecimal + ' ' + pairTokenSymbol;
-      break;
-    case 'minedHedge':
-      payOff = decodedValues.payOff._hex;
-      // Convert values to decimals based on the pair address
-      payOffDecimal = fromBigIntNumberToDecimal(payOff, tokenDecimals);
-      amountSpan.textContent = payOffDecimal + ' ' + pairTokenSymbol;
-      amountSpan.title = 'Pay Off: ' + payOffDecimal + ' ' + pairTokenSymbol;
-      break;
-    default:
-      break;
-  }
-  listItem.appendChild(amountSpan);
+	listItem.appendChild(amountSpan);
 
-  // Address
+	/* Dealer
   const dealerSpan = document.createElement('span');
-  dealerSpan.textContent = truncateAddress(decodedValues.writer || decodedValues.buyer || decodedValues.miner);
+  const dealerAddress = decodedValues.writer || decodedValues.buyer || decodedValues.miner;
+  dealerSpan.textContent = truncateAddress(dealerAddress);
   dealerSpan.title = 'ERC20 Asset';
   listItem.appendChild(dealerSpan);
+  */
 
-  // Link
-  const txSpan = document.createElement('span');
-  const link = document.createElement('a');
-  link.href = 'https://sepolia.etherscan.io/tx/' + event.transactionHash;
-  link.textContent = 'Transaction';
-  link.target = '_blank'; // Add this line to set the target attribute
-  txSpan.appendChild(link);
-  txSpan.title = 'Transaction Link';
-  listItem.appendChild(txSpan);
+	// Link
+	const txSpan = document.createElement('span');
+	const link = document.createElement('a');
+	link.href = 'https://sepolia.etherscan.io/tx/' + event.transactionHash;
+	link.textContent = 'Transaction';
+	link.target = '_blank'; // Add this line to set the target attribute
+	txSpan.appendChild(link);
+	txSpan.title = 'Transaction Link';
+	listItem.appendChild(txSpan);
 
-  // Add list item to the sidebar
-  sidebarDiv.appendChild(listItem);
+	// Add list item to the top of the sidebar
+  sidebarDiv.insertBefore(listItem, sidebarDiv.firstChild);
+
 }
 
 
