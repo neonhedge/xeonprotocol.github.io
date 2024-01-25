@@ -2,7 +2,7 @@
     Import modules
 ==========================================================================*/
 import { CONSTANTS } from './constants.js';
-import { initializeConnection, handleAccountChange, handleNetworkChange} from './web3-walletstatus-module.js';
+import { initializeConnection, chainCheck, handleAccountChange, handleNetworkChange} from './web3-walletstatus-module.js';
 import { setCurrent_TrafficSection, setCurrent_HedgeSection, setCurrent_EarningsSection, setCurrent_StakedSection, setCurrent_TokenomicsSection } from './module-analytics-section-fetchers.js';
 import { updateChartValues_Cashier, updateChartValues_Currencies, updateChartValues_hedges, updateChartValues_Revenue, updateChartValues_Dividents, updateChartValues_Claims, updateChartValues_Staking, updateChartValues_Tokenomics } from './module-analytics-chart-updaters.js';
 
@@ -209,8 +209,8 @@ ethereum.on("connect", (chainID) => {
 	// Update chainID on connect
 	CONSTANTS.chainID = chainID.chainId;
 	console.log("Connected to chain:", CONSTANTS.chainID);
-	handleNetworkChange(chainID.chainId)
-	chainCheck();
+	handleNetworkChange(chainID.chainId);
+    chainCheck();
 });
 
 ethereum.on("accountsChanged", async (accounts) => {

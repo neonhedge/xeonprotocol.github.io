@@ -245,7 +245,7 @@ async function loadOptions(){
 				}
 				MyGlobals.startIndex = MyGlobals.lastItemIndex - window.readLimit - 1;
 			} else { // Start from the latest item in the array, our solidity reads incrementally so subtract window.readLimit -1 point to pick correct starting point for reads
-				let allSwapsLength = await hedgingInstance.getAllSwapsLength();
+				let allSwapsLength = await hedgingInstance.equityswapsCreatedLength();
 				MyGlobals.startIndex = allSwapsLength - window.readLimit - 1;
 				if(MyGlobals.startIndex < 0){MyGlobals.startIndex = 0;}
 			}
