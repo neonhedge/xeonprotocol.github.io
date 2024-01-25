@@ -1,7 +1,7 @@
 /*=========================================================================
     Import modules
 ==========================================================================*/
-import { CONSTANTS, getUserBalancesForToken, truncateAddress, fromBigIntNumberToDecimal, fromDecimalToBigInt, getAccounts, getTokenDecimalAndSymbol, getSymbol } from './constants.js';
+import { CONSTANTS, getUserBalancesForToken, truncateAddress, fromBigIntNumberToDecimal, fromDecimalToBigInt, getAccounts, getTokenDecimalAndSymbol, getSymbol, getTokenDecimals } from './constants.js';
 import { initializeConnection } from './web3-walletstatus-module.js';
 
 /*======================================================
@@ -434,7 +434,9 @@ async function withdrawInterface(tokenAddress, tokenAmount) {
         const walletBalance = mybalances.withdrawableBalance;
         const tokenAmountString = formatStringDecimal(tokenAmount);
         const walletBalanceString = formatStringDecimal(walletBalance);
-        const tokenAmountBigInt = fromDecimalToBigInt(tokenAmount);
+
+        const tokenDecimals = await getTokenDecimals(tokenAddress);
+        const tokenAmountBigInt = fromDecimalToBigInt(tokenAmount, tokenDecimals);
         // symbol for messages
         const symbol = await getSymbol(tokenAddress);
 
