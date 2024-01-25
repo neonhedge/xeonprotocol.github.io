@@ -1,10 +1,12 @@
 import { MyGlobals } from './_silkroad.js';
-import { CONSTANTS, getUserBalancesForToken, truncateAddress, commaNumbering, fromWeiToFixed5, getTokenDecimals, isValidEthereumAddress, fromDecimalToBigInt, fromBigIntNumberToDecimal } from './constants.js';
+import { CONSTANTS, getAccounts, getUserBalancesForToken, truncateAddress, commaNumbering, fromWeiToFixed5, getTokenDecimals, isValidEthereumAddress, fromDecimalToBigInt, fromBigIntNumberToDecimal } from './constants.js';
 
 async function refreshDataOnElements() {
 	// Fetch data for all items in MyGlobals.outputArray concurrently
 	const promises = MyGlobals.outputArray.map(async (optionId) => {
 		const result = await hedgingInstance.getHedgeDetails(optionId);
+		// token address
+		const tokenAddress = result.token;
 		// Convert timestamp to human-readable dates
 		const dt_created = new Date(result.dt_created * 1000).toLocaleString();
 		const dt_started = new Date(result.dt_started * 1000).toLocaleString();
@@ -32,7 +34,7 @@ async function refreshDataOnElements() {
 		//..if option is taken then show start and market price
 		const [marketvalue, pairedAddress] = await hedgingInstance.getUnderlyingValue(tokenAddress, result.amount);
 		const element = $(`#${optionId}buyButton`);
-		let profit = marketvalue - (result.startvalue + result.cost);
+		let profit = marketvalue - (startValueBN + costBN);
 		let borderColor = '';
 		let boxShadowColor = '';
 		let textColor = '';
@@ -41,10 +43,10 @@ async function refreshDataOnElements() {
 
 		if (result.status === 2) {
 			const neonGlow = Math.round(profit / 10); // Adjust neon glow proportionally
-			borderColor = marketvalue >= result.startvalue + result.cost ? '#00ff00' : '#ff0000';
+			borderColor = marketvalue >= startValueBN + costBN ? '#00ff00' : '#ff0000';
 			boxShadowColor = borderColor;
 			textColor = borderColor;
-			backgroundImage = marketvalue >= result.startvalue + result.cost ? `url(${MyGlobals.profitBg})` : `url(${MyGlobals.lossBg})`;
+			backgroundImage = marketvalue >= startValueBN + costBN ? `url(${MyGlobals.profitBg})` : `url(${MyGlobals.lossBg})`;
 			newText = profit >= 0 ? `+${profit}` : `${profit}`; // Add "+" sign for positive profit, remove for negative profit
 			element.css({
 				'background-image': backgroundImage,
@@ -69,6 +71,9 @@ async function refreshDataOnElements() {
 //will load from last index only to a certain limit
 
 async function loadOptions(){
+
+	const accounts = await getAccounts();
+    const userAddress = accounts[0];
 
 	// Show loading animation on timeline
 	const timelineContainer = $('#hedgesTimeline');
@@ -96,7 +101,7 @@ async function loadOptions(){
 			if (optionsArray.length > 0) {
 				$('#hedgesTimeline').empty();		
 				// Update MyGlobals.outputArray directly
-				MyGlobals.MyGlobals.outputArray.push(...optionsArray);		
+				MyGlobals.outputArray.push(...optionsArray);		
 				for (const hedgeID of optionsArray) {
 					await fetchOptionCard(hedgeID);
 				}		
@@ -128,7 +133,7 @@ async function loadOptions(){
 				$('#hedgesTimeline').empty();
 			
 				// Update MyGlobals.outputArray directly
-				MyGlobals.MyGlobals.outputArray.push(...vacantOptionsArray);
+				MyGlobals.outputArray.push(...vacantOptionsArray);
 			
 				for (const hedgeID of vacantOptionsArray) {
 				  await fetchOptionCard(hedgeID);
@@ -150,9 +155,9 @@ async function loadOptions(){
 			}
 			MyGlobals.startIndex = MyGlobals.lastItemIndex - 1 - window.readLimit;
 		} else {
-			let myhedgesCreatedArray = await hedgingInstance.myoptionsCreated(MyGlobals.wallet);
+			let myhedgesCreatedArray = await hedgingInstance.myoptionsCreated(userAddress);
 			let myhedgesCreatedLength = myhedgesCreatedArray.length;
-			let myhedgesTakenArray = await hedgingInstance.myoptionsTaken(MyGlobals.wallet);
+			let myhedgesTakenArray = await hedgingInstance.myoptionsTaken(userAddress);
 			let myhedgesTakenLength = myhedgesTakenArray.length;
 		
 			MyGlobals.startIndex = Math.max(myhedgesCreatedLength, myhedgesTakenLength) - 1 - window.readLimit;
@@ -160,8 +165,8 @@ async function loadOptions(){
 		}
 		
 		// Fetch both created and taken options for use in combined array
-		let optionsCreatedArray = await hedgingInstance.getUserOptionsCreated(MyGlobals.wallet, MyGlobals.startIndex, window.readLimit);
-		let optionsTakenArray = await hedgingInstance.getUserOptionsTaken(MyGlobals.wallet, MyGlobals.startIndex, window.readLimit);
+		let optionsCreatedArray = await hedgingInstance.getUserOptionsCreated(userAddress, MyGlobals.startIndex, window.readLimit);
+		let optionsTakenArray = await hedgingInstance.getUserOptionsTaken(userAddress, MyGlobals.startIndex, window.readLimit);
 		
 		// Combine and sort the arrays
 		let allOptionsArray = [...optionsCreatedArray, ...optionsTakenArray].sort((a, b) => a - b);
@@ -171,7 +176,7 @@ async function loadOptions(){
 			$('#hedgesTimeline').empty();
 		
 			// Update MyGlobals.outputArray directly
-			MyGlobals.MyGlobals.outputArray.push(...allOptionsArray);
+			MyGlobals.outputArray.push(...allOptionsArray);
 		
 			for (const hedgeID of allOptionsArray) {
 				await fetchOptionCard(hedgeID);
@@ -187,11 +192,11 @@ async function loadOptions(){
 
 	//BOOKMARKED HEDGES
 	if(window.nav === 1 && window.filters === 3){//get my bookmarks
-		let optionsArray = await hedgingInstance.getmyBookmarks(MyGlobals.wallet);
+		let optionsArray = await hedgingInstance.getmyBookmarks(userAddress);
 		if(optionsArray.length > 0){
 			$('#hedgesTimeline').empty();
 			// Update MyGlobals.outputArray directly
-			MyGlobals.MyGlobals.outputArray.push(...optionsArray);
+			MyGlobals.outputArray.push(...optionsArray);
 
 			//for each element in array
 			let array = optionsArray;
@@ -228,7 +233,7 @@ async function loadOptions(){
 			if (optionsArray.length > 0) {
 				$('#hedgesTimeline').empty();		
 				// Update MyGlobals.outputArray directly
-				MyGlobals.MyGlobals.outputArray.push(...optionsArray);		
+				MyGlobals.outputArray.push(...optionsArray);		
 				for (const hedgeID of optionsArray) {
 					await fetchOptionCard(hedgeID);
 				}		
@@ -260,7 +265,7 @@ async function loadOptions(){
 				$('#hedgesTimeline').empty();
 			
 				// Update MyGlobals.outputArray directly
-				MyGlobals.MyGlobals.outputArray.push(...vacantOptionsArray);
+				MyGlobals.outputArray.push(...vacantOptionsArray);
 			
 				for (const hedgeID of vacantOptionsArray) {
 				  await fetchOptionCard(hedgeID);
@@ -281,9 +286,9 @@ async function loadOptions(){
 			}
 			MyGlobals.startIndex = MyGlobals.lastItemIndex - 1 - window.readLimit;
 		} else {
-			let myhedgesCreatedArray = await hedgingInstance.myswapsCreated(MyGlobals.wallet);
+			let myhedgesCreatedArray = await hedgingInstance.myswapsCreated(userAddress);
 			let myhedgesCreatedLength = myhedgesCreatedArray.length;
-			let myhedgesTakenArray = await hedgingInstance.myswapsTaken(MyGlobals.wallet);
+			let myhedgesTakenArray = await hedgingInstance.myswapsTaken(userAddress);
 			let myhedgesTakenLength = myhedgesTakenArray.length;
 		
 			MyGlobals.startIndex = Math.max(myhedgesCreatedLength, myhedgesTakenLength) - 1 - window.readLimit;
@@ -291,8 +296,8 @@ async function loadOptions(){
 		}
 		
 		// Fetch both created and taken swaps
-		let swapsCreatedArray = await hedgingInstance.getUserSwapsCreated(MyGlobals.wallet, MyGlobals.startIndex, window.readLimit);
-		let swapsTakenArray = await hedgingInstance.getUserSwapsTaken(MyGlobals.wallet, MyGlobals.startIndex, window.readLimit);
+		let swapsCreatedArray = await hedgingInstance.getUserSwapsCreated(userAddress, MyGlobals.startIndex, window.readLimit);
+		let swapsTakenArray = await hedgingInstance.getUserSwapsTaken(userAddress, MyGlobals.startIndex, window.readLimit);
 		
 		// Combine and sort the arrays
 		let allSwapsArray = [...swapsCreatedArray, ...swapsTakenArray].sort((a, b) => a - b);
@@ -305,7 +310,7 @@ async function loadOptions(){
 			$('#hedgesTimeline').empty();
 		
 			// Update MyGlobals.outputArray directly
-			MyGlobals.MyGlobals.outputArray.push(...combinedArray);
+			MyGlobals.outputArray.push(...combinedArray);
 		
 			for (const hedgeID of combinedArray) {
 				await fetchOptionCard(hedgeID);
@@ -319,11 +324,11 @@ async function loadOptions(){
 	}
 	//BOOKMARKED EQUITY SWAPS
 	if(window.nav === 2 && window.filters === 3){//get my bookmarks
-		let optionsArray = await hedgingInstance.getmyBookmarks(MyGlobals.wallet);
+		let optionsArray = await hedgingInstance.getmyBookmarks(userAddress);
 		if(optionsArray.length > 0){
 			$('#hedgesTimeline').empty();
 			// Update MyGlobals.outputArray directly
-			MyGlobals.MyGlobals.outputArray.push(...optionsArray);
+			MyGlobals.outputArray.push(...optionsArray);
 
 			//for each element in array
 			let array = optionsArray;
@@ -345,6 +350,19 @@ async function loadOptions(){
 }
 
 async function fetchOptionCard(optionId){
+
+	function cardCommaFormat(number){
+		const options = {
+			style: 'decimal',
+			minimumFractionDigits: 2,
+			maximumFractionDigits: 8,
+		};
+		return number.toLocaleString('en-US', options);
+	}; 
+
+	const accounts = await getAccounts();
+    const userAddress = accounts[0];
+
     try{
 		let result = await hedgingInstance.getHedgeDetails(optionId);
 		//name and symbol
@@ -353,8 +371,8 @@ async function fetchOptionCard(optionId){
 		//token & pair address
 		let tokenAddress = result.token;
 		let truncatedTokenAdd = tokenAddress.substring(0, 6) + '...' + tokenAddress.slice(-3);
-		let pairAddress = result.paired;
-		let truncatedPairAdd = pairAddress.substring(0, 6) + '...' + pairAddress.slice(-3);
+		let tokenPairAddress = result.paired;
+		let truncatedPairAdd = tokenPairAddress.substring(0, 6) + '...' + tokenPairAddress.slice(-3);
 		//owner
 		let owner = result.owner;
         let truncatedOwner = owner.substring(0, 6) + '...' + owner.slice(-3);
@@ -367,15 +385,15 @@ async function fetchOptionCard(optionId){
 		//amount
 		let amountTokenDecimals = await getTokenDecimals(tokenAddress);
 		let amountRaw = fromBigIntNumberToDecimal(result.amount, amountTokenDecimals);
-		let amount = commaNumbering(amountRaw);
+		let amount = cardCommaFormat(amountRaw);		
 
 		//hedge type
 		let hedgeType;
-		if (result.hedgeType === 'CALL') {
+		if (result.hedgeType === 0) {
 			hedgeType = 'CALL';
-		} else if (result.hedgeType === 'PUT') {
+		} else if (result.hedgeType === 1) {
 			hedgeType = 'PUT';
-		} else if (result.hedgeType === 'SWAP') {
+		} else if (result.hedgeType === 2) {
 			hedgeType = 'SWAP';
 		} else {
 			console.log('Hedge type is unknown');
@@ -383,28 +401,33 @@ async function fetchOptionCard(optionId){
 
 		//paired symbol
 		let pairSymbol;
-		if (pairedAddress === CONSTANTS.usdtAddress) {
+		if (tokenPairAddress === CONSTANTS.usdtAddress) {
 			pairSymbol = 'USDT';
-		} else if (pairedAddress === CONSTANTS.usdcAddress) {
+		} else if (tokenPairAddress === CONSTANTS.usdcAddress) {
 			pairSymbol = 'USDC';
-		} else if (pairedAddress === CONSTANTS.wethAddress) {
+		} else if (tokenPairAddress === CONSTANTS.wethAddress) {
 			pairSymbol = 'WETH';
 		}
 		//market value current
 		const [marketvalueCurrent, pairedAddress] = await hedgingInstance.getUnderlyingValue(tokenAddress, result.amount);
-		const pairedAddressDecimal = await getTokenDecimals(pairedAddress);
+		const pairedAddressDecimal = await getTokenDecimals(tokenPairAddress);
 		const marketvalue = fromBigIntNumberToDecimal(marketvalueCurrent, pairedAddressDecimal);
 
-		//start value, based on token decimals
+		
 		let startvalue, endvalue, cost, strikevalue;
-		if (pairedAddress === CONSTANTS.usdtAddress || pairedAddress === CONSTANTS.usdcAddress) { //USDT or USDC
-			startvalue = fromBigIntNumberToDecimal(result.startvalue, 6);
-			endvalue = fromBigIntNumberToDecimal(result.endvalue, 6);
-			cost = fromBigIntNumberToDecimal(result.cost, 6);
-		} else if (pairedAddress === CONSTANTS.wethAddress) { //WETH
-			startvalue = fromBigIntNumberToDecimal(result.startvalue, 18);
-			endvalue = fromBigIntNumberToDecimal(result.endvalue, 18);
-			cost = fromBigIntNumberToDecimal(result.cost, 18);
+		//start value in BN - before fromBigIntNumberToDecimal conversion
+		let startValueBN = ethers.BigNumber.from(result.startValue);
+		let endValueBN = ethers.BigNumber.from(result.endValue);
+		let costBN = ethers.BigNumber.from(result.cost);
+		//start value, based on token decimals
+		if (tokenPairAddress === CONSTANTS.usdtAddress || tokenPairAddress === CONSTANTS.usdcAddress) { //USDT or USDC
+			startvalue = fromBigIntNumberToDecimal(startValueBN, 6);
+			endvalue = fromBigIntNumberToDecimal(endValueBN, 6);
+			cost = fromBigIntNumberToDecimal(costBN, 6);
+		} else if (tokenPairAddress === CONSTANTS.wethAddress) { //WETH
+			startvalue = fromBigIntNumberToDecimal(startValueBN, 18);
+			endvalue = fromBigIntNumberToDecimal(endValueBN, 18);
+			cost = fromBigIntNumberToDecimal(costBN, 18);
 		}
 		//strike value
 		if(startvalue>0){
@@ -412,6 +435,13 @@ async function fetchOptionCard(optionId){
 		}else{
 			strikevalue = cost + marketvalue;
 		}
+
+		//format outputs
+		let marketvalueFormatted = cardCommaFormat(marketvalue);
+		let startvalueFormatted = cardCommaFormat(startvalue);
+		let endvalueFormatted = cardCommaFormat(endvalue);
+		let costFormatted = cardCommaFormat(cost);
+		let strikevalueFormatted = cardCommaFormat(strikevalue);
 		
 		//logourl
 		let logourl = result.logourl;
@@ -420,34 +450,35 @@ async function fetchOptionCard(optionId){
 		let dt_started = new Date(result.dt_started * 1000).toLocaleString();
 		let dt_expiry = new Date(result.dt_expiry * 1000).toLocaleString();
 		// Calculate time left for dt_expiry
+		// Calculate time left for dt_expiry
 		let timeNow = new Date().getTime();
 		let timeDiff = result.dt_expiry * 1000 - timeNow;
 		let days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
 		let hours = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
 		let minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
 		let seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
-		let timeToExpiry = days + " D " + hours + " H " + minutes + " M " + seconds + " S";
+		let timeToExpiry = days + "d " + hours + "h " + minutes + "m ";
 
 		//strategy description for the option
 		let strategyWidget, description;
 		if(hedgeType == 'CALL') {
-			description = `In ${timeToExpiry}<br>Taker is in profit when market price is ABOVE strike price. Market - Strike = Profit Margin. <br>Taker has max loss of ${cost}${pairSymbol} if market price is ABOVE strike price.`;
+			description = `on ${timeToExpiry}\nTaker will be in profit when market price is ABOVE strike price. Market - Strike = Profit Margin. \nTaker's max loss is ${costFormatted}${pairSymbol} if market price is ABOVE strike price.`;
 			strategyWidget = `
 			<div class="strategyHold" title="`+description+`">
 				<img class="strategyImage" src="./imgs/call-option.svg" />
 				<div class="strategyDataHold">
 					<div class="topValue-call">profit zone</div>
-					<div class="bottomValue-call">max loss `+cost+``+pairSymbol+`</div>
+					<div class="bottomValue-call">max loss `+costFormatted+` `+pairSymbol+`</div>
 				</div>
 			</div>`;
 		}
 		if(hedgeType == 'PUT') {
-			description = `In ${timeToExpiry}<br>Taker is in profit when market price is BELOW strike price. Strike - Market = Profit Margin. <br>Taker has max loss of ${cost}${pairSymbol} if market price is ABOVE strike price.`;
+			description = `on ${timeToExpiry}\nTaker is in profit when market price is BELOW strike price. Strike - Market = Profit Margin. \nTakers max loss is ${costFormatted}${pairSymbol} if market price is ABOVE strike price.`;
 			strategyWidget = `
 			<div class="strategyHold" title="`+description+`">
 				<img class="strategyImage" src="./imgs/put-option.svg" />
 				<div class="strategyDataHold">
-					<div class="topValue-put">max loss `+cost+``+pairSymbol+`</div>
+					<div class="topValue-put">max loss `+costFormatted+` `+pairSymbol+`</div>
 					<div class="bottomValue-put">profit zone</div>
 				</div>
 			</div>`;
@@ -478,7 +509,7 @@ async function fetchOptionCard(optionId){
 		//bookmark check
 		var bookmark = 'addBookmark("'+optionId+'")';
 		var unbookmark = 'removeBookmark("'+optionId+'")';
-		var bookmarkState = await hedgingInstance.getBookmark(MyGlobals.wallet, optionId);
+		var bookmarkState = await hedgingInstance.getBookmark(userAddress, optionId);
 		if(!bookmarkState){
 			var bookmark_btn = "<div class='raise_S_tab _bookmarkjump' onclick='"+bookmark+"'><img src='./imgs/bookmark_.png' width='18px'/></div>";
 		}
@@ -492,7 +523,7 @@ async function fetchOptionCard(optionId){
 						<div class="tl_hedgeGrid">
 							<div class="projectLogo" style="background-image:url('./imgs/erc20-uniswap-tr.png')"></div>
 							<div class="projectName">
-								<div>`+name+`<a class="blockexplorer" href="https://etherscan.io/address/'`+pairAddress+`" target="_blank" alt="SC" title="Go to Etherscan">`+truncatedTokenAdd+`</a></div>
+								<div>`+name+`<a class="blockexplorer" href="https://etherscan.io/address/'`+tokenPairAddress+`" target="_blank" alt="SC" title="Go to Etherscan">`+truncatedTokenAdd+`</a></div>
 								<div class="tl_bagsize">`+amount+` `+symbol+`</div>
 							</div>
 						</div>
@@ -500,7 +531,7 @@ async function fetchOptionCard(optionId){
 						<div class="valueHold">
 							<div class="assetsValue">
 								<div class="valueTitle"></div>
-								<div class="assetsMarketValue highlightOption">`+marketvalue+` `+pairSymbol+`</div>
+								<div class="assetsMarketValue highlightOption">`+marketvalueFormatted+` `+pairSymbol+`</div>
 							</div>
 							<div class="assetsType">
 								<div class="typeTitle">HEDGE</div>
@@ -510,9 +541,9 @@ async function fetchOptionCard(optionId){
 						
 						<div class="strategyContainer">
 							<div class="optionMarksHold">
-								<div class="optionMark"><span>Strike:</span><span class="oMfigure">`+strikevalue+` `+pairSymbol+`</span></div>
-								<div class="optionMark"><span>Premium:</span><span class="oMfigure">`+cost+` `+pairSymbol+`</span></div>
-								<div class="optionMark"><span>Expires:</span><span class="oMfigure">`+timeToExpiry+` `+timeToExpiry+`</span></div>
+								<div class="optionMark"><span>Strike:</span><span class="oMfigure">`+strikevalueFormatted+` `+pairSymbol+`</span></div>
+								<div class="optionMark"><span>Premium:</span><span class="oMfigure">`+costFormatted+` `+pairSymbol+`</span></div>
+								<div class="optionMark"><span>Expires:</span><span class="oMfigure">`+timeToExpiry+`</span></div>
 							</div>
 							`+strategyWidget+`
 						</div>
@@ -552,6 +583,14 @@ async function fetchOptionCard(optionId){
 }
 
 async function fetchOptionStrip(optionId) {
+	function cardCommaFormat(number){
+		const options = {
+			style: 'decimal',
+			minimumFractionDigits: 2,
+			maximumFractionDigits: 8,
+		};
+		return number.toLocaleString('en-US', options);
+	}; 
     try{
 		let result = await hedgingInstance.getHedgeDetails(optionId);
 		//name and symbol
@@ -560,8 +599,8 @@ async function fetchOptionStrip(optionId) {
 		//token & pair address
 		let tokenAddress = result.token;
 		let truncatedTokenAdd = tokenAddress.substring(0, 6) + '...' + tokenAddress.slice(-3);
-		let pairAddress = result.paired;
-		let truncatedPairAdd = pairAddress.substring(0, 6) + '...' + pairAddress.slice(-3);
+		let tokenPairAddress = result.paired;
+		let truncatedPairAdd = tokenPairAddress.substring(0, 6) + '...' + tokenPairAddress.slice(-3);
 		//owner
 		let owner = result.owner;
         let truncatedOwner = owner.substring(0, 6) + '...' + owner.slice(-3);
@@ -572,43 +611,49 @@ async function fetchOptionStrip(optionId) {
 		let status = parseFloat(result.status);
 		//amount
 		let amountTokenDecimals = await getTokenDecimals(tokenAddress);
-		let amountRaw = fromBigIntNumberToDecimal(result.amount, amountTokenDecimals);
-		let amount = commaNumbering(amountRaw);
+		let amountBN = ethers.BigNumber.from(result.amount);
+		let amountRaw = fromBigIntNumberToDecimal(amountBN, amountTokenDecimals);
+		let amount = cardCommaFormat(amountRaw);
 		//hedge type
 		let hedgeType;
-		if (result.hedgeType === 'CALL') {
+		if (result.hedgeType === 0) {
 			hedgeType = 'CALL';
-		} else if (result.hedgeType === 'PUT') {
+		} else if (result.hedgeType === 1) {
 			hedgeType = 'PUT';
-		} else if (result.hedgeType === 'SWAP') {
+		} else if (result.hedgeType === 2) {
 			hedgeType = 'SWAP';
 		} else {
 			console.log('Hedge type is unknown');
 		}
 		//paired symbol
 		let pairSymbol;
-		if (pairedAddress === CONSTANTS.usdtAddress) {
+		if (tokenPairAddress === CONSTANTS.usdtAddress) {
 			pairSymbol = 'USDT';
-		} else if (pairedAddress === CONSTANTS.usdcAddress) {
+		} else if (tokenPairAddress === CONSTANTS.usdcAddress) {
 			pairSymbol = 'USDC';
-		} else if (pairedAddress === CONSTANTS.wethAddress) {
+		} else if (tokenPairAddress === CONSTANTS.wethAddress) {
 			pairSymbol = 'WETH';
 		}
 		//market value current
 		const [marketvalueCurrent, pairedAddress] = await hedgingInstance.getUnderlyingValue(tokenAddress, result.amount);
-		const pairedAddressDecimal = await getTokenDecimals(pairedAddress);
+		const pairedAddressDecimal = await getTokenDecimals(tokenPairAddress);
 		const marketvalue = fromBigIntNumberToDecimal(marketvalueCurrent, pairedAddressDecimal);
 
 		//start value, based on token decimals
 		let startvalue, endvalue, cost, strikevalue;
-		if (pairedAddress === CONSTANTS.usdtAddress || pairedAddress === CONSTANTS.usdcAddress) { //USDT or USDC
-			startvalue = fromBigIntNumberToDecimal(result.startvalue, 6);
-			endvalue = fromBigIntNumberToDecimal(result.endvalue, 6);
-			cost = fromBigIntNumberToDecimal(result.cost, 6);
-		} else if (pairedAddress === CONSTANTS.wethAddress) { //WETH
-			startvalue = fromBigIntNumberToDecimal(result.startvalue, 18);
-			endvalue = fromBigIntNumberToDecimal(result.endvalue, 18);
-			cost = fromBigIntNumberToDecimal(result.cost, 18);
+		//start value in BN - before fromBigIntNumberToDecimal conversion
+		let startValueBN = ethers.BigNumber.from(result.startValue);
+		let endValueBN = ethers.BigNumber.from(result.endValue);
+		let costBN = ethers.BigNumber.from(result.cost);
+
+		if (tokenPairAddress === CONSTANTS.usdtAddress || tokenPairAddress === CONSTANTS.usdcAddress) { //USDT or USDC
+			startvalue = fromBigIntNumberToDecimal(startValueBN, 6);
+			endvalue = fromBigIntNumberToDecimal(endValueBN, 6);
+			cost = fromBigIntNumberToDecimal(costBN, 6);
+		} else if (tokenPairAddress === CONSTANTS.wethAddress) { //WETH
+			startvalue = fromBigIntNumberToDecimal(startValueBN, 18);
+			endvalue = fromBigIntNumberToDecimal(endValueBN, 18);
+			cost = fromBigIntNumberToDecimal(costBN, 18);
 		}
 		//strike value
 		if(startvalue>0){
@@ -616,6 +661,11 @@ async function fetchOptionStrip(optionId) {
 		}else{
 			strikevalue = cost + marketvalue;
 		}
+		//format amounts
+		const formattedAmount = amount.toLocaleString();
+		const formattedMarketValue = marketvalue.toLocaleString();
+		const formattedCost = cost.toLocaleString();
+		const formattedStrikeValue = strikevalue.toLocaleString();
 		//logourl
 		let logourl = result.logourl;
 		//dates to human-readable dates
@@ -623,15 +673,16 @@ async function fetchOptionStrip(optionId) {
 		let dt_started = new Date(result.dt_started * 1000).toLocaleString();
 		let dt_expiry = new Date(result.dt_expiry * 1000).toLocaleString();
 		// Calculate time left for dt_expiry
+		// Calculate time left for dt_expiry
 		let timeNow = new Date().getTime();
 		let timeDiff = result.dt_expiry * 1000 - timeNow;
 		let days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
 		let hours = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
 		let minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
 		let seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
-		let timeToExpiry = days + " D " + hours + " H " + minutes + " M " + seconds + " S";
+		let timeToExpiry = days + "d " + hours + "h " + minutes + "m ";
 		//prepare strip
-		var resultStrip = '<a href="hedge.html?id='+optionId+'" class="searchresultStrip"><div class="projectLogoLeft" style="background-image:url(' + logourl + ')"></div><div class="projectName">' + symbol + '</div><div class="projectName">' + amount + '</div><div class="projectName"> Value: ' + marketvalue + ' '+ pairSymbol +'</div></a>';
+		var resultStrip = '<a href="hedge.html?id='+optionId+'" class="searchresultStrip"><div class="projectLogoLeft" style="background-image:url(' + logourl + ')"></div><div class="projectName">' + symbol + '</div><div class="projectName">' + formattedAmount + '</div><div class="projectName"> Value: ' + formattedMarketValue + ' '+ pairSymbol +'</div></a>';
 		
 		$('#searchresult').empty().append(resultStrip);
 		
