@@ -4,21 +4,22 @@ import { CONSTANTS, getAccounts, getUserBalancesForToken, truncateAddress, comma
 async function refreshDataOnElements() {
 	// Fetch data for all items in MyGlobals.outputArray concurrently
 	const promises = MyGlobals.outputArray.map(async (optionId) => {
-		const result = await hedgingInstance.getHedgeDetails(optionId);
+		let result = await hedgingInstance.getHedgeDetails(optionId);
 		// token address
-		const tokenAddress = result.token;
+		let tokenAddress = result.token;
+		let tokenPairAddress = result.paired;
 		// Convert timestamp to human-readable dates
-		const dt_created = new Date(result.dt_created * 1000).toLocaleString();
-		const dt_started = new Date(result.dt_started * 1000).toLocaleString();
-		const dt_expiry = new Date(result.dt_expiry * 1000).toLocaleString();
+		let dt_created = new Date(result.dt_created * 1000).toLocaleString();
+		let dt_started = new Date(result.dt_started * 1000).toLocaleString();
+		let dt_expiry = new Date(result.dt_expiry * 1000).toLocaleString();
 
 		// Calculate time left for dt_expiry
-		const timeNow = new Date().getTime();
-		const timeDiff = result.dt_expiry * 1000 - timeNow;
-		const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
-		const hours = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-		const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
-		const seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
+		let timeNow = new Date().getTime();
+		let timeDiff = result.dt_expiry * 1000 - timeNow;
+		let days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+		let hours = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+		let minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+		let seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
 
 		// Assign the data to HTML elements using element IDs
 		$(`#${optionId}owner`).text(result.owner);
@@ -27,14 +28,48 @@ async function refreshDataOnElements() {
 		$(`#${optionId}dt_created`).text(dt_created);
 		$(`#${optionId}dt_started`).text(dt_started);
 		$(`#${optionId}dt_expiry`).text(dt_expiry);
-		$(`#${optionId}time_left`).text(`${days} D ${hours} H ${minutes} M ${seconds} S`);
+		$(`#${optionId}time_left`).text(`${days}d ${hours}h ${minutes}m`);
 
 		// Values 
 		//..if option available then show market & current strike price
 		//..if option is taken then show start and market price
-		const [marketvalue, pairedAddress] = await hedgingInstance.getUnderlyingValue(tokenAddress, result.amount);
 		const element = $(`#${optionId}buyButton`);
-		let profit = marketvalue - (startValueBN + costBN);
+
+		//market value current
+		const [marketvalueCurrent, pairedAddress] = await hedgingInstance.getUnderlyingValue(tokenAddress, result.amount);
+		const pairedAddressDecimal = await getTokenDecimals(tokenPairAddress);
+		const marketvalue = fromBigIntNumberToDecimal(marketvalueCurrent, pairedAddressDecimal);
+
+		
+		let startvalue, endvalue, cost, strikevalue;
+		//start value in BN - before fromBigIntNumberToDecimal conversion
+		let startValueBN = ethers.BigNumber.from(result.startValue);
+		let endValueBN = ethers.BigNumber.from(result.endValue);
+		let costBN = ethers.BigNumber.from(result.cost);
+		let marketvalueBN = ethers.BigNumber.from(marketvalueCurrent);
+
+		//start value, based on token decimals
+		if (tokenPairAddress === CONSTANTS.usdtAddress || tokenPairAddress === CONSTANTS.usdcAddress) { //USDT or USDC
+			startvalue = fromBigIntNumberToDecimal(startValueBN, 6);
+			endvalue = fromBigIntNumberToDecimal(endValueBN, 6);
+			cost = fromBigIntNumberToDecimal(costBN, 6);
+		} else if (tokenPairAddress === CONSTANTS.wethAddress) { //WETH
+			startvalue = fromBigIntNumberToDecimal(startValueBN, 18);
+			endvalue = fromBigIntNumberToDecimal(endValueBN, 18);
+			cost = fromBigIntNumberToDecimal(costBN, 18);
+		}
+
+		let profit;
+		if (result.hedgeType === 0) {
+			profit = marketvalueBN - (startValueBN + costBN);
+		} else if (result.hedgeType === 1) {
+			profit = (startValueBN + costBN) - marketvalueBN;
+		} else if (result.hedgeType === 2) {
+			profit = marketvalueBN - (startValueBN + costBN);
+		} else {
+			console.log('Hedge type is unknown');
+		}
+		
 		let borderColor = '';
 		let boxShadowColor = '';
 		let textColor = '';
@@ -43,11 +78,11 @@ async function refreshDataOnElements() {
 
 		if (result.status === 2) {
 			const neonGlow = Math.round(profit / 10); // Adjust neon glow proportionally
-			borderColor = marketvalue >= startValueBN + costBN ? '#00ff00' : '#ff0000';
+			borderColor = marketvalueBN >= startValueBN + costBN ? '#00ff00' : '#ff0000';
 			boxShadowColor = borderColor;
 			textColor = borderColor;
-			backgroundImage = marketvalue >= startValueBN + costBN ? `url(${MyGlobals.profitBg})` : `url(${MyGlobals.lossBg})`;
-			newText = profit >= 0 ? `+${profit}` : `${profit}`; // Add "+" sign for positive profit, remove for negative profit
+			backgroundImage = marketvalueBN >= startValueBN + costBN ? `url(${MyGlobals.profitBg})` : `url(${MyGlobals.lossBg})`;
+			newText = profit >= 0 ? `+${profit}` : `-${profit}`; // Add "+" sign for positive profit, remove for negative profit
 			element.css({
 				'background-image': backgroundImage,
 				'background-repeat': 'no-repeat',
@@ -355,7 +390,7 @@ async function fetchOptionCard(optionId){
 		const options = {
 			style: 'decimal',
 			minimumFractionDigits: 2,
-			maximumFractionDigits: 8,
+			maximumFractionDigits: 7,
 		};
 		return number.toLocaleString('en-US', options);
 	}; 
@@ -587,7 +622,7 @@ async function fetchOptionStrip(optionId) {
 		const options = {
 			style: 'decimal',
 			minimumFractionDigits: 2,
-			maximumFractionDigits: 8,
+			maximumFractionDigits: 7,
 		};
 		return number.toLocaleString('en-US', options);
 	}; 

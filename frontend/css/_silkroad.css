@@ -725,7 +725,7 @@ fieldset input{
 	max-width: 450px;
 	vertical-align: middle;
 	border: 0.5px solid #202A44;
-	border-radius: 5px;
+	border-radius: 1vw;
 	line-height: 1.5;
 	font-family: 'modeseven', 'bitwise', sans-serif, "Helvetica Neue", Helvetica, Arial;
 	font-family: "Space Grotesk", sans-serif;
@@ -791,7 +791,7 @@ fieldset input{
   .valueHold {
 	display: flex;
 	justify-content: space-between;
-	margin: 10px 0 -5px;
+	margin: 10px 0 0;
 	background-color: rgba(15, 8, 46, 0.9);
 	background-color: rgba(15, 8, 46, 0.5);
 	/* border: 0.5px solid rgba(8, 231, 254, 0.5); */
@@ -823,8 +823,8 @@ fieldset input{
   .assetsTypeValue,
   .compositionValue {
 	padding:2px;
-	font-family: "Space Grotesk",'modeseven','bitwise', sans-serif, "Helvetica Neue", Helvetica, Arial !important;
-	font-weight: 400;
+	font-family: 'modeseven','bitwise', sans-serif, "Helvetica Neue", Helvetica, Arial !important; /* font-family: "Space Grotesk", monospace, sans-serif, "Helvetica Neue", Helvetica, "Liberation Sans" !important; */
+	font-weight: 200;
 	font-size: clamp(15px, 1vw, 17px);
 	background-color: #0f082e;
 	background-color: #120d39;
@@ -886,11 +886,11 @@ fieldset input{
     column-gap:0;
 }
 .optionMarksHold {
-    flex: 1; /* Take up remaining width */
+    flex-basis: 50%; /* Take up remaining width */
 }
 .strategyHold {
     display: flex;
-  	min-width: 210px;
+  	width: 210px;
 	/* 10 oct 2023 dynamic positioning */
 	align-items: center;
   	position: relative;
@@ -899,17 +899,17 @@ fieldset input{
 	display:block;
     flex-basis: 50%;
     height: 100%; /* Take 100% of the height of the .strategyHold */
-	transform: scale(0.75) translateX(-5px);
+	transform: scale(0.75) translateX(27px);
 }
 .strategyDataHold {
-	transform: translateX(-25px);
+	transform: translateX(-15px);
 	display: flex;
     flex-basis: 50%;
 	flex-flow: column;
 	justify-content: space-around;
 	align-items: center;
 	font-family: "Space Grotesk", sans-serif;
-	font-size: 10.5px;
+	font-size: 9.5px;
 	/* 10 oct 2023 dynamic positioning */
 	height: 100%;
 	position: absolute;
@@ -943,12 +943,14 @@ fieldset input{
 	white-space: nowrap;
 	text-align: center;
 	font-size: 8px;
+	max-width:90px !important;
 }
 .topValue-put {
 	color:#ef6565;
 	white-space: nowrap;
 	text-align: center;
 	transform: translateY(-5px);
+	max-width:90px !important;
 }
 .topValue-put::before{
 	content: "strike price";
@@ -988,14 +990,13 @@ fieldset input{
   .optionMark {
 	position: relative;
 	width:100%;
-	height: auto;
-	flex-basis: 30%;
+	max-width: 210px;
 	display: flex;
 	
-	padding: 0.4vw;
+	padding: 0.4vw 0;
 	box-sizing: border-box;
 	text-align: center;
-	font-size: clamp(13px, 1vw, 13.5px);
+	font-size: clamp(12px, 1vw, 12.5px);
 	font-weight: 100;
 	line-height: 1;
 	text-transform: unset;
@@ -1042,14 +1043,13 @@ fieldset input{
 	text-align: left !important;
 	font-size: clamp(13px, 1vw, 14px) !important;
 	font-weight: 100 !important;
-	text-transform: uppercase;
 	color: #e8e8e8 !important;
 	padding-inline: unset !important;
 	white-space: nowrap;
 }
 
 .optionSummary{
-    margin-top: 15px;
+    margin-top: 10px;
     width:100%;
     height:auto;
     min-height:30px;

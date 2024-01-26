@@ -76,6 +76,9 @@ body.stop-scrolling {
     border: none;
     position: relative; 
   }
+  .sa-button-container {
+    padding-bottom: 0.5rem;
+  }
   .sweet-alert .sa-error-container {
     background-color: #f1f1f1;
     margin-left: -17px;
