@@ -859,9 +859,9 @@ fieldset input{
 	justify-content: left;
 	align-items: center;
 	font-size: unset;
-  }
+}
   
-  .assetsType {
+.assetsType {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
@@ -876,7 +876,21 @@ fieldset input{
 	background-color: #41014a;
   	border: 2px solid #41014a;
   */
-  }
+}
+
+.aType-call-option {
+	background-color: #089353;
+	border: 2px solid #089353;
+}
+
+.aType-put-option {
+	background-color: #59005e;
+  	border: 2px solid #59005e;
+}
+.aType-swap-option {
+	background-image: linear-gradient(45deg, #1b1f6b 20%, #380556 80%);
+	border: 2px solid #490386;
+}
   
   /* Option Strategy Values & Graphics */
 .strategyContainer {
@@ -1095,7 +1109,7 @@ fieldset input{
     font-family: "Space Grotesk", sans-serif;
     font-family: 'modeseven','bitwise', sans-serif, "Helvetica Neue", Helvetica;
     font-weight:600;
-    text-transform: uppercase;
+    text-transform: capitalize;
     letter-spacing: 0.5px;
     text-decoration: none;
     margin-inline:1vw;
