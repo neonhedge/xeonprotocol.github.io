@@ -4,6 +4,7 @@ import { CONSTANTS, getAccounts, getUserBalancesForToken, truncateAddress, comma
 async function refreshDataOnElements() {
 	// Fetch data for all items in MyGlobals.outputArray concurrently
 	const promises = MyGlobals.outputArray.map(async (optionId) => {
+		console.log('refreshing data for hedge: ' + optionId);
 		let result = await hedgingInstance.getHedgeDetails(optionId);
 		// token address
 		let tokenAddress = result.token;
@@ -495,8 +496,9 @@ async function fetchOptionCard(optionId){
 		let timeToExpiry = days + "d " + hours + "h " + minutes + "m ";
 
 		//strategy description for the option
-		let strategyWidget, description;
+		let strategyWidget, description, typeClass, typeClassValue;
 		if(hedgeType == 'CALL') {
+			typeClass = 'aType-call-option';
 			description = `on ${timeToExpiry}\nTaker will be in profit when market price is ABOVE strike price. Market - Strike = Profit Margin. \nTaker's max loss is ${costFormatted}${pairSymbol} if market price is ABOVE strike price.`;
 			strategyWidget = `
 			<div class="strategyHold" title="`+description+`">
@@ -508,6 +510,7 @@ async function fetchOptionCard(optionId){
 			</div>`;
 		}
 		if(hedgeType == 'PUT') {
+			typeClass = 'aType-put-option';
 			description = `on ${timeToExpiry}\nTaker is in profit when market price is BELOW strike price. Strike - Market = Profit Margin. \nTakers max loss is ${costFormatted}${pairSymbol} if market price is ABOVE strike price.`;
 			strategyWidget = `
 			<div class="strategyHold" title="`+description+`">
@@ -518,10 +521,14 @@ async function fetchOptionCard(optionId){
 				</div>
 			</div>`;
 		}
+		if(hedgeType == 'SWAP') {
+			typeClass = 'aType-swap-option';
+			typeClassValue = 'style="background: none !important;"';
+		}
 		//option action button: buy, running/settle, expired
 		let action_btn, activity_btn;
 		if(status == 1){
-			action_btn = "<div id='"+optionId+"buyButton' class='option_S_tab actionButton buyButton'>Buy Option</div>";
+			action_btn = "<div id='"+optionId+"buyButton' class='option_S_tab actionButton buyButton' onclick='buyOption(" + optionId + ")'>Buy Option</div>";
 			activity_btn = `
 			<div class="option_S_tab _bullbear">
 				<span class="status-dot inprogress"><svg stroke="currentColor" fill="#188dd6" stroke-width="0" viewBox="0 0 16 16" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><circle cx="8" cy="8" r="8"></circle></svg><span style="white-space: nowrap;">Vacant</span></span>
@@ -535,7 +542,7 @@ async function fetchOptionCard(optionId){
 			</div>`;
 		}
 		if(status == 3){
-			action_btn = "<div id='"+optionId+"buyButton' class='option_S_tab actionButton expiredButton'>Settle</div>";
+			action_btn = "<div id='"+optionId+"buyButton' class='option_S_tab actionButton expiredButton'  onclick='settleOption(" + optionId + ")'>Settle</div>";
 			activity_btn = `
 			<div class="option_S_tab _bullbear">
 				<span class="status-dot ended"><svg stroke="currentColor" fill="orange" stroke-width="0" viewBox="0 0 16 16" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><circle cx="8" cy="8" r="8"></circle></svg><span style="white-space: nowrap;">Expired</span></span>
@@ -546,10 +553,10 @@ async function fetchOptionCard(optionId){
 		var unbookmark = 'removeBookmark("'+optionId+'")';
 		var bookmarkState = await hedgingInstance.getBookmark(userAddress, optionId);
 		if(!bookmarkState){
-			var bookmark_btn = "<div class='raise_S_tab _bookmarkjump' onclick='"+bookmark+"'><img src='./imgs/bookmark_.png' width='18px'/></div>";
+			var bookmark_btn = "<div class='raise_S_tab _bookmarkjump' onclick='bookmarkOption("+optionId+")'><img src='./imgs/bookmark_.png' width='18px'/></div>";
 		}
 		if(bookmarkState){
-			var bookmark_btn = "<div class='raise_S_tab _bookmarkjump' onclick='"+unbookmark+"'><img src='./imgs/unbookmark_.png' width='18px'/></div>";
+			var bookmark_btn = "<div class='raise_S_tab _bookmarkjump' onclick='unbookmarkOption("+optionId+")'><img src='./imgs/unbookmark_.png' width='18px'/></div>";
 		}
 		//display nav 1 - vacant option
 		if(window.nav == 1){
@@ -568,9 +575,9 @@ async function fetchOptionCard(optionId){
 								<div class="valueTitle"></div>
 								<div class="assetsMarketValue highlightOption">`+marketvalueFormatted+` `+pairSymbol+`</div>
 							</div>
-							<div class="assetsType">
+							<div class="assetsType `+typeClass+`">
 								<div class="typeTitle">HEDGE</div>
-								<div class="assetsTypeValue highlightOption">`+hedgeType+`</div>
+								<div class="assetsTypeValue highlightOption `+typeClassValue+`">`+hedgeType+`</div>
 							</div>
 						</div>
 						
