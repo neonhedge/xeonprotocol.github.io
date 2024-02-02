@@ -257,7 +257,7 @@ hr.line {
 .sectionCenter {
   display: flex;
   justify-content: space-evenly;
-  padding-block:0.5vw 3vw !important;
+  padding: 4vw 0 !important;
   /* ENABLE FOR COOL BG THEME 
   
   background: none !important;
@@ -298,7 +298,6 @@ hr.line {
   width: calc(100% - 1em);
   max-width: 450px;
   display: inline-block;
-  margin-top: 3vw;
   vertical-align: middle;
   border: 0.5px solid #202A44;
   border-radius: 5px;
@@ -397,9 +396,10 @@ hr.line {
 }
 
 .optionType {
-  border: 2px solid #089353; 
+  /* border: 2px solid #089353; */
   text-shadow: none;
   flex-grow: 1;
+  padding-inline: 0 !important;
 }
 
 /* Option mark styles */
@@ -457,6 +457,7 @@ hr.line {
   display: flex;
   flex-wrap: wrap;
   max-height: 400px; /* curb tabs from stretching height */
+  margin-bottom: 1vw;
 }
 
 .hedgeDetails h5 {
@@ -491,10 +492,13 @@ hr.line {
 }
 
 .requestList span {
+  position: relative;
+  width: 100%;
+  margin-block: 2px;
   font-size: clamp(11px, 1vw, 11px);
   display: flex; /* Use flexbox */
   align-items: center; /* Align text vertically center */
-  width: unset;
+  justify-content: space-between;
   letter-spacing: unset;
   color: rgb(139, 149, 158);
 }
@@ -506,14 +510,14 @@ hr.line {
 
 .hedgeDetails, .dealRequests {
   flex-basis: 50%;
-  padding: 1%;
 }
 
 .requestWin button, .requestList button{
   padding:4px;
-  font-size: 13px;
-  margin-block: 5px;
   box-sizing: border-box;
+  font-size: 13px;
+  float: right;
+  margin-block: 5px;
 }
 
 .requestButton {
@@ -528,7 +532,6 @@ hr.line {
   margin: 2px 0 !important;
   padding: 2px 3px !important;
   font-size: 10px !important;
-  margin: 4px !important;
   font-weight: 400 !important;
 }
 

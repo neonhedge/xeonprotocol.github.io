@@ -884,11 +884,11 @@ fieldset input{
 }
 
 .aType-put-option {
-	background-color: #59005e;
-  	border: 2px solid #59005e;
+	background-color: #d6188a;
+  	border: 2px solid #d6188a;
 }
 .aType-swap-option {
-	background-image: linear-gradient(45deg, #1b1f6b 20%, #380556 80%);
+	background-image: linear-gradient(45deg, #1e2270 20%, #59005e 80%);
 	border: 2px solid #490386;
 }
   
@@ -1119,9 +1119,12 @@ fieldset input{
     border:0.5px solid #089353;
 }
 .buyButton:hover {
+	content: '';
     background-color: #089353;
     color: #FFF;
     border:0.5px solid #FFF;
+	border: 2px solid rgba(255, 255, 255, 0.2) !important;
+  	backdrop-filter: blur(10px) !important;
 }
 .activeButton{
     color: #08e7fe;
