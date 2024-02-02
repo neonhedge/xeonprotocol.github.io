@@ -612,6 +612,8 @@ async function submitWriting(hedgeType, tokenAddress, tokenAmount, premium, stri
 
     // Add deadline value
 	hedgeType = parseInt(hedgeType);
+	
+	// *** TESTING ONLY ***
     // Get the current timestamp in seconds & add 6 months for testing
 	const currentTimestamp = Math.floor(Date.now() / 1000);
 	const sixMonthsInSeconds = 6 * 30 * 24 * 60 * 60;
@@ -625,7 +627,8 @@ async function submitWriting(hedgeType, tokenAddress, tokenAmount, premium, stri
             hedgeType, //pass as integer, uint in solidity
             tokenAddress, 
             tokenAmountWei, 
-            premiumWei, 
+            premiumWei,
+			strikePriceWei,
             deadline  //pass as integer, uint in solidity
         );
 

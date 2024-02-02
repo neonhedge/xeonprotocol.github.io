@@ -5,81 +5,31 @@ import { CONSTANTS, getUserBalancesForToken, truncateAddress, fromBigIntNumberTo
 import { initializeConnection } from './web3-walletstatus-module.js';
 
 /*======================================================
-    WRITE FUNCTION CALLS for the wallet module
+    WRITE FUNCTION CALLS for the silkraod module
 ======================================================*/
-async function allowanceCheck(tokenAddress) {
-    const vaultAddress = CONSTANTS.hedgingAddress;
-    const accounts = await getAccounts();
+async function purchaseInterface(optionId) {
+    function cardCommaFormat(number){
+		const options = {
+			style: 'decimal',
+			minimumFractionDigits: 2,
+			maximumFractionDigits: 7,
+		};
+		return number.toLocaleString('en-US', options);
+	}; 
 
-    if (accounts.length === 0) {
-        console.error('No wallet connected. Please connect a wallet.');
-        return;
-    }
-
-    const tokenContract = new ethers.Contract(tokenAddress, [
-        { "inputs": [ { "internalType": "address", "name": "owner", "type": "address" }, { "internalType": "address", "name": "spender", "type": "address" } ], "name": "allowance", "outputs": [ { "internalType": "uint256", "name": "", "type": "uint256" } ], "stateMutability": "view", "type": "function" },
-        { "inputs": [], "name": "decimals", "outputs": [ { "internalType": "uint8", "name": "", "type": "uint8" } ], "stateMutability": "pure", "type": "function" },
-        { "inputs": [], "name": "symbol", "outputs": [ { "internalType": "string", "name": "", "type": "string" } ], "stateMutability": "pure", "type": "function" },
-    ], provider);
-
-    const [allowanceResult, decimals, symbol] = await Promise.all([
-        tokenContract.allowance(accounts[0], vaultAddress),
-        tokenContract.decimals(),
-        tokenContract.symbol(),
-    ]);
-    
-    console.log('allowance: '+allowanceResult+' decimal: '+decimals+' symbol: '+symbol)
-
-    const allowanceDecimal = fromBigIntNumberToDecimal(allowanceResult, decimals);
-
-    return { allowance: allowanceDecimal, symbol: symbol, decimals: decimals };
-}
-
-async function hedgeDealingInterface(optionId) {
-    // what - assets: 100K oVELA
-    // worth - 5 ETH
-    // cost - 0.2 ETH
-    // expiry - 30 days
-    // hedge - call option
-    // strikeprice - 0.0000001 ETH
-
-    //----typewriter effect:
-    //> context
-    //> youre giving him 0.2 ETH liquidity for 5 ETH worth of shitcoins over 30days
-    //> all gains on the assets beyond strike price are yours
-    //> your max loss is 0.2 ETH
-    //> settlement is at these conditions in 30 days
-    //> only buy if the RR is worth it. Read docs for technical guide into options>
-    
-    // Prepare addresses
-    const accounts = await getAccounts();
-    const walletAddress = accounts[0];
-    const walletAddressTrunc = truncateAddress(walletAddress);
-    const vaultAddress = CONSTANTS.hedgingAddress;
-    const vaultAddressTrunc = truncateAddress(vaultAddress);
-
-    // token allowance from wallet to Vault
-    const allowanceResult = await allowanceCheck(tokenAddress);
-    const allowance = Number(allowanceResult.allowance);
-    const decimals = Number(allowanceResult.decimals);
-    const symbol = allowanceResult.symbol;
-    tokenAmount = Number(tokenAmount);
-
-    // Format output
-    const formatStringDecimal = (number) => {
-        const options = {
-            style: 'decimal',
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 5,
-        };
-        return number.toLocaleString('en-US', options);
-    };
+	const accounts = await getAccounts();
+    const userAddress = accounts[0];
 
     // token balance check
-    const walletBalanceRaw = await neonInstance.balanceOf(walletAddress);
-    const walletBalance = fromBigIntNumberToDecimal(walletBalanceRaw, decimals);
-    const tokenAmountString = formatStringDecimal(tokenAmount);
-    const walletBalanceString = formatStringDecimal(walletBalance);
+    let userdeleteHedgeable, tokenAmount;
+    try { 
+        const mybalances = await getUserBalancesForToken(tokenAddress, userAddress);
+        userdeleteHedgeable = mybalances.withdrawableBalance;
+        withdrawableTokens = fromBigIntNumberToDecimal(userdeleteHedgeable);
+        tokenAmount = fromBigIntNumberToDecimal(tokenAmount);
+    } catch (error){
+        console.log(error);
+    }
 
     // Check hedge availability
     if (tokenAmount > walletBalance) {
@@ -112,6 +62,142 @@ async function hedgeDealingInterface(optionId) {
         }, async function(isConfirm) {  }); // close swal
         return;
     }
+    
+    // Prepare required data for quick preview:
+    // what - assets: 100K oVELA
+    // worth - 5 ETH
+    // cost - 0.2 ETH
+    // expiry - 30 days
+    // hedge - call option
+    // strikeprice - 0.0000001 ETH
+
+    //----typewriter effect:
+    //> context
+    //> youre giving him 0.2 ETH liquidity for 5 ETH worth of shitcoins over 30days
+    //> all gains on the assets beyond strike price are yours
+    //> your max loss is 0.2 ETH
+    //> settlement is at these conditions in 30 days
+    //> only buy if the RR is worth it. Read docs for technical guide into options>    
+
+    try{
+        // Fetch the hedge data by ID
+		let result = await hedgingInstance.getHedgeDetails(optionId);
+		// Fetch symbol
+		let symbol;
+		fetchNameSymbol(result.token).then(t=>{name=t.name,symbol=t.symbol}).catch(e=>console.error(e));
+		// Fetch token & pair address
+		let tokenAddress = result.token;
+		let truncatedTokenAdd = tokenAddress.substring(0, 6) + '...' + tokenAddress.slice(-3);
+		let tokenPairAddress = result.paired;
+		let truncatedPairAdd = tokenPairAddress.substring(0, 6) + '...' + tokenPairAddress.slice(-3);
+		// Fetch owner
+		let owner = result.owner;
+        let truncatedOwner = owner.substring(0, 6) + '...' + owner.slice(-3);
+		// Fetch taker
+		let taker = result.taker;
+        let truncatedTaker = taker.substring(0, 6) + '...' + taker.slice(-3);
+		// Fetch deal status
+		let status = parseFloat(result.status);        
+		// Format token amounts
+		let amountFormated = cardCommaFormat(tokenAmount);		
+
+		// Fetch hedge type
+		let hedgeType;
+		if (result.hedgeType === 0) {
+			hedgeType = 'CALL';
+		} else if (result.hedgeType === 1) {
+			hedgeType = 'PUT';
+		} else if (result.hedgeType === 2) {
+			hedgeType = 'SWAP';
+		} else {
+			console.log('Hedge type is unknown');
+		}
+		// Format manually the paired symbol
+		let pairSymbol;
+		if (tokenPairAddress === CONSTANTS.usdtAddress) {
+			pairSymbol = 'USDT';
+		} else if (tokenPairAddress === CONSTANTS.usdcAddress) {
+			pairSymbol = 'USDC';
+		} else if (tokenPairAddress === CONSTANTS.wethAddress) {
+			pairSymbol = 'WETH';
+		}
+        
+		// Fetch underlying tokens market value
+		const [marketvalueCurrent, pairedAddress] = await hedgingInstance.getUnderlyingValue(tokenAddress, result.amount);
+		const pairedAddressDecimal = await getTokenDecimals(tokenPairAddress);
+		const marketvalue = fromBigIntNumberToDecimal(marketvalueCurrent, pairedAddressDecimal);
+		
+		// Fetch startvalue, cost, strikeprice in BN - before fromBigIntNumberToDecimal conversion
+        let cost, strikeprice;
+		let costBN = ethers.BigNumber.from(result.cost);
+		// based on token decimals, manual not function call to pair address as WETH on sepolia is 6 decimal
+		if (tokenPairAddress === CONSTANTS.usdtAddress || tokenPairAddress === CONSTANTS.usdcAddress) { //USDT or USDC
+			strikeprice = fromBigIntNumberToDecimal(strike, 6);
+			cost = fromBigIntNumberToDecimal(costBN, 6);
+		} else if (tokenPairAddress === CONSTANTS.wethAddress) { //WETH
+			strikeprice = fromBigIntNumberToDecimal(strike, 18);
+			cost = fromBigIntNumberToDecimal(costBN, 18);
+		}
+
+		// Format outputs
+		let marketvalueFormatted = cardCommaFormat(marketvalue);
+		let costFormatted = cardCommaFormat(cost);
+		let strikeFormatted = cardCommaFormat(strikePrice);
+		
+		// Token logourl
+		let logourl = result.logourl;
+
+		// Dates to human-readable dates
+		let dt_created = new Date(result.dt_created * 1000).toLocaleString();
+		let dt_started = new Date(result.dt_started * 1000).toLocaleString();
+		let dt_expiry = new Date(result.dt_expiry * 1000).toLocaleString();
+
+		// Calculate time left for dt_expiry
+		let timeNow = new Date().getTime();
+		let timeDiff = result.dt_expiry * 1000 - timeNow;
+		let days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+		let hours = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+		let minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+		let seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
+		let timeToExpiry = days + "d " + hours + "h " + minutes + "m ";
+
+		//strategy description for the option
+		let hedgeTypeFull, strategyWidget, description, typeClass, typeClassValue;
+		if(hedgeType == 'CALL') {
+            hedgeTypeFull = 'Call Option';
+			typeClass = 'aType-call-option';
+			description = `on ${timeToExpiry}\nTaker will be in profit when market price is ABOVE strike price. Market - Strike = Profit Margin. \nTaker's max loss is ${costFormatted}${pairSymbol} if market price is ABOVE strike price.`;
+			strategyWidget = `
+			<div class="strategyHold" title="`+description+`">
+				<img class="strategyImage" src="./imgs/call-option.svg" />
+				<div class="strategyDataHold">
+					<div class="topValue-call">profit zone</div>
+					<div class="bottomValue-call">max loss `+costFormatted+` `+pairSymbol+`</div>
+				</div>
+			</div>`;
+		}
+		if(hedgeType == 'PUT') {
+            hedgeTypeFull = 'Put Option';
+			typeClass = 'aType-put-option';
+			description = `on ${timeToExpiry}\nTaker is in profit when market price is BELOW strike price. Strike - Market = Profit Margin. \nTakers max loss is ${costFormatted}${pairSymbol} if market price is ABOVE strike price.`;
+			strategyWidget = `
+			<div class="strategyHold" title="`+description+`">
+				<img class="strategyImage" src="./imgs/put-option.svg" />
+				<div class="strategyDataHold">
+					<div class="topValue-put">max loss `+costFormatted+` `+pairSymbol+`</div>
+					<div class="bottomValue-put">profit zone</div>
+				</div>
+			</div>`;
+		}
+		if(hedgeType == 'SWAP') {
+            hedgeTypeFull = 'Equity Swap';
+			typeClass = 'aType-swap-option';
+			typeClassValue = 'style="background: none !important;"';
+		}
+        
+    } catch (error){
+        console.log(error);
+    }
 
     let transactionMessage = '';
     let proceedButtonText = 'checking ...';
@@ -121,24 +207,43 @@ async function hedgeDealingInterface(optionId) {
     transactionMessage = `
 
             <div id="depositInProgress" class="interfaceWindow">
-                <span class="txStatus">Hedge buying in progress</span>
+                <span class="txStatus">Purchase in progress</span>
                 <div class="approvalInfo">
                     <p>Please confirm the transaction in your wallet.</p>
                 </div>
-                <span class="walletbalanceSpan">Buying ${tokenAmountString} ${symbol} to <a href="https://etherscan.io/token/${vaultAddress}" target="_blank">Vault <i class="fa fa-external-link"></i></a></span>
+                <span class="walletbalanceSpan">Buying a ${hedgeTypeFull} from <a href="https://etherscan.io/address/${owner}" target="_blank">${truncatedOwner} <i class="fa fa-external-link"></i></a></span>
+                <span class="walletbalanceSpan">Underlying Tokens: ${amountFormated} ${symbol} </span>
+                <span class="walletbalanceSpan">Cost to Buy: ${costFormatted} ${pairSymbol}</span>
             </div>
 
             <div id="depositRequired" class="interfaceWindow ">  
                 <span class="txStatus">Buy Hedge</span>
                 <div class="approvalInfo">
                     <p>
-                        <span class="txInfoHead txInfoAmount">${tokenAmountString}</span>
+                        <div class="projectLogo" style="background-image:url('${logourl}')"></div>
+                        <span class="txInfoHead txInfoAmount">${amountFormated}</span>
                         <span class="txInfoHead txInfoSymbol"> ${symbol} <a href="https://etherscan.io/token/${tokenAddress}" target="_blank"><i class="fa fa-external-link"></i></a> </span>
                     </p>
                     <p>
-                        <span class="txInfoBody txActionTitle">Deposit To Vault:</span>
-                        <span class="txInfoBody txInfoAddress">${vaultAddressTrunc} <a href="https://etherscan.io/address/${vaultAddress}" target="_blank"><i class="fa fa-external-link"></i></a></span>  
+                        <span class="txInfoBody txActionTitle">Market Value:</span>
+                        <span class="txInfoHead txInfoAmount">${marketvalueFormatted}</span>
+                        <span class="txInfoHead txInfoSymbol"> ${pairSymbol} <a href="https://etherscan.io/token/${pairedAddress}" target="_blank"><i class="fa fa-external-link"></i></a> </span>
                     </p>
+                    <p>
+                        <span class="txInfoBody txActionTitle">Buy Cost:</span>
+                        <span class="txInfoBody txInfoAddress">${costFormatted} <a href="https://etherscan.io/address/${pairedAddress}" target="_blank"><i class="fa fa-external-link"></i></a></span>  
+                    </p>
+
+                    <p>
+                        <span class="txInfoBody txActionTitle">Duration:</span>
+                        <span class="txInfoBody txInfoAddress">${timeToExpiry}</span>  
+                    </p>
+
+                    <p>
+                        <span class="txInfoBody txActionTitle">Hedge Type:</span>
+                        <span class="txInfoBody txInfoAddress">${hedgeTypeFull}</span>
+                    </p>
+                    
                 </div>
 
                 <div class="explainer">
@@ -153,30 +258,25 @@ async function hedgeDealingInterface(optionId) {
                 <span class="txStatus">Purchase Successful</span>
                 <div class="approvalInfo">
                     <p>
-                        <span class="txInfoHead txInfoAmount">${tokenAmountString}</span>
-                        <span class="txInfoHead txInfoSymbol"> ${symbol} <a href="https://etherscan.io/token/${tokenAddress}" target="_blank"><i class="fa fa-external-link"></i></a> </span>
+                        <span class="txInfoHead txInfoAmount">You have purchased the ${hedgeTypeFull} for ${amountFormated} ${symbol} <a href="https://etherscan.io/token/${tokenAddress}" target="_blank"><i class="fa fa-external-link"></i></a> </span>
                     </p>
                     <p>                   
-                        <span class="txActionTitle">To:</span>
-                        <span class="txInfoAddress">${vaultAddressTrunc} <a href="https://etherscan.io/address/${vaultAddress}" target="_blank"><i class="fa fa-external-link"></i></a></span>  
+                        <span class="txActionTitle">From:</span>
+                        <span class="txInfoAddress">${truncatedOwner} <a href="https://etherscan.io/address/${owner}" target="_blank"><i class="fa fa-external-link"></i></a></span>  
                     </p>
                 </div>
                 <div class="explainer">
                     <span> 
                         <i class="fa fa-info-circle"></i>
-                        Hedge purchased, you can view it here...
+                        Fetching the transaction...
                     </span>
                 </div>
             </div>
         `;
 
-    // Prepare deposit states
-    let allowanceRequired = allowance < tokenAmount && walletBalance >= tokenAmount;
-    let depositRequired = allowance >= tokenAmount && walletBalance >= tokenAmount;
-    let approved = allowance >= tokenAmount && walletBalance >= tokenAmount;
     swal({
         type: "info",
-        title: "Vault Deposit",
+        title: "Hedge Purchase",
         text: transactionMessage,
         html: true,
         showCancelButton: true,
@@ -188,21 +288,15 @@ async function hedgeDealingInterface(optionId) {
     }, async function(isConfirm) {
         if (isConfirm) {
             // Check if wallet has enough permissions
-            if (!allowanceRequired && !depositRequired && !approved) {
+            if (tokenAmount < walletBalance) {
                 $('.confirm').prop("disabled", true);
             } else {
                 $('.confirm').prop("disabled", false);
                 $('.confirm').html('<i class="fa fa-spinner fa-spin"></i> Processing...');
         
-                if (allowanceRequired) {
-                    tokenApprovingMessage();
-                    // Submit Transaction to Vault
-                    await vaultApprove(tokenAddress, tokenAmount);
-                } else if (depositRequired) {         
-                    tokenDepositingMessage();
-                    // Submit Transaction to Vault
-                    await vaultDeposit(tokenAddress, tokenAmount);
-                }
+                hedgeBuyingMessage();
+                // Submit Transaction to Vault
+                await buyHedge(optionId, pairedAddress, costBN);
             }
         }  else {
             // User clicked the cancel button
@@ -210,41 +304,9 @@ async function hedgeDealingInterface(optionId) {
             $('#transactSubmit').html('Deposit');
         }       
     });
-
-    // Run display changes after swal load
-    console.log("allowance: " + allowance + ", tokenAmount: " + tokenAmount + ", walletBalance: " + walletBalance);
-
-    if (allowance < tokenAmount) {
-        // Slide out current message
-        $(".interfaceWindow").hide();
-        // Slide in approval success
-        $("#approvalRequired").fadeIn("slow");
-        // Proceed button text
-        $('.confirm').html('Approve');
-
-    } else if (allowance >= tokenAmount) {
-        // Slide out current message
-        $(".interfaceWindow").hide();
-        // Slide in approval success
-        $("#depositRequired").fadeIn("slow");
-       // Proceed button text
-       $('.confirm').html('Deposit');
-    }
-    // if insufficient balance inform user
-    if (walletBalance < tokenAmount) {
-       // Disable confirm button
-       $("#confirmButton").prop("disabled", true);
-       // Slide out current message
-       $(".interfaceWindow").hide();
-       // Slide in approval success
-       $("#insufficientBalance").fadeIn("slow");
-       // Proceed button text
-       $('.confirm').html('<i class="fa fa-spinner fa-spin"></i> Wait...');
-    }
-
 }
 
-async function vaultApprove(tokenAddress, tokenAmount) {
+async function buyHedge(optionId, pairAddress, costBN) {
     try {
         // Retrieve wallet connected
         const accounts = await getAccounts();
@@ -252,90 +314,102 @@ async function vaultApprove(tokenAddress, tokenAmount) {
             console.log('No wallet connected. Please connect a wallet.');
             return;
         }
-        const walletAddress = accounts[0];
-        const vaultAddress = CONSTANTS.hedgingAddress;
-
-        const [decimals, symbol] = await getTokenDecimalAndSymbol(tokenAddress);
-        const approveAmountWei = fromDecimalToBigInt(tokenAmount, decimals);
-
-        // ERC20 ABI & instance
-        const erc20ABI = [
-            { "inputs": [ { "internalType": "address", "name": "spender", "type": "address" }, { "internalType": "uint256", "name": "amount", "type": "uint256" } ], "name": "approve", "outputs": [ { "internalType": "bool", "name": "", "type": "bool" } ], "stateMutability": "nonpayable", "type": "function" },
-        ];
-        
-        const tokenContract = new ethers.Contract(tokenAddress, erc20ABI, window.provider);
-        
         // Prepare Tx
-        const transaction = await tokenContract.connect(signer).approve(vaultAddress, approveAmountWei);
-
-        // Wait for the transaction to be mined
-        const receipt = await transaction.wait();
-
-        if (receipt.status === 1) {
-            // Show success message
-            tokenApprovedMessage(tokenAmount, tokenAddress);
-            console.log('Approval successful.');
-        } else {
-            // Transaction failed
-            console.log('Approval failed. Receipt status: ' + receipt.status);
-            swal({ title: "Failed.", type: "error", allowOutsideClick: true, confirmButtonColor: "#F27474", text: "Transaction failed. Receipt status: " + receipt.status });
-        }
-
-        // Enable confirm button again
-        $('.confirm').prop("disabled", false);
-    } catch (error) {
-        console.error('Approval error:', error);
-        swal({ title: "Failed.", type: "error", allowOutsideClick: true, confirmButtonColor: "#F27474", text: "Transaction error: " + error.message });
-    }
-}
-
-async function vaultDeposit(tokenAddress, tokenAmount) {
-    try {
-        // Retrieve wallet connected
-        const accounts = await getAccounts();
-        if (accounts.length === 0) {
-            console.log('No wallet connected. Please connect a wallet.');
-            return;
-        }
-        const walletAddress = accounts[0];
-        const vaultAddress = CONSTANTS.hedgingAddress;
-
-        const [decimals, symbol] = await getTokenDecimalAndSymbol(tokenAddress);
-        const depositAmountWei = fromDecimalToBigInt(tokenAmount, decimals);
-
-        // Prepare Tx
-        const transaction = await hedgingInstance.connect(signer).depositToken(tokenAddress, depositAmountWei);
+        const transaction = await hedgingInstance.connect(signer).buyHedge(optionId);
 
         // Wait for the transaction to be mined
         const receipt = await transaction.wait();
 
         if (receipt.status === 1) {
             // Call functions on success
-            tokenDepositedMessage(receipt.transactionHash);
+            hedgePurchasedMessage(receipt.transactionHash);
             console.log('Deposit successful...');
             console.log('Transaction Hash: '+ receipt.transactionHash);
         } else {
             // Transaction failed
-            console.log('Deposit failed. Receipt status: ' + receipt.status);
+            console.log('Purchase failed. Receipt status: ' + receipt.status);
             swal({ title: "Failed.", type: "error", allowOutsideClick: true, confirmButtonColor: "#F27474", text: "Transaction failed. Receipt status: " + receipt.status });
         }
     } catch (error) {
-        console.error('Deposit error:', error);
+        console.error('Purchase error:', error);
         swal({ title: "Failed.", type: "error", allowOutsideClick: true, confirmButtonColor: "#F27474", text: "Transaction error: " + error.message });
     }
 }
 
-// Withdrawal process handler
+// Delete process handler
 // Receives decimals 
-async function withdrawInterface(tokenAddress, tokenAmount) {
+async function deleteInterface(optionId) {
     
-    $("#transactSubmit").html('<i class="fa fa-spinner fa-spin"></i> transacting...');
-
-    tokenAmount = Number(tokenAmount);
     const accounts = await getAccounts();
     const walletAddress = accounts[0];
-    const vaultAddress = CONSTANTS.hedgingAddress;
-    const vaultAddressTrunc = truncateAddress(vaultAddress);
+
+    // Fetch the hedge owner by ID
+    let result = await hedgingInstance.getHedgeDetails(optionId);
+    let owner = result.owner;
+
+    // Fetch symbol
+    let symbol;
+    fetchNameSymbol(result.token).then(t=>{name=t.name,symbol=t.symbol}).catch(e=>console.error(e));
+    // Fetch token & pair address
+    let tokenAddress = result.token;
+    let truncatedTokenAdd = tokenAddress.substring(0, 6) + '...' + tokenAddress.slice(-3);
+    let tokenPairAddress = result.paired;
+    let truncatedPairAdd = tokenPairAddress.substring(0, 6) + '...' + tokenPairAddress.slice(-3);
+    // Prepare owner
+    let truncatedOwner = owner.substring(0, 6) + '...' + owner.slice(-3);
+    // Fetch taker
+    let taker = result.taker;
+    let truncatedTaker = taker.substring(0, 6) + '...' + taker.slice(-3);
+    // Fetch deal status
+    let status = parseFloat(result.status);        
+    // Format token amounts
+    let amountFormated = cardCommaFormat(tokenAmount);		
+
+    // Fetch hedge type
+    let hedgeType;
+    if (result.hedgeType === 0) {
+        hedgeType = 'CALL';
+    } else if (result.hedgeType === 1) {
+        hedgeType = 'PUT';
+    } else if (result.hedgeType === 2) {
+        hedgeType = 'SWAP';
+    } else {
+        console.log('Hedge type is unknown');
+    }
+    // Format manually the paired symbol
+    let pairSymbol;
+    if (tokenPairAddress === CONSTANTS.usdtAddress) {
+        pairSymbol = 'USDT';
+    } else if (tokenPairAddress === CONSTANTS.usdcAddress) {
+        pairSymbol = 'USDC';
+    } else if (tokenPairAddress === CONSTANTS.wethAddress) {
+        pairSymbol = 'WETH';
+    }
+    
+    // Fetch underlying tokens market value
+    const [marketvalueCurrent, pairedAddress] = await hedgingInstance.getUnderlyingValue(tokenAddress, result.amount);
+    const pairedAddressDecimal = await getTokenDecimals(tokenPairAddress);
+    const marketvalue = fromBigIntNumberToDecimal(marketvalueCurrent, pairedAddressDecimal);
+
+    // Format outputs
+    let marketvalueFormatted = cardCommaFormat(marketvalue);
+    let costFormatted = cardCommaFormat(cost);
+    let strikeFormatted = cardCommaFormat(strikePrice);
+    
+    // Token logourl
+    let logourl = result.logourl;
+
+    //strategy description for the option
+    let hedgeTypeFull;
+    if(hedgeType == 'CALL') {
+        hedgeTypeFull = 'Call Option';
+    }
+    if(hedgeType == 'PUT') {
+        hedgeTypeFull = 'Put Option';
+    }
+    if(hedgeType == 'SWAP') {
+        hedgeTypeFull = 'Equity Swap';
+    }
 
     if (accounts.length === 0) {
         console.log('No wallet connected. Please connect a wallet.');
@@ -352,7 +426,40 @@ async function withdrawInterface(tokenAddress, tokenAmount) {
         }); // close swal
         return;
     }
+    // Check ownership
+    if (walletAddress != owner) {
+        console.log('Connected wallet is not owner');
+        swal({
+            title: "Connect Owner Wallet",
+            text: "Only the owner address can delete the hedge. \n Connect before it's bought..",
+            html: true,
+            showCancelButton: false,
+            confirmButtonColor: "#04C86C",
+            confirmButtonText: "Ooops",
+            closeOnConfirm: true
+        }, async function(isConfirm) {
+            
+        }); // close swal
+        return;
+    }
 
+    // Check hedge status
+    if (status == 0) {
+        console.log('Hedge already purchased');
+        const purchaseSummary = `Bought by ${truncatedTaker}  <a href="https://etherscan.io/address/${taker}" target="_blank"><i class="fa fa-external-link"></i></a>\n For ${costFormatted} ${pairSymbol}.`
+        swal({
+            title: "Hedge has already been purchased",
+            text: purchaseSummary,
+            html: true,
+            showCancelButton: false,
+            confirmButtonColor: "#04C86C",
+            confirmButtonText: "Ooops",
+            closeOnConfirm: true
+        }, async function(isConfirm) {
+            
+        }); // close swal
+    }
+        
     // Format output
     const formatStringDecimal = (number) => {
         const options = {
@@ -364,106 +471,44 @@ async function withdrawInterface(tokenAddress, tokenAmount) {
     };
     
     try {
-        // check if wallet has enough balance in Vault: return decimal
-        const mybalances = await getUserBalancesForToken(tokenAddress, walletAddress);
-        const walletBalance = mybalances.withdrawableBalance;
-        const tokenAmountString = formatStringDecimal(tokenAmount);
-        const walletBalanceString = formatStringDecimal(walletBalance);
-
-        const tokenDecimals = await getTokenDecimals(tokenAddress);
-        const tokenAmountBigInt = fromDecimalToBigInt(tokenAmount, tokenDecimals);
-        // symbol for messages
-        const symbol = await getSymbol(tokenAddress);
-
-        // Check sufficient funds
-        /* deprecated
-        if (tokenAmount > walletBalance) {
-            console.log('Insufficient funds to withdraw.');
-            swal({
-                title: "Insufficient Vault Balances",
-                type: "warning",
-                text: "You are attempting to withdraw amount > balance.",
-                html: true,
-                showCancelButton: false,
-                confirmButtonColor: "#04C86C",
-                confirmButtonText: "Ooops",
-                closeOnConfirm: true
-            }, async function(isConfirm) {  }); // close swal
-            return;
-        }
-        */
-
         // classes on left are for size, on right are for coloring & font
         // interfaceWindow is displayed once in a swal popup, then changes messages on transaction status
         let transactionMessage = '';
         let proceedButtonText = 'checking ...';
         transactionMessage = `
                 <div id="withdrawConfirm" class="interfaceWindow">
-                    <span class="txStatus">You are about to withdraw</span>
-                    <span class="walletbalanceSpan">${tokenAmountString} ${symbol} from <a href="https://etherscan.io/token/${vaultAddress}" target="_blank">Vault <i class="fa fa-external-link"></i></a></span>
+                    <span class="txStatus">You are about to Delete</span>
+                    <span class="walletbalanceSpan">${hedgeTypeFull} for ${amountFormated} ${symbol} <a href="https://etherscan.io/token/${tokenAddress}" target="_blank">${truncatedTokenAdd} <i class="fa fa-external-link"></i></a></span>
                     <div class="approvalInfo">
                         <p>Proceed and confirm the transaction in your wallet.</p>
                     </div>
                 </div>
                 <div id="withdrawInProgress" class="interfaceWindow">
-                    <span class="txStatus">Withdrawal in progress</span>
+                    <span class="txStatus">Deleting in progress...</span>
                     <div class="approvalInfo">
                         <p>Please confirm the transaction in your wallet.</p>
                     </div>
-                    <span class="walletbalanceSpan">Withdrawing ${tokenAmountString} ${symbol} from <a href="https://etherscan.io/token/${vaultAddress}" target="_blank">Vault <i class="fa fa-external-link"></i></a></span>
-                </div>
-
-                <div id="insufficientBalance" class="interfaceWindow">  
-                    <span class="txStatus">Insufficient Balance</span>
-                    <div class="approvalInfo">
-                        <p> 
-                            <span class="txInfoBody txActionTitle">Available: </span>
-                            <span class="txInfoHead txInfoAmount">${walletBalanceString}</span>
-                            <span class="txInfoHead txInfoSymbol"> ${symbol} <a href="https://etherscan.io/token/${tokenAddress}" target="_blank"><i class="fa fa-external-link"></i></a> </span>
-                        </p>
-                        <p>
-                            <span class="txInfoBody txActionTitle">Required: </span>
-                            <span class="txInfoBody txInfoAmount">${tokenAmountString}</span>
-                            <span class="txInfoBody txInfoSymbol"> ${symbol} <a href="https://etherscan.io/token/${tokenAddress}" target="_blank"><i class="fa fa-external-link"></i></a> </span>
-                        </p>
-                    </div>
+                    <span class="walletbalanceSpan">${hedgeTypeFull} for ${amountFormated} ${symbol} <a href="https://etherscan.io/token/${tokenAddress}" target="_blank">${truncatedTokenAdd} <i class="fa fa-external-link"></i></a></span>
                 </div>
                 <div id="withdrawSuccess" class="interfaceWindow">
-                    <span class="txStatus">Withdrawal Success</span>
+                    <span class="txStatus">Hedge Deleted!</span>
                     <div class="approvalInfo">
                         <p>
-                            <span class="txInfoHead txInfoAmount">${tokenAmountString}</span>
-                            <span class="txInfoHead txInfoSymbol"> ${symbol} <a href="https://etherscan.io/token/${tokenAddress}" target="_blank"><i class="fa fa-external-link"></i></a> </span>
-                        </p>
-                        <p>                   
-                            <span class="txActionTitle">From:</span>
-                            <span class="txInfoAddress">${vaultAddressTrunc} <a href="https://etherscan.io/address/${vaultAddress}" target="_blank"><i class="fa fa-external-link"></i></a></span>  
+                            <span class="txInfoHead txInfoAmount">${amountFormated} ${symbol}  <a href="https://etherscan.io/token/${tokenAddress}" target="_blank"><i class="fa fa-external-link"></i></a> released from deal collateral back to balances.</span>
                         </p>
                     </div>
                     <div class="explainer">
                         <span> 
                             <i class="fa fa-info-circle"></i>
-                            Tokens withdrawn back to wallet.
+                            Tokens restored from lockedInUse to withdrawable.
                         </span>
                     </div>
                 </div>
             `;
 
-        // Prepare withdraw states
-        let insufficientBalance = walletBalance < tokenAmount;
-        // Scenarios with closing and proceeding
-        let swalType = "info";
-        let closeOnConfirm = false, showCancelButton = true;
-
-        if (insufficientBalance) {
-            closeOnConfirm = true;
-            showCancelButton = false;
-            swalType = "warning";
-        }
-
         swal({
             type: swalType,
-            title: "Vault Withdrawal",
+            title: "Hedge Deletion",
             text: transactionMessage,
             html: true,
             showCancelButton: showCancelButton,
@@ -474,17 +519,12 @@ async function withdrawInterface(tokenAddress, tokenAmount) {
             closeOnCancel: true
         }, async function (isConfirm) {
             if (isConfirm) {
-                // Check if wallet has enough balance
-                if (insufficientBalance) {
-                    $('.confirm').prop("disabled", true);
-                } else {
                     $('.confirm').prop("disabled", false);
                     $('.confirm').html('<i class="fa fa-spinner fa-spin"></i> Processing...');
                     // Progress notification
-                    tokenWithdrawingMessage(tokenAddress, tokenAmount, symbol);
+                    hedgeDeletingMessage();
                     // Call proceed function
-                    await vaultWithdraw(tokenAddress, tokenAmountBigInt, symbol);
-                }
+                    await deleteHedge();
             } else {
                 // User clicked the cancel button
                 swal("Cancelled", "Your money is safe :)", "error");
@@ -508,38 +548,23 @@ async function withdrawInterface(tokenAddress, tokenAmount) {
     }
 }
 
-async function vaultWithdraw(tokenAddress, tokenAmount, tokenSymbol) {
+async function deleteHedge(optionId) {
     try {
-        const accounts = await getAccounts();        
-        const walletAddress = accounts[0];
-        // Gas Tx
-        /*
-        const functionSelector = hedgingInstance.withdrawToken(tokenAddress, tokenAmount).encodeABI();
-        const transactionObject = {
-            to: CONSTANTS.neonAddress,
-            data: functionSelector,
-            from: walletAddress
-        };
-        const gasEstimate = await window.provider.estimateGas(transactionObject);
-        transactionObject.gasLimit = gasEstimate;
-        */
-
         // Submit Tx
-        const transaction = await hedgingInstance.connect(signer).withdrawToken(tokenAddress, tokenAmount);
-
+        const transaction = await hedgingInstance.connect(signer).deleteHedge(optionId);
         // Wait for the transaction to be mined
         const receipt = await transaction.wait();
 
         if (receipt.status === 1) {
-            console.log('Withdrawal successful. Transaction hash:', receipt.transactionHash);
+            console.log('Deleted successfully. Transaction hash:', receipt.transactionHash);
             // Progress notification
-            tokenWithdrawnMessage(receipt.transactionHash);
-            // Call refresh function
-            refreshBalances();
+            hedgeDeletedMessage(receipt.transactionHash);
+            // Hide hedge card
+            
         } else {
-            console.log('Withdrawal failed. Receipt status:', receipt.status);
+            console.log('Deletion failed. Receipt status:', receipt.status);
             swal({
-                title: "Withhdrawal Failed.",
+                title: "Failed to Delete.",
                 type: "error",
                 allowOutsideClick: true,
                 confirmButtonColor: "#F27474",
@@ -547,7 +572,7 @@ async function vaultWithdraw(tokenAddress, tokenAmount, tokenSymbol) {
             });
         }
     } catch (error) {
-        console.error('Withdrawal error:', error.message);
+        console.error('Deletion error:', error.message);
         swal({
             title: "Failed.",
             type: "error",
@@ -555,49 +580,24 @@ async function vaultWithdraw(tokenAddress, tokenAmount, tokenSymbol) {
             confirmButtonColor: "#F27474",
             text: "Transaction error: " + error.message
         });
-        $('#transactSubmit').html('Withdraw');
     }
 }
 
-async function tokenApprovingMessage() {
+async function hedgeBuyingMessage() {
     // Slide out the existing content
     $(".interfaceWindow").hide();
     // Slide in the new content
-    $("#approvalInProgress").fadeIn(2);
+    $("#depositInProgress").fadeIn(2);
 
     // Disable confirm button
     $('.confirm').prop("disabled", true);
 }
 
-function tokenApprovedMessage(tokenAmount, tokenAddress) {
-    // Slide out approval in progress
-    $(".interfaceWindow").hide();
-    // Slide in approval success
-    $("#allowanceSuccess").fadeIn("slow");
-
-    setTimeout(function() {
-        approvalDepositInterface(tokenAmount, tokenAddress); 
-    }, 4000);  
-}
-
-function tokenDepositingMessage() {
-
-    // Slide out the existing content
-    $(".interfaceWindow").hide();
-    // Slide in the new content
-    $("#depositInProgress").fadeIn("slow");
-
-    // Disable confirm button
-    $('.confirm').prop("disabled", true);
-}
-
-function tokenDepositedMessage(transactionHash) {
+function hedgePurchasedMessage(transactionHash) {
     // Slide out approval in progress
     $(".interfaceWindow").hide();
     // Slide in approval success
     $("#depositSuccess").fadeIn("slow");
-    // Reset cashier button
-    $('#transactSubmit').html('Deposit Again..');
     // Disable all buttons
     $('.cancel').prop("disabled", true);
 
@@ -610,13 +610,13 @@ function tokenDepositedMessage(transactionHash) {
         <div class="interfaceWindow">  
             <div class="approvalInfo">
                 <p>
-                    <span class="txInfoHead txInfoSymbol"> view transaction... <a href="https://sepolia.etherscan.io/tx/${transactionHash}" target="_blank"><i class="fa fa-external-link"></i></a> </span>
+                    <span class="txInfoHead txInfoSymbol">Hedge is active, view transaction... <a href="https://sepolia.etherscan.io/tx/${transactionHash}" target="_blank"><i class="fa fa-external-link"></i></a> </span>
                 </p>
             </div>
         </div>`;
 
         swal({
-            title: "Deposit Successful",
+            title: "Purchase Successful",
             type: "success",
             text: transactionMessage,
             html: true,
@@ -631,30 +631,26 @@ function tokenDepositedMessage(transactionHash) {
             }  else {
                 // User clicked the cancel button
                 swal("Cancelled", "Your money is safe :)", "error");
-                $('#transactSubmit').html('Deposit Again..');
             }       
         }); // close swal
     }, 3000); 
 }
 
-function tokenWithdrawingMessage() {
-
+function hedgeDeletingMessage() {
     // Slide out the existing content
     $(".interfaceWindow").hide();
     // Slide in the new content
     $("#withdrawInProgress").fadeIn("slow");
-
     // Disable confirm button
     $('.confirm').prop("disabled", true);
 }
 
-function tokenWithdrawnMessage(transactionHash) {
+function hedgeDeletedMessage(transactionHash) {
 
     // Slide out approval in progress
     $(".interfaceWindow").hide();
     // Slide in approval success
     $("#withdrawSuccess").fadeIn("slow");
-    $('#transactSubmit').html('Withdraw Again..');
     // Disable all buttons
     $('.cancel').prop("disabled", true);
     $('.confirm').prop("disabled", true);
@@ -671,7 +667,7 @@ function tokenWithdrawnMessage(transactionHash) {
         </div>`;
 
         swal({
-            title: "Withdrawal Successful",
+            title: "Hedge Deleted Successfully..",
             type: "success",
             text: transactionMessage,
             html: true,
@@ -693,91 +689,10 @@ function tokenWithdrawnMessage(transactionHash) {
 }
 
 
-
-
-
-
-
-
-/* WITHDRAWALs */
-
-
-
-
-
-
-
-
-
-
-
-/* Deprecated Deposit Function
-
-async function proceedDepositTx(tokenAddress, tokenAmount, tokenSymbol) {
-    try {
-        const accounts = await getAccounts();
-
-        if (accounts.length === 0) {
-            throw new Error('No wallet connected. Please connect a wallet.');
-        }
-
-        const walletAddress = accounts[0];
-        const functionSelector = hedgingInstance.depositToken(tokenAddress, tokenAmount).encodeABI();
-        const transactionObject = {
-            to: CONSTANTS.neonAddress,
-            data: functionSelector,
-            from: walletAddress
-        };
-        const gasEstimate = await window.provider.estimateGas(transactionObject);
-        transactionObject.gasLimit = gasEstimate;
-
-        // Submit deposit Tx & Listen for the transaction to be mined
-        const transaction = await window.ethereum.sendTransaction(transactionObject);
-        const receipt = await transaction.wait();
-
-        if (receipt.status === 1) {
-            console.log('Deposit status: ' + receipt.status);
-            console.log('Transaction hash:', receipt.transactionHash);
-            // Progress notification
-            tokenDepositedMessage(tokenAddress, tokenAmount, tokenSymbol);
-            // Call refresh function
-            refreshBalances();
-        } else {
-            console.log('Deposit Failed Receipt status: ' + receipt.status);
-            swal({
-                title: "Failed.",
-                type: "error",
-                allowOutsideClick: true,
-                confirmButtonColor: "#F27474",
-                text: "Transaction Failed Receipt status: " + receipt.status
-            });
-        }
-    } catch (error) {
-        console.error('Deposit error:', error);
-        swal({
-            title: "Failed.",
-            type: "error",
-            allowOutsideClick: true,
-            confirmButtonColor: "#F27474",
-            text: "Transaction error: " + error.message
-        });
-    }
-}
-*/
-
-// Event listener for modal being hidden
-/*
-Swal.fire({
-    onClose: () => {
-        $("#transactSubmit").html('Transact');
-    },
-});
-*/
-
 // Dummy refresh balances on networth card & append <li> to token list
 function refreshBalances() {
     console.log('Refreshing balances...');
 }
 
-export { allowanceCheck, approvalDepositInterface, withdrawInterface };
+export { purchaseInterface, deleteInterface };
   
