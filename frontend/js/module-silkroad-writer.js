@@ -20,19 +20,23 @@ async function purchaseInterface(optionId) {
 	const accounts = await getAccounts();
     const userAddress = accounts[0];
 
+    // Fetch the hedge data by ID
+	let result = await hedgingInstance.getHedgeDetails(optionId);
+
     // token balance check
-    let userdeleteHedgeable, tokenAmount;
+    let userwithdrawable, withdrawableTokens, tokenAmount;
     try { 
-        const mybalances = await getUserBalancesForToken(tokenAddress, userAddress);
-        userdeleteHedgeable = mybalances.withdrawableBalance;
-        withdrawableTokens = fromBigIntNumberToDecimal(userdeleteHedgeable);
+        const mybalances = await getUserBalancesForToken(result.token, userAddress);
+        userwithdrawable = mybalances.withdrawableBalance;
+        withdrawableTokens = fromBigIntNumberToDecimal(userwithdrawable);
         tokenAmount = fromBigIntNumberToDecimal(tokenAmount);
     } catch (error){
         console.log(error);
     }
 
     // Check hedge availability
-    if (tokenAmount > walletBalance) {
+    let status = parseFloat(result.status);     
+    if (status > 0) {
         console.log('Hedge Already Taken.');
         swal({
             title: "Hedge Already Taken",
@@ -48,7 +52,7 @@ async function purchaseInterface(optionId) {
     }
 
     // Check sufficient deposits
-    if (tokenAmount > walletBalance) {
+    if (withdrawableTokens > tokenAmount) {
         console.log('Insufficient Vault Balance.');
         swal({
             title: "Insufficient Vault Balance",
@@ -80,8 +84,6 @@ async function purchaseInterface(optionId) {
     //> only buy if the RR is worth it. Read docs for technical guide into options>    
 
     try{
-        // Fetch the hedge data by ID
-		let result = await hedgingInstance.getHedgeDetails(optionId);
 		// Fetch symbol
 		let symbol;
 		fetchNameSymbol(result.token).then(t=>{name=t.name,symbol=t.symbol}).catch(e=>console.error(e));
