@@ -3,10 +3,9 @@
 ==========================================================================*/
 import { CONSTANTS, getUserBalancesForToken, truncateAddress, getPairToken, getSymbol, getAccounts, isValidEthereumAddress, fromBigIntNumberToDecimal, fromDecimalToBigInt, getTokenDecimals, } from './constants.js';
 import { initializeConnection, chainCheck, reqConnect, handleAccountChange, handleNetworkChange, popupSuccess} from './web3-walletstatus-module.js';
-import { getTokenInfo } from './module-wallet-tokenlist-dependencies.js';
 import { refreshDataOnElements, loadOptions, fetchOptionStrip, fetchNameSymbol, prepareTimestamp, noOptionsSwal } from './module-market-card-fetchers.js';
 import { loadSidebar, loadSidebarVolume_All, loadSidebarVolume_Token, loadPastEvents, prepareEventListItem } from './module-market-sidebar-fetchers.js';
-
+import { purchaseInterface, deleteInterface } from './module-silkroad-writer.js';
 /*=========================================================================
     Wallet Page Main Functions
 ==========================================================================*/
@@ -434,6 +433,7 @@ async function createForm() {
 $(document).on('click', '#create_button', function(e){
 	createForm();
 });
+
 
 // Listeners: set sidebar globals
 $(document).on('click', '#statsLabel', async function(e){

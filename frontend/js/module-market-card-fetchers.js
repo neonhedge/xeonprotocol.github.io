@@ -1,5 +1,6 @@
 import { MyGlobals } from './_silkroad.js';
 import { CONSTANTS, getAccounts, getUserBalancesForToken, truncateAddress, commaNumbering, fromWeiToFixed5, getTokenDecimals, isValidEthereumAddress, fromDecimalToBigInt, fromBigIntNumberToDecimal } from './constants.js';
+import { purchaseInterface } from './module-silkroad-writer.js';
 
 async function refreshDataOnElements() {
 	// Fetch data for all items in MyGlobals.outputArray concurrently
@@ -382,7 +383,16 @@ async function loadOptions(){
 	
 
 	// Hide loading animation on timeline
-	timelineContainer.find('.loading').remove();		
+	timelineContainer.find('.loading').remove();
+
+	// Button Listeners: buyButton
+	document.querySelectorAll('.buyButton').forEach(button => {
+		button.addEventListener('click', function() {
+			// retrieve the optionId from the data-optionid attribute
+			const optionId = this.dataset.optionid;
+			purchaseInterface(optionId);
+		});
+	});
 }
 
 async function fetchOptionCard(optionId){
@@ -528,7 +538,7 @@ async function fetchOptionCard(optionId){
 		//option action button: buy, running/settle, expired
 		let action_btn, activity_btn;
 		if(status == 1){
-			action_btn = "<div id='"+optionId+"buyButton' class='option_S_tab actionButton buyButton' onclick='buyOption(" + optionId + ")'>Buy Option</div>";
+			action_btn = "<div id='"+optionId+"buyButton' class='option_S_tab actionButton buyButton' data-optionid="+optionId+">Buy Option</div>";
 			activity_btn = `
 			<div class="option_S_tab _bullbear">
 				<span class="status-dot inprogress"><svg stroke="currentColor" fill="#188dd6" stroke-width="0" viewBox="0 0 16 16" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><circle cx="8" cy="8" r="8"></circle></svg><span style="white-space: nowrap;">Vacant</span></span>
@@ -542,7 +552,7 @@ async function fetchOptionCard(optionId){
 			</div>`;
 		}
 		if(status == 3){
-			action_btn = "<div id='"+optionId+"buyButton' class='option_S_tab actionButton expiredButton'  onclick='settleOption(" + optionId + ")'>Settle</div>";
+			action_btn = "<div id='"+optionId+"buyButton' class='option_S_tab actionButton expiredButton'  onclick='settleInterface(" + optionId + ")'>Settle</div>";
 			activity_btn = `
 			<div class="option_S_tab _bullbear">
 				<span class="status-dot ended"><svg stroke="currentColor" fill="orange" stroke-width="0" viewBox="0 0 16 16" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><circle cx="8" cy="8" r="8"></circle></svg><span style="white-space: nowrap;">Expired</span></span>
