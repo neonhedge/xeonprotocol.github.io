@@ -29,14 +29,14 @@ async function purchaseInterface(optionId) {
         const mybalances = await getUserBalancesForToken(result.token, userAddress);
         userwithdrawable = mybalances.withdrawableBalance;
         withdrawableTokens = fromBigIntNumberToDecimal(userwithdrawable);
-        tokenAmount = fromBigIntNumberToDecimal(tokenAmount);
+        tokenAmount = fromBigIntNumberToDecimal(result.amount);
     } catch (error){
         console.log(error);
     }
 
     // Check hedge availability
     let status = parseFloat(result.status);     
-    if (status > 0) {
+    if (status > 1) {
         console.log('Hedge Already Taken.');
         swal({
             title: "Hedge Already Taken",
@@ -84,9 +84,6 @@ async function purchaseInterface(optionId) {
     //> only buy if the RR is worth it. Read docs for technical guide into options>    
 
     try{
-		// Fetch symbol
-		let symbol;
-		fetchNameSymbol(result.token).then(t=>{name=t.name,symbol=t.symbol}).catch(e=>console.error(e));
 		// Fetch token & pair address
 		let tokenAddress = result.token;
 		let truncatedTokenAdd = tokenAddress.substring(0, 6) + '...' + tokenAddress.slice(-3);
@@ -98,10 +95,10 @@ async function purchaseInterface(optionId) {
 		// Fetch taker
 		let taker = result.taker;
         let truncatedTaker = taker.substring(0, 6) + '...' + taker.slice(-3);
-		// Fetch deal status
-		let status = parseFloat(result.status);        
 		// Format token amounts
-		let amountFormated = cardCommaFormat(tokenAmount);		
+		let amountFormated = cardCommaFormat(tokenAmount);        
+		// Fetch symbol
+		//let symbol = await getTokenDecimalAndSymbol(tokenAddress);
 
 		// Fetch hedge type
 		let hedgeType;
@@ -129,22 +126,24 @@ async function purchaseInterface(optionId) {
 		const pairedAddressDecimal = await getTokenDecimals(tokenPairAddress);
 		const marketvalue = fromBigIntNumberToDecimal(marketvalueCurrent, pairedAddressDecimal);
 		
-		// Fetch startvalue, cost, strikeprice in BN - before fromBigIntNumberToDecimal conversion
-        let cost, strikeprice;
-		let costBN = ethers.BigNumber.from(result.cost);
+		// Fetch startvalue, cost, strikeprice
+        let cost, strikevalue;
+
 		// based on token decimals, manual not function call to pair address as WETH on sepolia is 6 decimal
 		if (tokenPairAddress === CONSTANTS.usdtAddress || tokenPairAddress === CONSTANTS.usdcAddress) { //USDT or USDC
-			strikeprice = fromBigIntNumberToDecimal(strike, 6);
-			cost = fromBigIntNumberToDecimal(costBN, 6);
+            cost = fromBigIntNumberToDecimal(result.cost, 6);
+            strikevalue = fromBigIntNumberToDecimal(result.strikeValue, 6);
 		} else if (tokenPairAddress === CONSTANTS.wethAddress) { //WETH
-			strikeprice = fromBigIntNumberToDecimal(strike, 18);
-			cost = fromBigIntNumberToDecimal(costBN, 18);
+			cost = fromBigIntNumberToDecimal(result.cost, 18);
+            strikevalue = fromBigIntNumberToDecimal(result.strikeValue, 18);
 		}
+        
+        let strikeprice = strikevalue / tokenAmount;
 
 		// Format outputs
 		let marketvalueFormatted = cardCommaFormat(marketvalue);
 		let costFormatted = cardCommaFormat(cost);
-		let strikeFormatted = cardCommaFormat(strikePrice);
+		let strikeFormatted = cardCommaFormat(strikeprice);
 		
 		// Token logourl
 		let logourl = result.logourl;
@@ -196,116 +195,115 @@ async function purchaseInterface(optionId) {
 			typeClass = 'aType-swap-option';
 			typeClassValue = 'style="background: none !important;"';
 		}
-        
+        let transactionMessage = '';
+        let proceedButtonText = 'checking ...';
+        // prepare approved info panel for swal below
+        // classes on left are for size, on right are for coloring & font
+        // interfaceWindow is displayed once in a swal popup, then changes messages on transaction status
+        transactionMessage = `
+                <div id="depositInProgress" class="interfaceWindow">
+                    <span class="txStatus">Purchase in progress</span>
+                    <div class="approvalInfo">
+                        <p>Please confirm the transaction in your wallet.</p>
+                    </div>
+                    <span class="walletbalanceSpan">Buying a ${hedgeTypeFull} from <a href="https://etherscan.io/address/${owner}" target="_blank">${truncatedOwner} <i class="fa fa-external-link"></i></a></span>
+                    <span class="walletbalanceSpan">Underlying Tokens: ${amountFormated} ${pairSymbol} </span>
+                    <span class="walletbalanceSpan">Cost to Buy: ${costFormatted} ${pairSymbol}</span>
+                </div>
+
+                <div id="depositRequired" class="interfaceWindow ">  
+                    <span class="txStatus">Buy Hedge</span>
+                    <div class="approvalInfo">
+                        <p>
+                            <div class="projectLogo" style="background-image:url('${logourl}')"></div>
+                            <span class="txInfoHead txInfoAmount">${amountFormated}</span>
+                            <span class="txInfoHead txInfoSymbol"> ${symbol} <a href="https://etherscan.io/token/${tokenAddress}" target="_blank"><i class="fa fa-external-link"></i></a> </span>
+                        </p>
+                        <p>
+                            <span class="txInfoBody txActionTitle">Market Value:</span>
+                            <span class="txInfoHead txInfoAmount">${marketvalueFormatted}</span>
+                            <span class="txInfoHead txInfoSymbol"> ${pairSymbol} <a href="https://etherscan.io/token/${pairedAddress}" target="_blank"><i class="fa fa-external-link"></i></a> </span>
+                        </p>
+                        <p>
+                            <span class="txInfoBody txActionTitle">Buy Cost:</span>
+                            <span class="txInfoBody txInfoAddress">${costFormatted} <a href="https://etherscan.io/address/${pairedAddress}" target="_blank"><i class="fa fa-external-link"></i></a></span>  
+                        </p>
+
+                        <p>
+                            <span class="txInfoBody txActionTitle">Duration:</span>
+                            <span class="txInfoBody txInfoAddress">${timeToExpiry}</span>  
+                        </p>
+
+                        <p>
+                            <span class="txInfoBody txActionTitle">Hedge Type:</span>
+                            <span class="txInfoBody txInfoAddress">${hedgeTypeFull}</span>
+                        </p>
+                        
+                    </div>
+
+                    <div class="explainer">
+                        <span> 
+                            <i class="fa fa-info-circle"></i>
+                            Click buy below, your wallet will be prompted to Sign the Purchase Transaction. 
+                        </span>
+                    </div>
+                </div>
+
+                <div id="depositSuccess" class="interfaceWindow">
+                    <span class="txStatus">Purchase Successful</span>
+                    <div class="approvalInfo">
+                        <p>
+                            <span class="txInfoHead txInfoAmount">You have purchased the ${hedgeTypeFull} for ${amountFormated} ${pairSymbol} <a href="https://etherscan.io/token/${tokenAddress}" target="_blank"><i class="fa fa-external-link"></i></a> </span>
+                        </p>
+                        <p>                   
+                            <span class="txActionTitle">From:</span>
+                            <span class="txInfoAddress">${truncatedOwner} <a href="https://etherscan.io/address/${owner}" target="_blank"><i class="fa fa-external-link"></i></a></span>  
+                        </p>
+                    </div>
+                    <div class="explainer">
+                        <span> 
+                            <i class="fa fa-info-circle"></i>
+                            Fetching the transaction...
+                        </span>
+                    </div>
+                </div>
+            `;
+
+        swal({
+            type: "info",
+            title: "Hedge Purchase",
+            text: transactionMessage,
+            html: true,
+            showCancelButton: true,
+            confirmButtonColor: "#04C86C",
+            confirmButtonText: proceedButtonText,
+            cancelButtonText: "Cancel",
+            closeOnConfirm: false,
+            closeOnCancel: true
+        }, async function(isConfirm) {
+            if (isConfirm) {
+                // Check if wallet has enough permissions
+                if (tokenAmount < walletBalance) {
+                    $('.confirm').prop("disabled", true);
+                } else {
+                    $('.confirm').prop("disabled", false);
+                    $('.confirm').html('<i class="fa fa-spinner fa-spin"></i> Processing...');
+            
+                    hedgeBuyingMessage();
+                    // Submit Transaction to Vault
+                    await buyHedge(optionId, pairedAddress, costBN);
+                }
+            }  else {
+                // User clicked the cancel button
+                swal("Cancelled", "Your money is safe :)", "error");
+                $('#transactSubmit').html('Deposit');
+            }       
+        });
     } catch (error){
         console.log(error);
-    }
-
-    let transactionMessage = '';
-    let proceedButtonText = 'checking ...';
-    // prepare approved info panel for swal below
-    // classes on left are for size, on right are for coloring & font
-    // interfaceWindow is displayed once in a swal popup, then changes messages on transaction status
-    transactionMessage = `
-
-            <div id="depositInProgress" class="interfaceWindow">
-                <span class="txStatus">Purchase in progress</span>
-                <div class="approvalInfo">
-                    <p>Please confirm the transaction in your wallet.</p>
-                </div>
-                <span class="walletbalanceSpan">Buying a ${hedgeTypeFull} from <a href="https://etherscan.io/address/${owner}" target="_blank">${truncatedOwner} <i class="fa fa-external-link"></i></a></span>
-                <span class="walletbalanceSpan">Underlying Tokens: ${amountFormated} ${symbol} </span>
-                <span class="walletbalanceSpan">Cost to Buy: ${costFormatted} ${pairSymbol}</span>
-            </div>
-
-            <div id="depositRequired" class="interfaceWindow ">  
-                <span class="txStatus">Buy Hedge</span>
-                <div class="approvalInfo">
-                    <p>
-                        <div class="projectLogo" style="background-image:url('${logourl}')"></div>
-                        <span class="txInfoHead txInfoAmount">${amountFormated}</span>
-                        <span class="txInfoHead txInfoSymbol"> ${symbol} <a href="https://etherscan.io/token/${tokenAddress}" target="_blank"><i class="fa fa-external-link"></i></a> </span>
-                    </p>
-                    <p>
-                        <span class="txInfoBody txActionTitle">Market Value:</span>
-                        <span class="txInfoHead txInfoAmount">${marketvalueFormatted}</span>
-                        <span class="txInfoHead txInfoSymbol"> ${pairSymbol} <a href="https://etherscan.io/token/${pairedAddress}" target="_blank"><i class="fa fa-external-link"></i></a> </span>
-                    </p>
-                    <p>
-                        <span class="txInfoBody txActionTitle">Buy Cost:</span>
-                        <span class="txInfoBody txInfoAddress">${costFormatted} <a href="https://etherscan.io/address/${pairedAddress}" target="_blank"><i class="fa fa-external-link"></i></a></span>  
-                    </p>
-
-                    <p>
-                        <span class="txInfoBody txActionTitle">Duration:</span>
-                        <span class="txInfoBody txInfoAddress">${timeToExpiry}</span>  
-                    </p>
-
-                    <p>
-                        <span class="txInfoBody txActionTitle">Hedge Type:</span>
-                        <span class="txInfoBody txInfoAddress">${hedgeTypeFull}</span>
-                    </p>
-                    
-                </div>
-
-                <div class="explainer">
-                    <span> 
-                        <i class="fa fa-info-circle"></i>
-                        Click buy below, your wallet will be prompted to Sign the Purchase Transaction. 
-                    </span>
-                </div>
-            </div>
-
-            <div id="depositSuccess" class="interfaceWindow">
-                <span class="txStatus">Purchase Successful</span>
-                <div class="approvalInfo">
-                    <p>
-                        <span class="txInfoHead txInfoAmount">You have purchased the ${hedgeTypeFull} for ${amountFormated} ${symbol} <a href="https://etherscan.io/token/${tokenAddress}" target="_blank"><i class="fa fa-external-link"></i></a> </span>
-                    </p>
-                    <p>                   
-                        <span class="txActionTitle">From:</span>
-                        <span class="txInfoAddress">${truncatedOwner} <a href="https://etherscan.io/address/${owner}" target="_blank"><i class="fa fa-external-link"></i></a></span>  
-                    </p>
-                </div>
-                <div class="explainer">
-                    <span> 
-                        <i class="fa fa-info-circle"></i>
-                        Fetching the transaction...
-                    </span>
-                </div>
-            </div>
-        `;
-
-    swal({
-        type: "info",
-        title: "Hedge Purchase",
-        text: transactionMessage,
-        html: true,
-        showCancelButton: true,
-        confirmButtonColor: "#04C86C",
-        confirmButtonText: proceedButtonText,
-        cancelButtonText: "Cancel",
-        closeOnConfirm: false,
-        closeOnCancel: true
-    }, async function(isConfirm) {
-        if (isConfirm) {
-            // Check if wallet has enough permissions
-            if (tokenAmount < walletBalance) {
-                $('.confirm').prop("disabled", true);
-            } else {
-                $('.confirm').prop("disabled", false);
-                $('.confirm').html('<i class="fa fa-spinner fa-spin"></i> Processing...');
+    } finally {
         
-                hedgeBuyingMessage();
-                // Submit Transaction to Vault
-                await buyHedge(optionId, pairedAddress, costBN);
-            }
-        }  else {
-            // User clicked the cancel button
-            swal("Cancelled", "Your money is safe :)", "error");
-            $('#transactSubmit').html('Deposit');
-        }       
-    });
+    }
 }
 
 async function buyHedge(optionId, pairAddress, costBN) {
