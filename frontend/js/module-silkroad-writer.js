@@ -112,7 +112,9 @@ async function purchaseInterface(optionId) {
 			console.log('Hedge type is unknown');
 		}
 		// Format manually the paired symbol
-		let pairSymbol;
+		let tokenSymbol, pairSymbol;
+        tokenSymbol = await getSymbol(tokenAddress);
+
 		if (tokenPairAddress === CONSTANTS.usdtAddress) {
 			pairSymbol = 'USDT';
 		} else if (tokenPairAddress === CONSTANTS.usdcAddress) {
@@ -146,7 +148,7 @@ async function purchaseInterface(optionId) {
 		let strikeFormatted = cardCommaFormat(strikeprice);
 		
 		// Token logourl
-		let logourl = result.logourl;
+		let logourl = './imgs/tokens/ovela.webp';
 
 		// Dates to human-readable dates
 		let dt_created = new Date(result.dt_created * 1000).toLocaleString();
@@ -196,29 +198,33 @@ async function purchaseInterface(optionId) {
 			typeClassValue = 'style="background: none !important;"';
 		}
         let transactionMessage = '';
-        let proceedButtonText = 'checking ...';
+        let proceedButtonText = 'Buy';
         // prepare approved info panel for swal below
         // classes on left are for size, on right are for coloring & font
         // interfaceWindow is displayed once in a swal popup, then changes messages on transaction status
         transactionMessage = `
                 <div id="depositInProgress" class="interfaceWindow">
-                    <span class="txStatus">Purchase in progress</span>
+                    <span class="txStatus">in progress...</span>
                     <div class="approvalInfo">
                         <p>Please confirm the transaction in your wallet.</p>
                     </div>
+                    </br>
                     <span class="walletbalanceSpan">Buying a ${hedgeTypeFull} from <a href="https://etherscan.io/address/${owner}" target="_blank">${truncatedOwner} <i class="fa fa-external-link"></i></a></span>
-                    <span class="walletbalanceSpan">Underlying Tokens: ${amountFormated} ${pairSymbol} </span>
+                    </br>
+                    <span class="walletbalanceSpan">Underlying Tokens: ${amountFormated} ${tokenSymbol} </span>
+                    </br>
                     <span class="walletbalanceSpan">Cost to Buy: ${costFormatted} ${pairSymbol}</span>
                 </div>
 
-                <div id="depositRequired" class="interfaceWindow ">  
-                    <span class="txStatus">Buy Hedge</span>
+                <div id="depositRequired" class="interfaceWindow ">
                     <div class="approvalInfo">
                         <p>
-                            <div class="projectLogo" style="background-image:url('${logourl}')"></div>
-                            <span class="txInfoHead txInfoAmount">${amountFormated}</span>
-                            <span class="txInfoHead txInfoSymbol"> ${symbol} <a href="https://etherscan.io/token/${tokenAddress}" target="_blank"><i class="fa fa-external-link"></i></a> </span>
+                            <span class="projectLogo" style="background-image:url('${logourl}')"></span>
                         </p>
+                        <p>
+                            <span class="txInfoHead txInfoAmount">${amountFormated} ${tokenSymbol} <a href="https://etherscan.io/token/${tokenAddress}" target="_blank"><i class="fa fa-external-link"></i></a></span>
+                        </p>
+                        </br>
                         <p>
                             <span class="txInfoBody txActionTitle">Market Value:</span>
                             <span class="txInfoHead txInfoAmount">${marketvalueFormatted}</span>
@@ -238,13 +244,13 @@ async function purchaseInterface(optionId) {
                             <span class="txInfoBody txActionTitle">Hedge Type:</span>
                             <span class="txInfoBody txInfoAddress">${hedgeTypeFull}</span>
                         </p>
-                        
+                        </br>
                     </div>
 
                     <div class="explainer">
                         <span> 
                             <i class="fa fa-info-circle"></i>
-                            Click buy below, your wallet will be prompted to Sign the Purchase Transaction. 
+                            Proceed below, you will be prompted to Sign the transaction in your wallet. 
                         </span>
                     </div>
                 </div>
@@ -283,15 +289,15 @@ async function purchaseInterface(optionId) {
         }, async function(isConfirm) {
             if (isConfirm) {
                 // Check if wallet has enough permissions
-                if (tokenAmount < walletBalance) {
+                if (tokenAmount < withdrawableTokens) {
                     $('.confirm').prop("disabled", true);
                 } else {
                     $('.confirm').prop("disabled", false);
-                    $('.confirm').html('<i class="fa fa-spinner fa-spin"></i> Processing...');
+                    $('.confirm').html('<i class="fa fa-spinner fa-spin"></i> buying...');
             
                     hedgeBuyingMessage();
                     // Submit Transaction to Vault
-                    await buyHedge(optionId, pairedAddress, costBN);
+                    await buyHedge(optionId);
                 }
             }  else {
                 // User clicked the cancel button
@@ -299,14 +305,21 @@ async function purchaseInterface(optionId) {
                 $('#transactSubmit').html('Deposit');
             }       
         });
+
+        // Run display scrips on swal load
+        $(".interfaceWindow").hide();
+        $("#depositRequired").fadeIn("slow");
+
     } catch (error){
-        console.log(error);
-    } finally {
-        
+        console.log(error.message);
     }
 }
 
-async function buyHedge(optionId, pairAddress, costBN) {
+async function buyHedge(optionId) {
+    // Run display scrips on swal load
+    $(".interfaceWindow").hide();
+    $("#depositInProgress").fadeIn("slow");
+
     try {
         // Retrieve wallet connected
         const accounts = await getAccounts();
@@ -331,7 +344,8 @@ async function buyHedge(optionId, pairAddress, costBN) {
             swal({ title: "Failed.", type: "error", allowOutsideClick: true, confirmButtonColor: "#F27474", text: "Transaction failed. Receipt status: " + receipt.status });
         }
     } catch (error) {
-        console.error('Purchase error:', error);
+        //Purchase error: Error: cannot estimate gas; transaction may fail or may require manual gas limit (error={"code":-32603,"message":"execution reverted: Invalid option ID | Owner can't buy","data":{"originalError":{"code":3,"data":"0x08c379a000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000023496e76616c6964206f7074696f6e204944207c204f776e65722063616e2774206275790000000000000000000000000000000000000000000000000000000000","message":"execution reverted: Invalid option ID | Owner can't buy"}}}, method="estimateGas", transaction={"from":"0xFe395BDfBc00484658b83088Edf7E0E19cD7A6cd","to":"0xa50E605f76661d4C0e36a78C588E084D779B05fE","data":"0x5000d7480000000000000000000000000000000000000000000000000000000000000000"}, code=UNPREDICTABLE_GAS_LIMIT, 
+        console.error('Purchase error:', error.messages);
         swal({ title: "Failed.", type: "error", allowOutsideClick: true, confirmButtonColor: "#F27474", text: "Transaction error: " + error.message });
     }
 }
@@ -533,16 +547,9 @@ async function deleteInterface(optionId) {
         });
 
         // Run display scrips on swal load
-        console.log("request: " + tokenAmount + ", walletBalance: " + walletBalance);
-        if (walletBalance < tokenAmount) {
-            $(".interfaceWindow").hide();
-            $("#insufficientBalance").fadeIn("slow");
-            $('.confirm').html('Oops!');
-        } else {
-            $(".interfaceWindow").hide();
-            $("#withdrawConfirm").fadeIn("slow");
-            $('.confirm').html('Withdraw...');
-        }
+        $(".interfaceWindow").hide();
+        $("#withdrawConfirm").fadeIn("slow");
+        $('.confirm').html('Oops!');
     } catch (error) {
         console.error('Error:', error.message);
     }
