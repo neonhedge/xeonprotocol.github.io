@@ -1,4 +1,4 @@
-import { CONSTANTS, getTokenDecimals, fromBigIntNumberToDecimal, fromDecimalToBigInt, getTokenDecimalSymbolName } from './constants.js';
+import { CONSTANTS, getTokenDecimals, fromBigIntNumberToDecimal, fromDecimalToBigInt, getTokenDecimalSymbolName, getAccounts } from './constants.js';
 import { updateSectionValues_HedgeCard, updateSectionValues_Progress, updateSectionValues_Gains } from './module-hedge-section-updaters.js';
 import { updateChartValues_Hedge, updateChartValues_Assets } from './module-hedge-chart-updaters.js';
 
@@ -19,7 +19,7 @@ async function fetchSection_HedgeCard(){
     }
 
     try {
-        const accounts = await web3.eth.requestAccounts();
+        const accounts = await getAccounts();
         const userAddress = accounts[0];
 
         
@@ -317,13 +317,13 @@ async function fetchSection_HedgeCardDefault(){
 
 
 async function fetchSection_HedgeRequests(topupRequests, owner, taker) {
-    const accounts = await web3.eth.requestAccounts();
+    const accounts = await getAccounts();
     const userAddress = accounts[0];
 
     const requestList = document.getElementById("requestList");
     // Iterate the array IDs and retrieve the request status then append to requestList
     topupRequests.forEach(async (requestId) => {
-        const topupData = await hedgingInstance.methods.topupMap(requestId).call();
+        const topupData = await hedgingInstance.topupMap(requestId);
 
         if (topupData.state == 0) {
             if (owner == userAddress && topupData.amountTaker > 0) {
