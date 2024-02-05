@@ -10,7 +10,7 @@ function updateSectionValues_HedgeCard(
     //values
     endValue,
     strikeValue,
-    underlyingValue,
+    marketValue,
     startValue,
     createValue,
     cost,
@@ -48,7 +48,7 @@ function updateSectionValues_HedgeCard(
             const options = {
                 style: 'decimal',
                 minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
+                maximumFractionDigits: 7,
             };
             return number.toLocaleString('en-US', options);
         };
@@ -56,38 +56,43 @@ function updateSectionValues_HedgeCard(
         // Step 1: Update Type
         // Define a mapping object for hedgeType values
         const hedgeTypeMapping = {
-            0: { text: 'Call Option', color: '#089353' }, // CALL
-            1: { text: 'Put Option', color: '#d6188a' },  // PUT
-            2: { text: 'Equity Swap', color: '#7e22ce' }, // SWAP
+            'CALL': { text: 'Call Option', color: '#089353' }, // CALL
+            'PUT': { text: 'Put Option', color: '#d6188a' },  // PUT
+            'SWAP': { text: 'Equity Swap', color: '#440076' }, // SWAP
         };
-alert(hedgeType)
+        
         // Get the hedgeType value
         const hedgeTypeDiv = document.querySelector('#hedgeType'); 
 
         // Ensure hedgeType is a valid key our hedgeTypeMapping
-        const hedgeTypeValue = hedgeTypeMapping.hasOwnProperty(hedgeType) ? hedgeTypeMapping[hedgeType] : { text: 'Unknown Hedge', color: '#000000' };
+        const hedgeTypeValue = hedgeTypeMapping.hasOwnProperty(hedgeType) ? hedgeTypeMapping[hedgeType] : { text: 'Unknown Hedge', color: '#FFF' };
+        document.getElementById('hedgeTypeCard').style.backgroundColor = hedgeTypeValue.color;
 
         // Update the text content and background color of the div
         hedgeTypeDiv.textContent = hedgeTypeValue.text;
-        hedgeTypeDiv.style.backgroundColor = hedgeTypeValue.color;
-
 
         // Step 2: Update token symbol & amount
         document.getElementById("tokenSymbol").textContent = tokenSymbol;
-        document.getElementById("tokenAmount").textContent = tokenAmount;
+        document.getElementById("tokenAmount").textContent = formatStringDecimal(tokenAmount) + ' tokens';
 
         // Step 3: Update underlying / current value
-        document.getElementById("underlyingValue").textContent = `${underlyingValue} ${pairedSymbol}`;
+        document.getElementById("marketValue").textContent = `${formatStringDecimal(marketValue)} ${pairedSymbol}`;
 
         // Step 4: Update hedge values
-        document.getElementById("startValue").textContent = `${formatValue(startValue)} ${pairedSymbol}`;
-        document.getElementById("strikeValue").textContent = `${formatValue(strikeValue)} ${pairedSymbol}`;
-        document.getElementById("hedgeCost").textContent = `${formatValue(cost)} ${pairedSymbol}`;
+        document.getElementById("startValue").textContent = `${formatStringDecimal(startValue)} ${pairedSymbol}`;
+        document.getElementById("strikeValue").textContent = `${formatStringDecimal(strikeValue)} ${pairedSymbol}`;
+        document.getElementById("cost").textContent = `${formatStringDecimal(cost)} ${pairedSymbol}`;
 
         // Step 5: Update times
-        document.getElementById("dateCreate").textContent = dt_createdFormatted;
-        document.getElementById("dateStart").textContent = dt_startedFormatted;
-        document.getElementById("dateExpiry").textContent = dt_expiryFormatted;
+        document.getElementById("created").textContent = dt_createdFormatted;
+        document.getElementById("taken").textContent = dt_startedFormatted;
+        document.getElementById("expires").textContent = dt_expiryFormatted;
+        
+        // Update the tokenLogo background
+        const tokenLogoDiv = document.getElementById('tokenLogo');
+        const newBackgroundImageUrl = 'url(\'./imgs/tokens/ovela.webp\')'; 
+        tokenLogoDiv.style.backgroundImage = newBackgroundImageUrl;
+
 
     } catch (error) {
         console.error("Error Updating Net Worth section data:", error);
@@ -99,7 +104,7 @@ function updateSectionValues_Progress(
     //values
     endValue,
     strikeValue,
-    underlyingValue,
+    marketValue,
     startValue,
     createValue,
     cost,
@@ -113,17 +118,23 @@ function updateSectionValues_Progress(
     //status
     status
 )   {
+    const formatValue = (value) => {
+        return `${value.toFixed(2)}`;
+    };
+
     try {
         // Step 1: Update progress : hours left
         document.getElementById("timetoExpiry").textContent = `${timetoExpiry} hrs`;
         
         // Step 2: compare lifespan to timetoExpiry and set the width of a div with ID progressBar, if timetoExpiry is 10% of lifespan then width is 10% of 100%        
-        const progressBar = document.getElementById('progressBar');
+        const progressBar = document.getElementById('meter_guage ');
         
         if (lifespan >= 0 && timetoExpiry < lifespan) {
           const percentage = (timetoExpiry / lifespan) * 100;
           const percentWidth = 100 - percentage;
           progressBar.style.width = `${percentWidth}%`;
+          //update % text
+          document.getElementById("measure").textContent = `${formatValue(percentage)} %`;
         } else {
           progressBar.style.width = '0%';
         }
@@ -143,7 +154,7 @@ function updateSectionValues_Gains(
     //values
     endValue,
     strikeValue,
-    underlyingValue,
+    marketValue,
     startValue,
     createValue,
     cost,
@@ -211,10 +222,10 @@ function updateSectionValues_Gains(
         };
 
         // Display privatised taker and owner addresses
-        const hedgeTakerDiv = document.getElementById("hedgeTaker");
+        const hedgeTakerDiv = document.getElementById("takerTrunc");
         hedgeTakerDiv.innerText = truncateAddress(taker);
 
-        const hedgeOwnerDiv = document.getElementById("hedgeOwner");
+        const hedgeOwnerDiv = document.getElementById("ownerTrunc");
         hedgeOwnerDiv.innerText = truncateAddress(owner);
 
         // Show buttons based on status and userAddress

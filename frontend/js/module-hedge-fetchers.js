@@ -50,7 +50,7 @@ async function fetchSection_HedgeCard(){
 		//name and symbol
 		let tokenName,tokenSymbol, tokenDecimal;
         
-		getTokenDecimalSymbolName(hedgeResult.token).then(t=>{tokenName=t.name,tokenSymbol=t.symbol, tokenDecimal=t.tokenDecimal}).catch(e=>console.error(e));
+		[tokenName, tokenDecimal, tokenSymbol] = await getTokenDecimalSymbolName(hedgeResult.token);
 		//token & pair address
 		let tokenAddress = hedgeResult.token;
 		let tokenPairAddress = hedgeResult.paired;
@@ -262,9 +262,8 @@ async function fetchSection_HedgeCard(){
 
         // Hedge Underlying ERC20 Assets - Global arrays for token names and amounts
         // For Alpha and Beta V1, single assets, display underlying quantity & cost quantity in basket
-        const costAmount = costDeci / marketPrice;
         const tokenNamesArray = [tokenSymbol, pairSymbol];
-        const tokenAmountArray = [tokenAmount, costAmount];
+        const tokenAmountArray = [tokenAmount, costDeci];
         updateChartValues_Assets(tokenNamesArray, tokenAmountArray);
 
         // Hedge Requests - pull topup requests from mappings and populate list

@@ -40,7 +40,7 @@
 
 	<script type="application/javascript" src="js/sweetalert/sweetalert.min.js"></script>	
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/bignumber.js/9.0.0/bignumber.min.js"></script>
-	
+
 	<!-- hedge dependancy scripts -->
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.17.1/matter.min.js"></script> <!-- ASSET BASKET-->
 
@@ -182,20 +182,20 @@
 			<div class="hedgeCore">
 				<div class="hedgeCard statemark_ill_wish">
 					<div class="hedgeGrid">
-						<div class="tokenLogoLeft" style="background-image:url('imgs/monkeytrain.png')"></div>
+						<div id="tokenLogo" class="tokenLogoLeft" style="background-image:url('imgs/monkeytrain.png')"></div>
 						<div class="tokenName">
-						<div>TSUKA <span class="additionalTokens">+6 others</span></div>
-						<div class="bagsize">1,660,500 Tokens</div>
+							<div id="tokenSymbol">TSUKA <span class="additionalTokens">+6 others</span></div>
+							<div id="tokenAmount" class="bagsize">1,660,500 Tokens</div>
 						</div>
 					</div>
 					<div class="valueHold">
-						<div class="optionType">
+						<div id="hedgeTypeCard" class="optionType">
 							<div class="typeTitle">HEDGE</div>
-							<div class="optionTypeValue flux highlightOption">Call Option</div>
+							<div id="hedgeType" class="optionTypeValue flux highlightOption">Call Option</div>
 						</div>
 						<div class="optionValue">
 							<div class="valueTitle">VALUE</div>
-							<div class="optionMarketValue flux highlightOption">10.2 ETH</div>
+							<div id="marketValue" class="optionMarketValue flux highlightOption">10.2 ETH</div>
 						</div>
 						<div class="optionComposition">
 							<div class="compositionTitle">Assets</div>
@@ -208,12 +208,12 @@
 					</div>
 					<div class="optionMarkContainer">
 						<div class="hedgeDetails">
-							<div class="optionMark"><span>Start Value:</span><span class="oMfigure">-- ETH</span></div>
-							<div class="optionMark"><span>Strike Value:</span><span class="oMfigure">10.7 ETH</span></div>
-							<div class="optionMark"><span>Hedge Cost:</span><span class="oMfigure">0.5 ETH</span></div>
-							<div class="optionMark"><span>Date Create:</span><span class="oMfigure">18/05/2023</span></div>
-							<div class="optionMark"><span>Date Taken:</span><span class="oMfigure">18/05/2023</span></div>
-							<div class="optionMark"><span>Date Expire:</span><span class="oMfigure">25/05/2023</span></div>
+							<div class="optionMark"><span>Start Value:</span><span id="startValue" class="oMfigure">-- ETH</span></div>
+							<div class="optionMark"><span>Strike Value:</span><span id="strikeValue" class="oMfigure">10.7 ETH</span></div>
+							<div class="optionMark"><span>Hedge Cost:</span><span id="cost" class="oMfigure">0.5 ETH</span></div>
+							<div class="optionMark"><span>Date Create:</span><span id="created" class="oMfigure">18/05/2023</span></div>
+							<div class="optionMark"><span>Date Taken:</span><span id="taken" class="oMfigure">18/05/2023</span></div>
+							<div class="optionMark"><span>Date Expire:</span><span id="expires" class="oMfigure">25/05/2023</span></div>
 						</div>
 						<div class="dealRequests">
 							<h5>Deal Requests..</h5>
@@ -243,12 +243,12 @@
 					<div class="progressSummary">
 						<div class="timetoexpiry status-dot">time to expiry..</div>
 						<span class="status-dot inprogress">
-							<span style="white-space: nowrap;" title="hours left until this hedge expires"> 246 hrs</span>
+							<span id="timetoExpiry" style="white-space: nowrap;" title="hours left until this hedge expires"> 246 hrs</span>
 							<i class="fa-solid fa-hourglass-start"></i>
 						</span>
 						<div class="mbcard_detail rb_detail">
 							<div class="parent_meter">
-								<div id="meter_guage"></div><span class="measure">90%</span>
+								<div id="meter_guage"></div><span id="measure" class="measure">90%</span>
 							</div>
 						</div>
 					</div>
@@ -270,11 +270,11 @@
 						<div class="user-card">
 							<div class="icon"><i class="fa-solid fa-user-astronaut"></i></div>
 						</div>
-						<div class="userWallet ownerMark">0X3fe...h986</div>
+						<div id="ownerTrunc" class="userWallet ownerMark">0X3fe...h986</div>
 					</div>						
 					<!-- graphic svg -->	
 					<div class="ownerProfitabil">
-						<span>+ 0.00$</span>
+						<span id="writerGains">+ 0.00$</span>
 						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 100">
 							<rect x="0" y="0" width="100%" height="100%" fill="none" />
 							<defs>
@@ -299,11 +299,11 @@
 						<div class="user-card">
 							<div class="icon"><i class="fa-solid fa-user-astronaut"></i></div>
 						</div>
-						<div class="userWallet ownerMark">0X000...0000</div>
+						<div id="takerTrunc" class="userWallet ownerMark">0X000...0000</div>
 					</div>						
 					<!-- graphic svg -->	
 					<div class="ownerProfitabil">
-						<span>+ 0.00$</span>
+						<span id="takerGains">+ 0.00$</span>
 						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 100">
 							<rect x="0" y="0" width="100%" height="100%" fill="none" />
 							<defs>
