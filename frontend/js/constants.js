@@ -154,11 +154,11 @@ async function getTokenDecimals(tokenAddress, defaultDecimals = 18) {
 async function getTokenDecimalSymbolName(tokenAddress) {
   // ERC20 ABI
   const erc20ABI = [
-      {"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"spender","type":"address"}],"name":"allowance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
-      {"constant":true,"inputs":[],"name":"decimals","outputs":[{"name":"","type":"uint8"}],"type":"function"},
-      {"constant":true,"inputs":[],"name":"symbol","outputs":[{"name":"","type":"string"}],"type":"function"},
-      {"constant":!0,"inputs":[],"name":"symbol","outputs":[{"name":"","type":"string"}],"payable":!1,"stateMutability":"view","type":"function"}
-  ]    
+      { constant: true, inputs: [], name: 'name', outputs: [{ name: '', type: 'string' }], payable: false, stateMutability: 'view', type: 'function' },
+      { constant: true, inputs: [], name: 'symbol', outputs: [{ name: '', type: 'string' }], payable: false, stateMutability: 'view', type: 'function' },
+      { constant: true, inputs: [], name: 'decimals', outputs: [{ name: '', type: 'uint8' }], payable: false, stateMutability: 'view', type: 'function' }
+  ];
+  
   const erc20Contract = new ethers.Contract(tokenAddress, erc20ABI, provider); 
 
 const [nameResult, decimalsResult, symbolResult] = await Promise.all([
@@ -167,19 +167,6 @@ const [nameResult, decimalsResult, symbolResult] = await Promise.all([
   erc20Contract.symbol()
 ]);
   return [nameResult, Number(decimalsResult), symbolResult];
-}
-
-// Standard ERC20 ABI
-const erc20ABI=[{"constant":!0,"inputs":[],"name":"name","outputs":[{"name":"","type":"string"}],"payable":!1,"stateMutability":"view","type":"function"},{"constant":!0,"inputs":[],"name":"symbol","outputs":[{"name":"","type":"string"}],"payable":!1,"stateMutability":"view","type":"function"}];
-
-async function fetchNameSymbol(tokenAddress){
-try {
-  const tokenContract = new ethers.Contract(tokenAddress, erc20ABI, provider);
-  const name = await tokenContract.name();
-  const symbol = await tokenContract.symbol();
-  // Return the token information
-  return { name, symbol };
-  } catch (error) {console.error('Failed to fetch token information:', error);}
 }
 
 // Function to fetch user's token balances
@@ -383,6 +370,15 @@ const options = {
 };
 return number.toLocaleString('en-US', options);
 }; 
+function cardCommaFormat(number){
+  const options = {
+      style: 'decimal',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 7,
+  };
+  return number.toLocaleString('en-US', options);
+}; 
+
 // Other backup formaters
 const formatValue = (value) => {
 return `$${value.toFixed(2)}`;
@@ -392,4 +388,4 @@ return number.toLocaleString();
 };
 
 export { CONSTANTS, getAccounts, getCurrentEthUsdcPriceFromUniswapV2, isValidEthereumAddress, truncateAddress, convertToUSD, getTokenUSDValue, getTokenETHValue, getUserBalancesForToken, getPairToken, getSymbol, getTokenDecimals, getTokenDecimalSymbolName };
-export { fromBigIntNumberToDecimal, fromDecimalToBigInt, commaNumbering, fromWeiToFixed12, fromWeiToFixed5, fromWeiToFixed8, fromWeiToFixed8_unrounded, fromWeiToFixed5_unrounded, fromWeiToFixed2_unrounded, toFixed8_unrounded };
+export { fromBigIntNumberToDecimal, fromDecimalToBigInt, commaNumbering, cardCommaFormat, fromWeiToFixed12, fromWeiToFixed5, fromWeiToFixed8, fromWeiToFixed8_unrounded, fromWeiToFixed5_unrounded, fromWeiToFixed2_unrounded, toFixed8_unrounded };

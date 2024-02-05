@@ -1,4 +1,4 @@
-import { CONSTANTS, getTokenDecimals, fromBigIntNumberToDecimal, fromDecimalToBigInt, getTokenDecimalSymbolName, getAccounts } from './constants.js';
+import { CONSTANTS, getTokenDecimals, cardCommaFormat, fromBigIntNumberToDecimal, fromDecimalToBigInt, getTokenDecimalSymbolName, getAccounts } from './constants.js';
 import { updateSectionValues_HedgeCard, updateSectionValues_Progress, updateSectionValues_Gains } from './module-hedge-section-updaters.js';
 import { updateChartValues_Hedge, updateChartValues_Assets } from './module-hedge-chart-updaters.js';
 

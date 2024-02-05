@@ -1,5 +1,5 @@
 import { MyGlobals } from './_silkroad.js';
-import { CONSTANTS, getAccounts, getUserBalancesForToken, truncateAddress, commaNumbering, fromWeiToFixed5, getTokenDecimals, fetchNameSymbol, isValidEthereumAddress, fromDecimalToBigInt, fromBigIntNumberToDecimal } from './constants.js';
+import { CONSTANTS, getAccounts, getUserBalancesForToken, truncateAddress, commaNumbering, cardCommaFormat, fromWeiToFixed5, getTokenDecimals, fetchNameSymbol, isValidEthereumAddress, fromDecimalToBigInt, fromBigIntNumberToDecimal } from './constants.js';
 import { purchaseInterface } from './module-silkroad-writer.js';
 
 async function refreshDataOnElements() {
@@ -397,15 +397,6 @@ async function loadOptions(){
 
 async function fetchOptionCard(optionId){
 
-	function cardCommaFormat(number){
-		const options = {
-			style: 'decimal',
-			minimumFractionDigits: 2,
-			maximumFractionDigits: 7,
-		};
-		return number.toLocaleString('en-US', options);
-	}; 
-
 	const accounts = await getAccounts();
     const userAddress = accounts[0];
 
@@ -635,14 +626,6 @@ async function fetchOptionCard(optionId){
 }
 
 async function fetchOptionStrip(optionId) {
-	function cardCommaFormat(number){
-		const options = {
-			style: 'decimal',
-			minimumFractionDigits: 2,
-			maximumFractionDigits: 7,
-		};
-		return number.toLocaleString('en-US', options);
-	}; 
     try{
 		let result = await hedgingInstance.getHedgeDetails(optionId);
 		//name and symbol

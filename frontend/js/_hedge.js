@@ -60,11 +60,6 @@ export const checkAndCallPageTries = async () => {
 
 $(document).ready(async function () {
 
-  // load sections periodically
-  setatmIntervalAsync(async () => {
-      checkAndCallPageTries();
-  }, 45000);
-
   // countdown timer refresh
   const setatmIntervalAsync = (fn, ms) => {
     let countdown = ms / 1000;
@@ -86,7 +81,11 @@ $(document).ready(async function () {
       }, 1000);
     });
   };
-  
+
+  // load sections periodically
+  setatmIntervalAsync(async () => {
+    checkAndCallPageTries();
+  }, 45000);
 });
 
 
