@@ -151,22 +151,36 @@ async function getTokenDecimals(tokenAddress, defaultDecimals = 18) {
   }
 }
 
-async function getTokenDecimalAndSymbol(tokenAddress) {
+async function getTokenDecimalSymbolName(tokenAddress) {
   // ERC20 ABI
   const erc20ABI = [
       {"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"spender","type":"address"}],"name":"allowance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
       {"constant":true,"inputs":[],"name":"decimals","outputs":[{"name":"","type":"uint8"}],"type":"function"},
-      {"constant":true,"inputs":[],"name":"symbol","outputs":[{"name":"","type":"string"}],"type":"function"}
+      {"constant":true,"inputs":[],"name":"symbol","outputs":[{"name":"","type":"string"}],"type":"function"},
+      {"constant":!0,"inputs":[],"name":"symbol","outputs":[{"name":"","type":"string"}],"payable":!1,"stateMutability":"view","type":"function"}
   ]    
   const erc20Contract = new ethers.Contract(tokenAddress, erc20ABI, provider); 
 
-const [decimalsResult, symbolResult] = await Promise.all([
+const [nameResult, decimalsResult, symbolResult] = await Promise.all([
+      erc20Contract.name(),
   erc20Contract.decimals(),
   erc20Contract.symbol()
 ]);
-  return [Number(decimalsResult), symbolResult];
+  return [nameResult, Number(decimalsResult), symbolResult];
 }
 
+// Standard ERC20 ABI
+const erc20ABI=[{"constant":!0,"inputs":[],"name":"name","outputs":[{"name":"","type":"string"}],"payable":!1,"stateMutability":"view","type":"function"},{"constant":!0,"inputs":[],"name":"symbol","outputs":[{"name":"","type":"string"}],"payable":!1,"stateMutability":"view","type":"function"}];
+
+async function fetchNameSymbol(tokenAddress){
+try {
+  const tokenContract = new ethers.Contract(tokenAddress, erc20ABI, provider);
+  const name = await tokenContract.name();
+  const symbol = await tokenContract.symbol();
+  // Return the token information
+  return { name, symbol };
+  } catch (error) {console.error('Failed to fetch token information:', error);}
+}
 
 // Function to fetch user's token balances
 // Returns Decimal
@@ -377,5 +391,5 @@ const formatString = (number) => {
 return number.toLocaleString();
 };
 
-export { CONSTANTS, getAccounts, getCurrentEthUsdcPriceFromUniswapV2, isValidEthereumAddress, truncateAddress, convertToUSD, getTokenUSDValue, getTokenETHValue, getUserBalancesForToken, getPairToken, getSymbol, getTokenDecimals, getTokenDecimalAndSymbol };
+export { CONSTANTS, getAccounts, getCurrentEthUsdcPriceFromUniswapV2, isValidEthereumAddress, truncateAddress, convertToUSD, getTokenUSDValue, getTokenETHValue, getUserBalancesForToken, getPairToken, getSymbol, getTokenDecimals, getTokenDecimalSymbolName };
 export { fromBigIntNumberToDecimal, fromDecimalToBigInt, commaNumbering, fromWeiToFixed12, fromWeiToFixed5, fromWeiToFixed8, fromWeiToFixed8_unrounded, fromWeiToFixed5_unrounded, fromWeiToFixed2_unrounded, toFixed8_unrounded };

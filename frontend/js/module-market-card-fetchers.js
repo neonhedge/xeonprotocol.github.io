@@ -1,5 +1,5 @@
 import { MyGlobals } from './_silkroad.js';
-import { CONSTANTS, getAccounts, getUserBalancesForToken, truncateAddress, commaNumbering, fromWeiToFixed5, getTokenDecimals, isValidEthereumAddress, fromDecimalToBigInt, fromBigIntNumberToDecimal } from './constants.js';
+import { CONSTANTS, getAccounts, getUserBalancesForToken, truncateAddress, commaNumbering, fromWeiToFixed5, getTokenDecimals, fetchNameSymbol, isValidEthereumAddress, fromDecimalToBigInt, fromBigIntNumberToDecimal } from './constants.js';
 import { purchaseInterface } from './module-silkroad-writer.js';
 
 async function refreshDataOnElements() {
@@ -743,19 +743,6 @@ async function fetchOptionStrip(optionId) {
 	}
 }
 
-
-// Standard ERC20 ABI
-const erc20ABI=[{"constant":!0,"inputs":[],"name":"name","outputs":[{"name":"","type":"string"}],"payable":!1,"stateMutability":"view","type":"function"},{"constant":!0,"inputs":[],"name":"symbol","outputs":[{"name":"","type":"string"}],"payable":!1,"stateMutability":"view","type":"function"}];
-
-async function fetchNameSymbol(tokenAddress){
-	try {
-		const tokenContract = new ethers.Contract(tokenAddress, erc20ABI, window.provider);
-		const name = await tokenContract.name();
-		const symbol = await tokenContract.symbol();
-		// Return the token information
-		return { name, symbol };
-	  } catch (error) {console.error('Failed to fetch token information:', error);}
-}
 async function prepareTimestamp(timeprint){
 	//timestamps
 	if(timeprint > 0){

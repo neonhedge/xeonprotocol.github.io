@@ -1,15 +1,29 @@
-import { CONSTANTS } from './constants.js';
+import { CONSTANTS, getTokenDecimals, fromBigIntNumberToDecimal, fromDecimalToBigInt, getTokenDecimalSymbolName } from './constants.js';
 import { updateSectionValues_HedgeCard, updateSectionValues_Progress, updateSectionValues_Gains } from './module-hedge-section-updaters.js';
 import { updateChartValues_Hedge, updateChartValues_Assets } from './module-hedge-chart-updaters.js';
 
 // 1. Fetch Section Values - Hedge
 //-----------------------------------------
-async function fetchSection_HedgeCard(hedgeID){
+async function fetchSection_HedgeCard(){
+            
+    // Check if the webpage URL has '?id='
+    const urlParams = new URLSearchParams(window.location.search);
+    const idParam = urlParams.get('id');
+
+    let optionId;
+    if (idParam) {
+       optionId = parseInt(idParam)
+    } else {
+        await fetchSection_HedgeCardDefault();
+        return;
+    }
+
     try {
         const accounts = await web3.eth.requestAccounts();
         const userAddress = accounts[0];
-        // get hedge data
-        const hedgeDataRaw = await hedgingInstance.methods.getHedgeDetails(hedgeID).call();
+
+        
+        const hedgeResult = await hedgingInstance.getHedgeDetails(optionId);
         const {
             topupConsent, // bool
             zapTaker, // bool
@@ -22,6 +36,7 @@ async function fetchSection_HedgeCard(hedgeID){
             amount, // uint256
             createValue, // uint256
             startValue, // uint256
+            strikeValue, // unit256
             endValue, // uint256
             cost, // uint256
             dt_created, // uint256
@@ -30,78 +45,89 @@ async function fetchSection_HedgeCard(hedgeID){
             dt_settled, // uint256
             hedgeType, // uint8 (enum value)
             topupRequests, // uint256[]
-        } = hedgeDataRaw;        
+        } = hedgeResult;
+
+		//name and symbol
+		let tokenName,tokenSymbol, tokenDecimal;
         
-        //standard ERC20 ABI
-        const erc20ABI = [
-            {
-              constant: true,
-              inputs: [],
-              name: 'name',
-              outputs: [{ name: '', type: 'string' }],
-              type: 'function',
-            },
-            {
-              constant: true,
-              inputs: [],
-              name: 'symbol', // Add the symbol function
-              outputs: [{ name: '', type: 'string' }],
-              type: 'function',
-            },
-        ];
-    
-        // ERC20 Instance 
-        const tokenContract = new web3.eth.Contract(erc20ABI, token);
-        // Token Name
-        const tokenName = await tokenContract.methods.name().call();
-        const tokenDecimal = await tokenContract.methods.decimals().call();
-        const tokenSymbol = await tokenContract.methods.symbol().call();
-        // Hedge Value
-        const hedgeValueRaw = await hedgingInstance.methods.getUnderlyingValue(token, amount).call();
-        const underlyingValueRaw = hedgeValueRaw[0];
-        const pairedCurrency = hedgeValueRaw[1];
-        // Fetch Symbol of paired currency
-        const pairedContract = new web3.eth.Contract(erc20ABI, paired);
-        const pairedSymbol = await pairedContract.methods.symbol().call();  
-        const pairedDeciaml = await pairedContract.methods.decimals().call();
-        // Amounts Conversion
-        const tokenAmount = new BigNumber(amount).div(10 ** tokenDecimal);
-        const underlyingValue = new BigNumber(underlyingValueRaw).div(10 ** pairedDeciaml);
-        createValue = new BigNumber(createValue).div(10 ** pairedDeciaml);
-        startValue = new BigNumber(startValue).div(10 ** pairedDeciaml);
+		getTokenDecimalSymbolName(hedgeResult.token).then(t=>{tokenName=t.name,tokenSymbol=t.symbol, tokenDecimal=t.tokenDecimal}).catch(e=>console.error(e));
+		//token & pair address
+		let tokenAddress = hedgeResult.token;
+		let tokenPairAddress = hedgeResult.paired;
+		//owner
+		let hedgeOwner = hedgeResult.owner;
+        let truncatedOwner = hedgeOwner.substring(0, 6) + '...' + hedgeOwner.slice(-3);
+		//taker
+		let hedgeTaker = hedgeResult.taker;
+        let truncatedTaker = hedgeTaker.substring(0, 6) + '...' + hedgeTaker.slice(-3);
+		//hedge status
+		let hedgeStatus = parseFloat(hedgeResult.status);		
+		//amounts
+		let tokenAmount = fromBigIntNumberToDecimal(hedgeResult.amount, tokenDecimal);
+		let amountFormated = cardCommaFormat(tokenAmount);
+
+		//hedge type
+		let hedgeTypeString;
+		if (hedgeResult.hedgeType === 0) {
+			hedgeTypeString = 'CALL';
+		} else if (hedgeResult.hedgeType === 1) {
+			hedgeTypeString = 'PUT';
+		} else if (hedgeResult.hedgeType === 2) {
+			hedgeTypeString = 'SWAP';
+		} else {
+			console.log('Hedge type is unknown');
+		}
+
+		//paired symbol
+		let pairSymbol;
+		if (tokenPairAddress === CONSTANTS.usdtAddress) {
+			pairSymbol = 'USDT';
+		} else if (tokenPairAddress === CONSTANTS.usdcAddress) {
+			pairSymbol = 'USDC';
+		} else if (tokenPairAddress === CONSTANTS.wethAddress) {
+			pairSymbol = 'WETH';
+		}
+
+		//market value current
+		const [marketvalueCurrent, pairedAddress] = await hedgingInstance.getUnderlyingValue(tokenAddress, hedgeResult.amount);
+		const pairedAddressDecimal = await getTokenDecimals(tokenPairAddress);
+		const marketvalue = fromBigIntNumberToDecimal(marketvalueCurrent, pairedAddressDecimal);
+        const marketPrice = marketvalue / tokenAmount;
+        const strikePrice = fromBigIntNumberToDecimal(hedgeResult.strikeprice, pairedAddressDecimal);
+        const strikeValueDeci = strikePrice * tokenAmount;
+        const startValueDeci = fromBigIntNumberToDecimal(hedgeResult.startValue, pairedAddressDecimal);
+        const costDeci = fromBigIntNumberToDecimal(hedgeResult.cost, pairedAddressDecimal);
+        
         // Gains & Losses
         // +ve or -ve integers passed to update function.. logic below is sound       
         let takerGains;
         let writerGains;
-        let strikeValue;
-        switch (hedgeType) {
+        switch (hedgeTypeString) {
         case 0: // CALL - cost max loss if price goes down
-            strikeValue = startValue + cost;
-            if(underlyingValue > startValue + cost) {
-                takerGains = underlyingValue - startValue + cost;
-                writerGains = startValue + cost - underlyingValue;
+            if(marketvalue > startValueDeci + costDeci) {
+                takerGains = marketvalue - startValueDeci + costDeci;
+                writerGains = startValueDeci + costDeci - marketvalue;
             }else{
-                takerGains =- cost;
-                writerGains = cost;
+                takerGains =- costDeci;
+                writerGains = costDeci;
             }
             break;
         case 1: // PUT - cost max loss if price goes up
-            strikeValue = startValue - cost;
-            if(underlyingValue > startValue - cost) {
-                takerGains =- cost;
-                writerGains = cost;
+            if(marketvalue > startValueDeci - costDeci) {
+                takerGains =- costDeci;
+                writerGains = costDeci;
             }else{
-                takerGains = startValue - underlyingValue - cost;
-                writerGains = cost + underlyingValue - startValue;
+                takerGains = startValueDeci - marketvalue - costDeci;
+                writerGains = costDeci + marketvalue - startValueDeci;
             }
             break;
         case 2: // SWAP - no cost paid in equity swaps
-            if(underlyingValue > startValue + cost) {
-                takerGains = underlyingValue - startValue;
-                writerGains = startValue - underlyingValue;
+            if(marketvalue > startValueDeci + costDeci) {
+                takerGains = marketvalue - startValueDeci;
+                writerGains = startValueDeci - marketvalue;
             }else{
-                takerGains = startValue - underlyingValue;
-                writerGains = underlyingValue - startValue;
+                takerGains = startValueDeci - marketvalue;
+                writerGains = marketvalue - startValueDeci;
             }
             break;
         default:
@@ -138,20 +164,20 @@ async function fetchSection_HedgeCard(hedgeID){
             tokenName,
             tokenSymbol,
             tokenAmount,
-            hedgeType,
+            hedgeTypeString,
             token,
             pairedCurrency,
             pairedSymbol,
             //values
             endValue,
-            strikeValue,
-            underlyingValue,
-            startValue,
+            strikeValueDeci,
+            marketvalue,
+            startValueDeci,
             createValue,
-            cost,
+            costDeci,
             //parties
-            owner,
-            taker,
+            hedgeOwner,
+            hedgeTaker,
             userAddress,
             takerGains,
             writerGains,
@@ -162,7 +188,7 @@ async function fetchSection_HedgeCard(hedgeID){
             dt_settledFormatted,
             timetoExpiry,
             //status
-            status,
+            hedgeStatus,
             //consent
             topupConsent, // bool
             zapTaker, // bool
@@ -175,11 +201,11 @@ async function fetchSection_HedgeCard(hedgeID){
             pairedSymbol,
             //values
             endValue,
-            strikeValue,
-            underlyingValue,
-            startValue,
+            strikeValueDeci,
+            marketvalue,
+            startValueDeci,
             createValue,
-            cost,
+            costDeci,
             //date
             dt_createdFormatted,
             dt_startedFormatted,
@@ -188,7 +214,7 @@ async function fetchSection_HedgeCard(hedgeID){
             timetoExpiry,
             lifespan,
             //status
-            status
+            hedgeStatus
         );
         // Gains, Buy & Requests. All variables needed to compile breakdown paragraph/ explainer for each party 
         //..(you wrote a swap of 1M TSUKA (TSU....) this means...
@@ -197,27 +223,27 @@ async function fetchSection_HedgeCard(hedgeID){
             tokenName,
             tokenSymbol,
             tokenAmount,
-            hedgeType,
+            hedgeTypeString,
             token,
             pairedCurrency,
             pairedSymbol,
             //values
             endValue,
-            strikeValue,
-            underlyingValue,
-            startValue,
+            strikeValueDeci,
+            marketvalue,
+            startValueDeci,
             createValue,
-            cost,
+            costDeci,
             //parties
-            owner,
-            taker,
+            hedgeOwner,
+            hedgeTaker,
             userAddress,
             takerGains,
             writerGains,
             //date
             timetoExpiry,
             //status
-            status,
+            hedgeStatus,
             //consent
             zapTaker, // bool
             zapWriter // bool
@@ -229,20 +255,20 @@ async function fetchSection_HedgeCard(hedgeID){
         // this way its easy to create a default load & separate an actual data update
         
         // Hedge Price Levels - First item is startValue, last item is underlying/current value
-        const initialPrices = [0, createValue, startValue, underlyingValue];
-        const initialTargetPrice = strikeValue;
+        const initialPrices = [0, createValue, startValueDeci, marketvalue];
+        const initialTargetPrice = strikeValueDeci;
         updateChartValues_Hedge(initialPrices, initialTargetPrice);
 
         // Hedge Underlying ERC20 Assets - Global arrays for token names and amounts
         // For Alpha and Beta V1, single assets, display underlying quantity & cost quantity in basket
-        const costAmount = cost / (tokenAmount / underlyingValue);
+        const costAmount = costDeci / (tokenAmount / marketvalue);
         const tokenNamesArray = [tokenSymbol, pairedSymbol];
         const tokenAmountArray = [tokenAmount, costAmount];
         updateChartValues_Assets(tokenNamesArray, tokenAmountArray);
 
         // Hedge Requests - pull topup requests from mappings and populate list
         // Put in separate module after hedgeCard
-        await fetchSection_HedgeRequests(topupRequests, owner, taker);
+        await fetchSection_HedgeRequests(topupRequests, hedgeOwner, hedgeTaker);
 
     } catch (error) {
         console.error("Error fetching Hedge Panel section data:", error);
@@ -255,8 +281,8 @@ async function fetchSection_HedgeCardDefault(){
         // Hedge Price Levels - First item is startValue, last item is underlying/current value
         const startValue = 0;
         const createValue = 50;
-        const underlyingValue = 100;
-        const initialPrices = [startValue, createValue, underlyingValue];
+        const marketvalue = 100;
+        const initialPrices = [startValue, createValue, marketvalue];
         const initialTargetPrice = 80;
         updateChartValues_Hedge(initialPrices, initialTargetPrice);
 

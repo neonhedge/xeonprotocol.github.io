@@ -1,101 +1,110 @@
 /*=========================================================================
-    Import modules
+    Import Modules
 ==========================================================================*/
 
-import { unlockedWallet, reqConnect } from './web3-walletstatus-module.js';
-import { initWeb3 } from './dapp-web3-utils.js';
+import { CONSTANTS } from './constants.js';
+import { initializeConnection, chainCheck, unlockedWallet, reqConnect, handleAccountChange, handleNetworkChange, popupSuccess} from './web3-walletstatus-module.js';
 import { fetchSection_HedgeCard, fetchSection_HedgeCardDefault } from './module-hedge-fetchers.js';
 
 /*=========================================================================
-    INITIALIZE WEB3
+    Hedge Page Main Scripts
 ==========================================================================*/
-initWeb3();
+// This is the main loading script for the page
+// It first checks if a wallet is connected || initialization passes
+// Initialization always returns boolean on whether it passes to load page scripts or not
+// scouter == wallect readiness check. If wallet check passes & sets all wallet dependencies, then we can load all other scripts below
+// if conditions to continueLoading change the script stops at scouter, event listeners at bottom of page to help with alerts & state changes
+
+// Start making calls to Dapp modules
+export const checkAndCallPageTries = async () => {
+  const scouter = await pageModulesLoadingScript();
+  
+  console.log('connection Scout: '+ scouter);  
+  if (scouter) {
+    // Load sections automatically & periodically
+    const asyncFunctions = [fetchSection_HedgeCard];
+    
+    // Check if the webpage URL has '?id='
+    const urlParams = new URLSearchParams(window.location.search);
+    const idParam = urlParams.get('id');
+
+    if (idParam) {
+        for (const func of asyncFunctions) {
+            await func();
+        }
+    } else {
+        await fetchSection_HedgeCardDefault();
+        // Get the page-title section
+        const pageTitleSection = document.getElementById('page-title');
+        pageTitleSection.innerHTML = '';
+        // Create the rewardsInformer div with the specified text and icon
+        const rewardsInformerDiv = document.createElement('div');
+        rewardsInformerDiv.classList.add('rewardsInformer');
+        // Create the icon element
+        const icon = document.createElement('i');
+        icon.classList.add('fa', 'fa-exclamation-triangle');
+        icon.setAttribute('aria-hidden', 'true');
+        // Create the text element
+        const text = document.createTextNode(' Hedge ID not found in URL, sample data displayed instead as default');
+        // Append the icon and text elements to the rewardsInformer div
+        rewardsInformerDiv.appendChild(icon);
+        rewardsInformerDiv.appendChild(text);
+
+        if (pageTitleSection) {
+            // Append the rewardsInformer div to the page-title section
+            pageTitleSection.appendChild(rewardsInformerDiv);
+        }
+    }
+  }
+};
 
 $(document).ready(async function () {
-    const accounts = await web3.eth.requestAccounts();
-    const userAddress = accounts[0];
-    const unlockState = await unlockedWallet();
-    
-    if (unlockState === true) {
-        const setatmIntervalAsync = (fn, ms) => {
-          let countdown = ms / 1000;
-          const refreshCounter = document.getElementById('refreshCounter');
-        
-          const updateCountdown = () => {
-            countdown--;
-            refreshCounter.innerText = countdown;
-          };
-          //Update the countdown in real time
-          fn().then(() => {
-            updateCountdown();
-            const intervalId = setInterval(() => {
-              updateCountdown();
-              if (countdown === 0) {
-                clearInterval(intervalId);
-                setatmIntervalAsync(fn, ms);
-              }
-            }, 1000);
-          });
-        };
 
-        // Load sections automatically & periodically
-        const callPageTries = async () => {
-            const asyncFunctions = [fetchSection_HedgeCard];
-            
-            // Check if the webpage URL has '?id='
-            const urlParams = new URLSearchParams(window.location.search);
-            const idParam = urlParams.get('id');
+  // load sections periodically
+  setatmIntervalAsync(async () => {
+      checkAndCallPageTries();
+  }, 45000);
 
-            if (idParam) {
-                for (const func of asyncFunctions) {
-                    await func();
-                }
-            } else {
-                await fetchSection_HedgeCardDefault();
-            }
-        };
+  // countdown timer refresh
+  const setatmIntervalAsync = (fn, ms) => {
+    let countdown = ms / 1000;
+    const refreshCounter = document.getElementById('refreshCounter');
+    const updateCountdown = () => {
+      countdown--;
+      refreshCounter.innerText = countdown;
+    };
 
-        // Check the URL before starting the periodic interval
-        const checkURL = async () => {
-            // Check if the webpage URL has '?id='
-            const urlParams = new URLSearchParams(window.location.search);
-            const idParam = urlParams.get('id');
-
-            if (idParam) {
-                await callPageTries();
-            } else {
-                await fetchSection_HedgeCardDefault();
-
-                // Get the page-title section
-                const pageTitleSection = document.getElementById('page-title');
-                pageTitleSection.innerHTML = '';
-                // Create the rewardsInformer div with the specified text and icon
-                const rewardsInformerDiv = document.createElement('div');
-                rewardsInformerDiv.classList.add('rewardsInformer');
-                // Create the icon element
-                const icon = document.createElement('i');
-                icon.classList.add('fa', 'fa-exclamation-triangle');
-                icon.setAttribute('aria-hidden', 'true');
-                // Create the text element
-                const text = document.createTextNode(' Hedge ID not found in URL, sample data displayed instead as default');
-                // Append the icon and text elements to the rewardsInformer div
-                rewardsInformerDiv.appendChild(icon);
-                rewardsInformerDiv.appendChild(text);
-
-                if (pageTitleSection) {
-                    // Append the rewardsInformer div to the page-title section
-                    pageTitleSection.appendChild(rewardsInformerDiv);
-                }
-            }
-        };
-
-        setatmIntervalAsync(async () => {
-            await checkURL();
-        }, 30000);
-    } else {
-        reqConnect();
-    }
+    //Update the countdown in real time
+    fn().then(() => {
+      updateCountdown();
+      const intervalId = setInterval(() => {
+        updateCountdown();
+        if (countdown === 0) {
+          clearInterval(intervalId);
+          setatmIntervalAsync(fn, ms);
+        }
+      }, 1000);
+    });
+  };
+  
 });
+
+
+// Checks if all wallet checks pass before calling page modules
+async function pageModulesLoadingScript() {
+  let continueLoad = false;
+  try {
+      continueLoad = initializeConnection();
+  if (continueLoad) {
+    return true;
+  } else {
+    return false;
+  }
+  } catch (error) {
+      console.log(error);
+  return false;
+  }
+}
 
 
 /*=========================================================================
