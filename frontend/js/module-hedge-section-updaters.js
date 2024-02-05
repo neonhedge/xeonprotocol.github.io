@@ -60,12 +60,17 @@ function updateSectionValues_HedgeCard(
             1: { text: 'Put Option', color: '#d6188a' },  // PUT
             2: { text: 'Equity Swap', color: '#7e22ce' }, // SWAP
         };
-        const hedgeTypeDiv = document.querySelector('.hedgetype');        
+alert(hedgeType)
         // Get the hedgeType value
-        const hedgeTypeValue = hedgeTypeMapping[hedgeType] || { text: 'Unknown', color: '#000000' };
+        const hedgeTypeDiv = document.querySelector('#hedgeType'); 
+
+        // Ensure hedgeType is a valid key our hedgeTypeMapping
+        const hedgeTypeValue = hedgeTypeMapping.hasOwnProperty(hedgeType) ? hedgeTypeMapping[hedgeType] : { text: 'Unknown Hedge', color: '#000000' };
+
         // Update the text content and background color of the div
         hedgeTypeDiv.textContent = hedgeTypeValue.text;
         hedgeTypeDiv.style.backgroundColor = hedgeTypeValue.color;
+
 
         // Step 2: Update token symbol & amount
         document.getElementById("tokenSymbol").textContent = tokenSymbol;

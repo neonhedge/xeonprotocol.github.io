@@ -91,10 +91,11 @@ async function fetchSection_HedgeCard(){
 		//market value current
 		const [marketvalueCurrent, pairedAddress] = await hedgingInstance.getUnderlyingValue(tokenAddress, hedgeResult.amount);
 		const pairedAddressDecimal = await getTokenDecimals(tokenPairAddress);
+        const createValueDeci = fromBigIntNumberToDecimal(hedgeResult.createValue, pairedAddressDecimal);
 		const marketvalue = fromBigIntNumberToDecimal(marketvalueCurrent, pairedAddressDecimal);
         const marketPrice = marketvalue / tokenAmount;
-        const strikePrice = fromBigIntNumberToDecimal(hedgeResult.strikeprice, pairedAddressDecimal);
-        const strikeValueDeci = strikePrice * tokenAmount;
+        const strikeValueDeci = fromBigIntNumberToDecimal(hedgeResult.strikeValue, pairedAddressDecimal);
+        const strikePrice = strikeValueDeci / tokenAmount;
         const startValueDeci = fromBigIntNumberToDecimal(hedgeResult.startValue, pairedAddressDecimal);
         const costDeci = fromBigIntNumberToDecimal(hedgeResult.cost, pairedAddressDecimal);
         
@@ -166,14 +167,14 @@ async function fetchSection_HedgeCard(){
             tokenAmount,
             hedgeTypeString,
             token,
-            pairedCurrency,
-            pairedSymbol,
+            tokenPairAddress,
+            pairSymbol,
             //values
             endValue,
             strikeValueDeci,
             marketvalue,
             startValueDeci,
-            createValue,
+            createValueDeci,
             costDeci,
             //parties
             hedgeOwner,
@@ -197,14 +198,14 @@ async function fetchSection_HedgeCard(){
             topupRequests, // uint256[]
         );
         updateSectionValues_Progress(
-            pairedCurrency,
-            pairedSymbol,
+            tokenPairAddress,
+            pairSymbol,
             //values
             endValue,
             strikeValueDeci,
             marketvalue,
             startValueDeci,
-            createValue,
+            createValueDeci,
             costDeci,
             //date
             dt_createdFormatted,
@@ -225,14 +226,14 @@ async function fetchSection_HedgeCard(){
             tokenAmount,
             hedgeTypeString,
             token,
-            pairedCurrency,
-            pairedSymbol,
+            tokenPairAddress,
+            pairSymbol,
             //values
             endValue,
             strikeValueDeci,
             marketvalue,
             startValueDeci,
-            createValue,
+            createValueDeci,
             costDeci,
             //parties
             hedgeOwner,
@@ -255,14 +256,14 @@ async function fetchSection_HedgeCard(){
         // this way its easy to create a default load & separate an actual data update
         
         // Hedge Price Levels - First item is startValue, last item is underlying/current value
-        const initialPrices = [0, createValue, startValueDeci, marketvalue];
+        const initialPrices = [0, createValueDeci, startValueDeci, marketvalue];
         const initialTargetPrice = strikeValueDeci;
         updateChartValues_Hedge(initialPrices, initialTargetPrice);
 
         // Hedge Underlying ERC20 Assets - Global arrays for token names and amounts
         // For Alpha and Beta V1, single assets, display underlying quantity & cost quantity in basket
-        const costAmount = costDeci / (tokenAmount / marketvalue);
-        const tokenNamesArray = [tokenSymbol, pairedSymbol];
+        const costAmount = costDeci / marketPrice;
+        const tokenNamesArray = [tokenSymbol, pairSymbol];
         const tokenAmountArray = [tokenAmount, costAmount];
         updateChartValues_Assets(tokenNamesArray, tokenAmountArray);
 
