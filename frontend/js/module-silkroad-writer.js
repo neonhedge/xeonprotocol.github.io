@@ -1,7 +1,7 @@
 /*=========================================================================
     Import modules
 ==========================================================================*/
-import { CONSTANTS, getUserBalancesForToken, truncateAddress, fromBigIntNumberToDecimal, fromDecimalToBigInt, getAccounts, getTokenDecimalAndSymbol, getSymbol, getTokenDecimals } from './constants.js';
+import { CONSTANTS, getUserBalancesForToken, truncateAddress, fromBigIntNumberToDecimal, fromDecimalToBigInt, getAccounts, getTokenDecimalSymbolName, getSymbol, getTokenDecimals } from './constants.js';
 import { initializeConnection } from './web3-walletstatus-module.js';
 
 /*======================================================

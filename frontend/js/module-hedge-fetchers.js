@@ -1,4 +1,4 @@
-import { CONSTANTS, getTokenDecimals, cardCommaFormat, fromBigIntNumberToDecimal, fromDecimalToBigInt, getTokenDecimalSymbolName, getAccounts } from './constants.js';
+import { CONSTANTS, getTokenDecimals, cardCommaFormat, fromBigIntNumberToDecimal, fromDecimalToBigInt, getTokenDecimalSymbolName, getAccounts, truncateAddress } from './constants.js';
 import { updateSectionValues_HedgeCard, updateSectionValues_Progress, updateSectionValues_Gains } from './module-hedge-section-updaters.js';
 import { updateChartValues_Hedge, updateChartValues_Assets } from './module-hedge-chart-updaters.js';
 
@@ -56,10 +56,10 @@ async function fetchSection_HedgeCard(){
 		let tokenPairAddress = hedgeResult.paired;
 		//owner
 		let hedgeOwner = hedgeResult.owner;
-        let truncatedOwner = hedgeOwner.substring(0, 6) + '...' + hedgeOwner.slice(-3);
+        let truncatedOwner = truncateAddress(hedgeOwner);
 		//taker
 		let hedgeTaker = hedgeResult.taker;
-        let truncatedTaker = hedgeTaker.substring(0, 6) + '...' + hedgeTaker.slice(-3);
+        let truncatedTaker = truncateAddress(hedgeTaker);
 		//hedge status
 		let hedgeStatus = parseFloat(hedgeResult.status);		
 		//amounts
@@ -87,6 +87,10 @@ async function fetchSection_HedgeCard(){
 		} else if (tokenPairAddress === CONSTANTS.wethAddress) {
 			pairSymbol = 'WETH';
 		}
+
+        //const strikevalueHex = hedgeResult.strikeValue; // Access _hex property if available
+	    //const strikeValuee = strikevalueHex ? parseInt(strikevalueHex, 16).toString() : 0; // Convert hex to decimal if available
+        //console.log(strikeValuee);
 
 		//market value current
 		const [marketvalueCurrent, pairedAddress] = await hedgingInstance.getUnderlyingValue(tokenAddress, hedgeResult.amount);

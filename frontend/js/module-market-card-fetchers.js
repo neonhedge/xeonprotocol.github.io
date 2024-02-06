@@ -1,5 +1,5 @@
 import { MyGlobals } from './_silkroad.js';
-import { CONSTANTS, getAccounts, getUserBalancesForToken, truncateAddress, commaNumbering, cardCommaFormat, fromWeiToFixed5, getTokenDecimals, fetchNameSymbol, isValidEthereumAddress, fromDecimalToBigInt, fromBigIntNumberToDecimal } from './constants.js';
+import { CONSTANTS, getAccounts, getUserBalancesForToken, truncateAddress, commaNumbering, cardCommaFormat, fromWeiToFixed5, getTokenDecimals, getTokenDecimalSymbolName, isValidEthereumAddress, fromDecimalToBigInt, fromBigIntNumberToDecimal } from './constants.js';
 import { purchaseInterface } from './module-silkroad-writer.js';
 
 async function refreshDataOnElements() {
@@ -403,25 +403,24 @@ async function fetchOptionCard(optionId){
     try{
 		let result = await hedgingInstance.getHedgeDetails(optionId);
 		//name and symbol
-		let name,symbol;
-		fetchNameSymbol(result.token).then(t=>{name=t.name,symbol=t.symbol}).catch(e=>console.error(e));
+		let name, decimals, symbol;
+		[name, decimals, symbol] = await getTokenDecimalSymbolName(result.token);
 		//token & pair address
 		let tokenAddress = result.token;
-		let truncatedTokenAdd = tokenAddress.substring(0, 6) + '...' + tokenAddress.slice(-3);
+		let truncatedTokenAdd = truncateAddress(tokenAddress);
 		let tokenPairAddress = result.paired;
-		let truncatedPairAdd = tokenPairAddress.substring(0, 6) + '...' + tokenPairAddress.slice(-3);
+		let truncatedPairAdd = truncateAddress(tokenPairAddress);
 		//owner
 		let owner = result.owner;
-        let truncatedOwner = owner.substring(0, 6) + '...' + owner.slice(-3);
+        let truncatedOwner = truncateAddress(owner);
 		//taker
 		let taker = result.taker;
-        let truncatedTaker = taker.substring(0, 6) + '...' + taker.slice(-3);
+        let truncatedTaker = truncateAddress(taker);
 		//hedge status
 		let status = parseFloat(result.status);
 		
 		//amount
-		let amountTokenDecimals = await getTokenDecimals(tokenAddress);
-		let amountRaw = fromBigIntNumberToDecimal(result.amount, amountTokenDecimals);
+		let amountRaw = fromBigIntNumberToDecimal(result.amount, decimals);
 		let amount = cardCommaFormat(amountRaw);		
 
 		//hedge type
@@ -629,25 +628,24 @@ async function fetchOptionStrip(optionId) {
     try{
 		let result = await hedgingInstance.getHedgeDetails(optionId);
 		//name and symbol
-		let name; let symbol;
-		fetchNameSymbol(result.token).then(t=>{name=t.name,symbol=t.symbol}).catch(e=>console.error(e));
+		let name, decimals, symbol;
+		[name, decimals, symbol] = await getTokenDecimalSymbolName(hedgeResult.token);
 		//token & pair address
 		let tokenAddress = result.token;
-		let truncatedTokenAdd = tokenAddress.substring(0, 6) + '...' + tokenAddress.slice(-3);
+		let truncatedTokenAdd = truncateAddress(tokenAddress);
 		let tokenPairAddress = result.paired;
-		let truncatedPairAdd = tokenPairAddress.substring(0, 6) + '...' + tokenPairAddress.slice(-3);
+		let truncatedPairAdd = truncateAddress(tokenPairAddress);
 		//owner
 		let owner = result.owner;
-        let truncatedOwner = owner.substring(0, 6) + '...' + owner.slice(-3);
+        let truncatedOwner = truncateAddress(owner);
 		//taker
 		let taker = result.taker;
-        let truncatedTaker = taker.substring(0, 6) + '...' + taker.slice(-3);
+        let truncatedTaker = truncateAddress(taker);
 		//hedge status
 		let status = parseFloat(result.status);
 		//amount
-		let amountTokenDecimals = await getTokenDecimals(tokenAddress);
 		let amountBN = ethers.BigNumber.from(result.amount);
-		let amountRaw = fromBigIntNumberToDecimal(amountBN, amountTokenDecimals);
+		let amountRaw = fromBigIntNumberToDecimal(amountBN, decimals);
 		let amount = cardCommaFormat(amountRaw);
 		//hedge type
 		let hedgeType;
@@ -761,4 +759,4 @@ async function noOptionsSwal(){
 	}, 4500);
 }
 
-export { refreshDataOnElements, loadOptions, fetchOptionCard, fetchOptionStrip, fetchNameSymbol, prepareTimestamp, noOptionsSwal };
+export { refreshDataOnElements, loadOptions, fetchOptionCard, fetchOptionStrip, prepareTimestamp, noOptionsSwal };
