@@ -13,8 +13,8 @@ function updateChartValues_Hedge(prices, targetPrice) {
     const ctx = canvas.getContext('2d');
   
     // Chart dimensions
-    const chartWidth = 250;
-    const chartHeight = 250;
+    const chartWidth = 300;
+    const chartHeight = 300;
     canvas.width = chartWidth;
     canvas.height = chartHeight;
   
@@ -95,25 +95,34 @@ function updateChartValues_Hedge(prices, targetPrice) {
       ctx.imageSmoothingEnabled = false;
   
       // Draw vertical lines representing prices
-      ctx.strokeStyle = '#000'; // Black color for lines
-      ctx.beginPath();
+      ctx.strokeStyle = 'rgba(0,0,0,0.8)'; // Black color for lines
+      ctx.lineWidth = 1; // Set the line width to 0.5px
       for (let i = 0; i < prices.length; i++) {
+        if(i == 0 || i == prices.length) {
           const x = i * step;
+          ctx.beginPath();
           ctx.moveTo(x, 0);
           ctx.lineTo(x, chartHeight);
+          ctx.stroke();
+        }          
       }
-      ctx.stroke();
   
-      // Draw horizontal lines representing time
-      ctx.beginPath();
-      ctx.moveTo(0, chartHeight - 1);
+      // Draw only start and end horizontal lines representing time
+      ctx.strokeStyle = 'rgba(0,0,0,0.4)'; // Light gray color for lines
+      ctx.lineWidth = 2;
+      ctx.beginPath();/* top line starts here
+      ctx.moveTo(0, 0);
+      ctx.lineTo(chartWidth, 0); */
+      ctx.moveTo(0, chartHeight - 1);/* bottom line starts here */
       ctx.lineTo(chartWidth, chartHeight - 1);
       ctx.stroke();
   
-      // Draw the line connecting prices on the chart
-      ctx.fillStyle = areaColor;
-      ctx.strokeStyle = 'rgba(0, 191, 255, 1)'; // Clear sky blue color with full opacity
-      ctx.lineWidth = 1; // Set the line width for crisp lines
+      // Draw the line connecting prices on the chart with light blur
+      ctx.fillStyle = 'rgba(0, 255, 255, 0.3)';
+      ctx.strokeStyle = 'rgba(0, 255, 255, 0.8)'; // Light blue color with transparency
+      ctx.shadowColor = 'rgba(0, 255, 255, 0.3)'; // Light blue shadow color with transparency
+      ctx.shadowBlur = 10; // Set shadow blur radius
+      ctx.lineWidth = 1.5; // Set the line width for the price line
       ctx.beginPath();
       ctx.moveTo(0, chartHeight - ((prices[0] - chartDimensions.minPrice) / chartDimensions.priceRange) * chartHeight);
       for (let i = 1; i < prices.length; i++) {
@@ -123,11 +132,26 @@ function updateChartValues_Hedge(prices, targetPrice) {
           const xc = (x + (x - step)) / 2; // Bezier control point x-coordinate
           ctx.bezierCurveTo(xc, prevY, xc, y, x, y); // Add a smooth curve to the path
       }
+      ctx.fill();
       ctx.stroke();
-  
+      ctx.shadowBlur = 0; // Reset shadow after drawing the line
+      
+      // Draw start price level line (constant line)
+      const startPrice = prices[0];
+      const startY = chartHeight - ((startPrice - chartDimensions.minPrice) / chartDimensions.priceRange) * chartHeight;
+      ctx.strokeStyle = '#FFF'; // Red color for the target price line
+      ctx.setLineDash([5, 4]); // Set the line to dashed
+      ctx.lineWidth = 0.5; // Set the line width to 1px
+      ctx.beginPath();
+      ctx.moveTo(0, startY);
+      ctx.lineTo(chartWidth, startY);
+      ctx.stroke();
+
       // Draw target price level line (constant line)
       const targetY = chartHeight - ((targetPrice - chartDimensions.minPrice) / chartDimensions.priceRange) * chartHeight;
-      ctx.strokeStyle = '#d6188a'; // Red
+      ctx.strokeStyle = '#d6188a'; // Red color for the target price line
+      ctx.setLineDash([5, 4]); // Set the line to dashed
+      ctx.lineWidth = 1; // Set the line width to 1px
       ctx.beginPath();
       ctx.moveTo(0, targetY);
       ctx.lineTo(chartWidth, targetY);
@@ -136,7 +160,9 @@ function updateChartValues_Hedge(prices, targetPrice) {
       // Draw current price level line
       const currentPrice = prices[prices.length - 1];
       const currentPriceY = chartHeight - ((currentPrice - chartDimensions.minPrice) / chartDimensions.priceRange) * chartHeight;
-      ctx.strokeStyle = '#089353'; // Green
+      ctx.strokeStyle = '#41f483'; // Green color for the current price line
+      ctx.setLineDash([2, 2]); // Set the line to dashed
+      ctx.lineWidth = 1.5; // Set the line width to 1px
       ctx.beginPath();
       ctx.moveTo(0, currentPriceY);
       ctx.lineTo(chartWidth, currentPriceY);
@@ -155,15 +181,16 @@ function updateChartValues_Hedge(prices, targetPrice) {
       }
   
       // Draw labels for horizontal lines
-      ctx.fillStyle = '#fff'; // White
-      ctx.fillText(`start: ${formatStringDecimal(prices[0])}`, 10, chartHeight - 10); // Adjust x-coordinate as needed
-      ctx.fillText(`strike: ${formatStringDecimal(targetPrice)}`, chartWidth / 2 - 30, targetY - 5); // Adjust x-coordinate as needed
-      ctx.fillText(`current: ${formatStringDecimal(prices[prices.length - 1])}`, chartWidth - 100, currentPriceY - 5); // Adjust x-coordinate as needed
+      ctx.fillStyle = '#fff'; // White color for labels      
+      ctx.fillText(`start price`, 0, startY + 11); // Adjust x-coordinate as needed
+      ctx.fillText(`strike price: ${formatStringDecimal(targetPrice)}`, chartWidth / 2 - 30, targetY - 5); // Adjust x-coordinate as needed
+      ctx.fillText(`current price: ${formatStringDecimal(prices[prices.length - 1])}`, chartWidth - 100, currentPriceY - 5); // Adjust x-coordinate as needed
   }
   
+  
   // Draw Price Chart with data provided
-  drawChart();  
-}
+  drawChart();
+}  
 /*
 function drawChart() {
   const chartDimensions = calculateChartDimensions();

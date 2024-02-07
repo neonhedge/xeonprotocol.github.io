@@ -602,7 +602,7 @@ hr.line {
 
 /* HEDGE PAGE SECTIONS STYLES */
 .progressSect {
-  max-width:270px;
+  max-width:320px;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
@@ -841,6 +841,7 @@ font-size: clamp(12.2px, 1vw, 13.5px);
   flex-basis: 100%;
   display: flex;
   justify-content: center;
+  caret-color: transparent;
 }
 
 .priceChangeTag {
