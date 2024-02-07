@@ -13,7 +13,7 @@ function updateChartValues_Hedge(prices, targetPrice) {
     const ctx = canvas.getContext('2d');
   
     // Chart dimensions
-    const chartWidth = 400;
+    const chartWidth = 250;
     const chartHeight = 250;
     canvas.width = chartWidth;
     canvas.height = chartHeight;
@@ -59,7 +59,7 @@ function updateChartValues_Hedge(prices, targetPrice) {
   
         if (mouseX > x - 2 && mouseX < x + 2 && mouseY > y - 2 && mouseY < y + 2) {
           const tag = document.getElementById('priceChangeTag');
-          tag.textContent = `Price: ${prices[i]}`;
+          tag.textContent = `Price: ${formatStringDecimal(prices[i])}`;
           tag.style.top = `${y}px`;
           tag.style.left = `${x + 5}px`;
           tag.classList.add('show');
@@ -94,9 +94,26 @@ function updateChartValues_Hedge(prices, targetPrice) {
       // Disable image smoothing for crisp text rendering
       ctx.imageSmoothingEnabled = false;
   
+      // Draw vertical lines representing prices
+      ctx.strokeStyle = '#000'; // Black color for lines
+      ctx.beginPath();
+      for (let i = 0; i < prices.length; i++) {
+          const x = i * step;
+          ctx.moveTo(x, 0);
+          ctx.lineTo(x, chartHeight);
+      }
+      ctx.stroke();
+  
+      // Draw horizontal lines representing time
+      ctx.beginPath();
+      ctx.moveTo(0, chartHeight - 1);
+      ctx.lineTo(chartWidth, chartHeight - 1);
+      ctx.stroke();
+  
       // Draw the line connecting prices on the chart
+      ctx.fillStyle = areaColor;
       ctx.strokeStyle = 'rgba(0, 191, 255, 1)'; // Clear sky blue color with full opacity
-      ctx.lineWidth = 2; // Set the line width for crisp lines
+      ctx.lineWidth = 1; // Set the line width for crisp lines
       ctx.beginPath();
       ctx.moveTo(0, chartHeight - ((prices[0] - chartDimensions.minPrice) / chartDimensions.priceRange) * chartHeight);
       for (let i = 1; i < prices.length; i++) {
@@ -116,6 +133,15 @@ function updateChartValues_Hedge(prices, targetPrice) {
       ctx.lineTo(chartWidth, targetY);
       ctx.stroke();
   
+      // Draw current price level line
+      const currentPrice = prices[prices.length - 1];
+      const currentPriceY = chartHeight - ((currentPrice - chartDimensions.minPrice) / chartDimensions.priceRange) * chartHeight;
+      ctx.strokeStyle = '#089353'; // Green
+      ctx.beginPath();
+      ctx.moveTo(0, currentPriceY);
+      ctx.lineTo(chartWidth, currentPriceY);
+      ctx.stroke();
+  
       // Draw price tags
       ctx.fillStyle = textColor;
       ctx.font = '100 10px sans-serif';
@@ -125,19 +151,92 @@ function updateChartValues_Hedge(prices, targetPrice) {
           ctx.beginPath();
           ctx.arc(x, y, 2, 0, Math.PI * 2);
           ctx.fill();
-          ctx.fillText(prices[i].toString(), x + 5, y - 10); // Display price values at all times
+          ctx.fillText(formatStringDecimal(prices[i]), x + 5, y - 10); // Display price values at all times
       }
   
       // Draw labels for horizontal lines
       ctx.fillStyle = '#fff'; // White
-      ctx.fillText(`start: ${formatStringDecimal(prices[0])}`, chartWidth - 60, chartHeight - 10);
-      ctx.fillText(`strike: ${formatStringDecimal(targetPrice)}`, chartWidth - 60, targetY - 5);
+      ctx.fillText(`start: ${formatStringDecimal(prices[0])}`, 10, chartHeight - 10); // Adjust x-coordinate as needed
+      ctx.fillText(`strike: ${formatStringDecimal(targetPrice)}`, chartWidth / 2 - 30, targetY - 5); // Adjust x-coordinate as needed
+      ctx.fillText(`current: ${formatStringDecimal(prices[prices.length - 1])}`, chartWidth - 100, currentPriceY - 5); // Adjust x-coordinate as needed
   }
+  
   // Draw Price Chart with data provided
   drawChart();  
 }
+/*
+function drawChart() {
+  const chartDimensions = calculateChartDimensions();
+  const step = chartWidth / (prices.length - 1);
 
+  // Clear canvas
+  ctx.clearRect(0, 0, chartWidth, chartHeight);
 
+  // Disable image smoothing for crisp text rendering
+  ctx.imageSmoothingEnabled = false;
+
+  // Draw area below the charted points
+  ctx.fillStyle = areaColor;
+  ctx.beginPath();
+  ctx.moveTo(0, chartHeight);
+  for (let i = 0; i < prices.length; i++) {
+      const x = i * step;
+      const y = chartHeight - ((prices[i] - chartDimensions.minPrice) / chartDimensions.priceRange) * chartHeight;
+      ctx.lineTo(x, y);
+  }
+  ctx.lineTo(chartWidth, chartHeight);
+  ctx.closePath();
+  ctx.fill();
+
+  // Draw target price level line (constant line)
+  const targetY = chartHeight - ((targetPrice - chartDimensions.minPrice) / chartDimensions.priceRange) * chartHeight;
+  ctx.strokeStyle = '#d6188a'; // red
+  ctx.beginPath();
+  ctx.moveTo(0, targetY);
+  ctx.lineTo(chartWidth, targetY);
+  ctx.stroke();
+
+  // Draw start price level line
+  const startPrice = prices[0];
+  const startPriceY = chartHeight - ((startPrice - chartDimensions.minPrice) / chartDimensions.priceRange) * chartHeight;
+  ctx.strokeStyle = 'rgb(8, 231, 254)'; // blue
+  ctx.beginPath();
+  ctx.moveTo(0, startPriceY);
+  ctx.lineTo(chartWidth, startPriceY);
+  ctx.stroke();
+
+  // Draw current price level line
+  const currentPrice = prices[prices.length - 1];
+  const currentPriceY = chartHeight - ((currentPrice - chartDimensions.minPrice) / chartDimensions.priceRange) * chartHeight;
+  ctx.strokeStyle = '#089353'; // green
+  ctx.beginPath();
+  ctx.moveTo(0, currentPriceY);
+  ctx.lineTo(chartWidth, currentPriceY);
+  ctx.stroke();
+
+  // Draw price tags
+  ctx.fillStyle = textColor;
+  ctx.font = '100 10px sans-serif';
+  for (let i = 0; i < prices.length; i++) {
+      const x = i * step;
+      const y = chartHeight - ((prices[i] - chartDimensions.minPrice) / chartDimensions.priceRange) * chartHeight;
+      ctx.beginPath();
+      ctx.arc(x, y, 2, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillText(prices[i].toString(), x + 5, y - 10); // Display price values at all times
+  }
+
+  // Draw labels for horizontal lines
+  ctx.fillStyle = '#fff'; // White
+  ctx.fillText(`start: ${formatStringDecimal(prices[0])}`, chartWidth - 60, startPriceY - 5);
+  ctx.fillText(`strike: ${formatStringDecimal(targetPrice)}`, chartWidth - 60, targetY - 5);
+  ctx.fillText(`current: ${formatStringDecimal(prices[prices.length - 1])}`, chartWidth - 60, currentPriceY - 5);
+  
+}
+
+// Draw Price Chart with data provided
+drawChart();
+*/
   /*===================================================*/
 
   

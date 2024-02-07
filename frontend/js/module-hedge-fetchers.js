@@ -325,6 +325,14 @@ async function fetchSection_HedgeRequests(topupRequests, owner, taker) {
     const userAddress = accounts[0];
 
     const requestList = document.getElementById("requestList");
+    requestList.innerHTML = "";
+
+    if(topupRequests.length == 0) {
+        requestList.innerHTML = '<div class="no-hedges-message sl_refresh">No trade requests. Make a request to populate this area...</span>';
+        $('#hedgesTimeline').empty().append();
+
+    }
+
     // Iterate the array IDs and retrieve the request status then append to requestList
     topupRequests.forEach(async (requestId) => {
         const topupData = await hedgingInstance.topupMap(requestId);
@@ -353,6 +361,7 @@ async function fetchSection_HedgeRequests(topupRequests, owner, taker) {
             requestList.innerHTML += `<span><i class="fa fa-times-circle"></i> Topup Rejected ${rejectTime}</span>`;
         }
     });
+    
 }
 
 function formatDate(timestamp) {

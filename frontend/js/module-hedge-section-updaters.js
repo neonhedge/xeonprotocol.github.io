@@ -93,6 +93,8 @@ function updateSectionValues_HedgeCard(
         const newBackgroundImageUrl = 'url(\'./imgs/tokens/ovela.webp\')'; 
         tokenLogoDiv.style.backgroundImage = newBackgroundImageUrl;
 
+        // Update the requests list
+        
 
     } catch (error) {
         console.error("Error Updating Net Worth section data:", error);
@@ -127,7 +129,7 @@ function updateSectionValues_Progress(
         document.getElementById("timetoExpiry").textContent = `${timetoExpiry} hrs`;
         
         // Step 2: compare lifespan to timetoExpiry and set the width of a div with ID progressBar, if timetoExpiry is 10% of lifespan then width is 10% of 100%        
-        const progressBar = document.getElementById('meter_guage ');
+        const progressBar = document.getElementById('meter_guage');
         
         if (lifespan >= 0 && timetoExpiry < lifespan) {
           const percentage = (timetoExpiry / lifespan) * 100;
@@ -208,11 +210,25 @@ function updateSectionValues_Gains(
         }
 
         // Display writer gains and taker gains with symbols
+        //writer
         const writerGainsBaseDiv = document.getElementById("writerGainsBase");
-        writerGainsBaseDiv.innerText = `${writerGains >= 0 ? '+' : '-'}${Math.abs(writerGains).toFixed(2)} ${pairedSymbol}`;
-        
+        let formattedGainsWr;
+        if (Math.abs(writerGains) == 0 || Math.abs(writerGains) >= 1) {
+            formattedGainsWr = writerGains.toFixed(2);
+        } else {
+            formattedGainsWr = writerGains.toFixed(7);
+        }
+        writerGainsBaseDiv.innerText = `${writerGains >= 0 ? '+' : '-'}${formattedGainsWr} ${pairedSymbol}`;
+
+        //taker
         const takerGainsBaseDiv = document.getElementById("takerGainsBase");
-        takerGainsBaseDiv.innerText = `${takerGains >= 0 ? '+' : '-'}${Math.abs(takerGains).toFixed(2)} ${pairedSymbol}`;
+        let formattedGainsTk;
+        if (Math.abs(takerGains) == 0 || Math.abs(takerGains) >= 1) {
+            formattedGainsTk = takerGains.toFixed(2);
+        } else {
+            formattedGainsTk = takerGains.toFixed(7);
+        }
+        takerGainsBaseDiv.innerText = `${takerGains >= 0 ? '+' : '-'}${formattedGainsTk} ${pairedSymbol}`;
 
         // Truncate addresses
         const truncateAddress = (address) => {

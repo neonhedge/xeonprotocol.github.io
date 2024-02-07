@@ -384,7 +384,8 @@ hr.line {
 .optionTypeValue,
 .compositionValue {
   width: 100%;
-  font-size: clamp(15px, 1vw, 16px);
+  font-size: clamp(13px, 1vw, 15px);
+  font-weight:100;
   padding: 8px;
   background-color: #0f082e;
   color: #188dd6;
@@ -396,11 +397,17 @@ hr.line {
 }
 
 .optionType {
+  max-width: 150px;
   /* border: 2px solid #089353; */
   text-shadow: none;
-  flex-grow: 1;
   padding-inline: 0 !important;
 }
+.optionValue,
+.optionComposition {
+  flex-grow:1;
+  text-align: center;
+}
+
 
 /* Option mark styles */
 .optionMarkContainer {
@@ -415,6 +422,7 @@ hr.line {
   width:100%;
   max-width: 170px;
   height: auto;
+  min-height: 55px;
   margin: 5px auto;
   display: flex;
   flex-wrap: wrap;
@@ -425,7 +433,6 @@ hr.line {
   text-align: center;
   font-size: clamp(13px, 1vw, 14px);
   font-weight: 100;
-  line-height: 1;
   text-transform: capitalize;
   background-color: rgba(0, 0, 0, 0.1);
   border-radius: 1vw;
@@ -438,6 +445,7 @@ hr.line {
   letter-spacing: unset;
   text-align: center !important;
   padding-inline: 8px;
+  line-height: 1.3;
   font-family: "Nunito Sans", monospace, sans-serif !important;
   font-size: clamp(13px, 1vw, 13.5px);
   color: rgb(139, 149, 158);
@@ -828,7 +836,7 @@ font-size: clamp(12.2px, 1vw, 13.5px);
   background: none;
   padding: 10px;
   border-radius: 5px;
-  overflow: hidden;
+  overflow: visible;
 
   flex-basis: 100%;
   display: flex;
@@ -993,3 +1001,43 @@ section.cta{
   text-align:center;
   z-index:150;
 }
+
+/*=================
+  Common NEON Styles
+  ===================*/
+
+  .no-hedges-message {
+    position: relative;
+    margin: 0px auto;
+    padding: 4vw;
+    box-sizing: border-box;
+    
+    text-align: center;
+    font-family: "Space Grotesk", "Monospace", sans-serif;
+    font-size: clamp(14px, 1vw, 15px);
+    font-weight: 100;
+    cursor: help;
+    transition: background-color 0.3s;
+    color: transparent;
+    background-clip: text;
+    text-fill-color: transparent;
+    border: 0.5px solid rgba(51, 153, 255, 0.5);
+    border-radius: 8px;
+    background-image: linear-gradient(to right, #08e7fe, #d6188a);
+  }  
+
+  .transparentTextLoading {
+    color: transparent !important;
+  }
+  
+  .alien-cowboy-title::before {
+      content: '\1F47D'; /* Alien Emoji */
+      margin-right: 10px;
+      font-size: 24px;
+  }
+  
+  .alien-cowboy-title::after {
+      content: '\1F920'; /* Cowboy Emoji */
+      margin-left: 10px;
+      font-size: 24px;
+  }  
