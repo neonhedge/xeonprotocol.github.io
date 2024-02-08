@@ -557,14 +557,12 @@ async function fetchOptionCard(optionId){
 			</div>`;
 		}
 		//bookmark check
-		var bookmark = 'addBookmark("'+optionId+'")';
-		var unbookmark = 'removeBookmark("'+optionId+'")';
 		var bookmarkState = await hedgingInstance.getBookmark(userAddress, optionId);
 		if(!bookmarkState){
-			var bookmark_btn = "<div class='raise_S_tab _bookmarkjump'  data-optionid="+optionId+" onclick='bookmarkOption("+optionId+")'><img src='./imgs/bookmark_.png' width='18px'/></div>";
+			var bookmark_btn = "<div class='raise_S_tab _bookmarkjump'  data-optionid="+optionId+"><img src='./imgs/bookmark_.png' width='18px'/></div>";
 		}
 		if(bookmarkState){
-			var bookmark_btn = "<div class='raise_S_tab _bookmarkjump'  data-optionid="+optionId+" onclick='unbookmarkOption("+optionId+")'><img src='./imgs/unbookmark_.png' width='18px'/></div>";
+			var bookmark_btn = "<div class='raise_S_tab _bookmarkjump'  data-optionid="+optionId+"><img src='./imgs/unbookmark_.png' width='18px'/></div>";
 		}
 		//display nav 1 - vacant option
 		if(window.nav == 1){

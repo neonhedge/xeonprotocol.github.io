@@ -900,7 +900,7 @@ function hedgeDeletedMessage(transactionHash) {
 }
 
 // Bookmark Toggle
-async function addBookmark(optionId) {
+async function toggleBookmark(optionId) {
 	try {
 		
 		// Submit Tx
@@ -982,5 +982,5 @@ function refreshBalances() {
     console.log('Refreshing balances...');
 }
 
-export { setupWritingModule, createForm, submitWriting, purchaseInterface, deleteInterface, addBookmark};
+export { setupWritingModule, createForm, submitWriting, purchaseInterface, deleteInterface, toggleBookmark};
   
