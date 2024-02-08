@@ -98,7 +98,9 @@ async function fetchSection_HedgeCard(){
         const createValueDeci = fromBigIntNumberToDecimal(hedgeResult.createValue, pairedAddressDecimal);
 		const marketvalue = fromBigIntNumberToDecimal(marketvalueCurrent, pairedAddressDecimal);
         const marketPrice = marketvalue / tokenAmount;
-        const strikeValueDeci = fromBigIntNumberToDecimal(hedgeResult.strikeValue, pairedAddressDecimal);
+        const strikeValueR1 = fromBigIntNumberToDecimal(hedgeResult.strikeValue, tokenDecimal);// saved as BigInt * BigInt in struct during create
+        const strikeValueR1BN = ethers.BigNumber.from(strikeValueR1);
+        const strikeValueDeci = fromBigIntNumberToDecimal(strikeValueR1BN, pairedAddressDecimal);// saved as BigInt * BigInt in struct during create
         const strikePrice = strikeValueDeci / tokenAmount;
         const startValueDeci = fromBigIntNumberToDecimal(hedgeResult.startValue, pairedAddressDecimal);
         const costDeci = fromBigIntNumberToDecimal(hedgeResult.cost, pairedAddressDecimal);
@@ -260,7 +262,7 @@ async function fetchSection_HedgeCard(){
         // this way its easy to create a default load & separate an actual data update
         
         // Hedge Price Levels - First item is startValue, last item is underlying/current value
-        const initialPrices = [0, createValueDeci, startValueDeci, marketvalue];
+        const initialPrices = [createValueDeci, startValueDeci, marketvalue];
         const initialTargetPrice = strikeValueDeci;
         updateChartValues_Hedge(initialPrices, initialTargetPrice);
 
