@@ -3,9 +3,9 @@
 ==========================================================================*/
 import { CONSTANTS, getUserBalancesForToken, truncateAddress, getPairToken, getSymbol, getAccounts, isValidEthereumAddress, fromBigIntNumberToDecimal, fromDecimalToBigInt, getTokenDecimals, } from './constants.js';
 import { initializeConnection, chainCheck, reqConnect, handleAccountChange, handleNetworkChange, popupSuccess} from './web3-walletstatus-module.js';
-import { refreshDataOnElements, loadOptions, fetchOptionStrip, fetchNameSymbol, prepareTimestamp, noOptionsSwal } from './module-market-card-fetchers.js';
+import { refreshDataOnElements, loadOptions, fetchOptionStrip,  prepareTimestamp, noOptionsSwal } from './module-market-card-fetchers.js';
 import { loadSidebar, loadSidebarVolume_All, loadSidebarVolume_Token, loadPastEvents, prepareEventListItem } from './module-market-sidebar-fetchers.js';
-import { purchaseInterface, deleteInterface } from './module-silkroad-writer.js';
+import { setupWritingModule, createForm, submitWriting, purchaseInterface, deleteInterface } from './module-silkroad-writer.js';
 /*=========================================================================
     Wallet Page Main Functions
 ==========================================================================*/
@@ -343,92 +343,6 @@ async function onSearchSubmit(event) {
 	}
 }
 
-async function createForm() {
-	const trader = await getAccounts();
-	let truncatedUser = '';
-	let depositedBalance = 0, withdrawnBalance = 0, lockedInUseBalance = 0, withdrawableBalance = 0;
-
-  	const isValid = isValidEthereumAddress(trader[0]);
-	if (isValid) {
-	  truncatedUser = truncateAddress(trader[0]);
-	} else {
-	  truncatedUser = 'Connect Wallet';
-	}
-  
-	const privatize = `
-	<form id="writeForm">
-	  <div class="shl_inputshold delegate_inputshold setBeneField">
-		<label id="typeLabel" class="labels"><img src="imgs/info.png" title="Options or Equity Swaps (read docs)">hedge type:</label>
-		<select id="hedgeType" name="hedgeType">
-		  <option value="0">Call Option</option>
-		  <option value="1">Put Option</option>
-		  <option value="2">Equity Swap</option>
-		  <option value="3">Loan Request (coming)</option>
-		</select>
-		<label id="tokenLabel" class="labels"><img src="imgs/info.png" title="token address of the underlying assets or tokens">token address:</label>
-		<input id="tokenAddy" class="sweetInput shldi benown" type="text" aria-invalid="false" autocomplete="ERC20 token to hedge">
-		<label id="amountLabel" class="labels"><img src="imgs/info.png" title="amount of the tokens you want to hedge. \nNote: Tokens should be deposited to Vault first, visit wallet page">token amount:</label>
-		<input id="tokenAmount" class="sweetInput shldi benown" type="number"  aria-invalid="false" autocomplete="amount of tokens in trade">
-		<label id="premiumLabel" class="labels"><img src="imgs/info.png" title="in paired currency, the cost the buyer has to pay to take the OTC trade">premium:</label>
-		<input id="premium" class="sweetInput shldi benown" type="number" step="any" aria-invalid="false" autocomplete="cost of buying trade">
-		<label id="strikeLabel" class="labels"><img src="imgs/info.png" title="strike price of the underlying tokens in paired currency">strike price:</label>
-		<input id="strikePrice" class="sweetInput shldi benown" type="number" step="any" aria-invalid="false" autocomplete="break even value for the trade">
-		<br>
-		<div class="walletBalancesTL">
-		  <p>paste token address above & view your balances: </p>
-		  <span class="walletbalanceSpan">${truncatedUser} <img src="imgs/info.png" title="protocol balances on connected wallet"></span></br>
-		  <div><span class="walBalTitle">deposited:</span><span id="depositedBalance">${depositedBalance}</span></div>
-		  <div><span class="walBalTitle">locked:</span><span id="lockedInUseBalance">${lockedInUseBalance}</span></div>
-		  <div><span class="walBalTitle">withdrawn:</span><span id="withdrawnBalance">${withdrawnBalance}</span></div>
-		  <div><span class="walBalTitle">available:</span><span id="withdrawableBalance">${withdrawableBalance}</span></div>
-		</div>
-	  </div>
-	</form>`;
-  
-	swal({
-		title: "Create OTC Trade",
-		text: privatize,
-		type: "prompt",
-		html: true,
-		dangerMode: true,
-		confirmButtonText: "Write",
-		confirmButtonColor: "#171716",
-		cancelButtonText: "Cancel",
-		closeOnConfirm: false,
-		showLoaderOnConfirm: true,
-		showConfirmButton: true,
-		showCancelButton: true
-	},async function(value){
-		if (value) {
-			// Manually select input elements
-			const hedgeType = document.getElementById('hedgeType').value;
-			const tokenAddress = document.getElementById('tokenAddy').value;
-			const tokenAmount = document.getElementById('tokenAmount').value;
-			const premium = document.getElementById('premium').value;
-			const strikePrice = document.getElementById('strikePrice').value;
-
-			// Prepare the form values if needed
-			const values = {
-				hedgeType,
-				tokenAddress,
-				tokenAmount,
-				premium,
-				strikePrice,
-			};
-
-            // You can use 'values' as needed
-            console.log(values);
-
-            // Continue with your logic here
-            await setupWritingModule(values);
-
-        } else {
-            // Handle cancel or empty input
-            swal.close();
-        }
-	});
-}
-
 // Listeners: create button click, sidebar tab click
 $(document).on('click', '#create_button', function(e){
 	createForm();
@@ -518,30 +432,8 @@ async function fetchUserTokenBalance(tokenAddress) {
 }
 
 //==============================================================
-// Move to writes module
+// Validity Checkers
 //==============================================================
-export async function setupWritingModule(formValues) {
-    // Get form inputs
-    const hedgeType = formValues['hedgeType'];
-    const tokenAddress = formValues['tokenAddress'];
-    const tokenAmount = formValues['tokenAmount'];
-    const premium = formValues['premium'];
-    const strikePrice = formValues['strikePrice'];
-
-	alert("hedgeType: " + hedgeType + "\ntokenAddress: " + tokenAddress + "\ntokenAmount: " + tokenAmount + "\npremium: " + premium + "\nstrikePrice: " + strikePrice);
-    
-	try {
-        // Validate form inputs
-        if (!isValidInput(hedgeType, tokenAddress, tokenAmount, premium, strikePrice)) {
-            return;
-        }
-
-        // Pass form values to write function
-        await submitWriting(hedgeType, tokenAddress, tokenAmount, premium, strikePrice);
-    } catch (error) {
-        console.error('Error:', error.message);
-    }
-}
 
 function isValidInput(hedgeType, tokenAddress, tokenAmount, premium, strikePrice) {
     if (isNaN(tokenAmount) || parseFloat(tokenAmount) <= 0) {
@@ -583,100 +475,6 @@ function showInvalidInputMessage(message) {
     });
 }
 
-async function submitWriting(hedgeType, tokenAddress, tokenAmount, premium, strikePrice) {
-    const accounts = await getAccounts();
-    if (accounts.length === 0) {
-        alert('Please connect your wallet');
-        return;
-    }
-    
-    // get token info and pair infor, price and cost are in pair currency
-    const tokenDecimals = await getTokenDecimals(tokenAddress);
-    const tokenAmountWei = fromDecimalToBigInt(tokenAmount, tokenDecimals);
-    // get dependency variables
-    const pairAddress = await hedgingInstance.getPairAddressZK(tokenAddress);
-	let pairDecimals;
-	if (pairAddress == CONSTANTS.wethAddress) {
-		pairDecimals = 18;
-	} else if (pairAddress == CONSTANTS.usdtAddress) {
-		pairDecimals = 6;
-	} else if (pairAddress == CONSTANTS.usdcAddress) {
-		pairDecimals = 6;
-	} else { // remove above hack when on mainnet with actual 18 decimal WETH not 6 on Sepolia
-		pairDecimals = await getTokenDecimals(pairAddress.pairedCurrency);
-	}
-
-    // prepare other inputs
-    const premiumWei = fromDecimalToBigInt(premium, pairDecimals);
-    const strikePriceWei = fromDecimalToBigInt(strikePrice, pairDecimals);
-
-    // Add deadline value
-	hedgeType = parseInt(hedgeType);
-	
-	// *** TESTING ONLY ***
-    // Get the current timestamp in seconds & add 6 months for testing
-	const currentTimestamp = Math.floor(Date.now() / 1000);
-	const sixMonthsInSeconds = 6 * 30 * 24 * 60 * 60;
-	const deadline = currentTimestamp + sixMonthsInSeconds;
-
-	console.log('hedgeType: ' + hedgeType + '\ntokenAddress: ' + tokenAddress + '\ntokenAmountWei: ' + tokenAmountWei + '\npremiumWei: ' + premiumWei + '\nstrikePriceWei: ' + strikePriceWei + '\ndeadline: ' + deadline);
-
-    try {
-        // prepare Tx
-        const transaction = await hedgingInstance.connect(signer).createHedge(
-            hedgeType, //pass as integer, uint in solidity
-            tokenAddress, 
-            tokenAmountWei, 
-            premiumWei,
-			strikePriceWei,
-            deadline  //pass as integer, uint in solidity
-        );
-
-        // Wait for the transaction to be mined
-        const receipt = await transaction.wait();
-
-        if (receipt.status === 1) {
-            console.log('Transaction hash:', receipt.transactionHash);
-            handleTransactionSuccess(receipt.transactionHash); 
-        } else {
-            console.log('Transaction failed. Receipt status:', receipt.status);
-            handleTransactionFailure(receipt.status); 
-        }
-    } catch (error) {
-        console.error('Transaction error:', error);
-        const text = error.message;
-        swal({
-            title: 'Transaction error.',
-            type: 'error',
-            confirmButtonColor: '#F27474',
-            text: text,
-        });
-    }
-}
-
-function handleTransactionSuccess(transactionHash) {
-	// Display a success message based on the status
-	var message = "Trade has been created..\nIt will now appear on the OTC timeline to buyers.";
-	swal({
-	  title: "Transaction Submitted Successfully",
-	  type: "success",
-	  confirmButtonText: "Yay!",
-	  confirmButtonColor: "#F27474",
-	  allowOutsideClick: true,
-	  text: message,
-	});
-}
-  
-function handleTransactionFailure(status) {
-	// Display a user-friendly message based on the status
-	var message = status ? "Transaction Failed" : "Transaction Reverted";
-	swal({
-	  title: "Writing Failed.",
-	  type: "error",
-	  confirmButtonColor: "#F27474",
-	  text: message,
-	});
-}
 
 
 // Listen to live events

@@ -5,6 +5,7 @@
 import { CONSTANTS } from './constants.js';
 import { initializeConnection, chainCheck, unlockedWallet, reqConnect, handleAccountChange, handleNetworkChange, popupSuccess} from './web3-walletstatus-module.js';
 import { fetchSection_HedgeCard, fetchSection_HedgeCardDefault } from './module-hedge-fetchers.js';
+import { prepareEventListItem, } from './module-market-sidebar-fetchers.js';
 
 /*=========================================================================
     Hedge Page Main Scripts
@@ -109,6 +110,125 @@ async function pageModulesLoadingScript() {
 /*=========================================================================
     INITIALIZE OTHER MODULES
 ==========================================================================*/
+
+/*  ---------------------------------------
+    HEDGING EVENT LISTENING
+-------------------------------------- */
+$(document).ready(async function () {
+
+  setupEventListening();
+
+});
+
+async function setupEventListening() {
+let hedgingInstance = window.hedgingInstance;
+
+// Hedging Events
+try {
+      const filter_hedgeCreated = await hedgingInstance.filters.hedgeCreated();
+      hedgingInstance.on(filter_hedgeCreated, handleHedgeCreatedEvent);
+
+      const filter_hedgePurchased = await hedgingInstance.filters.hedgePurchased();
+      hedgingInstance.on(filter_hedgePurchased, handleHedgePurchasedEvent);
+
+      const filter_hedgeSettled = await hedgingInstance.filters.hedgeSettled();
+      hedgingInstance.on(filter_hedgeSettled, handleHedgeSettledEvent);
+
+      const filter_minedHedge = await hedgingInstance.filters.minedHedge();
+      hedgingInstance.on(filter_minedHedge, handleMinedHedgeEvent);
+
+  } catch (error) {
+      console.error('Error setting up event listening:', error);
+  }
+}
+/* GitHub https://github.com/ethers-io/ethers.js/issues/1307
+hedgingInstance.on(filter_hedgeCreated, async (...args) => {
+console.log(args[args.length - 1].transactionHash);
+});
+*/
+async function handleHedgeCreatedEvent(token, optionId, createValue, type, writer, transactionHash) {
+
+const event = { 
+  returnValues: { token, optionId, createValue, type, writer },
+  event: 'hedgeCreated',
+  transactionHash: transactionHash.transactionHash
+};
+//console.log(transactionHash.transactionHash);
+const listItem = await prepareEventListItem(event, "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef");
+}
+
+async function handleHedgePurchasedEvent(token, optionId, startValue, type, buyer, transactionHash) {
+const event = {
+  returnValues: { token, optionId, startValue, type, buyer },
+  event: 'hedgePurchased',
+  transactionHash: transactionHash.transactionHash
+};
+const listItem = await prepareEventListItem(event, "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef");
+}
+
+async function handleHedgeSettledEvent(token, optionId, endValue, payOff, miner, transactionHash) {
+const event = {
+  returnValues: { token, optionId, endValue, payOff, miner },
+  event: 'hedgeSettled',
+  transactionHash: transactionHash.transactionHash
+};
+const listItem = await prepareEventListItem(event, "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef");
+}
+
+async function handleMinedHedgeEvent(optionId, miner, token, paired, tokenFee, pairFee, transactionHash) {
+const event = {
+  returnValues: { optionId, miner, token, paired, tokenFee, pairFee },
+  event: 'minedHedge',
+  transactionHash: transactionHash.transactionHash
+};
+const listItem = await prepareEventListItem(event, "0x123456789abcdef");
+}
+
+function handleHedgeCreatedSuccessEvent(token, optionId, amount, hedgeType, cost, tx_hash) {
+  const outputCurrency = ''; // using nonTxBased message with empty currency
+  const type = 'success'; // or error
+  const wallet = '';
+  const message = 'Hedge Created Successfully';
+  const nonTxAction = 'Token: ' + truncateAddress(token) + '<br>Hedge ID: ' + optionId + '<br>Amount: ' + amount + '<br>Hedge Type: ' + hedgeType + '<br>Premium: ' + cost;
+  popupSuccess(type, outputCurrency, tx_hash, message, 0, 0, wallet, nonTxAction);
+}
+
+
+/*  ---------------------------------------
+  BOTTOM OF EVERY MAIN SCRIPT MODULE 
+-------------------------------------- */
+// Provider Listeners
+ethereum.on("connect", (chainID) => {
+  // Update chainID on connect
+  CONSTANTS.chainID = chainID.chainId;
+  console.log("Connected to chain:", CONSTANTS.chainID);
+  handleNetworkChange(chainID.chainId)
+  chainCheck();
+});
+
+ethereum.on("accountsChanged", async (accounts) => {
+  console.log("Account changed:", accounts);
+  if(accounts.length > 0) {
+    handleAccountChange(accounts);
+    // Refresh accounts & page Feed
+    checkAndCallPageTries();
+    loadOptions();
+  } else {
+    handleAccountChange(accounts);
+    // Refresh wallet widget directly, force wallet initialization check first		
+    window.currentAccount = null;
+    checkAndCallPageTries();
+  }
+});
+
+ethereum.on("chainChanged", (chainID) => {
+  console.log("Network changed:", chainID);
+  handleNetworkChange(chainID);
+  window.location.reload();
+});
+
+
+
 
 
 

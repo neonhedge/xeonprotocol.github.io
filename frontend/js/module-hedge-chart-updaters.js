@@ -160,7 +160,7 @@ function updateChartValues_Hedge(prices, targetPrice) {
       // Draw current price level line
       const currentPrice = prices[prices.length - 1];
       const currentPriceY = chartHeight - ((currentPrice - chartDimensions.minPrice) / chartDimensions.priceRange) * chartHeight;
-      ctx.strokeStyle = '#41f483'; // Green color for the current price line
+      ctx.strokeStyle = '#5fff37'; // #00ff5e - Green color for the current price line
       ctx.setLineDash([2, 2]); // Set the line to dashed
       ctx.lineWidth = 1.5; // Set the line width to 1px
       ctx.beginPath();

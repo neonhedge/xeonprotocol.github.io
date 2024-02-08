@@ -268,7 +268,7 @@ hr.line {
   display: flex;
   justify-content: space-between;
   flex-basis: 750px;
-  flex-basis: 850px; /* without AI side panel */
+  flex-basis: 900px; /* without AI side panel */
 }
 
 @media (max-width: 55em) {
@@ -303,6 +303,7 @@ hr.line {
   border-radius: 5px;
   line-height: 1.5;
   font-family: 'modeseven', 'bitwise', sans-serif, "Helvetica Neue", Helvetica, Arial;
+  font-family: 'Raleway',"Space Grotesk", sans-serif !important;
   font-size: clamp(14px, 1vw, 16px);
   padding: 1vw;
   box-sizing: border-box;
@@ -310,7 +311,10 @@ hr.line {
   background-image: radial-gradient(#131145, #1b1b49 100%) !important;
   color: #EEE;
 }
-
+.flux {
+  display: inline-block;
+  font-family: unset!important;
+}
 /* Token styles */
 .tokenLogoLeft {
   position: relative;
@@ -326,7 +330,7 @@ hr.line {
 
 .tokenName {
   display: inline-block;
-  font-weight: 600;
+  font-weight: 400;
   font-size: clamp(16px, 2vw, 19px);
   text-align: left;
 }
@@ -338,6 +342,7 @@ hr.line {
   color: #188dd6;
   color:#FFF;
   text-align: left;
+  font-family: "Nunito Sans", monospace, sans-serif !important;
 }
 
 .additionalTokens {
@@ -362,6 +367,7 @@ hr.line {
   justify-content: space-evenly;
   margin: 15px 0;
   border-bottom: 2px dashed #0f082e;
+  font-weight: 400 !important;
 }
 
 .optionValue,
@@ -385,10 +391,14 @@ hr.line {
 .compositionValue {
   width: 100%;
   font-size: clamp(13px, 1vw, 15px);
-  font-weight:100;
+  font-weight:400;
   padding: 8px;
   background-color: #0f082e;
   color: #188dd6;
+}
+
+.optionMarketValue {
+  font-family: "Nunito Sans", monospace, sans-serif !important;
 }
 
 .optionTypeValue {
@@ -402,12 +412,12 @@ hr.line {
   text-shadow: none;
   padding-inline: 0 !important;
 }
+
 .optionValue,
 .optionComposition {
   flex-grow:1;
   text-align: center;
 }
-
 
 /* Option mark styles */
 .optionMarkContainer {
@@ -415,6 +425,7 @@ hr.line {
   margin-top: 15px;
   display: flex;
   flex-wrap: wrap;
+  padding-block: 0.5rem;
 }
 
 .optionMark {
@@ -489,7 +500,7 @@ hr.line {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
-  padding-inline: 8px;
+  padding: 5px;
 }
 
 .requestWin {
@@ -593,8 +604,8 @@ hr.line {
   justify-content: center; 
   text-align: center;
   color: white;
-  font-size: 13px;
-  font-family: Arial, sans-serif;
+  font-size: 11px;
+  font-family: "Space Grotesk", monospace, sans-serif;
   /* //Hide the text initially
   opacity: 0; 
   */
@@ -611,6 +622,7 @@ hr.line {
 .gainsSect {
   display: grid;
   align-content: space-between;
+  width:250px;
 }
 
 .progressSect, .gainsSect {
@@ -620,9 +632,10 @@ hr.line {
 
 .progressSect h5, .gainsSect h5 {
   font-size: 16px;
-  font-weight: bold;
+  font-weight: 400;
   /* color: #188dd6; */
   text-align: center;
+  font-family: 'Raleway',"Space Grotesk", sans-serif;
 }
 
 .progressSummary {
@@ -856,6 +869,7 @@ font-size: clamp(12.2px, 1vw, 13.5px);
   pointer-events: none;
   opacity: 0;
   transition: all 0.2s;
+  background-color: #00ff5e;
 }
 
 .priceChangeTag.show {
@@ -885,11 +899,15 @@ font-size: clamp(12.2px, 1vw, 13.5px);
     flex-direction: column;
     justify-content: center; /* Center vertically */
     align-items: center; /* Center horizontally */
-    border:1px solid #000;
-    box-shadow: 0 0 .05rem #fff, inset 0 0 .05rem #fff, 0 0 0.352rem var(--neon-border-color), inset 0 0 0.25rem var(--neon-border-color), 0 0 0.16rem var(--neon-border-color), inset 0 0 0.16rem var(--neon-border-color);
     margin-block: 1vw;
     padding-block:1vw;
     border-radius: 10px;
+    /*
+    border:1px solid #000;
+    box-shadow: 0 0 .05rem #fff, inset 0 0 .05rem #fff, 0 0 0.352rem var(--neon-border-color), inset 0 0 0.25rem var(--neon-border-color), 0 0 0.16rem var(--neon-border-color), inset 0 0 0.16rem var(--neon-border-color);
+    */
+    background-color: rgba(29, 129, 216, 0.15);
+    border: 0.5px solid #3399ff;
   }
 
   .partyContTop{
@@ -920,8 +938,11 @@ font-size: clamp(12.2px, 1vw, 13.5px);
   
   .ownerMark {
     margin-inline: 10px;
-    font-family: "modeseven";
     font-size: clamp(13.5px, 1vw, 15.5px);
+
+    font-family: 'Raleway',"Space Grotesk", sans-serif;
+    font-weight: 500;
+    text-transform: uppercase;
   }
 
   .ownerProfitabil span{
