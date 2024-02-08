@@ -899,11 +899,88 @@ function hedgeDeletedMessage(transactionHash) {
     }, 3000); 
 }
 
+// Bookmark Toggle
+async function addBookmark(optionId) {
+	try {
+		
+		// Submit Tx
+        const transaction = await hedgingInstance.connect(signer).bookmarkHedge(optionId);
+
+        // Wait for the transaction to be mined
+        const receipt = await transaction.wait();
+
+        if (receipt.status === 1) {
+	
+			// Bookmark state updated successfully
+			console.log('Bookmark State Updated:', receipt.events.BookmarkToggle.returnValues.bookmarked);
+		
+			// Display bookmark state in a browser alert
+			alert('Bookmark State Updated: ' + receipt.events.BookmarkToggle.returnValues.bookmarked);
+		
+			const state = receipt.events.bookmarked.returnValues[2];
+			const hedge = receipt.events.bookmarked.returnValues[1];
+		
+			const tx_hash = receipt.transactionHash;
+			const outputCurrency = ''; // or GUN - currency focus is outcome of Tx
+			const type = 'success'; // or error
+			const wallet = '';
+			const receivedTokens = 0;
+		
+			let message = '', title = '', nonTxAction = '';
+			if (state) {
+				message = 'Bookmark saved..';
+				title = 'Bookmarked!';
+				nonTxAction = 'hedge: ' + hedge + ' bookmarked: ';
+			} else {
+				title = 'Removed!';
+				message = 'Bookmark removed..';
+				nonTxAction = 'hedge: ' + hedge + ' unmarked: ';
+			}
+		
+			// Call popupSuccess function without waiting for it to complete (async)
+			popupSuccess(type, outputCurrency, tx_hash, message, 0, receivedTokens, wallet, nonTxAction);
+
+			swal ({
+				title: title,
+				text: message,
+				type: 'success',
+				html: false,
+				dangerMode: false,
+				showConfirmButton: false,
+				showCancelButton: false,
+				animation: "Pop",
+				allowOutsideClick: true,
+				timer: 1800,
+			})
+		} else {
+            console.log('Bookmarking failed. Receipt status:', receipt.status);
+            swal({
+                title: "Bookmarking Failed.",
+                type: "error",
+                allowOutsideClick: true,
+                confirmButtonColor: "#F27474",
+                text: "Transaction Failed. Receipt status: " + receipt.status
+            });
+        }
+
+	} catch (error) {
+		// Handle error
+		const text = error.message;
+		swal({
+			title: "Cancelled.",
+			type: "error",
+			allowOutsideClick: true,
+			text: text,
+			html: false,
+			confirmButtonColor: "#F27474"
+		});
+	}
+}  
 
 // Dummy refresh balances on networth card & append <li> to token list
 function refreshBalances() {
     console.log('Refreshing balances...');
 }
 
-export { setupWritingModule, createForm, submitWriting, purchaseInterface, deleteInterface };
+export { setupWritingModule, createForm, submitWriting, purchaseInterface, deleteInterface, addBookmark};
   

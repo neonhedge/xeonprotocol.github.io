@@ -1,6 +1,6 @@
 import { MyGlobals } from './_silkroad.js';
 import { CONSTANTS, getAccounts, getUserBalancesForToken, truncateAddress, commaNumbering, cardCommaFormat, fromWeiToFixed5, getTokenDecimals, getTokenDecimalSymbolName, isValidEthereumAddress, fromDecimalToBigInt, fromBigIntNumberToDecimal } from './constants.js';
-import { purchaseInterface } from './module-silkroad-writer.js';
+import { purchaseInterface, toggleBookmark } from './module-silkroad-writer.js';
 
 async function refreshDataOnElements() {
 	// Fetch data for all items in MyGlobals.outputArray concurrently
@@ -393,6 +393,14 @@ async function loadOptions(){
 			purchaseInterface(optionId);
 		});
 	});
+	// Bookmark button
+	document.querySelectorAll('._bookmarkjump').forEach(button => {
+		button.addEventListener('click', function() {
+			// retrieve the optionId from the data-optionid attribute
+			const optionId = this.dataset.optionid;
+			toggleBookmark(optionId);
+		});
+	});
 }
 
 async function fetchOptionCard(optionId){
@@ -553,10 +561,10 @@ async function fetchOptionCard(optionId){
 		var unbookmark = 'removeBookmark("'+optionId+'")';
 		var bookmarkState = await hedgingInstance.getBookmark(userAddress, optionId);
 		if(!bookmarkState){
-			var bookmark_btn = "<div class='raise_S_tab _bookmarkjump' onclick='bookmarkOption("+optionId+")'><img src='./imgs/bookmark_.png' width='18px'/></div>";
+			var bookmark_btn = "<div class='raise_S_tab _bookmarkjump'  data-optionid="+optionId+" onclick='bookmarkOption("+optionId+")'><img src='./imgs/bookmark_.png' width='18px'/></div>";
 		}
 		if(bookmarkState){
-			var bookmark_btn = "<div class='raise_S_tab _bookmarkjump' onclick='unbookmarkOption("+optionId+")'><img src='./imgs/unbookmark_.png' width='18px'/></div>";
+			var bookmark_btn = "<div class='raise_S_tab _bookmarkjump'  data-optionid="+optionId+" onclick='unbookmarkOption("+optionId+")'><img src='./imgs/unbookmark_.png' width='18px'/></div>";
 		}
 		//display nav 1 - vacant option
 		if(window.nav == 1){
