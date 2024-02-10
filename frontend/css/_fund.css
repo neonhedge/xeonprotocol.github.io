@@ -383,6 +383,7 @@ hr.line {
   color: #fff;
   font-size: clamp(14px, 1vw, 15px);
   text-align:center;
+  text-transform: uppercase;
   padding:4px;
 }
 
@@ -390,7 +391,7 @@ hr.line {
 .optionTypeValue,
 .compositionValue {
   width: 100%;
-  font-size: clamp(13px, 1vw, 15px);
+  font-size: clamp(13px, 1vw, 14px);
   font-weight:400;
   padding: 8px;
   background-color: #0f082e;
@@ -531,7 +532,7 @@ hr.line {
 }
 
 .hedgeDetails, .dealRequests {
-  flex-basis: 50%;
+  flex: 1;
 }
 
 .requestWin button, .requestList button{
@@ -723,11 +724,15 @@ hr.line {
 }
 
 /* Action button styles */
+#takeHedge, #deleteHedge, #zapHedge {
+  
+}
+
 .dealButton {
   position: relative;
-display: inline-block;
-text-align: center !important;
-font-size: clamp(12.2px, 1vw, 13.5px);
+  display: inline-block;
+  text-align: center !important;
+  font-size: clamp(12.2px, 1vw, 13.5px);
 
   background-color: transparent;
   border-radius: 1.8rem;
@@ -773,7 +778,7 @@ font-size: clamp(12.2px, 1vw, 13.5px);
 }
 
 .status-dot {
-  font-size: clamp(12.2px, 1vw, 13.5px);
+  font-size: clamp(13.5px, 1vw, 13.5px);
   font-weight: 400 !important;
   line-height: 16px;
   display: inline-flex;
@@ -928,7 +933,7 @@ font-size: clamp(12.2px, 1vw, 13.5px);
   .ownerProfitabil {
     position: relative;
     width: 100%;
-    height: 100px;
+    height: 120px;
     display: flex;
     justify-content: center;
     align-items: center; /* Center vertically */
@@ -939,16 +944,14 @@ font-size: clamp(12.2px, 1vw, 13.5px);
   .ownerMark {
     margin-inline: 10px;
     font-size: clamp(13.5px, 1vw, 15.5px);
-
     font-family: 'Raleway',"Space Grotesk", sans-serif;
-    font-weight: 500;
+    font-weight: 100;
     text-transform: uppercase;
   }
 
   .ownerProfitabil span{
-    padding:4px;
-    border-radius: 5px;
-    
+    padding: 0.5vw;
+    border-radius: 10px;
     width: auto;
     text-align: center;
     font-size: clamp(20px, 2vw, 25px);

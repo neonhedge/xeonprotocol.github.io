@@ -250,15 +250,17 @@ function updateSectionValues_Gains(
         const zapHedgeButton = document.getElementById("zapHedge");
         const settledAlreadyButton = document.getElementById("settledAlready");
 
+        $(".dealButton").hide();
         if (status === 1) {
             if (userAddress !== owner) {
-            takeHedgeButton.style.display = "block";
-            deleteHedgeButton.style.display = "block";
+            takeHedgeButton.style.display = "inline-block";
+            } else {
+            deleteHedgeButton.style.display = "inline-block";
             }
         } else if (status === 2) {
-            zapHedgeButton.style.display = "block";
+            zapHedgeButton.style.display = "inline-block";
         } else if (status === 3) {
-            settledAlreadyButton.style.display = "block";
+            settledAlreadyButton.style.display = "inline-block";
         }
   
     } catch (error) {
