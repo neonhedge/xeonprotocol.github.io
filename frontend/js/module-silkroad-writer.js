@@ -900,10 +900,11 @@ function hedgeDeletedMessage(transactionHash) {
 }
 
 // Bookmark Toggle
-async function toggleBookmark(optionId) {
+async function toggleBookmark(optionID) {
+    let optionId = ethers.BigNumber.from(parseInt(optionID));
 	try {
 		
-		// Submit Tx
+		// Submit Tx, accepts uint256 or BN
         const transaction = await hedgingInstance.connect(signer).bookmarkHedge(optionId);
 
         // Wait for the transaction to be mined

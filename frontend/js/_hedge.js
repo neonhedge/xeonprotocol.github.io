@@ -6,6 +6,7 @@ import { CONSTANTS } from './constants.js';
 import { initializeConnection, chainCheck, unlockedWallet, reqConnect, handleAccountChange, handleNetworkChange, popupSuccess} from './web3-walletstatus-module.js';
 import { fetchSection_HedgeCard, fetchSection_HedgeCardDefault } from './module-hedge-fetchers.js';
 import { prepareEventListItem, } from './module-market-sidebar-fetchers.js';
+import { setupWritingModule, createForm, submitWriting, purchaseInterface, deleteInterface, toggleBookmark } from './module-silkroad-writer.js';
 
 /*=========================================================================
     Hedge Page Main Scripts
@@ -18,7 +19,7 @@ import { prepareEventListItem, } from './module-market-sidebar-fetchers.js';
 
 // Start making calls to Dapp modules
 export const checkAndCallPageTries = async () => {
-  const scouter = await pageModulesLoadingScript();
+  let scouter = await pageModulesLoadingScript();
   
   console.log('connection Scout: '+ scouter);  
   if (scouter) {
@@ -61,7 +62,7 @@ export const checkAndCallPageTries = async () => {
 
 $(document).ready(async function () {
 
-  // countdown timer refresh
+  // Countdown timer refresh
   const setatmIntervalAsync = (fn, ms) => {
     let countdown = ms / 1000;
     const refreshCounter = document.getElementById('refreshCounter');
@@ -70,7 +71,7 @@ $(document).ready(async function () {
       refreshCounter.innerText = countdown;
     };
 
-    //Update the countdown in real time
+    // Update the countdown in real time
     fn().then(() => {
       updateCountdown();
       const intervalId = setInterval(() => {
@@ -83,10 +84,15 @@ $(document).ready(async function () {
     });
   };
 
-  // load sections periodically
+  // Load sections periodically
   setatmIntervalAsync(async () => {
     checkAndCallPageTries();
   }, 45000);
+
+  // Update optionId
+  // Check if the webpage URL has '?id='
+  const urlParams = new URLSearchParams(window.location.search);
+  window.optionID = urlParams.get('id');
 });
 
 
@@ -110,6 +116,31 @@ async function pageModulesLoadingScript() {
 /*=========================================================================
     INITIALIZE OTHER MODULES
 ==========================================================================*/
+// Button Listeners: buy
+$(document).on('click', '#takeHedge', function(e){
+  const optionId = parseInt(window.optionID);
+  if (optionId) {
+    purchaseInterface(optionId);
+  }
+});
+$(document).on('click', '#deleteHedge', function(e){
+  const optionId = parseInt(window.optionID);
+  if (optionId) {
+    deleteInterface(optionId);
+  }
+});
+$(document).on('click', '#zapHedge', function(e){
+
+});
+$(document).on('click', '#settleHedge', function(e){
+  
+});
+$(document).on('click', '#toggleBookmark', function(e){
+  const optionId = parseInt(window.optionID);
+  if (optionId) {
+    toggleBookmark();
+  }
+});
 
 /*  ---------------------------------------
     HEDGING EVENT LISTENING

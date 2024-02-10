@@ -287,11 +287,20 @@
 					</div>		
 				</div>
 				<div class="partiesAction">
-					<button class="dealButton btn-cta" title="speed up expiry. request instant spot settlement to the other party.">
+					<button id="takeHedge" class="dealButton btn-cta" title="buy hedge from writer" style="display: inline-block;">
+						<i class="fa-solid fa-bolt"></i> Buy Hedge <!-- accept zap, buy hedge, running -->
+					</button>
+					<button id="deleteHedge" class="dealButton btn-cta" title="delete the Hedge before buyers buy it." style="display: none;">
+						<i class="fa-solid fa-bolt"></i> Delete Hedge <!-- accept zap, buy hedge, running -->
+					</button>
+					<button id="zapHedge" class="dealButton btn-cta" title="speed up expiry. request instant spot settlement to the other party." style="display: none;">
 						<i class="fa-solid fa-bolt"></i> Request Zap <!-- accept zap, buy hedge, running -->
 					</button>
+					<button id="settleHedge" class="dealButton btn-cta" title="settlement can be initiated by either party upon expiry." style="display: none;">
+						<i class="fa-solid fa-bolt"></i> Settle Hedge <!-- accept zap, buy hedge, running -->
+					</button>
 					<div class="">
-						<div class='option_S_tab _bookmarkjump'><img src='imgs/bookmark_.png' width='18px'/></div>
+						<div id="toggleBookmark" class='option_S_tab _bookmarkjump'><img src='imgs/bookmark_.png' width='18px'/></div>
 					</div>
 				</div>					
 				<div class="partyCont">
