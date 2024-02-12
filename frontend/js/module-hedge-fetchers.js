@@ -142,7 +142,7 @@ async function fetchSection_HedgeCard(){
             writerGains = 0;
         }
 
-        // helper to farmatting below, format dates to "DD/MM/YYYY"
+        // Helper to farmatting below, format dates to "DD/MM/YYYY"
         function formatTimestamp(timestamp) {
             const date = new Date(timestamp * 1000);
             const day = date.getDate();
@@ -150,11 +150,13 @@ async function fetchSection_HedgeCard(){
             const year = date.getFullYear();
             return `${day.toString().padStart(2, '0')}/${month.toString().padStart(2, '0')}/${year}`;
         }
+
         // Format the dates
         const dt_createdFormatted = formatTimestamp(dt_created);
         const dt_startedFormatted = formatTimestamp(dt_started);
         const dt_expiryFormatted = formatTimestamp(dt_expiry);
         const dt_settledFormatted = formatTimestamp(dt_settled);
+
         // Progress or time to expiry
         // get current timestamp in seconds
         const dt_today = Math.floor(Date.now() / 1000); 
@@ -204,15 +206,6 @@ async function fetchSection_HedgeCard(){
             topupRequests, // uint256[]
         );
         updateSectionValues_Progress(
-            tokenPairAddress,
-            pairSymbol,
-            //values
-            endValue,
-            strikeValueDeci,
-            marketvalue,
-            startValueDeci,
-            createValueDeci,
-            costDeci,
             //date
             dt_createdFormatted,
             dt_startedFormatted,

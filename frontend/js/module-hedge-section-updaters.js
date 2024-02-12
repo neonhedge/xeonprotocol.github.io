@@ -101,15 +101,6 @@ function updateSectionValues_HedgeCard(
     }
 }
 function updateSectionValues_Progress(
-    pairedCurrency,
-    pairedSymbol,
-    //values
-    endValue,
-    strikeValue,
-    marketValue,
-    startValue,
-    createValue,
-    cost,
     //date
     dt_createdFormatted,
     dt_startedFormatted,
@@ -121,7 +112,7 @@ function updateSectionValues_Progress(
     status
 )   {
     const formatValue = (value) => {
-        return `${value.toFixed(2)}`;
+        return `${value.toFixed(0)}`;
     };
 
     try {
@@ -131,14 +122,16 @@ function updateSectionValues_Progress(
         // Step 2: compare lifespan to timetoExpiry and set the width of a div with ID progressBar, if timetoExpiry is 10% of lifespan then width is 10% of 100%        
         const progressBar = document.getElementById('meter_guage');
         
-        if (lifespan >= 0 && timetoExpiry < lifespan) {
-          const percentage = (timetoExpiry / lifespan) * 100;
-          const percentWidth = 100 - percentage;
-          progressBar.style.width = `${percentWidth}%`;
-          //update % text
-          document.getElementById("measure").textContent = `${formatValue(percentage)} %`;
+        if (timetoExpiry < lifespan) {
+            // Difference between them as %
+            const diffPercent = ((lifespan - timetoExpiry) / lifespan) * 100;
+            progressBar.style.width = `${diffPercent}%`;
+            //update % text
+            document.getElementById("measure").textContent = `${formatValue(diffPercent)} %`;
         } else {
-          progressBar.style.width = '0%';
+            progressBar.style.width = '0%';
+            //update % text
+            document.getElementById("measure").textContent = `${0} %`;
         }
     } catch (error) {
         console.error("Error Updating Net Worth section data:", error);
