@@ -1,7 +1,7 @@
 /*=========================================================================
     Import modules
 ==========================================================================*/
-import { CONSTANTS, getUserBalancesForToken, truncateAddress, isValidEthereumAddress, fromBigIntNumberToDecimal, fromDecimalToBigInt, getAccounts, getTokenDecimalSymbolName, getSymbol, getTokenDecimals } from './constants.js';
+import { CONSTANTS, getUserBalancesForToken, truncateAddress, isValidEthereumAddress, cardCommaFormat, fromBigIntNumberToDecimal, fromDecimalToBigInt, getAccounts, getTokenDecimalSymbolName, getSymbol, getTokenDecimals } from './constants.js';
 import { initializeConnection } from './web3-walletstatus-module.js';
 
 /*======================================================
@@ -565,9 +565,9 @@ async function deleteInterface(optionId) {
     let result = await hedgingInstance.getHedgeDetails(optionId);
     let owner = result.owner;
 
-    // Fetch symbol
-    let symbol;
-    fetchNameSymbol(result.token).then(t=>{name=t.name,symbol=t.symbol}).catch(e=>console.error(e));
+    // Fetch symbol//name and symbol
+    let name, decimals, symbol;
+    [name, decimals, symbol] = await getTokenDecimalSymbolName(result.token);
     // Fetch token & pair address
     let tokenAddress = result.token;
     let truncatedTokenAdd = tokenAddress.substring(0, 6) + '...' + tokenAddress.slice(-3);
@@ -604,14 +604,17 @@ async function deleteInterface(optionId) {
         pairSymbol = 'WETH';
     }
     
-    // Fetch underlying tokens market value
+    // Fetch underlying tokens market value. then others
     const [marketvalueCurrent, pairedAddress] = await hedgingInstance.getUnderlyingValue(tokenAddress, result.amount);
     const pairedAddressDecimal = await getTokenDecimals(tokenPairAddress);
     const marketvalue = fromBigIntNumberToDecimal(marketvalueCurrent, pairedAddressDecimal);
 
+    //start value in BN - before fromBigIntNumberToDecimal conversion
+    let costBN = ethers.BigNumber.from(result.cost);
+
     // Format outputs
     let marketvalueFormatted = cardCommaFormat(marketvalue);
-    let costFormatted = cardCommaFormat(cost);
+    let costFormatted = cardCommaFormat(costBN);
     let strikeFormatted = cardCommaFormat(strikePrice);
     
     // Token logourl
@@ -677,16 +680,6 @@ async function deleteInterface(optionId) {
             
         }); // close swal
     }
-        
-    // Format output
-    const formatStringDecimal = (number) => {
-        const options = {
-            style: 'decimal',
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 5,
-        };
-        return number.toLocaleString('en-US', options);
-    };
     
     try {
         // classes on left are for size, on right are for coloring & font

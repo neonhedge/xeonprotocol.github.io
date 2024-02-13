@@ -697,7 +697,7 @@ hr.line {
   position: absolute;
   top: 0;
   height: 20px;
-  width: 30px;
+  width: auto;
   left: 0;
   right: 0;
   margin-left: auto;

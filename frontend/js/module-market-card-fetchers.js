@@ -452,12 +452,12 @@ async function fetchOptionCard(optionId){
 		} else if (tokenPairAddress === CONSTANTS.wethAddress) {
 			pairSymbol = 'WETH';
 		}
+		
 		//market value current
 		const [marketvalueCurrent, pairedAddress] = await hedgingInstance.getUnderlyingValue(tokenAddress, result.amount);
 		const pairedAddressDecimal = await getTokenDecimals(tokenPairAddress);
 		const marketvalue = fromBigIntNumberToDecimal(marketvalueCurrent, pairedAddressDecimal);
 
-		
 		let startvalue, endvalue, cost, strikevalue;
 		//start value in BN - before fromBigIntNumberToDecimal conversion
 		let startValueBN = ethers.BigNumber.from(result.startValue);
