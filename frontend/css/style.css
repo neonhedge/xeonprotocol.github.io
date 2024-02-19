@@ -1301,7 +1301,7 @@ section.er404 {
   text-shadow: #9c0ad1 0px 0px 2px, #9c0ad1 0px 0px 3px, #9c0ad1 0px 0px 15px, #9c0ad1 0px 0px 15px, #9c0ad1 0px 0px 3px, #4a0663 3px 3px 0.5px;
 }
 .aishapeTools {
-  width: 100%;
+  margin-inline: 3rem;
   height: 100%;
   animation: morphing 16s linear infinite;
   border-radius: 50% 40% 35% 50% / 50% 35% 50% 40%;
@@ -1450,7 +1450,8 @@ span.ecosystemToolsIntro {
   box-shadow: 0 0 5px #38127c, 0 0 3px #38127c, 0 0 5px #38127c, 0 0 100px #38127c, 0 0 1px #38127c, 1px 1px 1px #38127c !important; 
 }
 .toolImage {
-  font-size: clamp(80px, 6vw, 110px);
+  font-size: clamp(80px, 6vw, 100px);
+  font-weight: 100;
   border-radius: 50%;
   color: #040115;
   text-shadow: 0 0 2px var(--neon-border-color), 0 0 3px var(--neon-border-color), 0 0 10px var(--neon-border-color), 0 0 10px var(--neon-border-color), 0 0 3px var(--neon-border-color), 2px 2px 0.5px var(--neon-border-color);
@@ -1549,8 +1550,9 @@ span.ecosystemToolsIntro {
   margin-bottom: 0.5vw;
 }
 .preview{
-  font-size: clamp(13.5px, 1vw, 14px);
+  font-size: clamp(13.5px, 1vw, 14.5px);
   text-align: justify;
+  font-weight: 400;
 }
 /* Animate neon flicker */
 @keyframes flicker {
@@ -1598,7 +1600,7 @@ span.ecosystemToolsIntro {
   -ms-flex: 0 0 50%;
   flex: 0 0 50%;
   max-width: 50%;
-  padding: 3vw;
+  padding: 6vw;
   padding-top: unset;
 }
 .callOptions h2, .putOptions h2 {
@@ -1764,6 +1766,13 @@ span.ecosystemToolsIntro {
   opacity: 60%;
 }
 
+.sampleHedgeCardLink {
+  font-family: inherit !important;
+  color: inherit !important;
+  font-weight: 700 !important;
+  text-decoration: none !important;
+  transition: inherit !important;
+}
   .hedgeTimeline{
     position:relative;
     top:0;
