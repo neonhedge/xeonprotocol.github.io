@@ -111,6 +111,22 @@ p {
     margin-bottom: 3rem;
     border: 1px dashed rgb(8, 231, 254);
   }
+
+  .illu-intro {
+    background-image: url("../imgs/xeonGIF.gif");
+    background-position: center;
+    background-size: 80%;
+    background-repeat: no-repeat;
+    background-color: #000 !important;
+  }
+
+  .illu-testnet {
+    background-image: url("../imgs/xeon-testnetGIF.gif");
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-color: #000 !important;
+  }
   
 /* informer panel */
 .dappInformer {
@@ -291,3 +307,321 @@ p {
 	  display: none;
 	}
 }
+
+/*=================================
+             GALLERY 
+==================================*/
+
+.gallery-container {
+    margin: auto;
+    padding: 25px 0;
+    max-width: 1025px;
+  }
+  
+  article {
+    padding: 15px 0;
+  }
+  .center {
+    text-align: center;
+  }
+  h2.subtitle {
+    font-size: inherit;
+    font-style: italic;
+    font-weight: normal;
+  }
+  span.keyboard-key {
+    background: #eff0f2;
+    margin: 0 4px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    border-top: 1px solid #f5f5f5;
+    box-shadow: inset 0 0 25px #e8e8e8, 0 1px 0 #c3c3c3, 0 2px 0 #c9c9c9,
+      0 2px 3px #333;
+    line-height: 23px;
+    font-family: "Arial", sans-serif;
+    font-size: 12px;
+    font-weight: bold;
+    text-shadow: 0px 1px 0px #f5f5f5;
+    white-space: nowrap;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+  }
+  
+  .swiper-container,
+  .swiper-container * {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+  }
+  
+  .swiper-container .swiper-no-swiping .swiper-button-prev,
+  .swiper-container .swiper-no-swiping .swiper-button-next {
+    opacity: 0;
+  }
+  .swiper-button-next.swiper-button-disabled,
+  .swiper-button-prev.swiper-button-disabled {
+    opacity: 0.1;
+  }
+  
+  .product-gallery .product-photo-main {
+    position: relative;
+  }
+  
+  .swiper-container {
+    position: static;
+    width: 100%;
+  }
+  
+  .swiper-slide {
+    overflow: hidden;
+    cursor: pointer;
+    text-align: center;
+  }
+  
+  .swiper-slide img {
+    max-height: 100%;
+    max-width: 100%;
+  }
+  
+  .main-top img.moveOne {
+    animation: move 10s infinite;
+    -ms-animation: move 10s infinite;
+    -webkit-animation: move 10s infinite;
+    -moz-animation: move 10s infinite;
+  }
+  .main-top img.moveTwo {
+    animation: moveTwo 10s infinite;
+    -ms-animation: moveTwo 10s infinite;
+    -webkit-animation: moveTwo 10s infinite;
+    -moz-animation: moveTwo 10s infinite;
+  }
+  @-webkit-keyframes move {
+    0% {
+      -webkit-transform-origin: bottom left;
+      -moz-transform-origin: bottom left;
+      -ms-transform-origin: bottom left;
+      -o-transform-origin: bottom left;
+      transform-origin: bottom left;
+      transform: scale(1);
+      -ms-transform: scale(1);
+      -webkit-transform: scale(1);
+      -o-transform: scale(1);
+      -moz-transform: scale(1);
+    }
+    50% {
+      transform: scale(1.2);
+      -ms-transform: scale(1.2);
+      -webkit-transform: scale(1.2);
+      -o-transform: scale(1.2);
+      -moz-transform: scale(1.2);
+    }
+    100% {
+      -webkit-transform-origin: bottom left;
+      -moz-transform-origin: bottom left;
+      -ms-transform-origin: bottom left;
+      -o-transform-origin: bottom left;
+      transform-origin: bottom left;
+      transform: scale(1);
+      -ms-transform: scale(1);
+      -webkit-transform: scale(1);
+      -o-transform: scale(1);
+      -moz-transform: scale(1);
+    }
+  }
+  @-webkit-keyframes moveTwo {
+    0% {
+      -webkit-transform-origin: top right;
+      -moz-transform-origin: top right;
+      -ms-transform-origin: top right;
+      -o-transform-origin: top right;
+      transform-origin: top right;
+      transform: scale(1);
+      -ms-transform: scale(1);
+      -webkit-transform: scale(1);
+      -o-transform: scale(1);
+      -moz-transform: scale(1);
+    }
+    50% {
+      transform: scale(1.2);
+      -ms-transform: scale(1.2);
+      -webkit-transform: scale(1.2);
+      -o-transform: scale(1.2);
+      -moz-transform: scale(1.2);
+    }
+    100% {
+      -webkit-transform-origin: top right;
+      -moz-transform-origin: top right;
+      -ms-transform-origin: top right;
+      -o-transform-origin: top right;
+      transform-origin: top right;
+      transform: scale(1);
+      -ms-transform: scale(1);
+      -webkit-transform: scale(1);
+      -o-transform: scale(1);
+      -moz-transform: scale(1);
+    }
+  }
+  
+  /* full screen product gallery */
+  .product-gallery-background {
+    position: absolute;
+    background: rgba(0, 0, 0, 0.9);
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+  }
+  
+  .product-gallery-full-screen {
+    position: fixed;
+    background: #000;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    width: 100vw;
+    opacity: 0;
+    pointer-events: none;
+    overflow-y: auto;
+    z-index: 999999;
+    transition: 350ms opacity ease-in-out;
+    background: #000;
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    align-items: center;
+  }
+  
+  .product-gallery-full-screen.opened {
+    opacity: 1;
+    overflow-y: scroll;
+    pointer-events: auto;
+  }
+  
+  .product-gallery-full-wrap {
+    max-width: 1024px;
+    width: 100%;
+    margin: 0 auto;
+  }
+  
+  .swiper-slide img {
+    cursor: pointer;
+    transition: 350ms -webkit-transform ease-in-out, 350ms transform ease-in-out;
+  }
+  
+  .main-thumbs .swiper-slide,
+  .gallery-thumbs .swiper-slide {
+    background: #fff;
+  }
+  
+  .main-thumbs .swiper-slide img,
+  .gallery-thumbs .swiper-slide img {
+    opacity: 0.4;
+  }
+  
+  .main-thumbs .swiper-slide.swiper-slide-thumb-active img,
+  .gallery-thumbs .swiper-slide.swiper-slide-thumb-active img {
+    opacity: 1;
+  }
+  
+  /* Swiper Arrows */
+  .product-gallery-full-screen .swiper-button-prev,
+  .product-gallery-full-screen .swiper-button-next {
+    background: rgba(0, 0, 0, 0.4);
+    color: #aaa;
+    transition: 250ms opacity ease-in-out, 150ms color ease-in-out;
+  }
+  body:not(:hover) .product-gallery-full-screen .swiper-button-prev,
+  body:not(:hover) .product-gallery-full-screen .swiper-button-next {
+    opacity: 0;
+    transition-delay: 1000ms;
+  }
+  body:hover .product-gallery-full-screen .swiper-button-prev,
+  body:hover .product-gallery-full-screen .swiper-button-next {
+    transition-delay: 0ms;
+  }
+  
+  .product-gallery-full-screen .swiper-button-prev:hover,
+  .product-gallery-full-screen .swiper-button-next:hover {
+    color: #fff;
+  }
+  
+  /* Gallery Nav */
+  .gallery-nav {
+    position: absolute;
+    background: rgba(0, 0, 0, 1);
+    color: #aaa;
+    padding: 10px 15px;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 9999;
+    transition: 250ms opacity ease-in-out;
+  }
+  body:not(:hover) .gallery-nav {
+    opacity: 0;
+    transition-delay: 1000ms;
+  }
+  body:hover .gallery-nav {
+    opacity: 0.65;
+    transition-delay: 0ms;
+  }
+  
+  .gallery-nav ul,
+  .gallery-nav li {
+    list-style: none;
+  }
+  
+  .gallery-nav ul {
+    float: right;
+  }
+  
+  .gallery-nav li {
+    float: left;
+    color: #aaa;
+    cursor: pointer;
+    margin-left: 15px;
+    transition: 150ms color ease-in-out;
+  }
+  
+  .gallery-nav li:hover {
+    color: #fff;
+  }
+  
+  .gallery-nav svg {
+    display: block;
+    fill: currentColor;
+    height: 24px;
+    width: 24px;
+  }
+  
+  .gallery-nav .zoom.zoom-out svg.zoom-icon-zoom-in {
+    display: none;
+  }
+  .gallery-nav .zoom svg.zoom-icon-zoom-out {
+    display: none;
+  }
+  .gallery-nav .zoom.zoom-out svg.zoom-icon-zoom-out {
+    display: block;
+  }
+  
+  .gallery-nav .fullscreen.leavefs svg.fs-icon {
+    display: none;
+  }
+  
+  .gallery-nav .fullscreen svg.fs-icon-exit {
+    display: none;
+  }
+  
+  .gallery-nav .fullscreen.leavefs svg.fs-icon-exit {
+    display: block;
+  }
+  
+  .gallery-nav .swiper-pagination {
+    position: static;
+    float: left;
+    width: auto;
+    line-height: 24px;
+  }
+  
