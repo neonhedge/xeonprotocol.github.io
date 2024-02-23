@@ -1,17 +1,23 @@
+import { CONSTANTS, getTokenDecimals, cardCommaFormat, fromBigIntNumberToDecimal, fromDecimalToBigInt, getTokenDecimalSymbolName, getAccounts, truncateAddress } from './constants.js';
+
 export async function loadHedgesModule(userAddress) {
   let startIndex = 0;
   const limit = 50;
   let dataType = 'Options Created';
+  let data;
 
   const loadMoreButton = document.createElement('button');
   loadMoreButton.textContent = 'Load More';
   loadMoreButton.classList.add('load-more-button');
   loadMoreButton.style.display = 'none';
 
-  const hedgesList = document.querySelector('#hedges-trade-list');
-
   async function fetchDataAndPopulateList() {
-    let data;
+    // Clear container
+    const hedgesList = document.querySelector('#hedges-trade-list');
+    while (hedgesList.firstChild) {
+        hedgesList.removeChild(hedgesList.firstChild);
+    }
+    // Proceed to fetch hedge structs
     console.log('fetching hedges for wallet: ', userAddress)
     switch (dataType) {
       case 'Options Created':
@@ -36,13 +42,13 @@ export async function loadHedgesModule(userAddress) {
 
     const fragment = document.createDocumentFragment();
 
-    if (data.length === 0 && startIndex > 0) {
+    if (data.length == 0 && startIndex > 0) {
       // If data is empty, append a message to inform the user
       const noHedgesMessage = document.createElement('div');
-      noHedgesMessage.textContent = 'no more hedges to load';
+      noHedgesMessage.textContent = 'No Hedges to Load';
       noHedgesMessage.classList.add('no-hedges-message');
       hedgesList.appendChild(noHedgesMessage);
-    } else if (data.length === 0 && startIndex === 0) {
+    } else if (data.length == 0 && startIndex == 0) {
       // Clear existing content in hedgesList
       hedgesList.innerHTML = '';
       const noHedgesMessage = document.createElement('div');
@@ -54,7 +60,7 @@ export async function loadHedgesModule(userAddress) {
       // If data is not empty, populate the list as before
       // For works better than foreach inside async function
       for (const item of data) {
-          const result = await getHedgeDetails(item); 
+          const result = await hedgingInstance.getHedgeDetails(item); 
 
           const listItem = document.createElement('li');
           listItem.classList.add('hedge-item');
@@ -69,18 +75,73 @@ export async function loadHedgesModule(userAddress) {
 
           const hedgeSymbol = document.createElement('div');
           hedgeSymbol.classList.add('hedge-symbol', 'hedge-i-cat');
-          hedgeSymbol.textContent = result.hedgeSymbol;
+          [, , hedgeSymbol.textContent] = await getTokenDecimalSymbolName(result.token);
           tokenInfo.appendChild(hedgeSymbol);
 
           const hedgeValue = document.createElement('div');
           hedgeValue.classList.add('hedge-value', 'hedge-i-cat');
-          hedgeValue.textContent = result.hedgeValue; 
+          let hedgeValues, pairedAddress, pairedSymbol;
+          [hedgeValues, pairedAddress] = hedgeValue.textContent = await hedgingInstance.getUnderlyingValue(result.token, result.amount); 
+          const hedgeValueDecimal = fromBigIntNumberToDecimal(hedgeValues, await getTokenDecimals(result.token));
+          [, , pairedSymbol] = await getTokenDecimalSymbolName(pairedAddress);
+          hedgeValue.textContent = cardCommaFormat(hedgeValueDecimal) + ' ' + pairedSymbol;
           tokenInfo.appendChild(hedgeValue);
+
+          const hedgeCost = document.createElement('div');
+          hedgeCost.classList.add('hedge-cost', 'hedge-i-cat');
+          let costValues = result.cost; 
+          const hedgeCostDecimal = fromBigIntNumberToDecimal(costValues, await getTokenDecimals(pairedAddress));
+          hedgeCost.textContent = cardCommaFormat(hedgeCostDecimal) + ' ' + pairedSymbol;
+          tokenInfo.appendChild(hedgeCost);
+
+          const hedgeState = document.createElement('div');
+          hedgeState.classList.add('hedge-state', 'hedge-i-cat');
+          const hedgeStatus = parseFloat(result.status);
+          if (hedgeStatus === 1) {
+            hedgeState.textContent = 'Open';
+          } else if (hedgeStatus === 2) {
+            hedgeState.textContent = 'Taken';
+          } else if (hedgeStatus === 3) {
+            hedgeState.textContent = 'Settled';
+          }
+          tokenInfo.appendChild(hedgeState);
+
+          function formatDate(date) {
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            const year = date.getFullYear().toString().slice(-2);
+            const month = months[date.getMonth()];
+            const day = date.getDate().toString().padStart(2, '0');
+            const hours = date.getHours().toString().padStart(2, '0');
+            const minutes = date.getMinutes().toString().padStart(2, '0');
+            return `${day} ${month}'${year} ${hours}:${minutes}`;
+          }
+        
+          const hedgeStart = document.createElement('div');
+          hedgeStart.classList.add('hedge-date', 'hedge-i-cat');
+          hedgeStart.textContent = formatDate(new Date(result.dt_created * 1000));
+          tokenInfo.appendChild(hedgeStart);
+          
+          const hedgeEnd = document.createElement('div');
+          hedgeEnd.classList.add('hedge-date', 'hedge-i-cat');
+          hedgeEnd.textContent = formatDate(new Date(result.dt_expiry * 1000));
+          tokenInfo.appendChild(hedgeEnd);
+        
+          const hedgeTaker = document.createElement('div');
+          hedgeTaker.classList.add('hedge-taker', 'hedge-i-cat');
+          const takerLink = document.createElement('a');
+          takerLink.href = 'https://etherscan.io/address/' + result.taker;
+          takerLink.target = '_blank';
+          takerLink.textContent = truncateAddress(result.taker);
+          hedgeTaker.appendChild(takerLink);
+          tokenInfo.appendChild(hedgeTaker);
 
           const tokenAddress = document.createElement('div');
           tokenAddress.classList.add('token-address');
-          let truncatedAddr = tokenAddress.substring(0, 6) + '...' + tokenAddress.slice(-3);
-          tokenAddress.textContent = truncatedAddr; 
+          const tokenLink = document.createElement('a');
+          tokenLink.href = 'https://etherscan.io/address/' + result.token;
+          tokenLink.target = '_blank';
+          tokenLink.textContent = truncateAddress(result.token);
+          tokenAddress.appendChild(tokenLink);
           tokenInfo.appendChild(tokenAddress);
 
           listItem.appendChild(tokenInfo);
@@ -131,7 +192,8 @@ export async function loadHedgesModule(userAddress) {
   }
 
   // Attach scroll event listener to the window using throttling
-  window.addEventListener('scroll', throttle(() => {
+  window.addEventListener('scroll', throttle(() => {    
+    const hedgesList = document.querySelector('#hedges-trade-list');
     const scrollPosition = window.scrollY;
     const listHeight = hedgesList.clientHeight;
     const windowHeight = window.innerHeight;
