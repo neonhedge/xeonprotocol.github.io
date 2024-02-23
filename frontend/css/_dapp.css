@@ -120,10 +120,16 @@ p {
     background-color: #000 !important;
   }
 
-  .illu-testnet {
-    background-image: url("../imgs/xeon-testnetGIF.gif");
+  .illu-testnet {    
+    border: 1px dashed rgb(8, 231, 254);
+    height: 338px;
+    width: 600px;
+    display: block;
+    max-height:350px !important;
+    border-radius: unset !important;
+    background-image: url("../imgs/xeon-testnet.gif");
     background-position: center;
-    background-size: cover;
+    background-size: contain;
     background-repeat: no-repeat;
     background-color: #000 !important;
   }
