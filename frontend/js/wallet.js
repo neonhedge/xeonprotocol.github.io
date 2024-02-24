@@ -13,7 +13,7 @@ import { loadHedgesModule } from './module-wallet-section-hedgesList.js';
 // This is the main loading script for the page
 // It first checks if a wallet is connected || initialization passes
 // Initialization always returns boolean on whether it passes to load page scripts or not
-// scouter == wallect readiness check. If wallet check passes & sets all wallet dependencies, then we can load all other scripts below
+// Scouter == wallect readiness check. If wallet check passes & sets all wallet dependencies, then we can load all other scripts below
 // if conditions to continueLoading change the script stops at scouter, event listeners at bottom of page to help with alerts & state changes
 
 // Start making calls to Dapp modules
@@ -22,7 +22,7 @@ export const checkAndCallPageTries = async () => {
     console.log('connection Scout: '+ scouter);
 
     if (scouter) {
-        const asyncFunctions = [fetchSection_Networth, fetchSection_BalanceList, fetchSection_HedgePanel, fetchHedgeList, fetchSection_RewardsPanel, fetchSection_StakingPanel];
+        const asyncFunctions = [fetchSection_Networth, fetchSection_BalanceList, fetchSection_HedgePanel, myHedgesList, fetchSection_RewardsPanel, fetchSection_StakingPanel];
         for (const func of asyncFunctions) {
             func();
         }
@@ -35,10 +35,14 @@ const setatmIntervalAsync = (fn, ms) => {
     });
 };
 
-
 // Ready all incl wallet display
 $(document).ready(async function () {
     $('.waiting_init').css('display', 'inline-block');
+    // hedge list globals
+    window.startIndex = 0;
+    window.limit = 50;
+    window.dataType = 'Options Created'; //changed on tab click
+    window.executed = false; //hedge list scroll trigger once only
 
     // load sections periodically
     setatmIntervalAsync(async () => {
@@ -64,7 +68,7 @@ async function pageModulesLoadingScript() {
     }
 }
 
-// Lazy loading implementation for Hedges Panel
+// Deprecated - Lazy loading implementation for Hedges Panel
 export async function fetchHedgeList() {
     const accounts = await getAccounts();
     const userAddress = accounts[0];
@@ -86,6 +90,12 @@ export async function fetchHedgeList() {
     const hedgingSection = document.getElementById('hedgingSection');
     const observer = new IntersectionObserver(loadHedgesSection, { root: null, threshold: 0.1 });
     observer.observe(hedgingSection);
+}
+
+async function myHedgesList() {
+    const accounts = await getAccounts();
+    const userAddress = accounts[0];
+    await loadHedgesModule(userAddress);
 }
 
 /*=========================================================================
