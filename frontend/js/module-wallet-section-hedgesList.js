@@ -17,6 +17,11 @@ export async function loadHedgesModule() {
     while (hedgesList.firstChild) {
         hedgesList.removeChild(hedgesList.firstChild);
     }
+    // Loading animation
+    const loading = document.createElement('i');
+    loading.classList.add('loading');
+    hedgesList.appendChild(loading);
+
     // Proceed to fetch hedge structs
     console.log('fetching hedges for wallet: ' + userAddress);
     alert('start index: ' + startIndex);
@@ -72,12 +77,16 @@ export async function loadHedgesModule() {
 
           const tokenInfo = document.createElement('div');
           tokenInfo.classList.add('token-info');
-
+          // token symbol
           const hedgeSymbol = document.createElement('div');
           hedgeSymbol.classList.add('hedge-symbol', 'hedge-i-cat');
+          const tokenLink = document.createElement('a');
+          tokenLink.href = 'https://sepolia.etherscan.io/address/' + result.token;
+          tokenLink.target = '_blank';
           [, , hedgeSymbol.textContent] = await getTokenDecimalSymbolName(result.token);
           tokenInfo.appendChild(hedgeSymbol);
 
+          // market value
           const hedgeValue = document.createElement('div');
           hedgeValue.classList.add('hedge-value', 'hedge-i-cat');
           let hedgeValues, pairedAddress, pairedSymbol;
@@ -86,14 +95,14 @@ export async function loadHedgesModule() {
           [, , pairedSymbol] = await getTokenDecimalSymbolName(pairedAddress);
           hedgeValue.textContent = cardCommaFormat(hedgeValueDecimal) + ' ' + pairedSymbol;
           tokenInfo.appendChild(hedgeValue);
-
+          // cost
           const hedgeCost = document.createElement('div');
           hedgeCost.classList.add('hedge-cost', 'hedge-i-cat');
           let costValues = result.cost; 
           const hedgeCostDecimal = fromBigIntNumberToDecimal(costValues, await getTokenDecimals(pairedAddress));
           hedgeCost.textContent = cardCommaFormat(hedgeCostDecimal) + ' ' + pairedSymbol;
           tokenInfo.appendChild(hedgeCost);
-
+          //status
           const hedgeState = document.createElement('div');
           hedgeState.classList.add('hedge-state', 'hedge-i-cat');
           const hedgeStatus = parseFloat(result.status);
@@ -115,37 +124,26 @@ export async function loadHedgesModule() {
             const minutes = date.getMinutes().toString().padStart(2, '0');
             return `${day} ${month}'${year} ${hours}:${minutes}`;
           }
-        
+          // start
           const hedgeStart = document.createElement('div');
           hedgeStart.classList.add('hedge-date', 'hedge-i-cat');
           hedgeStart.textContent = formatDate(new Date(result.dt_created * 1000));
           tokenInfo.appendChild(hedgeStart);
-          
+          // expiry
           const hedgeEnd = document.createElement('div');
           hedgeEnd.classList.add('hedge-date', 'hedge-i-cat');
           hedgeEnd.textContent = formatDate(new Date(result.dt_expiry * 1000));
           tokenInfo.appendChild(hedgeEnd);
-        
+          // taker
           const hedgeTaker = document.createElement('div');
           hedgeTaker.classList.add('hedge-taker', 'hedge-i-cat');
           const takerLink = document.createElement('a');
-          takerLink.href = 'https://etherscan.io/address/' + result.taker;
+          takerLink.href = 'https://sepolia.etherscan.io/address/' + result.taker;
           takerLink.target = '_blank';
           takerLink.textContent = truncateAddress(result.taker);
           hedgeTaker.appendChild(takerLink);
           tokenInfo.appendChild(hedgeTaker);
-
-          const tokenAddress = document.createElement('div');
-          tokenAddress.classList.add('token-address');
-          const tokenLink = document.createElement('a');
-          tokenLink.href = 'https://etherscan.io/address/' + result.token;
-          tokenLink.target = '_blank';
-          tokenLink.textContent = truncateAddress(result.token);
-          tokenAddress.appendChild(tokenLink);
-          tokenInfo.appendChild(tokenAddress);
-
-          listItem.appendChild(tokenInfo);
-
+          // action button
           const hedgeTxBtn = document.createElement('button');
           hedgeTxBtn.classList.add('hedgeTxBtn');
           hedgeTxBtn.textContent = 'Tx';
@@ -154,6 +152,9 @@ export async function loadHedgesModule() {
           // Use fragments instead of adding elements one by one
           fragment.appendChild(listItem);
       }
+      // Hide loading animation if available      
+      hedgesList.removeChild(loading);
+
       // Append the fragment to the list
       hedgesList.appendChild(fragment);
     }
