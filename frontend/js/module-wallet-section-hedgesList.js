@@ -1,9 +1,6 @@
 import { CONSTANTS, getTokenDecimals, cardCommaFormat, fromBigIntNumberToDecimal, fromDecimalToBigInt, getTokenDecimalSymbolName, getAccounts, truncateAddress } from './constants.js';
 
-export async function loadHedgesModule(userAddress) {
-  
-  let dataType = 'Options Created';
-  let data;
+export async function loadHedgesModule() {
 
   const loadMoreButton = document.createElement('button');
   loadMoreButton.textContent = 'Load More';
@@ -11,13 +8,17 @@ export async function loadHedgesModule(userAddress) {
   loadMoreButton.style.display = 'none';
 
   async function fetchDataAndPopulateList() {
+    let data;
+    const userAddressArray = await getAccounts();
+    const userAddress = userAddressArray[0];
+
     // Clear container
     const hedgesList = document.querySelector('#hedges-trade-list');
     while (hedgesList.firstChild) {
         hedgesList.removeChild(hedgesList.firstChild);
     }
     // Proceed to fetch hedge structs
-    console.log('fetching hedges for wallet: ', userAddress)
+    console.log('fetching hedges for wallet: ' + userAddress);
     alert('start index: ' + startIndex);
     switch (dataType) {
       case 'Options Created':
@@ -177,37 +178,45 @@ export async function loadHedgesModule(userAddress) {
     });
   });
 
-  // Function to check if an element is in view
-  function isInViewport(element) {
-    const rect = element.getBoundingClientRect();
-    return (
-      rect.top >= 0 &&
-      rect.left >= 0 &&
-      rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
-      rect.right <= (window.innerWidth || document.documentElement.clientWidth)
-    );
-  }
-
-  // Function to execute only once when the element is in view
-  function executeOnceInView(element, callback) {
-    let executed = false;
+  function throttle(callback, delay) {
+    let lastTime = 0;
     return function () {
-      if (!executed && isInViewport(element)) {
-        callback();
-        executed = true;
+      const currentTime = new Date();
+      if (currentTime - lastTime >= delay) {
+        callback.apply(null, arguments);
+        lastTime = currentTime;
       }
     };
   }
 
-  // Attach scroll event listener to the window using throttling
+  // Function to check if an element is in view
+  function isInViewport(element) {
+    const rect = element.getBoundingClientRect();
+    return rect.top >= 0 && rect.top <= window.innerHeight;
+  }
+
+  // Function to execute only once when the element is in view
+  function executeOnceInView(element, callback) {
+    return function () {
+      if (!executed && isInViewport(element)) {
+        callback();
+        executed = true;
+        alert('executed' + executed)
+      }
+    };
+  }
+
+  // Attach scroll event listener to the window
   window.addEventListener('scroll', () => {
     const hedgesList = document.querySelector('#hedges-trade-list');
     const executeOnce = executeOnceInView(hedgesList, async () => {
       startIndex = 0;
-      await fetchDataAndPopulateList();
-      window.removeEventListener('scroll', executeOnce);
+      fetchDataAndPopulateList();
+      window.removeEventListener('scroll', onScroll);
     });
-    executeOnce();
+
+    const onScroll = throttle(executeOnce, 2000); // Adjust delay (in milliseconds) for responsiveness
+    onScroll();
   });
 
 }
