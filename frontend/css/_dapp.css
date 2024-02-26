@@ -23,6 +23,9 @@ footer {
     transform: unset;
     top: unset;
 }
+img {
+  border-radius: unset;
+}
 
 main {
     position: relative;
