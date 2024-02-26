@@ -795,7 +795,8 @@ nav#navbar ul li ul.submenu li a {
 }
 .logoImg{
   max-width: 90px;
-  display: flex;
+  display: flex !important;
+  align-items: center;
   place-content: center;
 }
 @media (max-width: 680px){
@@ -875,6 +876,15 @@ nav#navbar ul li ul.submenu li a {
     background-color: #040115;
     box-shadow: 0 0.8rem 2rem rgba(37, 37, 45, 0.3);
   }
+}
+.logod-name {  
+  align-items: center;
+  display: flex !important;
+  letter-spacing: 0.1vw !important;
+  font-family: Raleway,monospace, sans-serif, "Helvetica Neue", Helvetica, "Liberation Sans" !important;
+  font-weight: 300;
+  line-height: 1.2;
+  text-decoration: double;
 }
 
 /*--------------------------------------------------------*/
