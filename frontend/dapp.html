@@ -31,9 +31,13 @@
 	<!-- windows styling -->
 	<link rel="stylesheet" type="text/css" href="css/_menu.css">
 	<link rel="stylesheet" type="text/css" href="css/_dapp.css">
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/Swiper/6.8.4/swiper-bundle.min.css">
 	<!-- main page script -->
 	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js"></script>
 	<script src="./js/_dapp.js"></script>
+	<!-- other page script -->	
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Swiper/6.8.4/swiper-bundle.min.js"></script>
 </head>
 
 <body>
@@ -47,6 +51,7 @@
 			<!-- your logo here -->
 			<a class="logoImg" href="./">
 				<img src="./imgs/maskot3.webp" alt="logo">
+				<span class="logod-name">Xeon Protocol</span>
 			</a>
 
 			<!-- mobile navbar toggle button -->
@@ -77,7 +82,10 @@
 
 	<div class="contain">
 		<main>
-			<h1 class="dappWelcome neon-blue">Xeon dApp</h1>
+				<h1 class="dappWelcome neon-blue">Dapp Home</h1>
+				<span data-aos="zoom-out-down" data-aos-delay="100">Advanced OTC – Equity Swaps, Call Options, Put Options, Crypto Lending.</span>
+		
+				
 			<div class="dappInformer">
 				<i class="fa fa-fire" aria-hidden="true"></i> start...</br>
 				This is the dApp home page for the current testnet.
@@ -85,7 +93,6 @@
 			</div>
 			<div id="developmentStatus">
 				<div class="devstatus">
-					<p>We are building a Universal ERC20 OTC Ecosystem, with onchain tools for Hedging, Lending, and Farming.</p>
 					<p>This testnet introduces <a href="https://docs.neonprotocol.io" target="_blank" title="ERC20 Swaps, Call, Put Options">Neon Hedge</a>, the pioneer platform from our ecosystem of 3 platforms.</p>
 				</div>
 				
@@ -118,8 +125,7 @@
 			<div class=itemContents>
 				<div class="illustration illu-intro"></div>
 				<p>This is Neon Hedge. The first platform to be released from our ecosystem. Neon Lend and Farm are still under development.</p>
-				<p>What you can do with Neon Hedge: </br>Hedge or speculate your ERC20 holdings to unlock more liquidity from them.
-					We built an entire protocol from scratch to enable users to deposit and create OTC trades  with any ERC20 token. Most of the development work for Neon Hedge is complete, we will only test, fine tune and experiment with monetary concepts that we think can be ground breaking. This is where you come in as the community to help in manifesting the cause: universal ERC20 hedging and lending.</p>
+				<p>We built an entire protocol from scratch to enable users to deposit and create OTC trades using any ERC20 token. Most of the development work for Neon Hedge is complete, we will only test, fine tune and experiment with monetary concepts that we think can be ground breaking. This is where you come in as the community to help in manifesting the cause: universal ERC20 hedging and lending.</p>
 				<p>To test this platform, you need testnet tokens.</p>
 			</div>
 		</div>
@@ -145,14 +151,15 @@
 		<div class="listItem">
 			<div class="itemHeder">04.<br>Use Cases</div>
 			<div class=itemContents>
-				<small>Hedge any ERC20 token, borrow against any ERC20 token. Manage risk and unlock liquidity with freedom. </small>
+				<small>Manage risk & liquidity on any ERC20 tokens you own.
+					This platform enables you to unlock liquidity and manage risk on any ERC20 tokens you own, without selling. </small>
 				</br>
 				</br>
-				<h3>Xeon Protocol enables you to use your ERC20 tokens to:</h3>
-				<li>1. Hedge Risk (cover your ERC20 tokens against price drops without selling)</li>
-				<li>2. Speculate (speculate on price movements to accumulate more tokens or its pair)</li>
-				<li>3. Leverage capital (buyers and lenders pay for higher exposure than above their capital worth)</li>
-				<li>4. Unlock liquidity (use your tokens as collateral to get a loan, LTV is custom)</li>
+				<h3>Xeon Protocol helps you manage your ERC20s:</h3>
+				<li>1. Hedge Risk - cover your ERC20 tokens against price drops.</li>
+				<li>2. Speculate - on future token prices, to accumulate more.</li>
+				<li>3. Leverage Capital - buyers are paying for higher exposure.</li>
+				<li>4. Unlock Liquidity - get a loan from your ERC20 token holdings. Withdraw the liquidity to buy more tokens. </li>
 				</br>
 				<h3>Scenarios X - imagine this</h3>
 				<h4>Factors</h4>
@@ -201,8 +208,8 @@
 							<div class="product-photo-main">
 							  <div class="swiper-container main-top" style="position:relative;">
 								<div class="swiper-wrapper">
-									  <div class="swiper-slide"><img src="https://source.unsplash.com/dPUWgZLsOk8/1920x1080" alt="" style="display:block;width:100%;" class="moveOne"></div>
-									  <div class="swiper-slide"><img src="https://source.unsplash.com/NqOInJ-ttqM/1920x1080" alt="" style="display:block;width:100%;" class="moveTwo"></div>
+									  <div class="swiper-slide"><img src="imgs/screenshots/user-guide/screen1.png" alt="" style="display:block;width:100%;" class="moveOne"></div>
+									  <div class="swiper-slide"><img src="imgs/screenshots/user-guide/screen2.png" alt="" style="display:block;width:100%;" class="moveTwo"></div>
 									  <div class="swiper-slide"><img src="https://source.unsplash.com/bwIqQ5qQhXs/1920x1080" alt="" style="display:block;width:100%;" class="moveOne"></div>
 									  <div class="swiper-slide"><img src="https://source.unsplash.com/dPUWgZLsOk8/1920x1080" alt="" style="display:block;width:100%;" class="moveTwo"></div>
 									  <div class="swiper-slide"><img src="https://source.unsplash.com/NqOInJ-ttqM/1920x1080" alt="" style="display:block;width:100%;" class="moveOne"></div>
@@ -219,8 +226,8 @@
 							  </div>
 							  <div class="swiper-container main-thumbs"> 
 								<div class="swiper-wrapper">
-									<div class="swiper-slide"><img src="https://source.unsplash.com/dPUWgZLsOk8/1920x1080" alt="" style="display:block;width:100%;"></div>
-									<div class="swiper-slide"><img src="https://source.unsplash.com/NqOInJ-ttqM/1920x1080" alt="" style="display:block;width:100%;"></div>
+									<div class="swiper-slide"><img src="imgs/screenshots/user-guide/screen1.png" alt="" style="display:block;width:100%;"></div>
+									<div class="swiper-slide"><img src="imgs/screenshots/user-guide/screen2.png" alt="" style="display:block;width:100%;"></div>
 									<div class="swiper-slide"><img src="https://source.unsplash.com/bwIqQ5qQhXs/1920x1080" alt="" style="display:block;width:100%;"></div>
 									<div class="swiper-slide"><img src="https://source.unsplash.com/dPUWgZLsOk8/1920x1080" alt="" style="display:block;width:100%;"></div>
 									<div class="swiper-slide"><img src="https://source.unsplash.com/NqOInJ-ttqM/1920x1080" alt="" style="display:block;width:100%;"></div>
@@ -254,8 +261,8 @@
 							  <div style="position:static">
 								<div class="swiper-container gallery-top" style="position:relative;">
 									<div class="swiper-wrapper">
-											<div class="swiper-slide"><img src="https://source.unsplash.com/dPUWgZLsOk8/1920x1080" alt="" style="display:block;width:100%;"></div>
-											<div class="swiper-slide"><img src="https://source.unsplash.com/NqOInJ-ttqM/1920x1080" alt="" style="display:block;width:100%;"></div>
+											<div class="swiper-slide"><img src="imgs/screenshots/user-guide/screen1.png" alt="" style="display:block;width:100%;"></div>
+											<div class="swiper-slide"><img src="imgs/screenshots/user-guide/screen2.png" alt="" style="display:block;width:100%;"></div>
 											<div class="swiper-slide"><img src="https://source.unsplash.com/bwIqQ5qQhXs/1920x1080" alt="" style="display:block;width:100%;"></div>
 											<div class="swiper-slide"><img src="https://source.unsplash.com/dPUWgZLsOk8/1920x1080" alt="" style="display:block;width:100%;"></div>
 											<div class="swiper-slide"><img src="https://source.unsplash.com/NqOInJ-ttqM/1920x1080" alt="" style="display:block;width:100%;"></div>
@@ -272,8 +279,8 @@
 								</div>
 								<div class="swiper-container gallery-thumbs"> 
 									<div class="swiper-wrapper">
-											<div class="swiper-slide"><img src="https://source.unsplash.com/dPUWgZLsOk8/1920x1080" alt="" style="display:block;width:100%;"></div>
-											<div class="swiper-slide"><img src="https://source.unsplash.com/NqOInJ-ttqM/1920x1080" alt="" style="display:block;width:100%;"></div>
+											<div class="swiper-slide"><img src="imgs/screenshots/user-guide/screen1.png" alt="" style="display:block;width:100%;"></div>
+											<div class="swiper-slide"><img src="imgs/screenshots/user-guide/screen2.png" alt="" style="display:block;width:100%;"></div>
 											<div class="swiper-slide"><img src="https://source.unsplash.com/bwIqQ5qQhXs/1920x1080" alt="" style="display:block;width:100%;"></div>
 											<div class="swiper-slide"><img src="https://source.unsplash.com/dPUWgZLsOk8/1920x1080" alt="" style="display:block;width:100%;"></div>
 											<div class="swiper-slide"><img src="https://source.unsplash.com/NqOInJ-ttqM/1920x1080" alt="" style="display:block;width:100%;"></div>
@@ -294,7 +301,7 @@
 						</div>
 					  </div>
 				</div>
-				<p>Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.</p>
+				<p>Screenshots of our Dapp interface.</p>
 			</div>
 		</div>
 	</div>	
