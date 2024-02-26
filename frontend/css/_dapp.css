@@ -120,18 +120,26 @@ p {
     background-color: #000 !important;
   }
 
-  .illu-testnet {    
+  .illu-testnet, .illu-deposit {    
     border: 1px dashed rgb(8, 231, 254);
     height: 338px;
     width: 600px;
     display: block;
     max-height:350px !important;
     border-radius: unset !important;
-    background-image: url("../imgs/xeon-testnet.gif");
+    background-image: url("../imgs/screenshots/xeon-testnet.gif");
     background-position: center;
     background-size: contain;
     background-repeat: no-repeat;
     background-color: #000 !important;
+  }
+  
+  .illu-deposit {
+    background-image: url("../imgs/screenshots/vault-deposit.gif");
+  }
+
+  .illu-howitworks {
+    background-image: url("../imgs/engineFlowDark5.png");
   }
   
 /* informer panel */
