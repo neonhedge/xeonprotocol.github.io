@@ -1,7 +1,7 @@
 /*=========================================================================
     Import modules
 ==========================================================================*/
-import { CONSTANTS, getUserBalancesForToken, truncateAddress, fromBigIntNumberToDecimal, fromDecimalToBigInt, getAccounts, getTokenDecimalAndSymbol, getSymbol, getTokenDecimals } from './constants.js';
+import { CONSTANTS, getUserBalancesForToken, truncateAddress, fromBigIntNumberToDecimal, fromDecimalToBigInt, getAccounts, getTokenDecimalSymbolName, getSymbol, getTokenDecimals } from './constants.js';
 import { initializeConnection } from './web3-walletstatus-module.js';
 
 /*======================================================
@@ -320,7 +320,7 @@ async function vaultApprove(tokenAddress, tokenAmount) {
         const walletAddress = accounts[0];
         const vaultAddress = CONSTANTS.hedgingAddress;
 
-        const [decimals, symbol] = await getTokenDecimalAndSymbol(tokenAddress);
+        const [, decimals, symbol] = await getTokenDecimalSymbolName(tokenAddress);
         const approveAmountWei = fromDecimalToBigInt(tokenAmount, decimals);
 
         // ERC20 ABI & instance
@@ -365,7 +365,7 @@ async function vaultDeposit(tokenAddress, tokenAmount) {
         const walletAddress = accounts[0];
         const vaultAddress = CONSTANTS.hedgingAddress;
 
-        const [decimals, symbol] = await getTokenDecimalAndSymbol(tokenAddress);
+        const [, decimals, symbol] = await getTokenDecimalSymbolName(tokenAddress);
         const depositAmountWei = fromDecimalToBigInt(tokenAmount, decimals);
 
         // Prepare Tx
