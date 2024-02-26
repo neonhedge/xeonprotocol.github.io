@@ -882,9 +882,16 @@ nav#navbar ul li ul.submenu li a {
   display: flex !important;
   letter-spacing: 0.1vw !important;
   font-family: Raleway,monospace, sans-serif, "Helvetica Neue", Helvetica, "Liberation Sans" !important;
+  font-size: 1rem;
   font-weight: 300;
   line-height: 1.2;
-  text-decoration: double;
+  text-decoration: none !important;
+
+  text-shadow: 0 0 2px #188dd6, 0 0 3px #188dd6, 0 0 15px #188dd6, 0 0 15px #188dd6, 0 0 3px #188dd6, 3px 3px 0.5px #0e567c !important;
+  color: #08e7fe !important;
+}
+.logod-name :hover {
+  text-decoration: none !important;
 }
 
 /*--------------------------------------------------------*/
