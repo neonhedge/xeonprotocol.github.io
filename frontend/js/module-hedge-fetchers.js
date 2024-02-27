@@ -96,6 +96,7 @@ async function fetchSection_HedgeCard(){
 		const [marketvalueCurrent, pairedAddress] = await hedgingInstance.getUnderlyingValue(tokenAddress, hedgeResult.amount);
 		const pairedAddressDecimal = await getTokenDecimals(tokenPairAddress);
         const createValueDeci = fromBigIntNumberToDecimal(hedgeResult.createValue, pairedAddressDecimal);
+        const createPrice = createValueDeci / tokenAmount;
 		const marketvalue = fromBigIntNumberToDecimal(marketvalueCurrent, pairedAddressDecimal);
         const marketPrice = marketvalue / tokenAmount;
         const strikeValueR1 = fromBigIntNumberToDecimal(hedgeResult.strikeValue, tokenDecimal);// saved as BigInt * BigInt in struct during create
@@ -157,15 +158,16 @@ async function fetchSection_HedgeCard(){
         const dt_expiryFormatted = formatTimestamp(dt_expiry);
         const dt_settledFormatted = formatTimestamp(dt_settled);
 
-        // Progress or time to expiry
-        // get current timestamp in seconds
-        const dt_today = Math.floor(Date.now() / 1000); 
+        // Get current timestamp in seconds
+        const dt_today = Math.floor(Date.now() / 1000);
+
+        // Assuming dt_expiry and dt_created are already in seconds since the Unix epoch
         const lifespan = Math.floor((dt_expiry - dt_created) / 3600);
+
+        // Calculate time to expiry in hours
         let timetoExpiry = 0;
-        if (dt_started > 0 && dt_today < dt_expiry) {
-            timetoExpiry = dt_expiry - dt_today;
-            // Convert seconds to hours
-            timetoExpiry = Math.floor(timetoExpiry / 3600); // 1 hour = 3600 seconds
+        if (dt_today < dt_expiry) {
+            timetoExpiry = Math.floor((dt_expiry - dt_today) / 3600); // Convert seconds to hours
         }
 
         // USE 3 UPDATERS: HEDGE, PROGRESS, GAINS
@@ -255,9 +257,8 @@ async function fetchSection_HedgeCard(){
         // this way its easy to create a default load & separate an actual data update
         
         // Hedge Price Levels - First item is startValue, last item is underlying/current value
-        const initialPrices = [createValueDeci, startValueDeci, marketvalue];
-        const initialTargetPrice = strikeValueDeci;
-        updateChartValues_Hedge(initialPrices, initialTargetPrice);
+        const initialPrices = [createPrice, marketPrice, strikePrice];
+        updateChartValues_Hedge(initialPrices);
 
         // Hedge Underlying ERC20 Assets - Global arrays for token names and amounts
         // For Alpha and Beta V1, single assets, display underlying quantity & cost quantity in basket

@@ -142,6 +142,9 @@ $(document).on('click', '#toggleBookmark', function(e){
   }
 });
 
+/* NEW UPDATE: 24/02/2024 - PRICE CHART */
+
+
 /*  ---------------------------------------
     HEDGING EVENT LISTENING
 -------------------------------------- */

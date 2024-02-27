@@ -895,6 +895,11 @@ hr.line {
   font-smooth: none;
 }
 
+/* NEW UPDATE 27/02/2024 */
+.line-chart {
+  width: 100%;
+  margin-top: 24px;
+}
 
 /*==========================
   HEDGE PARTIES & PROFITS

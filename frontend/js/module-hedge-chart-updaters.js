@@ -2,19 +2,20 @@ const formatStringDecimal = (number) => {
   const options = {
       style: 'decimal',
       minimumFractionDigits: 2,
-      maximumFractionDigits: 7,
+      maximumFractionDigits: 12,
   };
   return number.toLocaleString('en-US', options);
 };
 
-function updateChartValues_Hedge(prices, targetPrice) {
+function updateChartValues_Hedge(prices) {
+  
     // Canvas setup
-    const canvas = document.getElementById('priceChangeChart');
+    const canvas = document.getElementById('priceChart');
     const ctx = canvas.getContext('2d');
   
     // Chart dimensions
-    const chartWidth = 300;
-    const chartHeight = 300;
+    const chartWidth = 380;
+    const chartHeight = 380;
     canvas.width = chartWidth;
     canvas.height = chartHeight;
   
@@ -26,11 +27,8 @@ function updateChartValues_Hedge(prices, targetPrice) {
     // Calculate chart dimensions based on prices dataset
     function calculateChartDimensions() {    
         //add targetprice to array so it shows on chart even if price doesnt go there
-        //pop it from array afterwards so we dont plot it with the other prices
-        prices.push(targetPrice);
         let maxPrice = Math.max(...prices); // Default maximum price
         let minPrice = Math.min(...prices); // Default minimum price
-        prices.pop();
         //proceed
         const priceRange = maxPrice - minPrice;
         const padding = priceRange * 0.1; // Add 10% padding to the price range
@@ -43,32 +41,6 @@ function updateChartValues_Hedge(prices, targetPrice) {
           priceRange: adjustedMaxPrice - adjustedMinPrice,
         };
     }
-  
-    // Handle mousemove event to show/hide price change tag
-    canvas.addEventListener('mousemove', (e) => {
-      const rect = canvas.getBoundingClientRect();
-      const mouseX = e.clientX - rect.left;
-      const mouseY = e.clientY - rect.top;
-  
-      const step = chartWidth / (prices.length - 1);
-      const chartDimensions = calculateChartDimensions();
-  
-      for (let i = 0; i < prices.length; i++) {
-        const x = i * step;
-        const y = chartHeight - ((prices[i] - chartDimensions.minPrice) / chartDimensions.priceRange) * chartHeight;
-  
-        if (mouseX > x - 2 && mouseX < x + 2 && mouseY > y - 2 && mouseY < y + 2) {
-          const tag = document.getElementById('priceChangeTag');
-          tag.textContent = `Price: ${formatStringDecimal(prices[i])}`;
-          tag.style.top = `${y}px`;
-          tag.style.left = `${x + 5}px`;
-          tag.classList.add('show');
-        }
-      }
-      // Hide tag if not hovered over a price point
-      const tag = document.getElementById('priceChangeTag');
-      tag.classList.remove('show');
-    });
   
     // Function to update the chart with new prices
     function updateChart(newPrices) {
@@ -83,114 +55,250 @@ function updateChartValues_Hedge(prices, targetPrice) {
     });
     
 
-    // Draw chart
     function drawChart() {
+      // Calculate chart dimensions
       const chartDimensions = calculateChartDimensions();
       const step = chartWidth / (prices.length - 1);
   
-      // Clear canvas
-      ctx.clearRect(0, 0, chartWidth, chartHeight);
+      const canvas = document.getElementById('priceChart');
+      const ctx = canvas.getContext('2d');
   
-      // Disable image smoothing for crisp text rendering
-      ctx.imageSmoothingEnabled = false;
+      // Create linear gradient for background
+      const gradient = ctx.createLinearGradient(0, 0, 0, chartHeight);
+      gradient.addColorStop(0, "rgba(0, 199, 214, 0.32)");
+      gradient.addColorStop(0.3, "rgba(0, 199, 214, 0.1)");
+      gradient.addColorStop(1, "rgba(0, 199, 214, 0)");
   
-      // Draw vertical lines representing prices
-      ctx.strokeStyle = 'rgba(0,0,0,0.8)'; // Black color for lines
-      ctx.lineWidth = 1; // Set the line width to 0.5px
-      for (let i = 0; i < prices.length; i++) {
-        if(i == 0 || i == prices.length) {
-          const x = i * step;
-          ctx.beginPath();
-          ctx.moveTo(x, 0);
-          ctx.lineTo(x, chartHeight);
-          ctx.stroke();
-        }          
-      }
+      // Fill canvas with linear gradient
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, chartWidth, chartHeight);
   
-      // Draw only start and end horizontal lines representing time
-      ctx.strokeStyle = 'rgba(0,0,0,0.4)'; // Light gray color for lines
-      ctx.lineWidth = 2;
-      ctx.beginPath();/* top line starts here
-      ctx.moveTo(0, 0);
-      ctx.lineTo(chartWidth, 0); */
-      ctx.moveTo(0, chartHeight - 1);/* bottom line starts here */
-      ctx.lineTo(chartWidth, chartHeight - 1);
-      ctx.stroke();
-  
-      // Draw the line connecting prices on the chart with light blur
-      ctx.fillStyle = 'rgba(0, 255, 255, 0.3)';
-      ctx.strokeStyle = 'rgba(0, 255, 255, 0.8)'; // Light blue color with transparency
-      ctx.shadowColor = 'rgba(0, 255, 255, 0.3)'; // Light blue shadow color with transparency
-      ctx.shadowBlur = 10; // Set shadow blur radius
-      ctx.lineWidth = 1.5; // Set the line width for the price line
-      ctx.beginPath();
-      ctx.moveTo(0, chartHeight - ((prices[0] - chartDimensions.minPrice) / chartDimensions.priceRange) * chartHeight);
-      for (let i = 1; i < prices.length; i++) {
-          const x = i * step;
-          const y = chartHeight - ((prices[i] - chartDimensions.minPrice) / chartDimensions.priceRange) * chartHeight;
-          const prevY = chartHeight - ((prices[i - 1] - chartDimensions.minPrice) / chartDimensions.priceRange) * chartHeight;
-          const xc = (x + (x - step)) / 2; // Bezier control point x-coordinate
-          ctx.bezierCurveTo(xc, prevY, xc, y, x, y); // Add a smooth curve to the path
-      }
-      ctx.fill();
-      ctx.stroke();
-      ctx.shadowBlur = 0; // Reset shadow after drawing the line
-      
-      // Draw start price level line (constant line)
+      // Define start, target, and current prices
       const startPrice = prices[0];
-      const startY = chartHeight - ((startPrice - chartDimensions.minPrice) / chartDimensions.priceRange) * chartHeight;
-      ctx.strokeStyle = '#FFF'; // Red color for the target price line
-      ctx.setLineDash([5, 4]); // Set the line to dashed
-      ctx.lineWidth = 0.5; // Set the line width to 1px
-      ctx.beginPath();
-      ctx.moveTo(0, startY);
-      ctx.lineTo(chartWidth, startY);
-      ctx.stroke();
-
-      // Draw target price level line (constant line)
-      const targetY = chartHeight - ((targetPrice - chartDimensions.minPrice) / chartDimensions.priceRange) * chartHeight;
-      ctx.strokeStyle = '#d6188a'; // Red color for the target price line
-      ctx.setLineDash([5, 4]); // Set the line to dashed
-      ctx.lineWidth = 1; // Set the line width to 1px
-      ctx.beginPath();
-      ctx.moveTo(0, targetY);
-      ctx.lineTo(chartWidth, targetY);
-      ctx.stroke();
+      const currentPrice = prices[1];
+      const targetPrice = prices[prices.length - 1];
+      const Nan = NaN;
   
-      // Draw current price level line
-      const currentPrice = prices[prices.length - 1];
-      const currentPriceY = chartHeight - ((currentPrice - chartDimensions.minPrice) / chartDimensions.priceRange) * chartHeight;
-      ctx.strokeStyle = '#5fff37'; // #00ff5e - Green color for the current price line
-      ctx.setLineDash([2, 2]); // Set the line to dashed
-      ctx.lineWidth = 1.5; // Set the line width to 1px
-      ctx.beginPath();
-      ctx.moveTo(0, currentPriceY);
-      ctx.lineTo(chartWidth, currentPriceY);
-      ctx.stroke();
-  
-      // Draw price tags
-      ctx.fillStyle = textColor;
-      ctx.font = '100 10px sans-serif';
-      for (let i = 0; i < prices.length; i++) {
-          const x = i * step;
-          const y = chartHeight - ((prices[i] - chartDimensions.minPrice) / chartDimensions.priceRange) * chartHeight;
-          ctx.beginPath();
-          ctx.arc(x, y, 2, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.fillText(formatStringDecimal(prices[i]), x + 5, y - 10); // Display price values at all times
+      // Define data array
+      let borderColor_ = '#00c7d6';
+      if (targetPrice > startPrice) {
+          borderColor_ = '#089353'; //green
+      } else if (targetPrice < startPrice) {
+          borderColor_ = '#d6188a'; //red
       }
+      const data = {
+          labels: ["Start Price", "Current Price", "Target Price"],
+          datasets: [{
+              label: "Price",
+              backgroundColor: gradient,
+              pointBackgroundColor: "#00c7d6",
+              pointRadius: [3, 0, 0, 0],
+              borderWidth: 2,
+              borderColor: "rgb(75, 192, 192)",
+              data: [startPrice, currentPrice, null, targetPrice],
+              spanGaps: true,
+              tension: 0.4 // Adjust the tension for smoothness (default is 0.4)
+          }, {
+              label: "Price",
+              backgroundColor: gradient,
+              pointBackgroundColor: "#00c7d6",
+              pointRadius: [0, 4, 3], // Hide the point for "Current Price" only
+              borderWidth: 2,
+              borderColor: borderColor_,
+              data: [null, currentPrice, targetPrice],
+              borderDash: [6, 6], // Set the border dash pattern for the line
+              spanGaps: true,
+              tension: 0.4 // Adjust the tension for smoothness (default is 0.4)
+          }]
+      };
   
-      // Draw labels for horizontal lines
-      ctx.fillStyle = '#fff'; // White color for labels      
-      ctx.fillText(`start price`, 0, startY + 11); // Adjust x-coordinate as needed
-      ctx.fillText(`strike price: ${formatStringDecimal(targetPrice)}`, chartWidth / 2 - 30, targetY - 5); // Adjust x-coordinate as needed
-      ctx.fillText(`current price: ${formatStringDecimal(prices[prices.length - 1])}`, chartWidth - 100, currentPriceY - 5); // Adjust x-coordinate as needed
+  
+      // Chart.js options with custom scales for horizontal lines
+      const options = {
+          responsive: true,
+          maintainAspectRatio: true,
+          animation: {
+              easing: "easeInOutQuad",
+              duration: 520
+          },
+          scales: {
+              yAxes: [{
+                  ticks: {
+                      fontColor: "#5e6a81",
+                      callback: function(value, index, values) {
+                          // Format the tick labels to display numbers as strings or decimals
+                          return formatStringDecimal(value);
+                      }
+                  },
+                  gridLines: {
+                      color: "rgba(200, 200, 200, 0.08)",
+                      lineWidth: 1
+                  },
+                  // Add horizontal lines
+                  scaleLabel: {
+                      display: true,
+                      labelString: 'Price',
+                      fontColor: 'rgba(255,255,255,1)', // Transparent
+                      fontSize: 0, // Hide scale label
+                      lineHeight: 0 // Hide scale label
+                  }
+              }],
+              xAxes: [{
+                  ticks: {
+                      fontColor: "#5e6a81"
+                  }
+              }]
+          },
+          elements: {
+              line: {
+                  tension: 0.4
+              }
+          },
+          legend: {
+              display: false
+          },
+          point: {
+              backgroundColor: "#00c7d6"
+          },
+          tooltips: {
+              titleFontFamily: "sans-serif",
+              backgroundColor: "rgba(0,0,0,0.4)",
+              titleFontColor: "white",
+              caretSize: 5,
+              cornerRadius: 2,
+              xPadding: 10,
+              yPadding: 10,
+              callbacks: {
+                  label: function(tooltipItem, data) {
+                      let label = data.datasets[tooltipItem.datasetIndex].label || '';
+                      if (label) {
+                          label += ': ';
+                      }
+                      label += formatStringDecimal(tooltipItem.yLabel);
+                      return label;
+                  }
+              }
+          }
+      };
+  
+      // Create a new Chart instance with options
+      const chartInstance = new Chart(canvas, {
+          type: "line",
+          data: data,
+          options: options
+      });
   }
+  
   
   
   // Draw Price Chart with data provided
   drawChart();
-}  
+}
+
+function depracated_drawChart() {
+  const chartDimensions = calculateChartDimensions();
+  const step = chartWidth / (prices.length - 1);
+
+  // Clear canvas
+  ctx.clearRect(0, 0, chartWidth, chartHeight);
+
+  // Disable image smoothing for crisp text rendering
+  ctx.imageSmoothingEnabled = false;
+
+  // Draw vertical lines representing prices
+  ctx.strokeStyle = 'rgba(0,0,0,0.8)'; // Black color for lines
+  ctx.lineWidth = 1; // Set the line width to 0.5px
+  for (let i = 0; i < prices.length; i++) {
+    if(i == 0 || i == prices.length) {
+      const x = i * step;
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, chartHeight);
+      ctx.stroke();
+    }          
+  }
+
+  // Draw only start and end horizontal lines representing time
+  ctx.strokeStyle = 'rgba(0,0,0,0.4)'; // Light gray color for lines
+  ctx.lineWidth = 2;
+  ctx.beginPath();/* top line starts here
+  ctx.moveTo(0, 0);
+  ctx.lineTo(chartWidth, 0); */
+  ctx.moveTo(0, chartHeight - 1);/* bottom line starts here */
+  ctx.lineTo(chartWidth, chartHeight - 1);
+  ctx.stroke();
+
+  // Draw the line connecting prices on the chart with light blur
+  ctx.fillStyle = 'rgba(0, 255, 255, 0.3)';
+  ctx.strokeStyle = 'rgba(0, 255, 255, 0.8)'; // Light blue color with transparency
+  ctx.shadowColor = 'rgba(0, 255, 255, 0.3)'; // Light blue shadow color with transparency
+  ctx.shadowBlur = 10; // Set shadow blur radius
+  ctx.lineWidth = 1.5; // Set the line width for the price line
+  ctx.beginPath();
+  ctx.moveTo(0, chartHeight - ((prices[0] - chartDimensions.minPrice) / chartDimensions.priceRange) * chartHeight);
+  for (let i = 1; i < prices.length; i++) {
+      const x = i * step;
+      const y = chartHeight - ((prices[i] - chartDimensions.minPrice) / chartDimensions.priceRange) * chartHeight;
+      const prevY = chartHeight - ((prices[i - 1] - chartDimensions.minPrice) / chartDimensions.priceRange) * chartHeight;
+      const xc = (x + (x - step)) / 2; // Bezier control point x-coordinate
+      ctx.bezierCurveTo(xc, prevY, xc, y, x, y); // Add a smooth curve to the path
+  }
+  ctx.fill();
+  ctx.stroke();
+  ctx.shadowBlur = 0; // Reset shadow after drawing the line
+  
+  // Draw start price level line (constant line)
+  const startPrice = prices[0];
+  const startY = chartHeight - ((startPrice - chartDimensions.minPrice) / chartDimensions.priceRange) * chartHeight;
+  ctx.strokeStyle = '#FFF'; // Red color for the target price line
+  ctx.setLineDash([5, 4]); // Set the line to dashed
+  ctx.lineWidth = 0.5; // Set the line width to 1px
+  ctx.beginPath();
+  ctx.moveTo(0, startY);
+  ctx.lineTo(chartWidth, startY);
+  ctx.stroke();
+
+  // Draw target price level line (constant line)
+  const targetY = chartHeight - ((targetPrice - chartDimensions.minPrice) / chartDimensions.priceRange) * chartHeight;
+  ctx.strokeStyle = '#d6188a'; // Red color for the target price line
+  ctx.setLineDash([5, 4]); // Set the line to dashed
+  ctx.lineWidth = 1; // Set the line width to 1px
+  ctx.beginPath();
+  ctx.moveTo(0, targetY);
+  ctx.lineTo(chartWidth, targetY);
+  ctx.stroke();
+
+  // Draw current price level line
+  const currentPrice = prices[prices.length - 1];
+  const currentPriceY = chartHeight - ((currentPrice - chartDimensions.minPrice) / chartDimensions.priceRange) * chartHeight;
+  ctx.strokeStyle = '#5fff37'; // #00ff5e - Green color for the current price line
+  ctx.setLineDash([2, 2]); // Set the line to dashed
+  ctx.lineWidth = 1.5; // Set the line width to 1px
+  ctx.beginPath();
+  ctx.moveTo(0, currentPriceY);
+  ctx.lineTo(chartWidth, currentPriceY);
+  ctx.stroke();
+
+  // Draw price tags
+  ctx.fillStyle = textColor;
+  ctx.font = '100 10px sans-serif';
+  for (let i = 0; i < prices.length; i++) {
+      const x = i * step;
+      const y = chartHeight - ((prices[i] - chartDimensions.minPrice) / chartDimensions.priceRange) * chartHeight;
+      ctx.beginPath();
+      ctx.arc(x, y, 2, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillText(formatStringDecimal(prices[i]), x + 5, y - 10); // Display price values at all times
+  }
+
+  // Draw labels for horizontal lines
+  ctx.fillStyle = '#fff'; // White color for labels      
+  ctx.fillText(`start price`, 0, startY + 11); // Adjust x-coordinate as needed
+  ctx.fillText(`strike price: ${formatStringDecimal(targetPrice)}`, chartWidth / 2 - 30, targetY - 5); // Adjust x-coordinate as needed
+  ctx.fillText(`current price: ${formatStringDecimal(prices[prices.length - 1])}`, chartWidth - 100, currentPriceY - 5); // Adjust x-coordinate as needed
+}
+
+
 /*
 function drawChart() {
   const chartDimensions = calculateChartDimensions();
