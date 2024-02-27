@@ -244,7 +244,32 @@ function updateSectionValues_Staking(
     document.getElementById("assignedToCollateralValue").textContent = formatValue(assignedCollateralUSDT);
     document.getElementById("assignedToMiningAmnt").textContent = formatString(assignedMining);
     document.getElementById("assignedToMiningValue").textContent = formatValue(assignedMiningUSDT);
-    
+
+    // Update charts
+    const percentage = (stakedBalance / totalHoldings) * 100;
+    // ==========================================
+    const circle = document.querySelector('#stakedVsMyBalanceDash');
+    const percentageText = document.querySelector('#stakedVsMyBalancePercent');
+    // ==========================================
+    circle.setAttribute('stroke-dasharray', `${percentage}, 100`);
+    percentageText.textContent = `${percentage.toFixed(2)}%`;
+
+    const percentageStakedSup = (totalStaked / circulatingSupply) * 100;
+    // ==========================================
+    const circleStakedSup = document.querySelector('#stakedVsCirculatingDash');
+    const percentageTextStakedSup = document.querySelector('#stakedVsCirculatingPercent');
+    // ==========================================
+    circleStakedSup.setAttribute('stroke-dasharray', `${percentageStakedSup}, 100`);
+    percentageTextStakedSup.textContent = `${percentageStakedSup.toFixed(2)}%`;
+
+    const percentageDividentsDash = (totalStaked / circulatingSupply) * 100;
+    // ==========================================
+    const circleDividentsDash = document.querySelector('#dividentsDash');
+    const percentageTextDividentsDash = document.querySelector('#dividentsDashPercent');
+    // ==========================================
+    circleDividentsDash.setAttribute('stroke-dasharray', `${percentageDividentsDash}, 100`);
+    percentageTextDividentsDash.textContent = `${percentageDividentsDash.toFixed(2)}%`;
+
 }
 // Export the fetch functions
 export { updateSectionValues_Networth, updateSectionValues_Hedges, updateSectionValues_Rewards, updateSectionValues_Staking };

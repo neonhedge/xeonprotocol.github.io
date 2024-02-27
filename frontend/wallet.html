@@ -968,8 +968,16 @@
 									<div class="grid-sect-subtitle splitView stakedTitle"><span class="splitView-title">my Staked Balance: </span><span id="stakedBalanceAmnt">0</span><span id="stakedBalanceValue"> ($0)</span></div>
 									<div class="grid-sect-subtitle splitView"><span class="splitView-title">my Total Holdings: </span><span id="totalBalanceAmnt">0</span><span id="totalBalanceValue"> ($0)</span></div>
 								</div>
-								<div class="graph" style="--bluePercentage: 5;">
-									<p>5%</p>
+								<div id="stakedChart" class="chart-svg">
+									<svg viewBox="0 0 36 36" class="circular-chart green">
+										<path class="circle-bg" d="M18 2.0845
+											a 15.9155 15.9155 0 0 1 0 31.831
+											a 15.9155 15.9155 0 0 1 0 -31.831"></path>
+										<path id="stakedVsMyBalanceDash" class="circle" stroke-dasharray="30, 100" d="M18 2.0845
+											a 15.9155 15.9155 0 0 1 0 31.831
+											a 15.9155 15.9155 0 0 1 0 -31.831"></path>
+										<text x="18" y="20.35" id="stakedVsMyBalancePercent" class="percentage">30%</text>
+									</svg>
 								</div>
 							</div>
 							<hr class="line">
@@ -978,8 +986,16 @@
 									<div class="grid-sect-subtitle splitView stakedTitle"><span class="splitView-title">Staked Supply: </span><span id="stakedSupplyAmnt">0</span><span id="stakedSupplyValue"> ($0)</span></div>
 									<div class="grid-sect-subtitle splitView"><span class="splitView-title">Circulating Supply: </span><span id="circSupplyAmnt">0</span><span id="circSupplyValue"> ($0)</span></div>
 								</div>
-								<div class="graph" style="--bluePercentage: 40;">
-									<p>40%</p>
+								<div id="circulatingChart" class="chart-svg">
+									<svg viewBox="0 0 36 36" class="circular-chart blue">
+										<path class="circle-bg" d="M18 2.0845
+											a 15.9155 15.9155 0 0 1 0 31.831
+											a 15.9155 15.9155 0 0 1 0 -31.831"></path>
+										<path id="stakedVsCirculatingDash" class="circle" stroke-dasharray="30, 100" d="M18 2.0845
+											a 15.9155 15.9155 0 0 1 0 31.831
+											a 15.9155 15.9155 0 0 1 0 -31.831"></path>
+										<text x="18" y="20.35" id="stakedVsCirculatingPercent" class="percentage">30%</text>
+									</svg>
 								</div>
 							</div>
 							<hr class="line">
@@ -988,8 +1004,16 @@
 									<div class="grid-sect-subtitle splitView stakedTitle"><span class="splitView-title">Dividents Distributed: </span><span id="divDistributedAmnt">0</span><span id="divDistributedValue"> ($0)</span></div>
 									<div class="grid-sect-subtitle splitView"><span class="splitView-title">Dividents Claimed: </span><span id="divClaimedAmnt">0</span><span id="divClaimedValue"> ($0)</span></div>
 								</div>
-								<div class="graph" style="--bluePercentage: 85;">
-									<p>85%</p>
+								<div id="dividentsChart" class="chart-svg">
+									<svg viewBox="0 0 36 36" class="circular-chart blue">
+										<path class="circle-bg" d="M18 2.0845
+											a 15.9155 15.9155 0 0 1 0 31.831
+											a 15.9155 15.9155 0 0 1 0 -31.831"></path>
+										<path id="dividentsDash" class="circle" stroke-dasharray="30, 100" d="M18 2.0845
+											a 15.9155 15.9155 0 0 1 0 31.831
+											a 15.9155 15.9155 0 0 1 0 -31.831"></path>
+										<text x="18" y="20.35" id="dividentsPercent" class="percentage">30%</text>
+									</svg>
 								</div>
 							</div>
 						</div>
