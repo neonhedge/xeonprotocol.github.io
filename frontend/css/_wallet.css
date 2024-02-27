@@ -1,8 +1,4 @@
 @charset "utf-8";
-@font-face {
-	font-family: neon;
-	src: url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/707108/neon.ttf);
-}
 :root { 
 	--neon-text-color: rgb(255, 153, 0);
 	--neon-border-color: #08f;
@@ -2094,6 +2090,74 @@ button:disabled:hover {
 
   .stakedTitle {
 	color:#FFF;
+  }
+
+  
+.chart-svg {
+	position: relative;
+	flex: 1;
+
+	width: 120px;
+	height: 120px;
+	border-radius: 50%;
+  }
+  
+  .circle-bg {
+	fill: none;
+	stroke: #eee;
+	stroke-width: 1.2;
+  }
+  
+  .circle {
+	fill: none;
+	stroke-width: 1.6;
+	stroke-linecap: round;
+	-webkit-animation: progress 1s ease-out forwards;
+			animation: progress 1s ease-out forwards;
+  }
+  
+  .circular-chart.orange .circle {
+	stroke: #ff9f00;
+  }
+  .circular-chart.orange .circle-bg {
+	stroke: #776547;
+  }
+  .circular-chart.blue .circle {
+	stroke: #00cfde;
+  }
+  .circular-chart.blue .circle-bg {
+	stroke: #557b88;
+  }
+  .circular-chart.pink .circle {
+	stroke: #ff7dcb;
+  }
+  .circular-chart.pink .circle-bg {
+	stroke: #6f5684;
+  }
+  .circular-chart.green .circle {
+	stroke: #089353;
+  }
+  .circular-chart.green .circle-bg {
+	stroke: #034124;
+  }
+  
+  .percentage {
+	fill: #fff;
+	font-size: 0.5em;
+	text-anchor: middle;
+	font-weight: 400;
+  }
+  
+  @-webkit-keyframes progress {
+	0% {
+	  stroke-dasharray: 0 100;
+	}
+  }
+  
+  @keyframes progress {
+	0% {
+	  stroke-dasharray: 0 100;
+	}
   }
 
   /*=================
