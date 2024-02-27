@@ -65,9 +65,14 @@ function updateChartValues_Hedge(prices) {
   
       // Create linear gradient for background
       const gradient = ctx.createLinearGradient(0, 0, 0, chartHeight);
+      gradient.addColorStop(0, "rgba(0, 199, 214, 0)");
+      gradient.addColorStop(0.3, "rgba(0, 199, 214, 0.1)");
+      gradient.addColorStop(1, "rgba(0, 199, 214, 0.32)");
+      /* flipped gradinet 
       gradient.addColorStop(0, "rgba(0, 199, 214, 0.32)");
       gradient.addColorStop(0.3, "rgba(0, 199, 214, 0.1)");
       gradient.addColorStop(1, "rgba(0, 199, 214, 0)");
+      */
   
       // Fill canvas with linear gradient
       ctx.fillStyle = gradient;
@@ -93,7 +98,7 @@ function updateChartValues_Hedge(prices) {
               backgroundColor: gradient,
               pointBackgroundColor: "#00c7d6",
               pointRadius: [3, 0, 0, 0],
-              borderWidth: 2,
+              borderWidth: 1.5,
               borderColor: "rgb(75, 192, 192)",
               data: [startPrice, currentPrice, null, targetPrice],
               spanGaps: true,
@@ -103,7 +108,7 @@ function updateChartValues_Hedge(prices) {
               backgroundColor: gradient,
               pointBackgroundColor: "#00c7d6",
               pointRadius: [0, 4, 3], // Hide the point for "Current Price" only
-              borderWidth: 2,
+              borderWidth: 1.5,
               borderColor: borderColor_,
               data: [null, currentPrice, targetPrice],
               borderDash: [6, 6], // Set the border dash pattern for the line
@@ -118,8 +123,8 @@ function updateChartValues_Hedge(prices) {
           responsive: true,
           maintainAspectRatio: true,
           animation: {
-              easing: "easeInOutQuad",
-              duration: 520
+              easing: "easeInOutElastic",
+              duration: 1500
           },
           scales: {
               yAxes: [{

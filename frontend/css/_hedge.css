@@ -960,7 +960,7 @@ hr.line {
     width: auto;
     text-align: center;
     font-size: clamp(20px, 2vw, 25px);
-    font-weight: 400;
+    font-weight: 100;
     background-color: rgba(0,0,0,0.3);
     z-index: 10;
   }

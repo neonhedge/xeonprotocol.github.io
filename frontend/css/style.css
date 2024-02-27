@@ -799,6 +799,9 @@ nav#navbar ul li ul.submenu li a {
   align-items: center;
   place-content: center;
 }
+.logoImg:hover {
+  text-decoration: none;
+}
 @media (max-width: 680px){
   .logoImg {
     border-radius:50%;
@@ -890,7 +893,7 @@ nav#navbar ul li ul.submenu li a {
   text-shadow: 0 0 2px #188dd6, 0 0 3px #188dd6, 0 0 15px #188dd6, 0 0 15px #188dd6, 0 0 3px #188dd6, 3px 3px 0.5px #0e567c !important;
   color: #08e7fe !important;
 }
-.logod-name :hover {
+.logod-name:hover {
   text-decoration: none !important;
 }
 
