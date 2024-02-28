@@ -28,11 +28,15 @@
 	<link rel="stylesheet" href="./css/aos.css" />
 	<link rel="stylesheet" href="./css/style.css">
 	<link rel="stylesheet" href="./css/custom.css">
-	<!-- hedge window styling -->
+	<!-- windows styling -->
 	<link rel="stylesheet" type="text/css" href="css/_menu.css">
-	<link rel="stylesheet" type="text/css" href="css/_fund.css">
-	<link rel="stylesheet" type="text/css" href="css/sweetalert/sweetalert.css">
+    <link rel="stylesheet" type="text/css" href="css/_hedge.css">
+    <link rel="stylesheet" type="text/css" href="css/sweetalert/sweetalert.css">
+	<link rel="stylesheet" href="./css/hedge-card-core.css">
 	
+	<!-- charting scripts -->
+	<script type="module" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
+
 	<!-- hedge page scripts -->    
 	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js"></script>
 	<script type="module" src="js/ethers-5.0.umd.min.js"></script>
@@ -43,6 +47,7 @@
 
 	<!-- hedge dependancy scripts -->
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.17.1/matter.min.js"></script> <!-- ASSET BASKET-->
+
 
 
 	<script>
@@ -74,8 +79,9 @@
 	<header>
 		<div class="container grid" data-aos="fade-up">
 			<!-- your logo here -->
-			<a href="./">
+			<a class="logoImg" href="./">
 				<img src="./imgs/maskot3.webp" alt="logo">
+				<span class="logod-name">Xeon Protocol</span>
 			</a>
 
 			<!-- mobile navbar toggle button -->
@@ -184,8 +190,8 @@
 					<div class="hedgeGrid">
 						<div id="tokenLogo" class="tokenLogoLeft" style="background-image:url('imgs/monkeytrain.png')"></div>
 						<div class="tokenName">
-							<div id="tokenSymbol">TSUKA <span class="additionalTokens">+6 others</span></div>
-							<div id="tokenAmount" class="bagsize">1,660,500 Tokens</div>
+							<div id="tokenSymbol">Shitcoin <span class="additionalTokens">+1 others</span></div>
+							<div id="tokenAmount" class="bagsize">---- Tokens</div>
 						</div>
 					</div>
 					<div class="valueHold">
@@ -195,7 +201,7 @@
 						</div>
 						<div class="optionValue">
 							<div class="valueTitle">VALUE</div>
-							<div id="marketValue" class="optionMarketValue flux highlightOption">10.2 ETH</div>
+							<div id="marketValue" class="optionMarketValue flux highlightOption">-- ETH</div>
 						</div>
 						<div class="optionComposition">
 							<div class="compositionTitle">Assets</div>
@@ -209,11 +215,11 @@
 					<div class="optionMarkContainer">
 						<div class="hedgeDetails">
 							<div class="optionMark"><span>Start Value:</span><span id="startValue" class="oMfigure">-- ETH</span></div>
-							<div class="optionMark"><span>Strike Value:</span><span id="strikeValue" class="oMfigure">10.7 ETH</span></div>
-							<div class="optionMark"><span>Hedge Cost:</span><span id="cost" class="oMfigure">0.5 ETH</span></div>
-							<div class="optionMark"><span>Date Create:</span><span id="created" class="oMfigure">18/05/2023</span></div>
-							<div class="optionMark"><span>Date Taken:</span><span id="taken" class="oMfigure">18/05/2023</span></div>
-							<div class="optionMark"><span>Date Expire:</span><span id="expires" class="oMfigure">25/05/2023</span></div>
+							<div class="optionMark"><span>Strike Value:</span><span id="strikeValue" class="oMfigure">-- ETH</span></div>
+							<div class="optionMark"><span>Hedge Cost:</span><span id="cost" class="oMfigure">-- ETH</span></div>
+							<div class="optionMark"><span>Date Create:</span><span id="created" class="oMfigure">--/--/--</span></div>
+							<div class="optionMark"><span>Date Taken:</span><span id="taken" class="oMfigure">--/--/--</span></div>
+							<div class="optionMark"><span>Date Expire:</span><span id="expires" class="oMfigure">--/--/--</span></div>
 						</div>
 						<div class="dealRequests">
 							<h5>Deal Requests..</h5>
@@ -223,17 +229,12 @@
 							</div>
 							<div class="requestList" id="requestList">
 								<span><i class="fa fa-superpowers"></i> Topup Request Pending <button class="requestButton actonRequest">Accept</button></span>
-								<span><i class="fa fa-handshake-o"></i> Topup Accepted 20/05/2023</span>
-								<span><i class="fa fa-handshake-o"></i> Topup Accepted 19/05/2023</span>
-								<span><i class="fa fa-handshake-o"></i> Topup Accepted 18/05/2023</span>
-								<span><i class="fa fa-handshake-o"></i> Topup Accepted 18/05/2023</span>
-								<span><i class="fa fa-handshake-o"></i> Topup Accepted 18/05/2023</span>
-								<span><i class="fa fa-handshake-o"></i> Topup Accepted 18/05/2023</span>
-								<span><i class="fa fa-handshake-o"></i> Topup Accepted 18/05/2023</span>
-								<span><i class="fa fa-handshake-o"></i> Topup Accepted 18/05/2023</span>
-								<span><i class="fa fa-handshake-o"></i> Topup Accepted 18/05/2023</span>
-								<span><i class="fa fa-handshake-o"></i> Topup Accepted 18/05/2023</span>
-								<span><i class="fa fa-handshake-o"></i> Topup Accepted 18/05/2023</span>
+								<span><i class="fa fa-handshake-o"></i> Topup Accepted --/--/--</span>
+								<span><i class="fa fa-handshake-o"></i> Topup Accepted --/--/--</span>
+								<span><i class="fa fa-handshake-o"></i> Topup Accepted --/--/--</span>
+								<span><i class="fa fa-handshake-o"></i> Topup Accepted --/--/--</span>
+								<span><i class="fa fa-handshake-o"></i> Topup Accepted --/--/--</span>
+								<span><i class="fa fa-handshake-o"></i> Topup Accepted --/--/--</span>
 							</div>
 						</div>
 					</div>
@@ -243,12 +244,12 @@
 					<div class="progressSummary">
 						<div class="timetoexpiry status-dot">time to expiry..</div>
 						<span class="status-dot inprogress">
-							<span id="timetoExpiry" style="white-space: nowrap;" title="hours left until this hedge expires"> 246 hrs</span>
+							<span id="timetoExpiry" style="white-space: nowrap;" title="hours left until this hedge expires"> -- hrs</span>
 							<i class="fa-solid fa-hourglass-start"></i>
 						</span>
 						<div class="mbcard_detail rb_detail">
 							<div class="parent_meter">
-								<div id="meter_guage"></div><span id="measure" class="measure">90%</span>
+								<div id="meter_guage"></div><span id="measure" class="measure">--%</span>
 							</div>
 						</div>
 					</div>
@@ -259,7 +260,9 @@
 						<div id="priceChangeTag" class="price-tag"></div>
 
 						<!-- HTML Canvas Element -->
-						<canvas id="priceChangeChart" width="300" height="300"></canvas>
+						<div class="line-chart">
+							<canvas id="priceChart"></canvas>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -270,7 +273,7 @@
 						<div class="user-card">
 							<div class="icon"><i class="fa-solid fa-user-astronaut"></i></div>
 						</div>
-						<div id="ownerTrunc" class="userWallet ownerMark">0X3fe...h986</div>
+						<div id="ownerTrunc" class="userWallet ownerMark">0X00...000</div>
 					</div>						
 					<!-- graphic svg -->	
 					<div class="ownerProfitabil">
@@ -308,7 +311,7 @@
 						<div class="user-card">
 							<div class="icon"><i class="fa-solid fa-user-astronaut"></i></div>
 						</div>
-						<div id="takerTrunc" class="userWallet ownerMark">0X000...0000</div>
+						<div id="takerTrunc" class="userWallet ownerMark">0X00...000</div>
 					</div>						
 					<!-- graphic svg -->	
 					<div class="ownerProfitabil">
@@ -377,7 +380,7 @@
 				<a class="footermaskot" href="/">	
 					<img src="./imgs/maskot3.webp" alt="logo">
 				</a>
-				<p class="mb-2">Neon Protocol - Universal ERC20 Hedging and Lending.</p>
+				<p class="mb-2">Xeon Protocol - Universal ERC20 Hedging and Lending.</p>
 
 				<!-- social links -->
 				<ul class="inline-list">
@@ -434,7 +437,7 @@
 			</div>
 
 			<!-- copyrights -->
-			<p>&copy; Neon Protocol <span id="#thisYear"></span>. All Rights Reserved. 2023.</p>
+			<p>&copy; Xeon Protocol <span id="#thisYear"></span>. All Rights Reserved. 2023.</p>
 		</div>
 	</footer>
 	

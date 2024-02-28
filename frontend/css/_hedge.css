@@ -2,14 +2,13 @@
 @font-face {
 	font-family: neon;
 	src: url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/707108/neon.ttf);
-  }
+}
 
-  :root {  
+:root {  
 	/* set neon color */
 	--neon-text-color: rgb(255, 153, 0);
 	--neon-border-color: #08f;
-  }
-/*========================================*/
+}
 
 body {
 	background-size:contain !important;
@@ -253,7 +252,6 @@ hr.line {
         HEDGE DATA, STATE, PROFITABILITY
 ======================================*/
 
-/* General styles */
 .sectionCenter {
   display: flex;
   justify-content: space-evenly;
@@ -311,10 +309,12 @@ hr.line {
   background-image: radial-gradient(#131145, #1b1b49 100%) !important;
   color: #EEE;
 }
+
 .flux {
   display: inline-block;
   font-family: unset!important;
 }
+
 /* Token styles */
 .tokenLogoLeft {
   position: relative;
