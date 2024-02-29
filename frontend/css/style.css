@@ -428,18 +428,22 @@ button#goTop, a.btn#goTop {
   color: #1b9ff1;
 }
 /* x - app social button */
-.x-app-socials {
+.x-app-socials, .x-app-socials-inline {
   position: absolute;
   padding: 6px !important;
   left: -100px;
   transform: translateY(20%);
-
 }
-.x-app-socials img {
+.x-app-socials img, .x-app-socials-inline img {
   width: 22px !important;
   height: auto;
   border-radius: unset;
   transform: scale(0.75);
+}
+.x-app-socials-inline {
+  display: inline;
+  position: relative;
+  left: unset;
 }
 /* go to top */
 button#goTop svg, a.btn#goTop svg {
@@ -785,7 +789,9 @@ section.er404 {
   flex-direction: column;
   gap: 2rem;
   min-height: 80vh;
-  background: linear-gradient(180deg, #188dd6, #040115 80%);
+  background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.8)), url('../imgs/banner-bg.webp') !important;
+    background-attachment: scroll, scroll;
+  background-attachment: fixed !important;
 }
 
 /*--------------------------------------------------------*/
