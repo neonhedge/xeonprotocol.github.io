@@ -86,7 +86,7 @@ function init() {
     }
     //////Sun////////
     // Generate a random number between 0x42ecf5 and 0xf542b9 for the specular color
-    // Cooloest manual colors list: #592417
+    // Cooloest manual colors list: #592417, #
     var minSpecular = 0x42ecf5;
     var maxSpecular = 0xf542b9;
     var randomSpecular = Math.floor(Math.random() * (maxSpecular - minSpecular + 1)) + minSpecular;

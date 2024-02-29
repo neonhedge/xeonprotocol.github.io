@@ -107,7 +107,6 @@ async function getTokenInfo(tokenAddress, balanceBN) {
         // Format from BigNumber to human-readable: accepts bigNumber only
         // Fetch decimal value after
         const balanceBig = ethers.BigNumber.from(balanceBN);
-        console.log(balanceBig+'eeeeeeeeeeee:    '+balanceBN);
         const trueValue = fromBigIntNumberToDecimal(balanceBig, tokenDecimals);
 
         // Fetch the USD value of the token balance: accepts decimal

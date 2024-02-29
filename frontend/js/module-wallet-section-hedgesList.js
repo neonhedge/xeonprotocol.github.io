@@ -83,8 +83,10 @@ export async function loadHedgesModule() {
           const tokenLink = document.createElement('a');
           tokenLink.href = 'https://sepolia.etherscan.io/address/' + result.token;
           tokenLink.target = '_blank';
-          [, , hedgeSymbol.textContent] = await getTokenDecimalSymbolName(result.token);
-          tokenInfo.appendChild(hedgeSymbol);
+          const [, , symbol] = await getTokenDecimalSymbolName(result.token);
+          hedgeSymbol.textContent = symbol;
+          tokenLink.appendChild(hedgeSymbol);
+          tokenInfo.appendChild(tokenLink);
 
           // market value
           const hedgeValue = document.createElement('div');
@@ -143,12 +145,13 @@ export async function loadHedgesModule() {
           takerLink.textContent = truncateAddress(result.taker);
           hedgeTaker.appendChild(takerLink);
           tokenInfo.appendChild(hedgeTaker);
+          // add to list item
+          listItem.appendChild(tokenInfo);
           // action button
           const hedgeTxBtn = document.createElement('button');
           hedgeTxBtn.classList.add('hedgeTxBtn');
           hedgeTxBtn.textContent = 'Tx';
           listItem.appendChild(hedgeTxBtn);
-
           // Use fragments instead of adding elements one by one
           fragment.appendChild(listItem);
       }

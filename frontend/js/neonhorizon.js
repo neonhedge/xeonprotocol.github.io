@@ -59,32 +59,30 @@ var bgcamera = new THREE.PerspectiveCamera(50, aspect, 0.1, 20000);
 bgcamera.position.z = 20000;
 bgcamera.position.y = 0;
 
-background.add(new THREE.AmbientLight(0x0878af, 2));
-
-var light2 = new THREE.DirectionalLight(0x356399, 10);
+// Sun Colors start here
+background.add(new THREE.AmbientLight(0x0878af, 2)); // 0x1e0230 purpler
+var light2 = new THREE.DirectionalLight(0x356399, 10); //0x1e0230
 light2.position.set(0, -10000, 30000);
-
 background.add(light2);
 
-/* DISABLED PLANET AND DEPENDENCIES
+/* DISABLED PLANET AND DEPENDENCIES HERE
 - enable line 175 as well
 */
 var planet = THREE.SceneUtils.createMultiMaterialObject(
   new THREE.IcosahedronGeometry(7000, 3), [
     new THREE.MeshLambertMaterial({
-      color: 0x0878af
+      color: 0x8931d7 //light purple
     }),
     new THREE.MeshBasicMaterial({
-      color: 0x356399,
+      color: 0x531987, //darker purple
       wireframe: true
     })
   ]
 );
-
 planet.position.y -= 1500;
 background.add(planet);
 
-var spotLight3 = new THREE.SpotLight(0x3399ff, 7, 10000, Math.PI);
+var spotLight3 = new THREE.SpotLight(0x531987, 7, 10000, Math.PI);
 spotLight3.position.set(1000, 0, 10000);
 spotLight3.target = planet.children[0];
 
@@ -128,31 +126,32 @@ renderPass.clearDepth = true;
 renderPass.renderToScreen = true;
 
 composer.addPass(renderPass);
-
+// bad tv pass
 var badTVPass = new THREE.ShaderPass(THREE.BadTVShader);
 badTVPass.uniforms["distortion"].value = 0.5;
 badTVPass.uniforms["distortion2"].value = 0.5;
 badTVPass.uniforms["rollSpeed"].value = 0.05;
-
+// static pass
 var staticPass = new THREE.ShaderPass(THREE.StaticShader);
 staticPass.uniforms["amount"].value = 0.02;
 staticPass.uniforms["size"].value = 1;
-
+// film pass
 var filmPass = new THREE.ShaderPass(THREE.FilmShader);
 filmPass.uniforms["sCount"].value = 800;
 filmPass.uniforms["sIntensity"].value = 0.2;
 filmPass.uniforms["nIntensity"].value = 0.1;
 filmPass.uniforms["grayscale"].value = 0;
-
+// rgb pass
 var rgbPass = new THREE.ShaderPass(THREE.RGBShiftShader);
 rgbPass.uniforms["angle"].value = 0;
 rgbPass.uniforms["amount"].value = 0.0005;
-composer.addPass(rgbPass);
 
-composer.addPass(staticPass);
-composer.addPass(filmPass);
+// compose
+//composer.addPass(staticPass);
+//composer.addPass(filmPass);
 badTVPass.renderToScreen = true;
 composer.addPass(badTVPass);
+composer.addPass(rgbPass);
 
 /*==============================================
       LAZY LOADING THE WELCOME SCREEN HORIZON
@@ -170,8 +169,8 @@ function render() {
   var delta = clock.getDelta();
 
   badTVPass.uniforms['time'].value = delta;
-  filmPass.uniforms['time'].value = delta;
-  staticPass.uniforms['time'].value = delta;
+  //filmPass.uniforms['time'].value = delta;
+  //staticPass.uniforms['time'].value = delta;
 
   terrain.position.z += 2.5; // 4 original (faster terrain speed)or any other smaller value
   planet.rotateY(-0.001);

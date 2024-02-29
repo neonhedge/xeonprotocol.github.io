@@ -2,10 +2,10 @@ import { CONSTANTS, fromBigIntNumberToDecimal } from "./constants.js";
 
 async function getUserHedgeVolume(user) {
     // Fetch arrays
-    const optionsCreated = await hedgingInstance.methods.getUserOptionsCreated(user, 0, 100).call();
-    const swapsCreated = await hedgingInstance.methods.getUserSwapsCreated(user, 0, 100).call();
-    const optionsTaken = await hedgingInstance.methods.getUserOptionsTaken(user, 0, 100).call();
-    const swapsTaken = await hedgingInstance.methods.getUserSwapsTaken(user, 0, 100).call();
+    const optionsCreated = await hedgingInstance.getUserOptionsCreated(user, 0, 100);
+    const swapsCreated = await hedgingInstance.getUserSwapsCreated(user, 0, 100);
+    const optionsTaken = await hedgingInstance.getUserOptionsTaken(user, 0, 100);
+    const swapsTaken = await hedgingInstance.getUserSwapsTaken(user, 0, 100);
 
     // Combine arrays into one final array
     const finalArray = [...optionsCreated, ...swapsCreated, ...optionsTaken, ...swapsTaken];
@@ -21,7 +21,7 @@ async function getUserHedgeVolume(user) {
 
     // Fetch details for each hedge and calculate sums
     for (const hedgeId of finalArray) {
-        const hedgeDetails = await hedgingInstance.methods.getHedgeDetails(hedgeId).call;
+        const hedgeDetails = await hedgingInstance.getHedgeDetails(hedgeId);
 
         // Check if creator or taker
         const isUserCreator = hedgeDetails.owner === user;
@@ -82,7 +82,7 @@ async function getUserProfitLoss(user) {
 
     // Fetch profits and losses for each paired currency
     for (const pairedCurrency of pairedCurrencies) {
-        const { profits, losses } = await hedgingInstance.methods.getEquivUserPL(user, pairedCurrency).call();
+        const { profits, losses } = await hedgingInstance.getEquivUserPL(user, pairedCurrency);
         const decimals = pairedCurrency === CONSTANTS.wethAddress ? 18 : 6;
 
         // Update the variables based on the paired currency

@@ -615,7 +615,6 @@ async function deleteInterface(optionId) {
     // Format outputs
     let marketvalueFormatted = cardCommaFormat(marketvalue);
     let costFormatted = cardCommaFormat(costBN);
-    let strikeFormatted = cardCommaFormat(strikePrice);
     
     // Token logourl
     let logourl = result.logourl;
@@ -684,9 +683,9 @@ async function deleteInterface(optionId) {
     try {
         // classes on left are for size, on right are for coloring & font
         // interfaceWindow is displayed once in a swal popup, then changes messages on transaction status
-        let transactionMessage = '';
         let proceedButtonText = 'checking ...';
-        transactionMessage = `
+        let transactionMessage = `
+            <div>
                 <div id="withdrawConfirm" class="interfaceWindow">
                     <span class="txStatus">You are about to Delete</span>
                     <span class="walletbalanceSpan">${hedgeTypeFull} for ${amountFormated} ${symbol} <a href="https://etherscan.io/token/${tokenAddress}" target="_blank">${truncatedTokenAdd} <i class="fa fa-external-link"></i></a></span>
@@ -715,38 +714,39 @@ async function deleteInterface(optionId) {
                         </span>
                     </div>
                 </div>
+            </div>
             `;
 
         swal({
-            type: swalType,
-            title: "Hedge Deletion",
+            title: "",
             text: transactionMessage,
+            type: "warning",
             html: true,
-            showCancelButton: showCancelButton,
-            confirmButtonColor: "#04C86C",
-            confirmButtonText: proceedButtonText,
+            dangerMode: true,
+            confirmButtonText: "Delete",
+            confirmButtonColor: "#171716",
             cancelButtonText: "Cancel",
-            closeOnConfirm: closeOnConfirm,
-            closeOnCancel: true
-        }, async function (isConfirm) {
-            if (isConfirm) {
-                    $('.confirm').prop("disabled", false);
-                    $('.confirm').html('<i class="fa fa-spinner fa-spin"></i> Processing...');
-                    // Progress notification
-                    hedgeDeletingMessage();
-                    // Call proceed function
-                    await deleteHedge();
-            } else {
-                // User clicked the cancel button
-                swal("Cancelled", "Your money is safe :)", "error");
-                $("#transactSubmit").html('Withdraw');
-            }
-        });
+            closeOnConfirm: false,
+            showCancelButton: true
+            }, async function (isConfirm) {
+                if (isConfirm) {
+                        $('.confirm').prop("disabled", false);
+                        $('.confirm').html('<i class="fa fa-spinner fa-spin"></i> Processing...');
+                        // Progress notification
+                        hedgeDeletingMessage();
+                        // Call proceed function
+                        await deleteHedge();
+                } else {
+                    // User clicked the cancel button
+                    swal("Cancelled", "Your money is safe :)", "error");
+                    $("#transactSubmit").html('Withdraw');
+                }
+            });
 
         // Run display scrips on swal load
         $(".interfaceWindow").hide();
         $("#withdrawConfirm").fadeIn("slow");
-        $('.confirm').html('Oops!');
+        $('.confirm').html('Delete');
     } catch (error) {
         console.error('Error:', error.message);
     }

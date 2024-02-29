@@ -132,7 +132,7 @@ async function fetchILLoan(address){
 		var requestState = parseFloat(projectItem[6]);
 		//logourl
 		var logourl = projectItem[3];
-		//twitter - for now website is twitter link, depracate website requirement
+		//twitter - for now website is twitter link, deprecate website requirement
 		var twitterURL = projectItem[1];
 		//telegram
 		var telegramURL = projectItem[2];
@@ -319,7 +319,7 @@ async function fetchSummary(address){
 		var factoryaddr = projectAddrs[2];
 		//logourl
 		var logourl = projectItem[3];
-		//twitter - for now website is twitter link, depracate website requirement
+		//twitter - for now website is twitter link, deprecate website requirement
 		var twitterURL = projectItem[1];
 		//telegram
 		var telegramURL = projectItem[2];
@@ -360,7 +360,7 @@ async function fetchOPHeader(loanID){
         var trancatedOwner = first+'...'+last;
 		//logourl
 		var logourl = projectItem[3];
-		//twitter - for now website is twitter link, depracate website requirement
+		//twitter - for now website is twitter link, deprecate website requirement
 		var twitterURL = projectItem[1];
 		//telegram
 		var telegramURL = projectItem[2];
