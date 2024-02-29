@@ -5,13 +5,20 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<!-- favicons -->
-	<link rel="icon" href="./imgs/favicon.ico" />
-	<link rel="apple-touch-icon" href="./imgs/favicon-192.png" />
-	<meta name="author" content="Travolgi">
+	<link rel="apple-touch-icon" sizes="180x180" href="./imgs/fav/apple-touch-icon.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="./imgs/fav/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="./imgs/fav/favicon-16x16.png">
+	<link rel="manifest" href="./imgs/fav/site.webmanifest">
+	<link rel="mask-icon" href="./imgs/fav/safari-pinned-tab.svg" color="#5bbad5">
+	<link rel="shortcut icon" href="./imgs/fav/favicon.ico">
+	<meta name="msapplication-TileColor" content="#da532c">
+	<meta name="msapplication-config" content="./imgs/fav/browserconfig.xml">
+	<meta name="theme-color" content="#ffffff">
+	<meta name="author" content="Kaveman-x">
 	<!-- title page & SEO meta -->
-	<title>Page not found - much WOW</title>
-	<meta name="description" content="woof of wallstreet is a Decentralized Lending Club, runs a unique crypto lending platform and launchpad, collateralised crypto loans, lp tokens as collateral, assets, liquidity">
-	<meta name="keywords" content="money, funding, launchpad, loans, lp, assets, shiba, shib, inu, website, html, html5, css">
+	<title>XEON - 404 Error</title>
+	<meta name="description" content="neon hedge is a universal ERC20 hedging and lending platform">
+	<meta name="keywords" content="erc20, crypto, hedging, call options, swaps, lending, collateral, website, html, html5, css">
 	<!-- google fonts -->
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -21,19 +28,24 @@
 	<link rel="stylesheet" href="./css/aos.css" />
 	<link rel="stylesheet" href="./css/style.css">
 	<link rel="stylesheet" href="./css/custom.css">
+	<!-- windows styling -->
+	<link rel="stylesheet" type="text/css" href="./css/_menu.css">	
+	<link rel="stylesheet" type="text/css" href="./css/404.css">
+	
 </head>
 
 <body>
 	<!-- Accessibility: Skip to content -->
 	<a href="#main" class="skip-to-content">Skip to content</a>
 	<!-- Preload page -->
-	<div id="preload">loading...</div>
+	<div id="preload">neon hedge loading...</div>
 
 	<header>
 		<div class="container grid" data-aos="fade-up">
 			<!-- your logo here -->
-			<a href="./">
-				<img src="./imgs/logo.webp" alt="logo">
+			<a class="logoImg" href="./">
+				<img src="./imgs/maskot3.webp" alt="logo">
+				<span class="logod-name">Xeon Protocol</span>
 			</a>
 
 			<!-- mobile navbar toggle button -->
@@ -47,11 +59,19 @@
 			<!-- navbar with page links -->
 			<nav id="navbar" data-visible="false">
 				<ul>
-					<li><a href="./">WOW</a></li>
-					<li><a href="about.html">Contact</a></li>
+                    <li><a href="docs.html">Docs</a></li>
 				</ul>
+				<!-- navbar buttons -->
+				<div class="account">
+					<a href="https://twitter.com/neonhedge" target="_blank" class="x-app-socials" title="Follow us on X-App"><img src="./imgs/x-app-w.svg" alt="Neon on X-App"></a>
+					<a href="ecosystem.html" target="_self"  class="btn-cta" title="Closed door Beta">Ecosystem</a>
+				</div>
 			</nav>
 		</div>
+        <!-- chain stat-->
+        <div class="chainstat">
+            <div id="blocknumber" class="blockel">-------</div><div class="dot blockel"></div>
+        </div>
 	</header>
 	
 	
@@ -60,10 +80,34 @@
 		<!-- 404 error section -->
 		<section class="er404">
 			<h1 data-aos="zoom-out-down">404 Error</h1>
-			<p data-aos="zoom-out-down" data-aos-delay="100">Page Not Found! Ups... Something wrong!</p>
+			<p data-aos="zoom-out-down" data-aos-delay="100">Page Not Found...</p>
+			<!-- mars landing -->
+			<div class="marsspace">
+				<div class="ship">
+				<div class="ship-rotate">
+					<div class="pod"></div>
+					<div class="fuselage"></div>
+				</div>
+				</div>
+				<div class="ship-shadow"></div>
+				<div class="marsred">
+				<div class="tentacle"></div>
+				<div class="flag">
+					<div class="small-tentacle"></div>
+				</div>
+				<div class="planet">
+					<div class="surface"></div>
+					<div class="crater1"></div>
+					<div class="crater2"></div>
+					<div class="crater3"></div>
+				</div>
+				</div>
+				<div class="test"></div>
+			</div>
+			<p data-aos="zoom-out-down" data-aos-delay="100">something weird going on!</p>
 			<!-- back to home button -->
-			<a href="/" title="Go Home" data-aos="zoom-out-up" data-aos-delay="200">
-				<button class="btn-border">Go Home</button>
+			<a href="./" title="Go Home" data-aos="zoom-out-up" data-aos-delay="200">
+				Go Home
 			</a>
 		</section>
 
@@ -72,64 +116,70 @@
 	
 	<!-- footer -->
 	<footer>
-		<div class="container grid" data-aos="fade-up">
-			<div>
+		<div class="container grid footerContainer" data-aos="fade-up">
+			<div class="badgeLeft">
 				<!-- your logo here -->
-				<a href="/">	
-					<img src="./imgs/logo.webp" alt="logo">
+				<a class="footermaskot" href="/">	
+					<img src="./imgs/maskot3.webp" alt="logo">
 				</a>
-				<p class="mb-2">Woof of Wallstreet is a degen launchpad and crypto lending platform, for the new crypto age.</p>
+				<p class="mb-2">Xeon Protocol - Universal ERC20 Hedging and Lending.</p>
 
 				<!-- social links -->
 				<ul class="inline-list">
 					<li>
-						<a href="#" target="_self">
-							<i class="icon-opensea"></i>
-						</a>
-					</li>
-					<li>
-						<a href="https://twitter.com/woofofwallstreet" target="_self">
+						<a href="https://twitter.com/neon_protocol" target="_self">
 							<i class="fa-brands fa-twitter"></i>
 						</a>
 					</li>
 					<li>
-						<a href="https://t.me/woofofwallstreet" target="_self">
+						<a href="https://t.me/neon_protocol" target="_self">
 							<i class="fa-solid fa-paper-plane"></i>
 						</a>
 					</li>
 				</ul>
 			</div>
 
-			<!-- links -->
+			<!-- read -->
 			<div>
-				<h3>Navigate</h3>
+				<h4>Read</h4>
 				<ul>
-					<li><a href="dashboard.html" title="coming soon">Dashboard</a></li>
+					<li><a href="https://neon-hedge.gitbook.io/xeon-protocol/" target="_blank">Documentation</a></li>
+					<li><a href="https://" target="_blank">Whitepaper</a></li>
+					<li><a href="https://" target="_blank">Medium</a></li>
+				</ul>
+			</div>
+
+			<!-- technical -->
+			<div>
+				<h4>Engineering</h4>
+				<ul><li><a href="https://github.com/neon_protocol/smartcontracts/" target="_blank">GitHub Repo</a></li>
+					<li><a href="https://etherscan.io/" target="_blank">Smart Contracts</a></li>
+					<li><a href="https://" target="_blank">Security Audits</a></li>
+				</ul>
+			</div>
+
+			<!-- income -->
+			<div>
+				<h4>Revenue Sharing</h4>
+				<ul>
+					<li><a href="https://" target="_blank">Protocol Fees</a></li>
+					<li><a href="https://" target="_blank">Ways to Earn</a></li>
+					<li><a href="https://" target="_blank">Miner Program</a></li>
 				</ul>
 			</div>
 
 			<!-- links -->
 			<div>
-				<h3>Links</h3>
+				<h4>Join Us</h4>
 				<ul>
-					<li><a href="#">Whitepaper</a></li>
-					<li><a href="#">DexTools</a></li>
-					<li><a href="#">Uniswap</a></li>
-				</ul>
-			</div>
-
-			<!-- links -->
-			<div>
-				<h3>Socials</h3>
-				<ul>
-					<li><a href="https://twitter.com/woofofwallstreet">Twitter</a></li>
-					<li><a href="https://t.me/woofofwallstreet">Telegram</a></li>
-					<li><a href="mailto:info@woofofwallstreet.com">Mail</a></li>
+					<li><a href="https://twitter.com/neon_protocol" target="_blank">X – App</a></li>
+					<li><a href="https://t.me/neon_protocol" target="_blank">Telegram</a></li>
+					<li><a href="mailto:info@neon_protocol.com">E-Mail</a></li>
 				</ul>
 			</div>
 
 			<!-- copyrights -->
-			<p>&copy; woof of wallstreet <span id="#thisYear"></span>. All Rights Reserved. 2023.</p>
+			<p>&copy; Xeon Protocol <span id="#thisYear"></span>. All Rights Reserved. 2023.</p>
 		</div>
 	</footer>
 	
@@ -203,8 +253,8 @@
 	</div>
 	
 	
-	<!-- scrool to top button -->
-	<button id="goTop" title="Scrool to top">
+	<!-- Scroll to top button -->
+	<button id="goTop" title="Scroll to top">
 		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 450"><path d="M168.5 164.2l148 146.8c4.7 4.7 4.7 12.3 0 17l-19.8 19.8c-4.7 4.7-12.3 4.7-17 0L160 229.3 40.3 347.8c-4.7 4.7-12.3 4.7-17 0L3.5 328c-4.7-4.7-4.7-12.3 0-17l148-146.8c4.7-4.7 12.3-4.7 17 0z"></path></svg>
 	</button>
 
