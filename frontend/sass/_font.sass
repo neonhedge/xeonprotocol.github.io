@@ -1,0 +1,60 @@
+body
+   font-family: $body-font
+   font-size: $xs
+   font-weight: 400
+   line-height: 1.6
+   color: $white
+
+h1, h2, h3
+   font-family: $heading-font
+   line-height: 1
+   color: $white
+   margin-bottom: $sm
+   font-weight: 900
+h1
+   font-size: calc(#{$xs} * 2.618)
+h2
+   font-size: calc(#{$xs} * 1.618)
+h3
+   font-size: 1.6rem
+   font-weight: 600
+   color: $secondary
+
+a
+   font-family: $heading-font
+   color: $primary
+   font-weight: 700
+   text-decoration: none
+   transition: all 1s ease-in
+   &:hover
+      text-decoration: underline
+
+input, textarea
+   font-family: $body-font
+   font-size: $xs
+
+button, a.btn
+   font-family: $heading-font
+   font-size: $xs
+   font-weight: 700
+   text-decoration: none
+   color: $white
+
+footer
+   font-size: $xs
+   font-weight: 500
+   line-height: 1.8
+   text-align: center
+   color: $white
+
+.txt-gradient
+   -webkit-text-fill-color: transparent
+   background: $gradient
+   -webkit-background-clip: text
+   display: inline-block
+
+.txt-center
+   text-align: center
+
+.upper
+   text-transform: uppercase

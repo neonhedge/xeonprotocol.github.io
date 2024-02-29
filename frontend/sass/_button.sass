@@ -1,0 +1,32 @@
+button, a.btn
+   background-color: transparent
+   border-radius: $br-btn
+   padding: .8rem 2.5rem
+   transition: background-color .8s, color .5s
+   cursor: pointer
+
+   &.btn-cta
+      background-color: $primary
+      &:hover
+         background-color: $white
+         color: $light-primary
+         
+   &.btn-border
+      border: .1rem solid $white
+      &:hover
+         background-color: $white
+         color: $primary
+
+   &#goTop
+      display: none
+      position: fixed
+      right: 1.8rem
+      bottom: 7rem
+      background: $gradient
+      padding: .2rem .6rem
+      @mixin shadow
+      z-index: 99
+      animation: fade ease 4s
+      svg
+         width: $xs
+         fill: $white

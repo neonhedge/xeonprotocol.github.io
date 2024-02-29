@@ -1,0 +1,46 @@
+.card
+   position: relative
+   border-radius: $br
+   padding: $xs
+   overflow: hidden
+   * > :last-child
+      margin-bottom: 0
+
+   img
+      transform: translateY(-4rem)
+
+   .card-overlay
+      position: absolute
+      inset: 0
+      top: unset
+      padding: $sm $xs
+      border-radius: $br 0 0 0
+      background: $gradient
+      transition: .35s ease-in-out
+      z-index: 1
+      &::before
+         content: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" fill="rgb(2, 192,202)"><path d="M 40 80 c 22 0 40 -22 40 -40 v 40 Z"></path></svg>')
+         position: absolute
+         bottom: 100%
+         right: 0
+         width: 70px
+         height: 70px
+  
+      h2
+         margin-bottom: 0
+      
+      > p:not(:last-child)
+         margin-bottom: $xs
+      i
+         font-size: calc(#{$xs} * 1.618)
+         color: $white
+
+         
+   @include tablet
+      img
+         transform: none
+
+      .card-overlay
+         transform: translateY(56%)
+         &:hover
+            transform: translateY(0)

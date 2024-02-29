@@ -1,0 +1,65 @@
+// colors
+$white: rgba(255,255,255,.9)
+$dark: #130228
+$dark-2: #091e31
+$primary: #d6188a
+$light-primary: #e34aa6
+$secondary: #02c0ca
+
+// gradients
+$gradient: linear-gradient(45deg, $primary, $secondary 80%)
+$gradient-sm: linear-gradient(150deg, $primary, $secondary 80%)
+$dark-gradient: linear-gradient(45deg, $dark 30%, $dark-2)
+$dark-gradient-inverse: linear-gradient(45deg, $dark-2, $dark 30%)
+
+// fonts family
+$body-font: 'Nunito Sans', sans-serif
+$heading-font: 'Space Grotesk', sans-serif
+
+// font size
+$fs: 1rem
+
+// logo width
+$w-logo: 12rem
+
+// logo width
+$xxs: .6rem
+$xs: 1.2rem
+$sm: 2rem
+$md: 4rem
+$lg: 6rem
+
+// border radius
+$br: 1.5rem
+$br-btn: 1.8rem
+
+// break point for @media queries
+$breakPoint: 55em
+
+
+// flex mix
+@mixin flex
+   display: flex
+   justify-content: center
+   align-items: center
+   flex-direction: column
+
+// box-shadow mix
+@mixin shadow
+   box-shadow: 0 .8rem 2rem rgba(37, 37, 45, .3)
+
+// rotate transformation mix
+@mixin rotateX-90
+   transform: rotateX(90deg)
+   transform-origin: top
+   transition: all .5s ease-in-out
+
+// @media queries for mobile
+@mixin only-mobile
+   @media (max-width: #{$breakPoint})
+      @content
+
+// @media queries for tablet and desktop
+@mixin tablet
+   @media (min-width: #{$breakPoint})
+      @content

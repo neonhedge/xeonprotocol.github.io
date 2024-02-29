@@ -1,0 +1,131 @@
+.container
+   max-width: 90rem
+   padding-inline: $xs
+
+// display
+.block
+   display: block
+
+.grid   
+   display: grid
+   grid-template-columns: 1fr
+   place-items: center
+   gap: $md
+
+.flex
+   display: flex
+   gap: $xs
+
+.gtm-sm-2
+   grid-template-columns: repeat(2, 1fr)
+
+.align-start
+   align-self: start
+   
+.g-1
+   gap: 1rem
+.g-2
+   gap: $sm
+
+.right
+   float: right
+
+.mx-w-25
+   max-width: 25rem
+
+// paddings & margins
+.p-0
+   padding: 0 !important
+.pb-0
+   padding-bottom: 0 !important
+    
+.mt-4
+   margin-top: $md
+.mt-6
+   margin-top: $lg
+
+.mb-1
+   margin-bottom: 1rem
+.mb-2
+   margin-bottom: $sm
+.mb-4
+   margin-bottom: $md
+
+// backgrounds
+.bg-primary
+   background: $primary
+.bg-primary-rgba
+   background: rgba( $primary, .6)
+
+.bg-secondary
+   background: $secondary
+.bg-secondary-rgba
+   background: rgba( $secondary, .6)
+
+// transforms
+.translateY-3
+   transform: translateY(3rem)
+.translateY--5
+   transform: translateY(-5rem)
+
+// custom icons
+.icon-opensea
+   content: url('../imgs/icon-opensea.png')
+   width: $sm
+
+// custom elements
+.space-vortex
+   position: relative
+   display: grid
+   place-items: center
+   width: 100%
+   aspect-ratio: 1
+   transition: 2s ease
+   &:hover
+      transform: scale(1.2)
+   &.vortex-sm
+      width: 50%
+   .arc
+      position: absolute
+      display: block
+      width: 85%
+      height: 85%
+      margin: 7.5%
+      border-radius: 50%
+      animation: 120s rotate linear infinite
+      &::before,
+      &::after
+         content: ''
+         position: absolute
+         top: -4px
+         left: -4px
+         display: block
+         width: 100%
+         height: 100%
+         border: .3rem solid transparent
+         border-color: $primary transparent transparent transparent
+         border-radius: 50%
+         z-index: -8
+      &::after
+         border-color: transparent transparent $secondary transparent
+
+
+@include tablet
+   .container
+      text-align: center
+      margin-inline: auto
+
+   .grid
+      grid-template-columns: repeat(2, 1fr)
+      
+   .gtc-3
+      grid-template-columns: repeat(3, 1fr)
+
+   .gtc-4
+      grid-template-columns: repeat(4, 1fr)
+
+   .gtc-6
+      grid-template-columns: repeat(6, 1fr)
+
+   .order-md-2
+      order: 2
