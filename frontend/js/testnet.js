@@ -9,7 +9,7 @@ import { buyTokens, sellTokens } from './claim-swap.js';
 async function pageModulesLoadingScript() {
   let continueLoad = false;
   try {
-      continueLoad = initializeConnection();
+      continueLoad = await initializeConnection();
   if (continueLoad) {
     return true;
   } else {
@@ -173,18 +173,53 @@ const slippagePercentage = 10; // Slippage percentage
 document.addEventListener('DOMContentLoaded', async function () {
   const claimButtons = document.querySelectorAll('.claimBtn');
 
+  claimButtons.forEach(function (button) {
+      button.addEventListener('click', async function () {
+          const tokenAddress = this.parentNode.querySelector('.token-address').textContent.trim();
+          await fireClaim(tokenAddress);
+      });
+  });
+});
+
+async function fireClaim(tokenAddress) {
   const scouter = await pageModulesLoadingScript();
 
   if(scouter){
-    claimButtons.forEach(function (button) {
-        button.addEventListener('click', async function () {
-            const tokenAddress = this.parentNode.querySelector('.token-address').textContent.trim();
-            await buyTokens(tokenAddress, amountInETH, slippagePercentage);
-        });
-    });
+    await buyTokens(tokenAddress, amountInETH, slippagePercentage);
   } else {
     // pops error swal
   }
+}
+
+
+/*---------------------------------------
+    BOTTOM OF EVERY MAIN SCRIPT MODULE 
+----------------------------------------*/
+// Provider Listeners
+ethereum.on("connect", (chainID) => {
+	CONSTANTS.chainID = chainID.chainId;
+	console.log("Connected to chain:", CONSTANTS.chainID);
+	handleNetworkChange(chainID.chainId)
+	chainCheck();
 });
 
+ethereum.on("accountsChanged", async (accounts) => {
+    console.log("Account changed:", accounts);
+	if(accounts.length > 0) {
+		handleAccountChange(accounts);
+		// Refresh accounts & page Feed
+		checkAndCallPageTries();
+	} else {
+		handleAccountChange(accounts);
+		// Refresh wallet widget directly, force wallet initialization check first		
+		window.currentAccount = null;
+		checkAndCallPageTries();
+	}
+});
+
+ethereum.on("chainChanged", (chainID) => {
+	console.log("Network changed:", chainID);
+	handleNetworkChange(chainID);
+	window.location.reload();
+});
 
