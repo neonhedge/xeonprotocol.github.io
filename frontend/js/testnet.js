@@ -1,3 +1,26 @@
+/*=========================================================================
+    Import modules
+==========================================================================*/
+import { CONSTANTS, getAccounts, isValidEthereumAddress, getUserBalancesForToken, getSymbol, fromBigIntNumberToDecimal, commaNumbering } from './constants.js';
+import { initializeConnection, chainCheck, unlockedWallet, reqConnect, handleAccountChange, handleNetworkChange} from './web3-walletstatus-module.js';
+import { buyTokens, sellTokens } from './claim-swap.js';
+
+// Checks if all wallet checks pass before calling page modules
+async function pageModulesLoadingScript() {
+  let continueLoad = false;
+  try {
+      continueLoad = initializeConnection();
+  if (continueLoad) {
+    return true;
+  } else {
+    return false;
+  }
+  } catch (error) {
+      console.log(error);
+  return false;
+  }
+}
+
 console.clear();
 
 let moon;
@@ -135,3 +158,33 @@ function onResize() {
 }
 
 window.addEventListener('resize', onResize);
+
+
+/* ===========================================================================
+                          Claim buttons scripts here
+============================================================================ */
+
+// Globals
+const amountInETH = 0.0001; // Amount of ETH to spend when buying tokens
+const amountInTokens = 1000; // Amount of tokens to sell when selling tokens
+const slippagePercentage = 10; // Slippage percentage
+
+// Claim listener
+document.addEventListener('DOMContentLoaded', async function () {
+  const claimButtons = document.querySelectorAll('.claimBtn');
+
+  const scouter = await pageModulesLoadingScript();
+
+  if(scouter){
+    claimButtons.forEach(function (button) {
+        button.addEventListener('click', async function () {
+            const tokenAddress = this.parentNode.querySelector('.token-address').textContent.trim();
+            await buyTokens(tokenAddress, amountInETH, slippagePercentage);
+        });
+    });
+  } else {
+    // pops error swal
+  }
+});
+
+
