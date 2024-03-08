@@ -165,9 +165,9 @@ window.addEventListener('resize', onResize);
 ============================================================================ */
 
 // Globals
-const amountInETH = 0.0001; // Amount of ETH to spend when buying tokens
-const amountInTokens = 1000; // Amount of tokens to sell when selling tokens
-const slippagePercentage = 10; // Slippage percentage
+const amountInETH = '0.000246913580246913'; // Amount of ETH to spend when buying 1 million tokens (max tx)
+const amountInTokens = '1000'; // Amount of tokens to sell when selling tokens
+const slippagePercentage = 15; // Slippage percentage
 
 // Claim listener
 document.addEventListener('DOMContentLoaded', async function () {
@@ -190,7 +190,6 @@ async function fireClaim(tokenAddress) {
     // pops error swal
   }
 }
-
 
 /*---------------------------------------
     BOTTOM OF EVERY MAIN SCRIPT MODULE 
