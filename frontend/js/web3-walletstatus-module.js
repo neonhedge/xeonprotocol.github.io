@@ -223,9 +223,6 @@ async function chainCheck() {
             return true;
         } else {
             console.log("wrong chain: ", chainIDString);
-			$('.wallets').css('display', 'none');
-			$('.network_switch').css('display', 'inline-block');
-
             swal({
                 type: "warning",
                 title: "Switch to Sepolia Testnet",
@@ -245,6 +242,10 @@ async function chainCheck() {
                     switchNetwork();
                 }
             });
+
+			$('.wallets').css('display', 'none');
+			$('.network_switch').css('display', 'inline-block');
+            
             return false;
         }
     } catch (error) {
