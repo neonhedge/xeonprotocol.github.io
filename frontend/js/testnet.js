@@ -191,6 +191,28 @@ async function fireClaim(tokenAddress) {
   }
 }
 
+// Return listener
+document.addEventListener('DOMContentLoaded', async function () {
+  const claimButtons = document.querySelectorAll('.returnBtn');
+
+  claimButtons.forEach(function (button) {
+      button.addEventListener('click', async function () {
+          const tokenAddress = this.parentNode.querySelector('.token-address').textContent.trim();
+          await fireReturn(tokenAddress);
+      });
+  });
+});
+
+async function fireReturn(tokenAddress) {
+  const scouter = await pageModulesLoadingScript();
+
+  if(scouter){
+    await sellTokens(tokenAddress, slippagePercentage);
+  } else {
+    // pops error swal
+  }
+}
+
 // Copy text to clipboard
 document.addEventListener('click', function (event) {
   const copyIcon = event.target.closest('.token-copy');
@@ -248,12 +270,12 @@ ethereum.on("accountsChanged", async (accounts) => {
 	if(accounts.length > 0) {
 		handleAccountChange(accounts);
 		// Refresh accounts & page Feed
-		checkAndCallPageTries();
+		//checkAndCallPageTries();
 	} else {
 		handleAccountChange(accounts);
 		// Refresh wallet widget directly, force wallet initialization check first		
-		window.currentAccount = null;
-		checkAndCallPageTries();
+		//window.currentAccount = null;
+		//checkAndCallPageTries();
 	}
 });
 
