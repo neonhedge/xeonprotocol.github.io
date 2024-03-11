@@ -5,6 +5,11 @@ body {
     background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.8)), url('../imgs/banner-bg.webp') !important;
     font-family: "Space Grotesk", monospace, sans-serif !important;
 }
+.neon-blue {
+    text-shadow: 0 0 2px #188dd6, 0 0 3px #188dd6, 0 0 15px #188dd6, 0 0 15px #188dd6, 0 0 3px #188dd6, 3px 3px 0.5px #0e567c !important;  
+    color: #92f1fc !important;
+    color: #08e7fe !important;/* darker */
+}
 header {
     border-bottom: 0.5px solid #15213c !important;
     padding-block: 0.5rem;

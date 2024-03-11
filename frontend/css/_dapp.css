@@ -8,6 +8,11 @@ body {
     background-size: cover !important;
     font-family: "Space Grotesk", monospace, sans-serif !important;
 }
+.neon-blue {
+  text-shadow: 0 0 2px #188dd6, 0 0 3px #188dd6, 0 0 15px #188dd6, 0 0 15px #188dd6, 0 0 3px #188dd6, 3px 3px 0.5px #0e567c !important;  
+  color: #92f1fc !important;
+  color: #08e7fe !important;/* darker */
+}
 header {
     border-bottom: 0.5px solid #15213c !important;
     padding-block: 0.5rem;
@@ -304,8 +309,8 @@ p {
     font-family: "Space Grotesk", sans-serif;
     transition: 0.5s;
 }
-.devstatus {
-
+.devstatus p{
+  font-size: 1rem;
 }
 
 @keyframes hideDiv {
@@ -642,5 +647,17 @@ p {
     float: left;
     width: auto;
     line-height: 24px;
+  }
+  
+
+  /* Dapp Development Status */
+  .twitter-widget {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  
+  .twitter-widget a {
+    display: block;
   }
   

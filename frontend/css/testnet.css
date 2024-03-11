@@ -10,13 +10,22 @@ body {
     scroll-behavior: smooth;
     font-family: "Space Grotesk", monospace, sans-serif !important;
 }
+
+.neon-blue {
+  text-shadow: 0 0 2px #188dd6, 0 0 3px #188dd6, 0 0 15px #188dd6, 0 0 15px #188dd6, 0 0 3px #188dd6, 3px 3px 0.5px #0e567c !important;  
+  color: #92f1fc !important;
+  color: #08e7fe !important;/* darker */
+}
+
 header {
     border-bottom: 0.5px solid #15213c !important;
     padding-block: 0.5rem;
 }
+
 footer {
     background: unset !important;
 }
+
 main {
     position: relative;
     min-height: 50rem;
@@ -33,12 +42,14 @@ main {
 
     font-family: "Space Grotesk", monospace, sans-serif;
 }
+
 .testnetH {
     letter-spacing: 0.2vw !important;
     font-size: clamp(26px, 5vw, 40px);
     font-family: Raleway,monospace, sans-serif, "Helvetica Neue", Helvetica, "Liberation Sans" !important;
     font-weight: 100;
 }
+
 #testnetWelcome {
     position: relative;
     width: 100%;
@@ -720,9 +731,11 @@ svg.cityscape {
 }
 
 .token-copy {
-	width:14px;
+	width: 14px;
     font-size: 14px;
     white-space: nowrap;
+    cursor: pointer;
+    z-index: 1;
 }
 
 .copy-icon {
@@ -761,6 +774,23 @@ svg.cityscape {
   transition: all 0.5s ease;
 }
 
+.returnBtn {
+  margin-left: 10px;
+  border: 0.5px dashed rgb(214, 24, 138) !important;
+  border-radius: 8px;
+  background-color: rgba(29,78,216,.2) !important;
+  background-color: #071432 !important;
+  font-weight: 500;
+  font-size: clamp(14px, 1vw, 15px);
+}
+
+.returnBtn:hover {
+  background-color: rgba(3, 19, 62, 0.5) !important;
+  background-color: #09001d !important;
+  transition: all 0.5s ease;
+  color: #ff15ff;
+}
+
 .token-pair {
 	width: 50px;
   color: #FFF;
@@ -787,7 +817,7 @@ svg.cityscape {
 	.token-pair {
 		text-align: center;
 	}
-  .claimBtn {
+  .claimBtn, .returnBtn {
     padding:0.2rem 0.5rem;
   }
 }
