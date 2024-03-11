@@ -191,6 +191,47 @@ async function fireClaim(tokenAddress) {
   }
 }
 
+// Copy text to clipboard
+document.addEventListener('click', function (event) {
+  const copyIcon = event.target.closest('.token-copy');
+
+  if (copyIcon) {
+      const nearestParent = copyIcon.closest('.token-info');
+      const textToCopyElement = nearestParent.querySelector('.text-to-copy');
+
+      if (textToCopyElement) {
+          const textToCopy = textToCopyElement.innerText.trim();
+
+          // Create a temporary input element
+          const tempInput = document.createElement('textarea');
+          tempInput.value = textToCopy;
+          document.body.appendChild(tempInput);
+
+          // Select and copy the text
+          tempInput.select();
+          document.execCommand('copy');
+
+          // Remove the temporary input element
+          document.body.removeChild(tempInput);
+
+          swal ({
+              title: 'Copied!',
+              text: 'Address copied to clipboard.',
+              type: 'success',
+              html: false,
+              dangerMode: false,
+              showConfirmButton: false,
+              showCancelButton: false,
+              animation: "Pop",
+              allowOutsideClick: true,
+              timer: 2000,
+          })
+      } else {
+          console.error('No text-to-copy element found.');
+      }
+  }
+});
+
 /*---------------------------------------
     BOTTOM OF EVERY MAIN SCRIPT MODULE 
 ----------------------------------------*/
