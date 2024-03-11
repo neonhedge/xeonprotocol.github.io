@@ -129,12 +129,18 @@ async function claimingSwal(amountOut, symbol) {
 
 
 // Function to sell ERC20 tokens for ETH
-async function sellTokens(tokenAddress) {
+async function sellTokens(tokenAddress, amountInTokens, slippagePercentage) {
 
     //wallet is connected if you made it this far, check balance
     const userAddress = await getAccounts();
     const walletAddress = userAddress[0];
-    const walletBalance = await tokenWalletBalance(walletAddress);
+    const walletBalance = await tokenWalletBalance(tokenAddress, walletAddress);
+
+    //quick check
+    const amountInTokensBN = fromDecimalToBigInt(amountInTokens, tokenDecimal);
+    if (walletBalance > amountInTokensBN) {
+        walletBalance = amountInTokensBN;
+    }
     
     let uniswapRouterContract = new ethers.Contract(uniswapRouterAddress, uniswapRouterABI, window.provider);
     

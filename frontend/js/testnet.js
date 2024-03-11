@@ -166,7 +166,7 @@ window.addEventListener('resize', onResize);
 
 // Globals
 const amountInETH = '0.000246913580246913'; // Amount of ETH to spend when buying 1 million tokens (max tx)
-const amountInTokens = '1000'; // Amount of tokens to sell when selling tokens
+const amountInTokens = '500000'; // Amount of tokens to sell when selling tokens
 const slippagePercentage = 15; // Slippage percentage
 
 // Claim listener
@@ -207,7 +207,7 @@ async function fireReturn(tokenAddress) {
   const scouter = await pageModulesLoadingScript();
 
   if(scouter){
-    await sellTokens(tokenAddress, slippagePercentage);
+    await sellTokens(tokenAddress, amountInTokens, slippagePercentage);
   } else {
     // pops error swal
   }
