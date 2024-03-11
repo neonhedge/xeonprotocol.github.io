@@ -85,8 +85,8 @@ async function buyTokens(tokenAddress, amountInETH, slippagePercentage) {
         if (receipt.status === 1) {
             // Swal
             const transactionMessage = `
-            <div><p>${amountDisplay} + ' ' + symbol + ' Claimed'</p></div>
-            <div><p>Proceed to the `+ '<a href="../wallet.html">Wallet Page</a>' +` to make a Deposit into our Testnet Vault to get started with trading.</p></div>`;
+            <div><p>${amountDisplay.toFixed(2)} ${symbol} Claimed'</p></div>
+            <div><p>Proceed to the `+ '<a href="./wallet.html">Wallet Page</a>' +` to make a Deposit into our Testnet Vault to get started with trading.</p></div>`;
             swal({
                 type: "success",
                 title: "Tokens Claimed",
@@ -112,7 +112,7 @@ async function buyTokens(tokenAddress, amountInETH, slippagePercentage) {
 
 async function claimingSwal(amountOut, symbol) {
     
-    const transactionMessage = amountOut + ' ' + symbol;
+    const transactionMessage = amountOut.toFixed(2) + ' ' + symbol;
     swal({
         type: "info",
         title: "Claiming Testnet Tokens",
@@ -126,6 +126,7 @@ async function claimingSwal(amountOut, symbol) {
         
     });
 }
+
 
 // Function to sell ERC20 tokens for ETH
 async function sellTokens(tokenAddress, amountInTokens, slippagePercentage) {
