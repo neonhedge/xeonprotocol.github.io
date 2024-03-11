@@ -1,7 +1,7 @@
 /*=========================================================================
     Import modules
 ==========================================================================*/
-import { CONSTANTS, getUserBalancesForToken, truncateAddress, isValidEthereumAddress, cardCommaFormat, fromBigIntNumberToDecimal, fromDecimalToBigInt, getAccounts, getTokenDecimalSymbolName, getSymbol, getTokenDecimals } from './constants.js';
+import { CONSTANTS, getUserBalancesForToken, getTokenETHValue, truncateAddress, isValidEthereumAddress, cardCommaFormat, fromBigIntNumberToDecimal, fromDecimalToBigInt, getAccounts, getTokenDecimalSymbolName, getSymbol, getTokenDecimals } from './constants.js';
 import { initializeConnection } from './web3-walletstatus-module.js';
 
 /*======================================================
@@ -61,6 +61,9 @@ async function createForm() {
 		<label id="strikeLabel" class="labels"><img src="imgs/info.png" title="strike price of the underlying tokens in paired currency">strike price:</label>
 		<input id="strikePrice" class="sweetInput shldi benown" type="number" step="any" aria-invalid="false" autocomplete="break even value for the trade">
 		<br>
+        <div id="tokenAmountValueDiv" class="swal-button-container" style="display:none;">
+            <span class="tokenAmountValue" title="value of tokens in deal. your premium or cost should be a fraction of this value. eg 10% of value">Token Value: </span><span id="tokenAmountValue"></span>
+        </div>
 		<div class="walletBalancesTL">
 		  <p>paste token address above & view your balances: </p>
 		  <span class="walletbalanceSpan">${truncatedUser} <img src="imgs/info.png" title="protocol balances on connected wallet"></span></br>
@@ -114,6 +117,42 @@ async function createForm() {
             swal.close();
         }
 	});
+
+    // Listen to form fields
+    // Token amount valuator listener
+    document.getElementById('tokenAmount').addEventListener('input', async (event) => {
+
+        const tokenAddress = document.getElementById('tokenAddy').value.trim();
+        const tokenAmount = event.target.value.trim();
+
+        if (isNaN(tokenAmount) || parseFloat(tokenAmount) < 0) {
+            alert('Please enter a valid amount.');
+            return;
+        }
+        
+        if (!isValidEthereumAddress(tokenAddress)) {
+            alert('Please enter a valid ERC20 token address.');
+            return;
+        }
+        // prep
+        const tokenDecimals = await getTokenDecimals(tokenAddress);
+        const tokenAmountBN = fromDecimalToBigInt(tokenAmount, tokenDecimals);
+        try {
+            const [tokensPairedValue, pairedSymbol] = await getTokenETHValue(tokenAddress, tokenAmountBN); //input in wei, output already formated
+
+            // Display value in the HTML form
+            const displayBalance = cardCommaFormat(tokensPairedValue);
+            const tokenAmountValueDiv = document.getElementById("tokenAmountValueDiv");
+            const tokenAmountValue = document.getElementById("tokenAmountValue");
+
+            // show div and display value 
+            tokenAmountValueDiv.style.display = "block";
+            tokenAmountValue.innerHTML = displayBalance + " " + pairedSymbol;
+
+        } catch (error) {
+            console.error("Error processing wallet address:", error);
+        }
+    });
 }
 
 async function submitWriting(hedgeType, tokenAddress, tokenAmount, premium, strikePrice) {

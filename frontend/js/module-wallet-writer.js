@@ -1,7 +1,7 @@
 /*=========================================================================
     Import modules
 ==========================================================================*/
-import { CONSTANTS, getUserBalancesForToken, truncateAddress, fromBigIntNumberToDecimal, fromDecimalToBigInt, getAccounts, getTokenDecimalSymbolName, getSymbol, getTokenDecimals } from './constants.js';
+import { CONSTANTS, getUserBalancesForToken, truncateAddress, fromBigIntNumberToDecimal, fromDecimalToBigInt, getAccounts, getTokenDecimalSymbolName, getSymbol, getTokenDecimals, tokenWalletBalance } from './constants.js';
 import { initializeConnection } from './web3-walletstatus-module.js';
 
 /*======================================================
@@ -64,7 +64,7 @@ async function approvalDepositInterface(tokenAmount, tokenAddress) {
     };
 
     // token balance check
-    const walletBalanceRaw = await neonInstance.balanceOf(walletAddress);
+    const walletBalanceRaw = await tokenWalletBalance(tokenAddress, walletAddress);
     const walletBalance = fromBigIntNumberToDecimal(walletBalanceRaw, decimals);
     const tokenAmountString = formatStringDecimal(tokenAmount);
     const walletBalanceString = formatStringDecimal(walletBalance);
