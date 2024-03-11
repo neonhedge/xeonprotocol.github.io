@@ -467,22 +467,23 @@ svg {
   }
   .sol {
 	position: absolute;
-	width: 7.5vw;  /* Converted from 90px to vw */
-	height: 7.5vw;  /* Converted from 90px to vw */
+	width: 7.5vw;  
+	height: 7.5vw; 
 	border-radius: 100%;
 	border: 0.2vw solid rgba(248, 241, 75, 0.5);
 	border-color: rgba(248, 241, 75, 1);
-	box-shadow: 0 0 3.8vw 0.3vw rgba(248, 241, 75, 0.3);  /* Converted from 30px to vw */
-	margin: 2vw 5vw;  /* Converted from 50px 210.156vw to vw */
+	box-shadow: 0 0 3.8vw 0.3vw rgba(248, 241, 75, 0.3); 
+	margin: 2vw 5vw; 
+	background-color: rgba(248, 241, 75, 1);
   }
   .casa {
 	position: absolute;
-	width: 12.6vw;  /* Converted from 150.156vw to vw */
-	height: 11vw;  /* Converted from 130.156vw to vw */
-	margin: 20vw 5vw;  /* Converted from 310.156vw 281px to vw */
+	width: 12.6vw; 
+	height: 11vw;  
+	margin: 20vw 5vw;  
 	border: 0.2vw solid rgba(251, 94, 55, 0.5);
 	border-color: rgba(251, 94, 55, 1);
-	box-shadow: 0 0 3vw 0.3vw rgba(251, 94, 55, 0.5);  /* Converted from 21px to vw */
+	box-shadow: 0 0 3vw 0.3vw rgba(251, 94, 55, 0.5); 
   }
   .casa::before {
 	content: "";
@@ -699,6 +700,7 @@ svg {
 	-webkit-box-shadow: 0 0 12px 3px rgba(255, 21, 255, 0.3);
 	-moz-box-shadow: 0 0 12px 3px rgba(255, 21, 255, 0.3);
 	margin: 11vw 35vw;
+	background-color: rgba(255, 21, 255, 1);
   }
   .chi::before {
 	content: "";
@@ -711,6 +713,7 @@ svg {
 	-webkit-box-shadow: 0 0 21px 3px rgba(255, 21, 255, 0.3);
 	-moz-box-shadow: 0 0 21px 3px rgba(255, 21, 255, 0.3);
 	margin: -0.8vw -7px;
+	background-color: rgba(255, 21, 255, 1);
   }
   
   .hu {
@@ -968,6 +971,7 @@ svg {
 	-webkit-box-shadow: 0 0 12px 3px rgba(162, 228, 0, 0.3);
 	-moz-box-shadow: 0 0 12px 3px rgba(162, 228, 0, 0.3);
 	margin: -2.2vw -1.1vw;
+	background-color: rgba(0, 247, 152, 1);
   }
   
   .arboles3 {
@@ -993,6 +997,7 @@ svg {
 	-webkit-box-shadow: 0 0 12px 3px rgba(162, 228, 0, 0.3);
 	-moz-box-shadow: 0 0 12px 3px rgba(162, 228, 0, 0.3);
 	margin: -2.2vw -1.1vw;
+	background-color: rgba(0, 247, 152, 1);
   }
   
   @-webkit-keyframes huu {
