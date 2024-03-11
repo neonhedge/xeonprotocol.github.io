@@ -675,7 +675,8 @@ function tokenDepositedMessage(transactionHash) {
         <div class="interfaceWindow">  
             <div class="approvalInfo">
                 <p>
-                    <span class="txInfoHead txInfoSymbol"> view transaction... <a href="https://sepolia.etherscan.io/tx/${transactionHash}" target="_blank"><i class="fa fa-external-link"></i></a> </span>
+                <span class="txInfoHead txInfoSymbol"> view transaction... <a href="https://sepolia.etherscan.io/tx/${transactionHash}" target="_blank"><i class="fa fa-external-link"></i></a> </span>
+                <span class="txInfoHead txInfoSymbol"> trade on silkroad... <a href="./silkroad.html" target="_blank"><i class="fa fa-external-link"></i></a> </span>
                 </p>
             </div>
         </div>`;

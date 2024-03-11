@@ -2,7 +2,51 @@
     Import modules
 ==========================================================================*/
 import { CONSTANTS, getUserBalancesForToken, getTokenETHValue, truncateAddress, isValidEthereumAddress, cardCommaFormat, fromBigIntNumberToDecimal, fromDecimalToBigInt, getAccounts, getTokenDecimalSymbolName, getSymbol, getTokenDecimals } from './constants.js';
+import { loadOptions } from './module-market-card-fetchers.js';
 import { initializeConnection } from './web3-walletstatus-module.js';
+
+//==============================================================
+// Validity Checkers
+//==============================================================
+function isValidInput(hedgeType, tokenAddress, tokenAmount, premium, strikePrice) {
+    if (isNaN(tokenAmount) || parseFloat(tokenAmount) <= 0) {
+        showInvalidInputMessage('Invalid token amount. Please enter an amount greater than 0.');
+        return false;
+    }
+
+    if (!tokenAddress || !isValidEthereumAddress(tokenAddress)) {
+        showInvalidInputMessage('Invalid ERC20 token address. Please enter a valid address.');
+        return false;
+    }
+
+    if (isNaN(premium) || parseFloat(premium) <= 0) {
+        showInvalidInputMessage('Invalid premium. Please enter a premium greater than 0.');
+        return false;
+    }
+
+    if (isNaN(strikePrice) || parseFloat(strikePrice) <= 0) {
+        showInvalidInputMessage('Invalid strike price. Please enter a strike price greater than 0.');
+        return false;
+    }
+
+    return true;
+}
+
+function showInvalidInputMessage(message) {
+    swal({
+        title: 'Invalid Tx Inputs...',
+        text: message,
+        type: 'info',
+        html: false,
+        dangerMode: false,
+        confirmButtonText: 'Okay',
+        showConfirmButton: true,
+        showCancelButton: false,
+        animation: 'Pop',
+    }, function () {
+        console.log('Invalid input...');
+    });
+}
 
 /*======================================================
     WRITE FUNCTION CALLS for the silkraod module
@@ -62,7 +106,7 @@ async function createForm() {
 		<input id="strikePrice" class="sweetInput shldi benown" type="number" step="any" aria-invalid="false" autocomplete="break even value for the trade">
 		<br>
         <div id="tokenAmountValueDiv" class="swal-button-container" style="display:none;">
-            <span class="tokenAmountValue" title="value of tokens in deal. your premium or cost should be a fraction of this value. eg 10% of value">Token Value: </span><span id="tokenAmountValue"></span>
+            <span class="tokenAmountValue">Token Value: </span><span id="tokenAmountValue" title="value of tokens in deal. your premium or cost should be a fraction of this value. eg 10% of value"></span>
         </div>
 		<div class="walletBalancesTL">
 		  <p>paste token address above & view your balances: </p>
@@ -210,6 +254,7 @@ async function submitWriting(hedgeType, tokenAddress, tokenAmount, premium, stri
         if (receipt.status === 1) {
             console.log('Transaction hash:', receipt.transactionHash);
             handleTransactionSuccess(receipt.transactionHash); 
+            loadOptions(MyGlobals.startIndex, window.readLimit);
         } else {
             console.log('Transaction failed. Receipt status:', receipt.status);
             handleTransactionFailure(receipt.status); 

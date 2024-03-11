@@ -356,50 +356,8 @@ async function fetchUserTokenBalance(tokenAddress) {
 }
 
 //==============================================================
-// Validity Checkers
+// DEPRECATED
 //==============================================================
-
-function isValidInput(hedgeType, tokenAddress, tokenAmount, premium, strikePrice) {
-    if (isNaN(tokenAmount) || parseFloat(tokenAmount) <= 0) {
-        showInvalidInputMessage('Invalid token amount. Please enter an amount greater than 0.');
-        return false;
-    }
-
-    if (!tokenAddress || !isValidEthereumAddress(tokenAddress)) {
-        showInvalidInputMessage('Invalid ERC20 token address. Please enter a valid address.');
-        return false;
-    }
-
-    if (isNaN(premium) || parseFloat(premium) <= 0) {
-        showInvalidInputMessage('Invalid premium. Please enter a premium greater than 0.');
-        return false;
-    }
-
-    if (isNaN(strikePrice) || parseFloat(strikePrice) <= 0) {
-        showInvalidInputMessage('Invalid strike price. Please enter a strike price greater than 0.');
-        return false;
-    }
-
-    return true;
-}
-
-function showInvalidInputMessage(message) {
-    swal({
-        title: 'Invalid Tx Inputs...',
-        text: message,
-        type: 'info',
-        html: false,
-        dangerMode: false,
-        confirmButtonText: 'Okay',
-        showConfirmButton: true,
-        showCancelButton: false,
-        animation: 'Pop',
-    }, function () {
-        console.log('Invalid input...');
-    });
-}
-
-
 
 // Listen to live events
 // Eg: HEDGE created - to be used for live transactions on sidebar
