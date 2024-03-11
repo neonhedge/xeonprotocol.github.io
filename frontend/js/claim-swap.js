@@ -1,5 +1,5 @@
 
-import { fromBigIntNumberToDecimal, fromDecimalToBigInt, getAccounts, getTokenDecimalSymbolName, tokenWalletBalance } from './constants.js';
+import { fromBigIntNumberToDecimal, fromDecimalToBigInt, getAccounts, getTokenDecimalSymbolName, getTokenDecimals, tokenWalletBalance } from './constants.js';
 
 
 // Uniswap V2 Router address, Sepolia testnet
@@ -35,8 +35,8 @@ async function estimateOutputAmount(inputAmount, inputTokenAddress, outputTokenA
     const amountsOut = await uniswapRouterContract.getAmountsOut(inputAmount, path);
     const amountConsole1 = parseInt(amountsOut[1], 16).toString();
     const amountConsole0 = parseInt(amountsOut[0], 16).toString();
-    console.log('amount console1',amountConsole1);
-    console.log('amount console0',amountConsole0);
+    //console.log('amount console1',amountConsole1);
+    //console.log('amount console0',amountConsole0);
     return amountsOut[1];
 }
 
@@ -130,36 +130,132 @@ async function claimingSwal(amountOut, symbol) {
 
 // Function to sell ERC20 tokens for ETH
 async function sellTokens(tokenAddress, amountInTokens, slippagePercentage) {
+    try {
+        //wallet is connected if you made it this far, check balance
+        const userAddress = await getAccounts();
+        const walletAddress = userAddress[0];
+        const walletBalance = await tokenWalletBalance(tokenAddress, walletAddress);
 
-    //wallet is connected if you made it this far, check balance
-    const userAddress = await getAccounts();
-    const walletAddress = userAddress[0];
-    const walletBalance = await tokenWalletBalance(tokenAddress, walletAddress);
+        //quick check    
+        const [, tokenDecimal, symbol] = await getTokenDecimalSymbolName(tokenAddress);
+        const amountInTokensBN = fromDecimalToBigInt(amountInTokens, tokenDecimal);
+        let amountIn = walletBalance;
+        if (walletBalance > amountInTokensBN) {
+            amountIn = amountInTokensBN;
+        }
+        // Approve tokens
+        const allowance = await tokenAllowance(tokenAddress, walletAddress, uniswapRouterAddress);
+        if (allowance < amountIn) {
+            await approveTokens(tokenAddress, amountIn);
+        }
 
-    //quick check
-    const amountInTokensBN = fromDecimalToBigInt(amountInTokens, tokenDecimal);
-    if (walletBalance > amountInTokensBN) {
-        walletBalance = amountInTokensBN;
+        let uniswapRouterContract = new ethers.Contract(uniswapRouterAddress, uniswapRouterABI, window.provider);
+        const path = [tokenAddress, wethAddress]; // Token to ETH
+        const deadline = Math.floor(Date.now() / 1000) + 60 * 20; // 20 minutes from now
+
+        // throw swal
+        const amountDisplay = fromBigIntNumberToDecimal(amountIn, tokenDecimal);
+        sellingSwal(amountDisplay, symbol);
+
+        const signer = provider.getSigner();
+        const tx = await uniswapRouterContract.connect(signer).swapExactTokensForETHSupportingFeeOnTransferTokens(
+            amountIn,
+            0,
+            path,
+            walletAddress,
+            deadline
+        );
+
+        // Wait for the transaction to be mined
+        const receipt = await tx.wait();
+
+        if (receipt.status === 1) {
+            // Swal
+            const transactionMessage = `
+            <div><p>${amountDisplay.toFixed(2)} ${symbol} Returned'</p></div>
+            <div><p>Thank you for keeping the testnet LPs healthy!</p></div>`;
+            swal({
+                type: "success",
+                title: "Tokens Returned",
+                text: transactionMessage,
+                html: true,
+                showCancelButton: false,
+                confirmButtonColor: "#04C86C",
+                confirmButtonText: "Done!",
+                closeOnConfirm: true
+            }, async function (isConfirm) {
+                
+            });
+        } else {
+            // Transaction failed
+            console.log('Return failed. Receipt status: ' + receipt.status);
+            swal({ title: "Failed to Return.", type: "error", allowOutsideClick: true, confirmButtonColor: "#F27474", text: "Receipt status: " + receipt.status });
+        }    
+    } catch (error) {
+        console.error('Error:', error.message);
+        swal({ title: "Failed to Return.", type: "error", allowOutsideClick: true, confirmButtonColor: "#F27474", text: "Receipt status: " + error.message });
     }
     
-    let uniswapRouterContract = new ethers.Contract(uniswapRouterAddress, uniswapRouterABI, window.provider);
-    
-    const amountIn = walletBalance;
-    const adjustedAmountOutMin = await calculateAdjustedAmountOutMin(amountIn, tokenAddress, wethAddress, slippagePercentage);
-    const path = [tokenAddress, deadAddress]; // Token to ETH
-    const deadline = Math.floor(Date.now() / 1000) + 60 * 20; // 20 minutes from now
-
-    const signer = provider.getSigner();
-    const tx = await uniswapRouterContract.connect(signer).swapExactTokensForETHSupportingFeeOnTransferTokens(
-        amountIn,
-        adjustedAmountOutMin,
-        path,
-        walletAddress,
-        deadline
-    );
-
-    await tx.wait();
-    console.log('Tokens sold successfully.');
 }
 
+const erc20ABI = [
+    {"constant":true,"inputs":[{"name":"_owner","type":"address"}],"name":"balanceOf","outputs":[{"name":"balance","type":"uint256"}],"type":"function"},
+    {"constant":false,"inputs":[{"name":"_spender","type":"address"},{"name":"_value","type":"uint256"}],"name":"approve","outputs":[{"name":"success","type":"bool"}],"type":"function"},
+    {"constant":true,"inputs":[{"name":"_owner","type":"address"},{"name":"_spender","type":"address"}],"name":"allowance","outputs":[{"name":"remaining","type":"uint256"}],"type":"function"}
+];
+
+async function tokenAllowance(tokenAddress, ownerAddress, spenderAddress) {
+    try {
+        // Get the signer
+        const signer = provider.getSigner();
+        
+        // Load ERC20 token contract
+        const tokenContract = new ethers.Contract(tokenAddress, erc20ABI, signer);
+        
+        // Fetch allowance
+        const allowance = await tokenContract.allowance(ownerAddress, spenderAddress);
+        
+        return allowance;
+    } catch (error) {
+        console.error('Error fetching allowance:', error);
+        return 0; // Return 0 in case of error
+    }
+}
+
+async function approveTokens(tokenAddress, amount) {
+    try {
+        // Get the signer
+        const signer = provider.getSigner();
+        
+        // Load ERC20 token contract
+        const tokenContract = new ethers.Contract(tokenAddress, erc20ABI, signer);
+        
+        // Approve tokens for spending
+        const tx = await tokenContract.approve(uniswapRouterAddress, amount);
+        
+        // Wait for transaction confirmation
+        await tx.wait();
+        
+        console.log('Tokens approved successfully.');
+    } catch (error) {
+        console.error('Error approving tokens:', error);
+    }
+}
+
+async function sellingSwal(amountOut, symbol) {
+    
+    const transactionMessage = amountOut.toFixed(2) + ' ' + symbol;
+    swal({
+        type: "info",
+        title: "Returning Testnet Tokens",
+        text: transactionMessage,
+        html: true,
+        showCancelButton: false,
+        confirmButtonColor: "#04C86C",
+        confirmButtonText: "Confirm",
+        closeOnConfirm: true
+    }, async function (isConfirm) {
+        
+    });
+}
 export { buyTokens, sellTokens };
