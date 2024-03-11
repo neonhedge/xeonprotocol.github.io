@@ -376,9 +376,22 @@ async function loadOptions(){
 			noOptionsSwal();
 		}
 	}
-	
-	//LOANS
+	/*===================================================================================================
 
+	====================================================================================================*/
+	// ERC20 LOANS
+	if (window.nav === 3 && window.filters === 1) { // Get vacant loans, exclude taken
+		comingSoonSwal();		
+	}
+	// ERC20 LOANS, MY POSITIONS
+	if (window.nav === 3 && window.filters === 2) { // Get my positions; mix of taken and created
+		comingSoonSwal();	
+	}
+	//BOOKMARKED EQUITY SWAPS
+	if(window.nav === 3 && window.filters === 3){//get my bookmarks
+		comingSoonSwal();
+	}
+	
 	//SOCIAL TWITTER FEED #neonhedge
 	
 
@@ -748,6 +761,32 @@ async function noOptionsSwal(){
 		var privatize = '<div class="clms_case">nothing to find here...</div>';
 		swal({
 				title: "No OTC Trades Found",
+				text: privatize,
+				type: "info",  //var alertTypes = ['error', 'warning', 'info', 'success', 'input', 'prompt'];
+				html: true,
+						dangerMode: true,
+						confirmButtonText: "Okay",
+						confirmButtonColor: "#d6188a", //site pink
+				showConfirmButton: true,
+				showCancelButton: false,
+				allowOutsideClick: true,
+				timer: 2500,
+				animation: "slide-from-top"
+		},function(){//on confirm click
+		
+		});//confirm swal close
+	}, 4500);
+}
+
+async function comingSoonSwal(){
+	// add message to timeline
+	$('#hedgesTimeline').empty().append('<div class="no-hedges-message sl_refresh">Neon Lend is currently under development. Coming Soon...</span>');
+
+	//proceed to swal
+	setTimeout(function() {
+		var privatize = '<div class="clms_case">visit the <a href="./ecosystem.html" target="_blank">ecosystem page</a> to check out our platforms...</div>';
+		swal({
+				title: "Neon Lend is Under Construction",
 				text: privatize,
 				type: "info",  //var alertTypes = ['error', 'warning', 'info', 'success', 'input', 'prompt'];
 				html: true,

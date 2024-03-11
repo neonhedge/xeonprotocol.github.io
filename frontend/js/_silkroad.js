@@ -163,7 +163,7 @@ $(document).on('click', '#socialstream', function(e){
 	swal(
 		{
 			title: 'Coming...',
-			text: 'Social will be introduced in later Beta testing. \nIt will provide a live feed of opinions on deals.',
+			text: 'Social will be introduced later together with AI sentiment trackers from other providers. \nIt will provide a live feed of opinions on tokens. \nAI intergration is primarily intended to help in advising trades before or during their lifespan.',
 			type: 'info',
 			html: false,
 			dangerMode: false,
