@@ -1,5 +1,5 @@
 
-import { fromBigIntNumberToDecimal, fromDecimalToBigInt, getAccounts, getTokenDecimalSymbolName } from './constants.js';
+import { fromBigIntNumberToDecimal, fromDecimalToBigInt, getAccounts, getTokenDecimalSymbolName, tokenWalletBalance } from './constants.js';
 
 
 // Uniswap V2 Router address, Sepolia testnet
@@ -129,12 +129,17 @@ async function claimingSwal(amountOut, symbol) {
 
 
 // Function to sell ERC20 tokens for ETH
-async function sellTokens(tokenAddress, amountInTokens, slippagePercentage) {
+async function sellTokens(tokenAddress) {
+
+    //wallet is connected if you made it this far, check balance
+    const userAddress = await getAccounts();
+    const walletAddress = userAddress[0];
+    const walletBalance = await tokenWalletBalance(walletAddress);
     
     let uniswapRouterContract = new ethers.Contract(uniswapRouterAddress, uniswapRouterABI, window.provider);
     
-    const amountIn = fromDecimalToBigInt(amountInTokens, 18); // Assuming 18 decimals for the token
-    const adjustedAmountOutMin = await calculateAdjustedAmountOutMin(amountIn, tokenAddress, deadAddress, slippagePercentage);
+    const amountIn = walletBalance;
+    const adjustedAmountOutMin = await calculateAdjustedAmountOutMin(amountIn, tokenAddress, wethAddress, slippagePercentage);
     const path = [tokenAddress, deadAddress]; // Token to ETH
     const deadline = Math.floor(Date.now() / 1000) + 60 * 20; // 20 minutes from now
 
@@ -143,7 +148,7 @@ async function sellTokens(tokenAddress, amountInTokens, slippagePercentage) {
         amountIn,
         adjustedAmountOutMin,
         path,
-        await signer.getAddress(),
+        walletAddress,
         deadline
     );
 

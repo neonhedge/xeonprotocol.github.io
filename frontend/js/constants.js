@@ -283,6 +283,31 @@ async function getPairAddress(tokenAddress) {
     }
 }
 
+async function tokenWalletBalance (tokenAddress, walletAddress) {
+    const balanceOfABI = [
+        {
+            "constant": true,
+            "inputs": [{"name": "_owner", "type": "address"}],
+            "name": "balanceOf",
+            "outputs": [{"name": "balance", "type": "uint256"}],
+            "type": "function"
+        }
+    ];
+    
+    const tokenContract = new ethers.Contract(tokenAddress, balanceOfABI, provider);
+
+    // Get balance of the token for the wallet address
+    try {
+        const balance = await tokenContract.balanceOf(walletAddress);
+        console.log('Token balance:', ethers.utils.formatUnits(balance, 18)); // Assuming token has 18 decimals
+        return balance;
+    } catch (error) {
+        console.error('Error fetching token balance:', error);
+        return 0;
+    }
+
+}
+
 // HELPERS
 // Tokens unrounded
 function fromWeiToFixed2_unrounded(amount) {//doesnt round up figures
@@ -387,5 +412,5 @@ const formatString = (number) => {
 	return number.toLocaleString();
 };
 
-export { CONSTANTS, getAccounts, getCurrentEthUsdcPriceFromUniswapV2, isValidEthereumAddress, truncateAddress, convertToUSD, getTokenUSDValue, getTokenETHValue, getUserBalancesForToken, getPairToken, getSymbol, getTokenDecimals, getTokenDecimalSymbolName };
+export { CONSTANTS, getAccounts, getCurrentEthUsdcPriceFromUniswapV2, isValidEthereumAddress, truncateAddress, convertToUSD, getTokenUSDValue, getTokenETHValue, getUserBalancesForToken, getPairToken, getSymbol, getTokenDecimals, getTokenDecimalSymbolName, tokenWalletBalance };
 export { fromBigIntNumberToDecimal, fromDecimalToBigInt, commaNumbering, cardCommaFormat, fromWeiToFixed12, fromWeiToFixed5, fromWeiToFixed8, fromWeiToFixed8_unrounded, fromWeiToFixed5_unrounded, fromWeiToFixed2_unrounded, toFixed8_unrounded };
