@@ -635,6 +635,9 @@ fieldset input{
     -webkit-transition: all 0.3s;
     transition: all 0.3s; 
 }
+#tokenAmountValueDiv {
+	color: #d6188a;
+}
 .walletBalancesTL{
 	width: 95%;
 	margin:10px auto;
@@ -1055,7 +1058,7 @@ fieldset input{
 	min-width: unset !important;
 	flex-grow: 1;
 	text-align: left !important;
-	font-size: clamp(13px, 1vw, 14px) !important;
+	font-size: clamp(12px, 1vw, 13px) !important;
 	font-weight: 100 !important;
 	color: #e8e8e8 !important;
 	padding-inline: unset !important;
@@ -1150,6 +1153,13 @@ fieldset input{
     display:inline !important;
     border-radius: 0 !important;
     vertical-align: middle;
+}
+._bookmarkjump {
+	cursor: pointer;
+}
+._bookmarkjump:hover > img {
+	width: 18px;
+	transition: all 0.3s ease-in-out;
 }
 .status-dot {
     font-size: clamp(12.2px, 1vw, 13.5px);

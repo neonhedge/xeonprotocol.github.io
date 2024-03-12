@@ -1,8 +1,11 @@
-
 header {
-	padding-block: unset !important;
-	padding-top: 1.2rem !important;
-	border-bottom: 0.5px solid #15213c !important;
+	padding-block: 0.5rem !important;
+	padding-inline: 6rem 0rem !important;
+	border-bottom: 0.5px solid #15213c !important; /* darker #071432 */
+}
+header .container {
+	max-width: unset !important;
+	padding-inline: unset !important;
 }
 main{
     padding-top:150px;
@@ -55,10 +58,8 @@ main{
   }
 
   .section-big-chart {
-    flex: 1 1 auto;
+    flex-basis: calc(70% - 450px); /* Set the initial size to 50% - 450px */
     background: none;
-    width:100%;
-    max-width: 480px;
     padding: 0;
   }
 
@@ -122,18 +123,15 @@ main{
   }
 
   .trafficStats {
+    width: 100%;
     display: flex;
     justify-content: space-around;
-    align-items: center;
-    gap: 0;
+    gap: 1vw;
     margin-block: 2vw;
-    flex-wrap: wrap;
   }
   
   .statsbreakdown {
-    flex: 0 0 auto;
-    width:100%;
-    max-width: 450px;
+    width: 450px;
     border-radius: 8px;
     box-sizing: border-box;
   }
@@ -944,6 +942,8 @@ hr.line {
 	background-color: rgba(29,78,216,.2);
 	background: linear-gradient(220deg, #39f, #110f47 80%);
 }
+
+
 
   /*===============================
       BOTTOM OF EVERY CSS FILE
