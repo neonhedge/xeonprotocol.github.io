@@ -243,7 +243,6 @@ ethereum.on("accountsChanged", async (accounts) => {
     handleAccountChange(accounts);
     // Refresh accounts & page Feed
     checkAndCallPageTries();
-    loadOptions();
   } else {
     handleAccountChange(accounts);
     // Refresh wallet widget directly, force wallet initialization check first		
