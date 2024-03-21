@@ -544,7 +544,16 @@ async function fetchOptionCard(optionId){
 		}
 		if(hedgeType == 'SWAP') {
 			typeClass = 'aType-swap-option';
-			typeClassValue = 'style="background: none !important;"';
+			//typeClassValue = 'style="background: none !important;"';
+			description = `Taker is in profit when price is above the start price. Writer is in proportional loss. If writer profit is more than Taker collateral then all of the Takers collateral is liquidated as max loss.`;
+			strategyWidget = `
+			<div class="strategyHold" title="`+description+`">
+				<img class="strategyImage" src="./imgs/equityswap.svg" />
+				<div class="strategyDataHold">
+					<div class="topValue-put">profit zone `+costFormatted+` `+pairSymbol+`</div>
+					<div class="bottomValue-put">loss zone</div>
+				</div>
+			</div>`;
 		}
 		//option action button: buy, running/settle, expired
 		let action_btn, activity_btn;
