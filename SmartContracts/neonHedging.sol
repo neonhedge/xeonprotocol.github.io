@@ -3,7 +3,7 @@ pragma solidity ^0.8.4;
 
 // Xeon Protocol - Universal ERC20 OTC Hedging and Lending. 
 // Testnet Version 2.3
-// Deployed on Sepolia Testnet 18/01/2024
+// Deployed on Sepolia Testnet 25/01/2024
 // Sepolia testnet on the basis of Uniswap V2 Router support
 
 // ====================Description===========================
@@ -99,7 +99,6 @@ contract oXEONVAULT {
         uint256 withdrawn;
     }
     struct hedgingOption {
-        bool topupConsent;
         bool zapTaker;
         bool zapWriter;
         address owner;
@@ -128,6 +127,7 @@ contract oXEONVAULT {
     }
 
     struct topupData {
+        address requester;
         uint256 amountWriter;
         uint256 amountTaker;
         uint256 requestTime;
@@ -282,10 +282,11 @@ contract oXEONVAULT {
                 if (paired == wethAddress) wethEquivDeposits += marketValue;
                 else if (paired == usdtAddress) usdtEquivDeposits += marketValue;
                 else if (paired == usdcAddress) usdcEquivDeposits += marketValue;
+            } else if (_token == usdtAddress) {
+                usdtEquivDeposits += _amount;
+            } else if (_token == usdcAddress) {
+                usdcEquivDeposits += _amount;
             }
-            // Log stables
-            if (_token == usdtAddress) usdtEquivDeposits += _amount;
-            else if (_token == usdcAddress) usdcEquivDeposits += _amount;
         }
 
         // Log user balance & tokens
@@ -353,7 +354,7 @@ contract oXEONVAULT {
     // premium or buying cost paid in paired token of the underlying asset in the deal
     // no premium for swaps. swap collateral must  be equal for both parties, settle function relies on this implementation here
     // put options will have a max loss check to only accept a strike price 50% away max
-    function createHedge(uint tool, address token, uint256 amount, uint256 cost, uint256 deadline) external nonReentrant {
+    function createHedge(uint tool, address token, uint256 amount, uint256 cost, uint256 strikeprice, uint256 deadline) external nonReentrant {
         require(tool <= 2 && amount > 0 && cost > 0 && deadline > block.timestamp, "Invalid option parameters");
         (, , , uint256 withdrawable, , ) = getUserTokenBalances(token, msg.sender);
         require(withdrawable > 0, "Insufficient balance");
@@ -366,6 +367,7 @@ contract oXEONVAULT {
         newOption.amount = amount;
         (newOption.createValue, newOption.paired) = getUnderlyingValue(token, amount);
         newOption.cost = cost;
+        newOption.strikeValue = strikeprice.mul(amount);
         newOption.dt_expiry = deadline;
         newOption.dt_created = block.timestamp;
         if (tool == 0) {
@@ -379,8 +381,7 @@ contract oXEONVAULT {
         }
 
         // Update user balances for token in hedge
-        userBalance storage hto = userBalanceMap[token][msg.sender]; 
-        hto.lockedinuse.add(amount);
+        userBalanceMap[token][msg.sender].lockedinuse += amount;
         
         // Update arrays
         if (newOption.hedgeType == HedgeType.SWAP) {
@@ -403,8 +404,8 @@ contract oXEONVAULT {
         emit hedgeCreated(token, optionID, newOption.createValue, newOption.hedgeType, msg.sender);
     }
 
-    // Hedges are bought in quote/paired currency of underlying token
-    // For Call and Put Options cost is premium, lockedinuse here but paid out on settlement
+    // Hedge costs are in paired currency of underlying token
+    // For Call and Put Options cost is premium, lockedinuse during buy, but paid out on settlement
     // For Equity Swaps cost is equal to underlying value as 100% collateral is required. There is no premium
     // Strike value is not set here, maturity calculations left to the settlement function
     function buyHedge(uint256 _optionId) external nonReentrant {
@@ -488,6 +489,9 @@ contract oXEONVAULT {
         userBalance storage bal = userBalanceMap[tokenToUse][msg.sender];
         bal.lockedinuse = bal.lockedinuse.add(hedge.cost);
         userBalanceMap[tokenToUse][msg.sender] = bal;
+        if (topupMap[topupRequestID].amountWriter == 0 && topupMap[topupRequestID].amountTaker == 0){
+            topupMap[topupRequestID].requester = msg.sender;
+        }
         // Update hedge amount/cost
         if (msg.sender == hedge.owner) {
             hedge.amount += amount;
@@ -503,15 +507,12 @@ contract oXEONVAULT {
         hedgingOption storage hedge = hedgeMap[_optionId];
         require(msg.sender == hedge.owner || msg.sender == hedge.taker, "Invalid party to reject");
         require(topupMap[_requestID].state == 0, "Request already accepted or rejected");
-        hedge.topupConsent = true;
         topupMap[_requestID].state = 2;
     }
 
     function cancelTopupRequest(uint _optionId, uint _requestID) external {
         require(topupMap[_requestID].amountTaker == 0, "Request already accepted");
-        require(hedgeMap[_optionId].owner == msg.sender, "Only owner can cancel");
-        hedgingOption storage hedge = hedgeMap[_optionId];
-        hedge.topupConsent = true;
+        require(topupMap[_requestID].requester == msg.sender, "Only owner can cancel");
         topupMap[_requestID].state = 2;
     }
 
@@ -1009,7 +1010,7 @@ contract oXEONVAULT {
 
         return result;
     }
-
+    
     // Function to get the length of the options array for a specific token
     function getCountTokenOptions(address token) external view returns (uint) {
         return tokenOptions[token].length;
