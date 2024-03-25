@@ -510,7 +510,7 @@ contract oXEONVAULT {
         topupMap[_requestID].state = 2;
     }
 
-    function cancelTopupRequest(uint _optionId, uint _requestID) external {
+    function cancelTopupRequest(uint _requestID) external {
         require(topupMap[_requestID].amountTaker == 0, "Request already accepted");
         require(topupMap[_requestID].requester == msg.sender, "Only owner can cancel");
         topupMap[_requestID].state = 2;
@@ -566,7 +566,7 @@ contract oXEONVAULT {
         require(_optionId < optionID, "Invalid option ID");
         hedgingOption storage option = hedgeMap[_optionId];
         // Check if either zapWriter or zapTaker flags are true, or if the hedge has expired
-        require(option.zapWriter || option.zapTaker || block.timestamp >= option.dt_expiry, "Hedge cannot be settled yet");
+        require(option.zapWriter && option.zapTaker || block.timestamp >= option.dt_expiry, "Hedge cannot be settled yet");
 
         (hedgeInfo.underlyingValue, ) = getUnderlyingValue(option.token, option.amount);
 
