@@ -139,7 +139,7 @@
     padding-inline: 1.5rem;
   }
   #slider .container div:last-child {
-    margin-top: 0 !important;
+    margin-top: 2rem !important;
     max-width: 30rem;
   }
 }
