@@ -1,0 +1,43 @@
+.er-404
+   footer
+      border-top-right-radius: 0
+
+footer
+   position: relative
+   padding-block: $lg $md
+   background-color: $dark
+   border-top-right-radius: $md
+   &::before
+      content: ''
+      position: absolute
+      inset: 0
+      display: block
+      height: $xxs
+      background-image: $gradient
+
+   .container
+      gap: $sm
+      @include tablet
+         grid-template-columns: repeat(4, 1fr)
+         place-items: start
+         
+         p:last-child
+            width: 100%
+            margin-top: $sm
+            text-align: center
+            grid-column: span 4
+
+      img
+         width: $w-logo
+      
+      i
+         font-size: $sm
+      
+      li
+         a
+            font-family: $body-font
+            color: $white
+            &:hover
+               font-weight: 400
+
+      

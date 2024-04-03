@@ -1,0 +1,158 @@
+$breakPointNav: 1220px
+
+header
+   position: fixed
+   width: 100%
+   padding-block: $xs
+   color: $white
+   transition: all .6s ease-in-out
+   z-index: 999
+
+   &.bg 
+      background-color: $dark
+
+   .container
+      grid-template-columns: $w-logo 1fr
+
+      img
+         width: $w-logo
+
+
+.mobile-nav-toggle
+   display: block
+   justify-self: end
+   width: 2.5rem
+   padding: 0
+   z-index: 9999
+   .bar1,
+   .bar2,
+   .bar3
+      width: 100%
+      height: .12rem
+      margin-block: .65rem
+      background-color: $white
+      transition: all .8s ease
+
+   &[aria-expanded="true"]
+      .bar1
+         transform: rotate(-45deg) translate(-50%, -50%)
+      .bar2
+         opacity: 0
+      .bar3
+         transform: rotate(45deg) translate(-50%, -50%)
+
+   @media (min-width: $breakPointNav)
+      display: none
+
+
+nav#navbar
+   @include flex
+   position: fixed
+   top: 7rem
+   width: calc(100% - #{$xs} * 2)
+   padding: $xxs $xs
+   border-radius: $br
+   background-color: $dark
+   @include rotateX-90
+   z-index: 1000
+   &[data-visible="true"]
+      transform: rotateX(0)
+   @include only-mobile
+      @include shadow
+
+   ul
+      text-align: center
+      @include only-mobile
+         width: 100%
+
+      li
+         display: block
+         padding-top: 1rem
+         &.has-submenu
+            > a
+               &::after
+                  content: url(../imgs/icon-arrow.svg)
+                  display: inline-block
+                  padding-left: .5rem
+                  transition: all .5s ease-in-out
+            &.open
+               > a
+                  &::after
+                     transform: rotate(180deg)
+                     padding-right: .5rem
+               ul.submenu
+                  display: block
+
+         a
+            color: $white
+            &:hover
+               color: $primary
+               text-decoration: none
+      
+         ul.submenu
+            display: none
+            padding: $xxs $xs
+            margin-top: 1rem
+            border-radius: $br
+            background-color: $dark-2
+            animation: fadeIn .5s ease-in
+
+            li
+               display: block
+               padding-block: .5rem
+               padding-left: 0
+
+               a
+                  text-decoration: none
+
+   @media (max-height: 32em)
+      display: block
+      overflow-y: scroll
+      max-height: 60vh
+
+   @media (max-width: $breakPointNav)
+      .account
+         display: flex
+         flex-direction: column
+         width: 100%
+         border-top: .2rem solid $dark-2
+         margin-top: $xs
+
+         button
+            width: max-content
+            margin: .8rem auto
+            &.btn-cta
+               background: $gradient
+               color: $white
+               margin-top: 0
+
+   @media (min-width: $breakPointNav)
+      justify-content: space-between
+      flex-direction: row
+      position: relative
+      top: 0
+      padding: 0
+      background-color: transparent
+      transform: rotateX(0)
+
+      ul
+         text-align: left
+
+         li
+            display: inline-block
+            padding-right: $sm
+            padding-top: 0
+            a
+               color: $white
+            &.has-submenu
+               > a
+                  color: $white
+               &.open
+                  ul.submenu
+                     position: absolute
+
+            ul.submenu
+               min-width: 10rem
+               margin-top: 2.55rem
+               background-color: $dark
+               @include shadow

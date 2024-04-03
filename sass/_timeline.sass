@@ -1,0 +1,61 @@
+$w-line: 2px
+$sm-space-line: .8rem
+
+ul.timeline
+   position: relative
+   &:before
+      content: ''
+      position: absolute
+      height: 100%
+      border-left: $w-line dashed $white
+
+   li
+      position: relative
+      width: 25rem
+      margin-left: $sm
+      padding: $sm $xs
+      border-radius: $br
+      background: $gradient
+      &:not(:first-child)
+         margin-top: $md
+
+      span.line
+         position: absolute
+         left: -$sm
+         top: 0
+         width: $w-line
+         height: 100%
+         background: $white
+         &:before, &:after
+            content: ''
+            position: absolute
+            left: -.35rem
+            top: 0 
+            width: $xxs
+            height: $xxs
+            border-radius: 100%
+            border: $w-line solid $white
+            background: $secondary
+         &:after
+            top: 100%
+
+         strong
+            position: absolute
+            font-size: $xxs
+            left: -$md
+            &:first-child
+               top: 0
+            &:last-child
+               top: 100%
+      
+      h2
+         margin-bottom: $xxs
+         
+         
+      @include only-mobile
+         width: 16rem
+         margin-left: $sm-space-line
+         span.line
+            left: -$sm-space-line
+            strong
+               left: -$sm-space-line*3

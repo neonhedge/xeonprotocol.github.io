@@ -1,0 +1,107 @@
+section
+   padding-block: $lg
+   overflow-x: clip
+   &.page-title
+      padding-block: 12rem 6rem
+      background: $gradient-sm
+      border-bottom-left-radius: $md
+      h1
+         margin-bottom: $xxs
+   
+   &.cta
+      background: $dark-gradient
+      .container
+         display: grid
+         grid-template-columns: 1fr .8fr
+         place-items: center
+         gap: $sm
+
+   &.er404
+      @include flex
+      gap: $sm
+      min-height: 80vh
+      background: $gradient-sm
+
+#slider
+   @include flex
+   gap: $sm
+   height: clamp(35rem, 75vh, 90vh)
+   padding: 2.4rem 0
+   border-bottom-left-radius: $md
+   background: $gradient-sm
+   color: $white
+   div.grid
+      gap: 1rem
+
+   h1
+      margin-top: $sm
+      color: $white
+      background: unset
+      -webkit-text-fill-color: unset
+      -webkit-background-clip: unset
+
+   div
+      margin-top: $sm
+
+   @include only-mobile
+      min-height: 85vh
+      line-height: 1
+      .container 
+         padding-top: 8rem
+         h1
+            font-size: 2.4rem
+            margin-bottom: $xs
+         img
+            max-width: 80%
+            margin-bottom: -5.5rem
+         div
+            a.btn
+               padding-inline: 1.5rem
+            &:last-child
+               max-width: 30rem
+
+   @media (max-height: 44.5em)
+      min-height: 50rem
+
+
+.bg-dark
+   background-image: $dark-gradient-inverse
+   border-top-right-radius: $md
+   border-bottom-left-radius: $md
+
+.bg-dark-circle
+   color: $white
+   background-image: url(../imgs/bg-circles.svg), $dark-gradient
+   background-position: 10% center, center
+   background-size: 100%, auto
+   background-repeat: no-repeat
+   border-top-right-radius: $md
+   border-bottom-left-radius: $md
+   margin-top: 10rem
+   margin-bottom: 0
+
+   .container
+      gap: $sm
+
+      > img
+         margin-top: -15rem
+
+
+@include tablet
+   section.intro
+      h1
+         grid-column: span 2
+
+      img
+         right: clamp(-30%, -55%, -80%)
+         left: unset
+
+   .out-container
+      position: relative
+      width: clamp(100%, 150%, 200%)
+      left: clamp(-30%, -55%, -80%)
+
+   .bg-dark-circle
+      background-position: 22% 85%, center
+      background-size: 40%, auto
+      margin-block: 0

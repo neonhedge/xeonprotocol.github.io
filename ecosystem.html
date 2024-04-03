@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<!-- favicons -->
+	<link rel="apple-touch-icon" sizes="180x180" href="./imgs/fav/apple-touch-icon.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="./imgs/fav/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="./imgs/fav/favicon-16x16.png">
+	<link rel="manifest" href="./imgs/fav/site.webmanifest">
+	<link rel="mask-icon" href="./imgs/fav/safari-pinned-tab.svg" color="#5bbad5">
+	<link rel="shortcut icon" href="./imgs/fav/favicon.ico">
+	<meta name="msapplication-TileColor" content="#da532c">
+	<meta name="msapplication-config" content="./imgs/fav/browserconfig.xml">
+	<meta name="theme-color" content="#ffffff">
+	<meta name="author" content="Kaveman-x">
+	<!-- title page & SEO meta -->
+	<title>NEON - Ecosystem</title>
+	<meta name="description" content="xeon protocol is a universal ERC20 hedging and lending platform">
+	<meta name="keywords" content="erc20, crypto, hedging, call options, swaps, lending, collateral, OTC, P2P, website, html, html5, css">
+	<!-- google fonts -->
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700&family=Space+Grotesk:wght@300;400;600;700&display=swap" rel="stylesheet">
+	<!-- font awesome FA icons -->
+	<script src="https://kit.fontawesome.com/13f07506fc.js" crossorigin="anonymous"></script>
+	<!-- ecosystem THREE script -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.19.0/TweenMax.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/84/three.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/stats.js/r16/Stats.min.js"></script>
+	<script src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/264161/OrbitControls.js"></script>
+
+	<!-- main page script -->
+	<script src="./js/ecosystem.js"></script>
+	<!-- windows styling -->
+	<link rel="stylesheet" type="text/css" href="css/_menu.css">
+	
+	<!-- css -->
+	<link rel="stylesheet" href="./css/fontawesome.min.css" />
+	<link rel="stylesheet" href="./css/aos.css" />
+	<link rel="stylesheet" href="./css/style.css">
+	<link rel="stylesheet" href="./css/custom.css">
+	<link rel="stylesheet" href="./css/_menu.css">
+	<link rel="stylesheet" href="./css/ecosystem.css">
+</head>
+
+<body>
+	<!-- Accessibility: Skip to content -->
+	<a href="#main" class="skip-to-content">to the main</a>
+	<!-- Preload page -->
+	<div id="preload"><span>neon hedge is loading...</span></div>
+
+	<header>
+		<div class="container grid" data-aos="fade-up">
+			<!-- your logo here -->
+			<a class="logoImg" href="./">
+				<img src="./imgs/maskot3.webp" alt="logo">
+			</a>
+
+			<!-- mobile navbar toggle button -->
+			<button class="mobile-nav-toggle" aria-controls="navbar">
+				<span class="sr-only" aria-expanded="false">Menu</span>
+				<div class="bar1"></div>
+				<div class="bar2"></div>
+				<div class="bar3"></div>
+			</button>
+			
+			<!-- navbar with page links -->
+			<nav id="navbar" data-visible="false">
+				<ul>
+					<li><a href="">Docs</a></li>
+				</ul>
+				<!-- navbar buttons -->
+				<div class="account">
+					<a href="https://twitter.com/XeonProtocol" target="_blank" class="x-app-socials" title="Follow us on X-App"><img src="./imgs/x-app-w.svg" alt="Neon on X-App"></a>
+					<a href="testnet.html"  class="btn-cta" title="Closed door Beta">Testnet Guide</a></div>
+			</nav>
+		</div>
+	</header>
+
+	
+	<main>
+		<h1 class="ecosystemH neon-blue">Neon Ecosystem</h1>
+		<div id="developmentStatus">
+			<div>We are building an OTC ecosystem for ERC20 tokens, with tools for Hedging, Lending, and Farming.</br>
+				<a href="https://docs.neonprotocol.io" target="_blank" title="ERC20 Swaps, Call, Put Options">Neon Hedge</a> the pioneer platform in our ecosystem, is currently under development.</br>
+				Github Repo: <a href="https://github.com/neonhedge" target="_blank" title="Closed door Beta">open github <i class="fa fa-github" aria-hidden="true"></i></a></br></br>
+			</div>
+			
+			<div class="rewardsInformer">
+				<small>Scroll down to explore our ecosystem.</small></br>
+				<small>When in full view, Click the center Sun to Start! Drag solar system to change perspective.</small>
+			</div>
+		</div>
+		<div id="ecosystemContainer">			  
+			<img id="border" src="https://image.ibb.co/gFxj6F/border.png">
+			<div id="ecosystemWelcome">
+				<p id="firstSentence">Neon Protocol's Ecosystem</br> Comprises <span id="universe">3 OTC Platforms</span></p>
+				<p id="lastSentence">Click on the <span id="sun">sun</span> to get started</p>
+			</div>
+			<div id="ecoContent">
+				<h2 id="ecoContentTitle"></h2>
+				<p id="subtitle"></p>
+				<p id="description"></p>
+			</div>
+		</div>
+	</main>
+
+
+	<!-- footer -->
+	<footer>
+		<div class="container grid footerContainer" data-aos="fade-up">
+			<div class="badgeLeft">
+				<!-- XEON logo here -->
+				<a class="footermaskot" href="/">
+					<img src="./imgs/maskot3.webp" alt="logo">
+				</a>
+				<p class="mb-1">Xeon Protocol</br>ERC20 Hedging & Lending Ecosystem.</p>
+
+				<!-- social links -->
+				<ul class="inline-list">
+					<li>
+						<a href="https://twitter.com/XeonProtocol" target="_self">
+							<i class="fa-brands fa-twitter"></i>
+						</a>
+					</li>
+					<li>
+						<a href="https://t.me/xeon_protocol" target="_self">
+							<i class="fa-solid fa-paper-plane"></i>
+						</a>
+					</li>
+				</ul>
+			</div>
+
+			<!-- read -->
+			<div>
+				<h4>Read</h4>
+				<ul>
+					<li><a href="https://neon-hedge.gitbook.io/xeon-protocol/" target="_blank">Documentation</a></li>
+					<li><a href="./WHITEPAPER V1 - XEON Protocol.pdf" target="_blank">Whitepaper</a></li>
+					<li><a href="https://" target="_blank">Medium</a></li>
+				</ul>
+			</div>
+
+			<!-- technical -->
+			<div>
+				<h4>Engineering</h4>
+				<ul><li><a href="https://github.com/neon_protocol/smartcontracts/" target="_blank">GitHub Repo</a></li>
+					<li><a href="https://etherscan.io/" target="_blank">Smart Contracts</a></li>
+					<li><a href="https://" target="_blank">Security Audits</a></li>
+				</ul>
+			</div>
+
+			<!-- income -->
+			<div>
+				<h4>Revenue Sharing</h4>
+				<ul>
+					<li><a href="https://app.gitbook.com/o/CdRqVKZQ8jcIiQELVhpJ/s/SiJYDrcI9KUv1DeX8YqX/~/changes/8/real-yield/protocol-income" target="_blank">Protocol Fees</a></li>
+					<li><a href="https://app.gitbook.com/o/CdRqVKZQ8jcIiQELVhpJ/s/SiJYDrcI9KUv1DeX8YqX/~/changes/8/earn-with-us/how-to-earn" target="_blank">Ways to Earn</a></li>
+					<li><a href="https://app.gitbook.com/o/CdRqVKZQ8jcIiQELVhpJ/s/SiJYDrcI9KUv1DeX8YqX/~/changes/8/earn-with-us/hedge-mining" target="_blank">Miner Program</a></li>
+				</ul>
+			</div>
+
+			<!-- links -->
+			<div>
+				<h4>Join Us</h4>
+				<ul>
+					<li><a href="https://twitter.com/xeon_protocol" target="_blank">X – App</a></li>
+					<li><a href="https://t.me/xeon_protocol" target="_blank">Telegram</a></li>
+					<li><a href="mailto:info@xeon_protocol.io">E-Mail</a></li>
+				</ul>
+			</div>
+
+			<!-- copyrights -->
+			<p>Xeon Protocol &copy;<span id="#thisYear"></span>. All Rights Reserved. 2024.</p>
+		</div>
+	</footer>
+
+
+	<!-- login modal -->
+	<div id="loginModal">
+		<div class="modal">
+			<!-- close modal icon -->
+			<span class="close-modal">x</span>
+			<!-- your logo here -->
+			<img src="./imgs/logo.webp" alt="logo">
+			
+			<h2>Login with your account</h2>
+			<!-- login form -->
+			<form id="loginForm" action="javascript:void(0)">
+				<input type="email" name="emailLogin" id="emailLogin" placeholder="Your Email" required>
+				<input type="password" name="passwordLogin" id="passwordLogin" placeholder="Your Password" required>
+				<button type="submit" class="btn-cta">Login</button>
+			</form>
+			
+			<p>or continue</p>
+			<!-- login with Google account -->
+			<button class="btn-border">
+				with <strong>Google</strong>
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 488 512"><path d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z"/></svg>
+			</button>
+			<!-- login with Facebook account -->
+			<button class="btn-border">
+				with <strong>Facebook</strong>
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 310 512"><path d="M279.14 288l14.22-92.66h-88.91v-60.13c0-25.35 12.42-50.06 52.24-50.06h40.42V6.26S260.43 0 225.36 0c-73.22 0-121.08 44.38-121.08 124.72v70.62H22.89V288h81.39v224h100.17V288z"/></svg>
+			</button>
+			
+			<!-- link to registration modal -->
+			<small>Don't have an account? <a href="javascript:void(0)" id="changeSignUp">Sign up</a></small>
+		</div>
+	</div>
+
+
+	<!-- registration modal -->
+	<div id="signUpModal">
+		<div class="modal">
+			<!-- close modal icon -->
+			<span class="close-modal">x</span>
+			<!-- your logo here -->
+			<img src="./imgs/logo.webp" alt="logo">
+			
+			<h2>Sign Up now!</h2>
+			<!-- registration form -->
+			<form id="signUpForm" action="javascript:void(0)">
+				<input type="text" name="usernameSignUp" id="usernameSignUp" placeholder="Your Username" required>
+				<input type="email" name="emailSignUp" id="emailSignUp" placeholder="Your Email" required>
+				<input type="password" name="passwordSignUp" id="passwordSignUp" placeholder="Your Password" required>
+				<button type="submit" class="btn-cta">Sign Up</button>
+			</form>
+
+			<p>or Sign Up</p>
+			<!-- registration with Google account -->
+			<button class="btn-border">
+				with <strong>Google</strong>
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 488 512"><path d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z"/></svg>
+			</button>
+			<!-- registration with Facebook account -->
+			<button class="btn-border">
+				with <strong>Facebook</strong>
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 310 512"><path d="M279.14 288l14.22-92.66h-88.91v-60.13c0-25.35 12.42-50.06 52.24-50.06h40.42V6.26S260.43 0 225.36 0c-73.22 0-121.08 44.38-121.08 124.72v70.62H22.89V288h81.39v224h100.17V288z"/></svg>
+			</button>
+			
+			<!-- link to login modal -->
+			<small>Already have an account? <a href="javascript:void(0)" id="changeLogin">Login</a></small>
+		</div>
+	</div>
+
+
+	<!-- connect wallet modal -->
+	<div id="walletModal">
+		<div class="modal">
+			<!-- close modal icon -->
+			<span class="close-modal">x</span>
+
+			<h2>Available Wallets</h2>
+			<!-- wallets button -->
+			<button class="btn-border">
+				<svg width="38" height="33" viewBox="0 0 38 33" xmlns="http://www.w3.org/2000/svg"><path d="M32.9583 1L19.8242 10.7183L22.2666 4.99099L32.9583 1Z" fill="#E17726" stroke="#E17726" stroke-width="0.25" stroke-linecap="round" stroke-linejoin="round"/><path d="M2.66284 1L15.68 10.809L13.3546 4.99098L2.66284 1Z" fill="#E27625" stroke="#E27625" stroke-width="0.25" stroke-linecap="round" stroke-linejoin="round"/><path d="M28.2292 23.5334L24.7346 28.872L32.2175 30.9323L34.3611 23.6501L28.2292 23.5334Z" fill="#E27625" stroke="#E27625" stroke-width="0.25" stroke-linecap="round" stroke-linejoin="round"/><path d="M1.27271 23.6501L3.40325 30.9323L10.8732 28.872L7.39154 23.5334L1.27271 23.6501Z" fill="#E27625" stroke="#E27625" stroke-width="0.25" stroke-linecap="round" stroke-linejoin="round"/><path d="M10.4704 14.5149L8.39185 17.6507L15.7968 17.9876L15.55 10.0186L10.4704 14.5149Z" fill="#E27625" stroke="#E27625" stroke-width="0.25" stroke-linecap="round" stroke-linejoin="round"/><path d="M25.1503 14.515L19.9929 9.92798L19.824 17.9877L27.2289 17.6508L25.1503 14.515Z" fill="#E27625" stroke="#E27625" stroke-width="0.25" stroke-linecap="round" stroke-linejoin="round"/><path d="M10.8733 28.872L15.3552 26.7081L11.4969 23.7019L10.8733 28.872Z" fill="#E27625" stroke="#E27625" stroke-width="0.25" stroke-linecap="round" stroke-linejoin="round"/><path d="M20.2659 26.7081L24.7348 28.872L24.1242 23.7019L20.2659 26.7081Z" fill="#E27625" stroke="#E27625" stroke-width="0.25" stroke-linecap="round" stroke-linejoin="round"/><path d="M24.7348 28.8722L20.2659 26.7083L20.6296 29.6108L20.5906 30.8418L24.7348 28.8722Z" fill="#D5BFB2" stroke="#D5BFB2" stroke-width="0.25" stroke-linecap="round" stroke-linejoin="round"/><path d="M10.8733 28.8722L15.0305 30.8418L15.0045 29.6108L15.3552 26.7083L10.8733 28.8722Z" fill="#D5BFB2" stroke="#D5BFB2" stroke-width="0.25" stroke-linecap="round" stroke-linejoin="round"/><path d="M15.1083 21.7842L11.3928 20.6958L14.017 19.4907L15.1083 21.7842Z" fill="#233447" stroke="#233447" stroke-width="0.25" stroke-linecap="round" stroke-linejoin="round"/><path d="M20.5127 21.7842L21.604 19.4907L24.2412 20.6958L20.5127 21.7842Z" fill="#233447" stroke="#233447" stroke-width="0.25" stroke-linecap="round" stroke-linejoin="round"/><path d="M10.8732 28.872L11.5228 23.5334L7.3916 23.6501L10.8732 28.872Z" fill="#CC6228" stroke="#CC6228" stroke-width="0.25" stroke-linecap="round" stroke-linejoin="round"/><path d="M24.0981 23.5334L24.7347 28.872L28.2293 23.6501L24.0981 23.5334Z" fill="#CC6228" stroke="#CC6228" stroke-width="0.25" stroke-linecap="round" stroke-linejoin="round"/><path d="M27.2289 17.6506L19.824 17.9875L20.5125 21.7842L21.6038 19.4906L24.241 20.6957L27.2289 17.6506Z" fill="#CC6228" stroke="#CC6228" stroke-width="0.25" stroke-linecap="round" stroke-linejoin="round"/><path d="M11.3928 20.6957L14.017 19.4906L15.1083 21.7842L15.7968 17.9875L8.39185 17.6506L11.3928 20.6957Z" fill="#CC6228" stroke="#CC6228" stroke-width="0.25" stroke-linecap="round" stroke-linejoin="round"/><path d="M8.39209 17.6506L11.497 23.7019L11.393 20.6957L8.39209 17.6506Z" fill="#E27525" stroke="#E27525" stroke-width="0.25" stroke-linecap="round" stroke-linejoin="round"/><path d="M24.2412 20.6957L24.1243 23.7019L27.2292 17.6506L24.2412 20.6957Z" fill="#E27525" stroke="#E27525" stroke-width="0.25" stroke-linecap="round" stroke-linejoin="round"/><path d="M15.7972 17.9875L15.1086 21.7842L15.979 26.2675L16.1739 20.3588L15.7972 17.9875Z" fill="#E27525" stroke="#E27525" stroke-width="0.25" stroke-linecap="round" stroke-linejoin="round"/><path d="M19.8242 17.9875L19.4604 20.3459L19.6423 26.2675L20.5127 21.7842L19.8242 17.9875Z" fill="#E27525" stroke="#E27525" stroke-width="0.25" stroke-linecap="round" stroke-linejoin="round"/><path d="M20.5127 21.7843L19.6423 26.2676L20.2659 26.7082L24.1243 23.702L24.2412 20.6958L20.5127 21.7843Z" fill="#F5841F" stroke="#F5841F" stroke-width="0.25" stroke-linecap="round" stroke-linejoin="round"/><path d="M11.3928 20.6958L11.4968 23.702L15.3551 26.7082L15.9787 26.2676L15.1083 21.7843L11.3928 20.6958Z" fill="#F5841F" stroke="#F5841F" stroke-width="0.25" stroke-linecap="round" stroke-linejoin="round"/><path d="M20.5907 30.8417L20.6296 29.6107L20.2919 29.3256H15.3293L15.0045 29.6107L15.0305 30.8417L10.8733 28.8721L12.3283 30.0642L15.2773 32.0986H20.3308L23.2928 30.0642L24.7348 28.8721L20.5907 30.8417Z" fill="#C0AC9D" stroke="#C0AC9D" stroke-width="0.25" stroke-linecap="round" stroke-linejoin="round"/><path d="M20.2658 26.7081L19.6422 26.2676H15.9787L15.3552 26.7081L15.0044 29.6107L15.3292 29.3256H20.2918L20.6296 29.6107L20.2658 26.7081Z" fill="#161616" stroke="#161616" stroke-width="0.25" stroke-linecap="round" stroke-linejoin="round"/><path d="M33.5168 11.3532L34.6211 5.98873L32.9582 1L20.2659 10.3944L25.1505 14.5149L32.0488 16.5234L33.5688 14.7482L32.9063 14.2687L33.9585 13.3099L33.1531 12.6879L34.2054 11.8845L33.5168 11.3532Z" fill="#763E1A" stroke="#763E1A" stroke-width="0.25" stroke-linecap="round" stroke-linejoin="round"/><path d="M1 5.98873L2.11724 11.3532L1.40273 11.8845L2.468 12.6879L1.66255 13.3099L2.71483 14.2687L2.05228 14.7482L3.57225 16.5234L10.4706 14.5149L15.3552 10.3944L2.66287 1L1 5.98873Z" fill="#763E1A" stroke="#763E1A" stroke-width="0.25" stroke-linecap="round" stroke-linejoin="round"/><path d="M32.0489 16.5233L25.1506 14.5149L27.2292 17.6507L24.1243 23.7019L28.2295 23.6501H34.3613L32.0489 16.5233Z" fill="#F5841F" stroke="#F5841F" stroke-width="0.25" stroke-linecap="round" stroke-linejoin="round"/><path d="M10.4704 14.5149L3.57214 16.5233L1.27271 23.6501H7.39154L11.4967 23.7019L8.39186 17.6507L10.4704 14.5149Z" fill="#F5841F" stroke="#F5841F" stroke-width="0.25" stroke-linecap="round" stroke-linejoin="round"/><path d="M19.8241 17.9876L20.2658 10.3943L22.2664 4.99097H13.3545L15.3551 10.3943L15.7968 17.9876L15.9657 20.3718L15.9787 26.2676H19.6422L19.6552 20.3718L19.8241 17.9876Z" fill="#F5841F" stroke="#F5841F" stroke-width="0.25" stroke-linecap="round" stroke-linejoin="round"/></svg>
+				Metamask Wallet
+			</button>
+			<button class="btn-border">
+				<svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+					<path d="M20 40C31.0457 40 40 31.0457 40 20C40 8.9543 31.0457 0 20 0C8.9543 0 0 8.9543 0 20C0 31.0457 8.9543 40 20 40Z" fill="#1652F0"></path>
+					<path fill-rule="evenodd" clip-rule="evenodd" d="M5.45508 20.0006C5.45508 28.0338 11.9673 34.546 20.0006 34.546C28.0338 34.546 34.546 28.0338 34.546 20.0006C34.546 11.9673 28.0338 5.45508 20.0006 5.45508C11.9673 5.45508 5.45508 11.9673 5.45508 20.0006ZM17.3137 15.3145C16.2091 15.3145 15.3137 16.2099 15.3137 17.3145V22.6882C15.3137 23.7928 16.2091 24.6882 17.3137 24.6882H22.6874C23.792 24.6882 24.6874 23.7928 24.6874 22.6882V17.3145C24.6874 16.2099 23.792 15.3145 22.6874 15.3145H17.3137Z" fill="white"></path>
+				</svg>
+				Coinbase Wallet
+			</button>
+
+			<button class="btn-border">
+				<svg viewBox="0 0 40 25" xmlns="http://www.w3.org/2000/svg">
+					<path d="m8.19180572 4.83416816c6.52149658-6.38508884 17.09493158-6.38508884 23.61642788 0l.7848727.76845565c.3260748.31925442.3260748.83686816 0 1.15612272l-2.6848927 2.62873374c-.1630375.15962734-.4273733.15962734-.5904108 0l-1.0800779-1.05748639c-4.5495589-4.45439756-11.9258514-4.45439756-16.4754105 0l-1.1566741 1.13248068c-.1630376.15962721-.4273735.15962721-.5904108 0l-2.68489263-2.62873375c-.32607483-.31925456-.32607483-.83686829 0-1.15612272zm29.16903948 5.43649934 2.3895596 2.3395862c.3260732.319253.3260751.8368636.0000041 1.1561187l-10.7746894 10.5494845c-.3260726.3192568-.8547443.3192604-1.1808214.0000083-.0000013-.0000013-.0000029-.0000029-.0000042-.0000043l-7.6472191-7.4872762c-.0815187-.0798136-.2136867-.0798136-.2952053 0-.0000006.0000005-.000001.000001-.0000015.0000014l-7.6470562 7.4872708c-.3260715.3192576-.8547434.319263-1.1808215.0000116-.0000019-.0000018-.0000039-.0000037-.0000059-.0000058l-10.7749893-10.5496247c-.32607469-.3192544-.32607469-.8368682 0-1.1561226l2.38956395-2.3395823c.3260747-.31925446.85474652-.31925446 1.18082136 0l7.64733029 7.4873809c.0815188.0798136.2136866.0798136.2952054 0 .0000012-.0000012.0000023-.0000023.0000035-.0000032l7.6469471-7.4873777c.3260673-.31926181.8547392-.31927378 1.1808214-.0000267.0000046.0000045.0000091.000009.0000135.0000135l7.6473203 7.4873909c.0815186.0798135.2136866.0798135.2952053 0l7.6471967-7.4872433c.3260748-.31925458.8547465-.31925458 1.1808213 0z" fill="#3b99fc"></path>
+				</svg>
+				WalletConnect
+			</button>
+
+			<button class="btn-border">
+				<svg viewBox="0 0 114 166" xmlns="http://www.w3.org/2000/svg">
+					<g stroke="none" stroke-width="1" fill="none">
+						<path d="M17,51.453125 L17,40 C17,17.90861 34.90861,-1.0658141e-14 57,-1.0658141e-14 C79.09139,-1.0658141e-14 97,17.90861 97,40 L97,51.453125 L113.736328,51.453125 L113.736328,139.193359 L57.5,166 L0,139.193359 L0,51.453125 L17,51.453125 Z M37,51.453125 L77,51.453125 L77,40 L76.9678398,40 C76.3750564,29.406335 67.6617997,21 57,21 C46.3382003,21 37.6249436,29.406335 37.0321602,40 L37,40 L37,51.453125 Z M23,72 L23,125 L56.8681641,140.966797 L91,125 L91,72 L23,72 Z" fill="currentColor"></path>
+					</g>
+				</svg>
+				Trezor
+			</button>
+		</div>
+	</div>
+
+
+	<!-- scrool to top button -->
+	<button id="goTop" title="Scroll to top">
+		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 450"><path d="M168.5 164.2l148 146.8c4.7 4.7 4.7 12.3 0 17l-19.8 19.8c-4.7 4.7-12.3 4.7-17 0L160 229.3 40.3 347.8c-4.7 4.7-12.3 4.7-17 0L3.5 328c-4.7-4.7-4.7-12.3 0-17l148-146.8c4.7-4.7 12.3-4.7 17 0z"></path></svg>
+	</button>
+
+
+	<!-- js -->
+	<script src="./js/aos.js"></script>
+	<script src="./js/main.js" defer></script>
+</body>
+</html>
