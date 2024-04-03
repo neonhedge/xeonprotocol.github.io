@@ -578,6 +578,37 @@ svg.cityscape {
   visibility: visible;
   transition: all 1s ease-in-out !important;
 }
+@media (max-width: 650px) {
+  .useCase {
+    display: block !important;
+  }
+  .testnetWindow {
+    display: block !important;
+  }
+  .terminalStep {
+    padding: 0 !important;
+  }
+  .aboutTestnetHold {
+    display: block !important;
+    padding-inline: unset !important;
+  }
+  .buttonsHold {
+    padding-inline:2vw !important;
+  }
+  .jumpToTestnet .buttonsHold a {
+    padding: 0 !important;
+  }
+  .glow-container {
+    display: unset !important;
+  }
+  .code-container {
+    min-width: unset !important;
+  }
+  .case1::before, .case2::before, .case3::before {
+    left: unset;
+    right: 0 !important;
+  }
+}
 /*=========================================================================
     Tokens List
 ==========================================================================*/
